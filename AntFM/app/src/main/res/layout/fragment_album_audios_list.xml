@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true">
+
+    <RelativeLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+        <TextView
+            android:id="@+id/playAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:drawableStart="@drawable/audios_play"
+            android:drawablePadding="10dp"
+            android:textSize="@dimen/font_size_34px"
+            android:textColor="@color/textColorEight"
+            android:textStyle="bold"
+            android:layout_centerVertical="true"
+            android:text="播放全部"/>
+        <!--<TextView-->
+            <!--android:id="@+id/programNumber"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="@dimen/font_size_28px"-->
+            <!--android:textColor="@color/textColorEight"-->
+            <!--android:layout_toRightOf="@+id/a"-->
+            <!--android:layout_marginLeft="10dp"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:text="(99)"/>-->
+        <TextView
+            android:id="@+id/audioSort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:drawableStart="@drawable/audios_sort"
+            android:drawablePadding="3dp"
+            android:text="排序"
+            android:textColor="@color/textColorEight"
+            android:textSize="@dimen/font_size_30px" />
+
+        <TextView
+            android:id="@+id/audioSelect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/audioSort"
+            android:layout_marginEnd="25dp"
+            android:drawableStart="@drawable/audios_select"
+            android:drawablePadding="3dp"
+            android:textSize="@dimen/font_size_30px"
+            android:textColor="@color/textColorEight"
+            android:layout_centerVertical="true"
+            android:text="排序"/>
+
+    </RelativeLayout>
+
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/topBar"
+        android:visibility="visible">
+
+
+    </ListView>
+
+
+
+
+</RelativeLayout>

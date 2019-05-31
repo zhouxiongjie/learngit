@@ -1,0 +1,381 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:clickable="true"
+    android:orientation="vertical">
+
+
+    <com.shuangln.antfm.customview.TopTitleBar
+        android:id="@+id/activity_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        fresco:canBack="true" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divideColorOne" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/logo"
+                android:layout_width="145dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                fresco:actualImageScaleType="centerCrop"
+                fresco:placeholderImage="@drawable/article_placeholder"
+                fresco:placeholderImageScaleType="centerCrop"
+                fresco:roundedCornerRadius="4dp"
+                fresco:viewAspectRatio="1" />
+
+            <TextView
+                android:id="@+id/audioTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="10dp"
+                android:ellipsize="marquee"
+                android:lineSpacingExtra="5dp"
+                android:lineSpacingMultiplier="1.0"
+                android:singleLine="true"
+                android:textColor="@color/textColorTwo"
+                android:textSize="@dimen/font_size_34px"
+                tools:text="资讯文章内容中只有2张图资讯文章内" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/currentTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="20dp"
+                    android:text="00:00"
+                    android:textColor="@color/textColorSix"
+                    android:textSize="@dimen/font_size_26px" />
+
+                <TextView
+                    android:id="@+id/endTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="20dp"
+                    android:text="04:30"
+                    android:textColor="@color/textColorSix"
+                    android:textSize="@dimen/font_size_26px" />
+
+
+                <SeekBar
+                    android:id="@+id/seekBar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/currentTime"
+                    android:layout_toStartOf="@+id/endTime"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:maxHeight="5dp"
+                    android:minHeight="5dp"
+
+                    android:progressDrawable="@drawable/my_seekbar_style"
+                    android:splitTrack="false"
+                    android:thumb="@drawable/seekbar_thumb" />
+
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/actionBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+
+                <ImageButton
+                    android:id="@+id/play"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/ic_play" />
+
+                <ImageButton
+                    android:id="@+id/previous"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="30dp"
+                    android:layout_toLeftOf="@+id/play"
+                    android:background="@drawable/ic_back_off" />
+
+                <ImageButton
+                    android:id="@+id/next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="30dp"
+                    android:layout_toRightOf="@+id/play"
+                    android:background="@drawable/ic_fast_forward" />
+
+
+            </RelativeLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableTop="@drawable/ic_list"
+                        android:layout_centerInParent="true"
+                        android:text="列表"
+                        android:textSize="@dimen/font_size_26px"
+                        android:drawablePadding="5dp"
+                        android:textColor="@color/textColorTen"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/timer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:drawableTop="@drawable/ic_timing"
+                        android:text="定时"
+                        android:textSize="@dimen/font_size_26px"
+                        android:drawablePadding="5dp"
+                        android:textColor="@color/textColorTen"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/rate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:drawableTop="@drawable/ic_multiple"
+                        android:text="倍速"
+                        android:textSize="@dimen/font_size_26px"
+                        android:drawablePadding="5dp"
+                        android:textColor="@color/textColorTen"/>
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:background="@color/divideColorTwo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="所属专辑"
+                android:textColor="@color/black"
+                android:textSize="@dimen/font_size_36px" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/albumLogo"
+                    android:layout_width="@dimen/article_right_image_width"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    fresco:actualImageScaleType="centerCrop"
+                    fresco:placeholderImage="@drawable/article_placeholder"
+                    fresco:placeholderImageScaleType="centerCrop"
+                    fresco:roundedCornerRadius="4dp"
+                    fresco:viewAspectRatio="1" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@+id/albumLogo"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/albumTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:lineSpacingExtra="5dp"
+                        android:lineSpacingMultiplier="1.0"
+                        android:lines="2"
+                        android:textColor="@color/textColorTwo"
+                        android:textSize="@dimen/font_size_34px"
+                        tools:text="资讯文章内容中只有2张图片以下的，按左图右文的方式显示（左图为封面图）" />
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp">
+
+
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/head"
+                            android:layout_width="30dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            fresco:actualImageScaleType="centerCrop"
+                            fresco:placeholderImage="@drawable/head_placeholder"
+                            fresco:placeholderImageScaleType="centerCrop"
+                            fresco:roundAsCircle="true"
+                            fresco:viewAspectRatio="1" />
+
+                        <TextView
+                            android:id="@+id/subscribe"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="15dp"
+                            android:background="@drawable/subscribe_text_bg"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:padding="8dp"
+                            android:textColor="@color/textColorFive"
+                            android:textSize="@dimen/font_size_24px"
+                            tools:text="已订阅" />
+
+
+                    </RelativeLayout>
+
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:background="@color/divideColorTwo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="所属主播"
+                android:textColor="@color/black"
+                android:textSize="@dimen/font_size_36px" />
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/anchorHead"
+                    android:layout_width="35dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    fresco:actualImageScaleType="centerCrop"
+                    fresco:placeholderImage="@drawable/head_placeholder"
+                    fresco:placeholderImageScaleType="centerCrop"
+                    fresco:roundAsCircle="true"
+                    fresco:viewAspectRatio="1" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/anchorHead"
+                    android:layout_marginStart="20dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/anchorName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="李宁"
+                        android:textSize="@dimen/font_size_28px"
+                        android:textColor="@color/black"/>
+
+                    <TextView
+                        android:id="@+id/attentionNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:textSize="@dimen/font_size_24px"
+                        android:textColor="@color/black"
+                        android:text="关注量"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/attention"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="15dp"
+                    android:background="@drawable/subscribe_text_bg"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:padding="8dp"
+                    android:textColor="@color/textColorFive"
+                    android:textSize="@dimen/font_size_24px"
+                    tools:text="关注" />
+
+
+
+
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+</LinearLayout>
+
+

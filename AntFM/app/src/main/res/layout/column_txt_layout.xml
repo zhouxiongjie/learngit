@@ -1,0 +1,37 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+	android:background="@color/textColorOne"
+
+	android:clickable="true"
+	android:orientation="vertical">
+	<!--android:descendantFocusability="blocksDescendants"-->
+
+	<TextView
+		android:id="@+id/text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:paddingLeft="15dp"
+		android:paddingRight="15dp"
+		android:paddingTop="8dp"
+		android:paddingBottom="8dp"
+		android:layout_gravity="center_horizontal"
+		android:text="人民的名义"
+
+		/>
+	<com.facebook.drawee.view.SimpleDraweeView
+		android:id="@+id/indicator"
+		android:layout_width="20dp"
+		android:layout_height="2dp"
+		app:roundedCornerRadius="1dp"
+		app:placeholderImage="@color/white"
+		android:layout_marginTop="2dp"
+		android:layout_marginBottom="2dp"
+		android:layout_gravity="center_horizontal"
+        />
+	<!--android:clickable="false"-->
+	<!--android:focusable="false"-->
+
+</LinearLayout>

@@ -11,4 +11,8 @@
     <dimen name="font_size_20px">10sp</dimen>
     <dimen name="font_size_18px">9sp</dimen>
     <dimen name="font_size_16px">8sp</dimen>
+
+
+
+    <dimen name="article_right_image_width">113dp</dimen>
 </resources>

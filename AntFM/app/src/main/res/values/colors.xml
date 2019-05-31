@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorPrimary">#1CA0FF</color>
+    <color name="colorPrimaryDark">#1CA0FF</color>
     <color name="colorAccent">#D81B60</color>
 
 
@@ -158,12 +158,22 @@
     <color name="transparent2">#88000000</color><!-- 透明 -->
 
     <color name="divideColorOne">#ecebf0</color>
+    <color name="divideColorTwo">#EFEFEF</color>
 
     <color name="textColorOne">#1CA0FF</color>
-    <color name="textColorTwo">#A4A5A5</color>
-    <color name="textColorThree">#bcbcbc</color>
-    <color name="textColorFour">#a0a0a0</color>
-    <color name="textColorFive">#7d7d7d</color>
-    <color name="textColorSix">#ff4e00</color>
-    <color name="textColorSeven">#df2f31</color>
+    <color name="textColorTwo">#333333</color>
+    <color name="textColorThree">#A0A0A0</color>
+    <color name="textColorFour">#FF5F53</color>
+    <color name="textColorFive">#4A4A4A</color>
+    <color name="textColorSix">#9C9C9C</color>
+    <color name="textColorSeven">#999999</color>
+    <color name="textColorEight">#4D4D4D</color>
+    <color name="textColorNine">#666666</color>
+    <color name="textColorTen">#515151</color>
+
+
+
+
 </resources>
+
+

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp" >
+
+
+    <TextView
+        android:id="@+id/index"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1"
+        android:padding="10dp"
+        android:textColor="@color/textColorNine"
+        android:textSize="@dimen/font_size_36px"
+        android:layout_centerVertical="true"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/index"
+        android:layout_marginStart="20dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="人间有情，世间有爱"
+            android:textSize="@dimen/font_size_30px"
+            android:textColor="@color/textColorTwo"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+            <TextView
+                android:id="@+id/publishTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2019-03-27"
+                android:textSize="@dimen/font_size_24px"
+                android:textColor="@color/textColorThree"
+                />
+            <TextView
+                android:id="@+id/duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="时长 24:20"
+                android:textSize="@dimen/font_size_24px"
+                android:textColor="@color/textColorThree"
+                android:layout_marginStart="20dp"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

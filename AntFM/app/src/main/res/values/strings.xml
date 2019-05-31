@@ -7,4 +7,17 @@
     <string name="personalcenter">我的</string>
     <string name="divideLine">下划线</string>
 
+    <string name="special">专题</string>
+    <string name="city">同城</string>
+    <string name="subscribe">订阅</string>
+    <string name="has_subscribe">已订阅</string>
+
+    <string name="play_circle">单曲循环</string>
+    <string name="play_order">顺序播放</string>
+    <string name="play_random">随机播放</string>
+    <string name="play_loop">循环播放</string>
+    <string name="play_list">播放列表</string>
+
+    <string name="play_timer">定时关闭</string>
+
 </resources>

@@ -1,19 +1,26 @@
 package com.shuangln.antfm.activity;
 
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import com.jaeger.library.StatusBarUtil;
 import com.shuangln.antfm.R;
 import com.shuangln.antfm.fragment.DiscoverFragment;
 import com.shuangln.antfm.fragment.IndexFragment;
 import com.shuangln.antfm.fragment.PersonalCenterFragment;
 import com.shuangln.antfm.fragment.RecommendFragment;
+import com.shuangln.antfm.service.AudioPlayerService;
 import com.shuangln.antfm.utils.StatusBarManager;
 
 import butterknife.BindView;
@@ -49,11 +56,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //StatusBarUtil.setTransparent(this);
+        StatusBarUtil.setTransparent(this);
         StatusBarManager.setImmersiveStatusBar(this, true);
         ButterKnife.bind(this);
+        Intent it = new Intent(this, AudioPlayerService.class);
+        startService(it);
 
         showFragment(0);
+
     }
 
 
@@ -172,5 +182,13 @@ public class MainActivity extends AppCompatActivity {
             hideFragments(transaction);
             transaction.commit();
         }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        Intent it = new Intent(this, AudioPlayerService.class);
+        stopService(it);
+        super.onDestroy();
     }
 }

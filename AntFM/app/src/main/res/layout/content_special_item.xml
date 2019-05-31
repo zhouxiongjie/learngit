@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/logo"
+        android:layout_width="@dimen/article_right_image_width"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        fresco:roundedCornerRadius="4dp"
+        fresco:actualImageScaleType="centerCrop"
+        fresco:placeholderImage="@drawable/article_placeholder"
+        fresco:placeholderImageScaleType="centerCrop"
+        fresco:viewAspectRatio="1.5" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="5dp"
+        android:layout_toStartOf="@+id/logo"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:lineSpacingExtra="5dp"
+            android:lineSpacingMultiplier="1.0"
+            android:lines="2"
+            android:textColor="@color/textColorTwo"
+            android:textSize="@dimen/font_size_34px"
+            tools:text="资讯文章内容中只有2张图片以下的，按左图右文的方式显示（左图为封面图）" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/special_text_bg"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/special"
+                android:textColor="@color/textColorFour"
+                android:textSize="@dimen/font_size_18px" />
+
+            <TextView
+                android:id="@+id/merchant"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginEnd="15dp"
+                android:textColor="@color/textColorThree"
+                android:textSize="@dimen/font_size_24px"
+                tools:text="浏阳电台" />
+
+            <TextView
+                android:id="@+id/commentNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginEnd="15dp"
+                android:textColor="@color/textColorThree"
+                android:textSize="@dimen/font_size_24px"
+                tools:text="52评论" />
+
+            <TextView
+                android:id="@+id/publishTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginEnd="15dp"
+                android:textColor="@color/textColorThree"
+                android:textSize="@dimen/font_size_24px"
+                tools:text="5小时前" />
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>
+
+
+

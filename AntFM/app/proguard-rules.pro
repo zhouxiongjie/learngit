@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep class com.alivc.player.**{*;}
+-keep class com.aliyun.clientinforeport.**{*;}
+-keep class com.aliyun.vodplayer.**{*;}
+-dontwarn com.alivc.player.**

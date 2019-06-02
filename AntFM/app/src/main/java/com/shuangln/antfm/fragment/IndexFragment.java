@@ -1,9 +1,13 @@
 package com.shuangln.antfm.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,6 +36,7 @@ import com.shuangln.antfm.entity.ColumnInfo;
 import com.shuangln.antfm.entity.LocalService;
 import com.shuangln.antfm.network.OkHttpCallback;
 import com.shuangln.antfm.network.OkHttpUtils;
+import com.shuangln.antfm.utils.FloatWindowUtil;
 import com.shuangln.antfm.utils.ServerInfo;
 
 import java.io.IOException;
@@ -44,6 +49,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import cn.jake.share.frdialog.dialog.FRDialog;
+import cn.jake.share.frdialog.interfaces.FRDialogClickListener;
 import okhttp3.Call;
 import okhttp3.Response;
 
@@ -53,6 +60,8 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     public static final int MSG_GET_AHCHORS = 0x1;
     public static final int MSG_GET_SERVICE = 0x2;
     public static final int MSG_GET_CITY_CONTNET = 0x3;
+
+    public static final int REQUEST_PERMISSION_CODE = 0x0110;
     @BindView(R.id.city)
     TextView city;
     @BindView(R.id.temperature)
@@ -117,6 +126,38 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                 bannerView.setData(banners);
             }
         }, 1000);
+
+        temperature.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FloatWindowUtil.getInstance().addOnPermissionListener(new FloatWindowUtil.OnPermissionListener() {
+                    @Override
+                    public void showPermissionDialog() {
+                        FRDialog dialog = new FRDialog.MDBuilder(getContext())
+                                .setTitle("悬浮窗权限")
+                                .setMessage("您的手机没有授予悬浮窗权限，请开启后再试")
+                                .setPositiveContentAndListener("现在去开启", new FRDialogClickListener() {
+                                    @Override
+                                    public boolean onDialogClick(View view) {
+                                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                                            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                                            intent.setData(Uri.parse("package:" + getContext().getPackageName()));
+                                            startActivityForResult(intent, REQUEST_PERMISSION_CODE);
+                                        }
+                                        return true;
+                                    }
+                                }).setNegativeContentAndListener("暂不开启", new FRDialogClickListener() {
+                                    @Override
+                                    public boolean onDialogClick(View view) {
+                                        return true;
+                                    }
+                                }).create();
+                        dialog.show();
+                    }
+                });
+                FloatWindowUtil.getInstance().showFloatWindow(getContext());
+            }
+        });
 
         getCityAnchors();
         getCityService();
@@ -372,5 +413,24 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                 break;
         }
         return false;
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_PERMISSION_CODE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                if(FloatWindowUtil.checkFloatWindowPermission(getContext())){
+                    FloatWindowUtil.getInstance().showFloatWindow(getContext());
+                }else{
+                    //不显示悬浮窗 并提示
+                }
+
+
+
+            }
+        }
+
     }
 }

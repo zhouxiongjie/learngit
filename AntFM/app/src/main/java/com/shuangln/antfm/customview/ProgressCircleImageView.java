@@ -30,6 +30,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.CountDownTimer;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
 import android.support.v7.widget.AppCompatImageView;
@@ -77,11 +78,17 @@ public class ProgressCircleImageView extends AppCompatImageView {
     private boolean mBorderOverlay;
     private boolean mDisableCircularTransformation;
 
+    private PlayCountDownTimer mTimer;               //计时器
+    private float mProgress;                        //录制视频的进度
+
     public ProgressCircleImageView(Context context) {
         super(context);
 
         init();
     }
+
+
+
 
     public ProgressCircleImageView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -102,6 +109,19 @@ public class ProgressCircleImageView extends AppCompatImageView {
         init();
     }
 
+
+    public void setTimer(long millisInFuture, long countDownInterval){
+        if(mTimer!=null){
+            mTimer.cancel();
+        }
+        mTimer=new PlayCountDownTimer(millisInFuture,countDownInterval);
+
+    }
+
+    public PlayCountDownTimer getTimer(){
+        return mTimer;
+    }
+
     private void init() {
         super.setScaleType(SCALE_TYPE);
         mReady = true;
@@ -110,6 +130,7 @@ public class ProgressCircleImageView extends AppCompatImageView {
             setup();
             mSetupPending = false;
         }
+
     }
 
     @Override
@@ -147,7 +168,9 @@ public class ProgressCircleImageView extends AppCompatImageView {
         }
         canvas.drawCircle(mDrawableRect.centerX(), mDrawableRect.centerY(), mDrawableRadius, mBitmapPaint);
         if (mBorderWidth > 0) {
-            canvas.drawCircle(mBorderRect.centerX(), mBorderRect.centerY(), mBorderRadius, mBorderPaint);
+
+            canvas.drawArc(mBorderRect, -90, mProgress, false, mBorderPaint);
+            //canvas.drawCircle(mBorderRect.centerX(), mBorderRect.centerY(), mBorderRadius, mBorderPaint);
         }
     }
 
@@ -395,16 +418,19 @@ public class ProgressCircleImageView extends AppCompatImageView {
 
         mDrawableRect.set(mBorderRect);
         if (!mBorderOverlay && mBorderWidth > 0) {
-            mDrawableRect.inset(mBorderWidth - 1.0f, mBorderWidth - 1.0f);
+            mDrawableRect.inset(mBorderWidth - 2.0f, mBorderWidth - 2.0f);
         }
         mDrawableRadius = Math.min(mDrawableRect.height() / 2.0f, mDrawableRect.width() / 2.0f);
-
+        mBorderRect.inset(mBorderWidth/2,mBorderWidth/2);
         applyColorFilter();
         updateShaderMatrix();
         invalidate();
     }
 
     private RectF calculateBounds() {
+        int width=getWidth();
+        int padl=getPaddingLeft();
+        int padr=getPaddingRight();
         int availableWidth  = getWidth() - getPaddingLeft() - getPaddingRight();
         int availableHeight = getHeight() - getPaddingTop() - getPaddingBottom();
 
@@ -435,6 +461,33 @@ public class ProgressCircleImageView extends AppCompatImageView {
         mShaderMatrix.postTranslate((int) (dx + 0.5f) + mDrawableRect.left, (int) (dy + 0.5f) + mDrawableRect.top);
 
         mBitmapShader.setLocalMatrix(mShaderMatrix);
+    }
+
+
+
+    //录制视频计时器
+    public final class PlayCountDownTimer extends CountDownTimer {
+        private long mDuration;
+        public PlayCountDownTimer(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+            mDuration=millisInFuture;
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            updateProgress(millisUntilFinished);
+        }
+
+        @Override
+        public void onFinish() {
+            updateProgress(0);
+        }
+
+        //更新进度条
+        private void updateProgress(long millisUntilFinished) {
+            mProgress = 360f - millisUntilFinished / (float) mDuration * 360f;
+            invalidate();
+        }
     }
 
 }

@@ -1,14 +1,14 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical">
+    android:background="@color/white">
 
-    <com.shuangln.antfm.customview.TopTitleBar
+    <com.shuangling.software.customview.TopTitleBar
         android:id="@+id/activity_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         fresco:canBack="true"
         fresco:titleText="当前城市-长沙"/>
 
@@ -17,7 +17,8 @@
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        fresco:srlEnableAutoLoadMore="true">
+        fresco:srlEnableAutoLoadMore="true"
+        android:layout_below="@+id/activity_title">
 
         <com.scwang.smartrefresh.layout.header.ClassicsHeader
             android:layout_width="match_parent"
@@ -76,12 +77,15 @@
 
 
 
-    <com.shuangln.antfm.customview.SideBar
+    <com.shuangling.software.customview.SideBar
         android:id="@+id/sidebar"
         android:layout_width="25dp"
         android:layout_height="match_parent"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="100dp"
         android:layout_alignParentRight="true"
         android:background="@android:color/transparent"/>
+
 
     <TextView
         android:id="@+id/letters"
@@ -95,7 +99,7 @@
         android:text="A"
         android:visibility="gone" />
 
-</LinearLayout>
+</RelativeLayout>
 
 
 

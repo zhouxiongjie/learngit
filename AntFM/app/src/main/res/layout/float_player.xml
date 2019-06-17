@@ -8,7 +8,7 @@
     android:padding="5dp"
     android:background="@drawable/float_player_bg">
 
-    <com.shuangln.antfm.customview.ProgressCircleImageView
+    <com.shuangling.software.customview.ProgressCircleImageView
         android:id="@+id/progressImageView"
         android:layout_width="30dp"
         android:layout_height="30dp"
@@ -27,7 +27,7 @@
         android:orientation="horizontal"
         android:visibility="visible">
         <ImageView
-            android:layout_width="2dp"
+            android:layout_width="1dp"
             android:layout_height="30dp"
             android:layout_marginStart="10dp"
             android:background="@color/divideColorTwo"/>
@@ -35,30 +35,34 @@
             android:id="@+id/play"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:padding="5dp"
+            android:src="@drawable/float_play_icon"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:background="@drawable/float_play_icon"/>
+            />
         <ImageView
-            android:layout_width="2dp"
+            android:layout_width="1dp"
             android:layout_height="30dp"
             android:background="@color/divideColorTwo"/>
         <ImageView
             android:id="@+id/next"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:padding="5dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:background="@drawable/float_next_icon"/>
+            android:src="@drawable/float_next_icon"/>
         <ImageView
-            android:layout_width="2dp"
+            android:layout_width="1dp"
             android:layout_height="30dp"
             android:background="@color/divideColorTwo"/>
         <ImageView
             android:id="@+id/close"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:padding="5dp"
             android:layout_marginStart="10dp"
-            android:background="@drawable/float_close_icon"/>
+            android:src="@drawable/float_close_icon"/>
 
     </LinearLayout>
 

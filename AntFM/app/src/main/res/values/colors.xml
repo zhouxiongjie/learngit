@@ -5,6 +5,13 @@
     <color name="colorAccent">#D81B60</color>
 
 
+    <color name="themeBlue">#158CFF</color>
+    <color name="themePurple">#7A67FF</color>
+    <color name="themeRed">#FF5B56</color>
+    <color name="themeGreen">#1EC392</color>
+    <color name="themeOrange">#FF7548</color>
+
+
 <!--基础颜色-->
     <color name="white">#ffffff</color><!--白色 -->
     <color name="ivory">#fffff0</color><!--象牙色 -->
@@ -170,6 +177,8 @@
     <color name="textColorEight">#4D4D4D</color>
     <color name="textColorNine">#666666</color>
     <color name="textColorTen">#515151</color>
+    <color name="textColorEleven">#C7C7CC</color>
+
 
 
 

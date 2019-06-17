@@ -9,29 +9,25 @@
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/textColorOne"
+        android:background="?attr/themeColor"
         android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/search"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/search_box_bg"
-                android:drawableLeft="@drawable/ic_search"
-                android:drawablePadding="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+        <TextView
+            android:id="@+id/search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/search_box_bg"
+            android:drawableLeft="@drawable/ic_search"
+            android:drawablePadding="10dp"
 
-                android:padding="10dp"
-                android:text="请输入搜索内容"
-                android:textColor="#FFFFFF"
-                android:textSize="@dimen/font_size_24px"/>
-
-
-
-
+            android:padding="10dp"
+            android:text="请输入搜索内容"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/font_size_24px" />
 
 
         <HorizontalScrollView
@@ -49,17 +45,14 @@
         </HorizontalScrollView>
 
 
-
-
-
     </LinearLayout>
 
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
-        android:layout_below="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_below="@+id/topBar" />
 
 
 </RelativeLayout>

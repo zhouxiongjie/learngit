@@ -29,59 +29,143 @@
             android:paddingBottom="5dp"
             android:orientation="horizontal" >
 
-            <TextView
-                android:id="@+id/index"
+            <LinearLayout
+                android:id="@+id/indexLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:drawableTop="@drawable/main_index_selector"
-                android:drawablePadding="5dp"
-                android:text="@string/index"
-                android:textSize="@dimen/font_size_20px"
-                android:textColor="@color/main_bottom_text_selector"
-                android:textStyle="bold"
-                />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/recommend"
+                <com.shuangling.software.customview.FontIconView
+                    android:id="@+id/indexIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="&#xe614;"
+                    android:textColor="@color/main_bottom_text_selector"
+                    android:textSize="@dimen/font_size_50px"/>
+
+
+
+                <TextView
+                    android:id="@+id/index"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/index"
+                    android:textSize="@dimen/font_size_20px"
+                    android:textColor="@color/main_bottom_text_selector"
+                    android:textStyle="bold"
+                    />
+
+            </LinearLayout>
+
+
+
+
+            <LinearLayout
+                android:id="@+id/recommendLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:drawableTop="@drawable/main_recommend_selector"
-                android:drawablePadding="5dp"
-                android:text="@string/recommend"
-                android:textSize="@dimen/font_size_20px"
-                android:textColor="@color/main_bottom_text_selector"
-                android:textStyle="bold"/>
+                android:orientation="vertical">
+
+                <com.shuangling.software.customview.FontIconView
+                    android:id="@+id/recommendIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="&#xe635;"
+                    android:textColor="@color/main_bottom_text_selector"
+                    android:textSize="@dimen/font_size_50px" />
 
 
-            <TextView
-                android:id="@+id/discover"
+
+                <TextView
+                    android:id="@+id/recommend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/recommend"
+                    android:textSize="@dimen/font_size_20px"
+                    android:textColor="@color/main_bottom_text_selector"
+                    android:textStyle="bold"
+                    />
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/discoverLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:drawableTop="@drawable/main_discover_selector"
-                android:drawablePadding="5dp"
-                android:text="@string/discover"
-                android:textSize="@dimen/font_size_20px"
-                android:textColor="@color/main_bottom_text_selector"
-                android:textStyle="bold"/>
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/personalCenter"
+                <com.shuangling.software.customview.FontIconView
+                    android:id="@+id/discoverIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="&#xe60b;"
+                    android:textColor="@color/main_bottom_text_selector"
+                    android:textSize="@dimen/font_size_50px"/>
+
+
+
+                <TextView
+                    android:id="@+id/discover"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/discover"
+                    android:textSize="@dimen/font_size_20px"
+                    android:textColor="@color/main_bottom_text_selector"
+                    android:textStyle="bold"
+                    />
+
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/personalCenterLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:drawableTop="@drawable/main_personalcenter_selector"
-                android:drawablePadding="5dp"
-                android:text="@string/personalcenter"
-                android:textSize="@dimen/font_size_20px"
-                android:textColor="@color/main_bottom_text_selector"
-                android:textStyle="bold"/>
+                android:orientation="vertical">
+
+                <com.shuangling.software.customview.FontIconView
+                    android:id="@+id/personalCenterIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="&#xe61e;"
+                    android:textColor="@color/main_bottom_text_selector"
+                    android:textSize="@dimen/font_size_50px" />
+
+
+
+                <TextView
+                    android:id="@+id/personalCenter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/personal_center"
+                    android:textSize="@dimen/font_size_20px"
+                    android:textColor="@color/main_bottom_text_selector"
+                    android:textStyle="bold"
+                    />
+
+
+
+            </LinearLayout>
 
 
         </LinearLayout>

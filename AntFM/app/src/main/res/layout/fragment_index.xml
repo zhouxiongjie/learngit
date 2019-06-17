@@ -4,10 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/backgroundImage"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:background="@drawable/index_top_bg" />
+        ptr:actualImageScaleType="fitXY"
+        ptr:placeholderImage="@drawable/index_top_bg"
+        ptr:placeholderImageScaleType="fitXY"
+        ptr:failureImage="@drawable/index_top_bg"
+        ptr:failureImageScaleType="fitXY"
+        android:src="@drawable/index_top_bg"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -113,7 +120,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <com.shuangln.antfm.customview.BannerView
+                    <com.shuangling.software.customview.BannerView
                         android:id="@+id/bannerView"
                         android:layout_width="match_parent"
                         android:layout_height="180dp"
@@ -135,7 +142,7 @@
                         <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-
+                            android:background="@color/divideColorTwo"
                             android:padding="10dp">
 
                             <TextView
@@ -148,32 +155,45 @@
                                 android:textSize="@dimen/font_size_36px"
                                 android:textStyle="bold"/>
 
-                            <TextView
-                                android:id="@+id/moreAnchors"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:drawableRight="@drawable/ic_right"
-                                android:drawablePadding="10dp"
-                                android:text="更多"
-                                android:textColor="@color/textColorSeven"
-                                android:textSize="@dimen/font_size_26px" />
+                            <!--<TextView-->
+                                <!--android:id="@+id/moreAnchors"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:layout_alignParentEnd="true"-->
+                                <!--android:layout_centerVertical="true"-->
+                                <!--android:drawableRight="@drawable/ic_right"-->
+                                <!--android:drawablePadding="10dp"-->
+                                <!--android:text="更多"-->
+                                <!--android:textColor="@color/textColorSeven"-->
+                                <!--android:textSize="@dimen/font_size_26px" />-->
                         </RelativeLayout>
 
-                        <com.shuangln.antfm.customview.MyGridView
-                            android:id="@+id/anchors"
+                        <!--<com.shuangling.software.customview.MyGridView-->
+                            <!--android:id="@+id/anchors"-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:cacheColorHint="@android:color/transparent"-->
+                            <!--android:gravity="center"-->
+                            <!--android:horizontalSpacing="10dp"-->
+                            <!--android:listSelector="@android:color/transparent"-->
+                            <!--android:numColumns="4"-->
+                            <!--android:stretchMode="columnWidth"-->
+                            <!--android:verticalSpacing="10dp"-->
+                            <!--android:layout_marginTop="10dp"-->
+                            <!--android:layout_marginBottom="10dp"/>-->
+
+                        <HorizontalScrollView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:cacheColorHint="@android:color/transparent"
-                            android:gravity="center"
-                            android:horizontalSpacing="10dp"
-                            android:listSelector="@android:color/transparent"
-                            android:numColumns="4"
-                            android:stretchMode="columnWidth"
-                            android:verticalSpacing="10dp"
-                            android:layout_marginTop="10dp"
-                            android:layout_marginBottom="10dp"/>
+                            android:background="@color/divideColorTwo"
+                            android:scrollbars="none">
+                            <LinearLayout
+                                android:id="@+id/anchorsLayout"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal" />
+
+                        </HorizontalScrollView>
 
                     </LinearLayout>
 
@@ -219,7 +239,7 @@
                                 android:textSize="@dimen/font_size_26px" />
                         </RelativeLayout>
 
-                        <com.shuangln.antfm.customview.MyGridView
+                        <com.shuangling.software.customview.MyGridView
                             android:id="@+id/service"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

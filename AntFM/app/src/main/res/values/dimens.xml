@@ -1,5 +1,6 @@
 <resources>
 
+    <dimen name="font_size_50px">25sp</dimen>
     <dimen name="font_size_36px">18sp</dimen>
     <dimen name="font_size_34px">17sp</dimen>
     <dimen name="font_size_32px">16sp</dimen>

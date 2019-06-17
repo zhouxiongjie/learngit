@@ -1,18 +1,45 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'org.greenrobot.greendao'
+apply from: '../MobSDK.gradle'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.shuangln.antfm"
+        applicationId "com.shuangling.software"
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
+
+
+
+    signingConfigs {
+        debug {
+            storeFile file("release_lingting.keystore")
+            storePassword "123456"
+            keyAlias "xiongjie"
+            keyPassword "123456"
+        }
         release {
+            storeFile file("release_lingting.keystore")
+            storePassword "123456"
+            keyAlias "xiongjie"
+            keyPassword "123456"
+        }
+    }
+
+    buildTypes {
+
+        debug {
+            signingConfig signingConfigs.debug
             minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -23,6 +50,14 @@ android {
             dirs 'libs'
         }
     }
+}
+
+
+
+greendao {
+    schemaVersion 1
+    daoPackage 'com.shuangling.software.dao'
+    targetGenDir 'src/main/java'
 }
 
 
@@ -74,5 +109,15 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'com.mylhyl:circleDialog:2.6.7'
     implementation 'com.jack.frdialog:FRDialog:1.0.3'
+    implementation 'com.hjq:toast:5.0'
+
+    implementation 'com.amap.api:3dmap:6.4.0'
+    implementation 'com.amap.api:location:4.2.0'
+    implementation 'com.amap.api:search:6.1.0'
+    implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
+    implementation 'io.reactivex.rxjava2:rxjava:2.0.0'
+    implementation 'org.greenrobot:greendao:3.2.2'
+    implementation 'com.airbnb.android:lottie:2.5.4'
+
 
 }

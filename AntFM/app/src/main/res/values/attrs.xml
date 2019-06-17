@@ -2,6 +2,7 @@
 <resources>
 
 
+    <attr name="themeColor" format="reference"/>
 
     <declare-styleable name="TopTitleBar">
         <!-- 标题文案 -->
@@ -24,6 +25,9 @@
         <attr name="civ_fill_color" format="color" />
     </declare-styleable>
 
-
+    <declare-styleable name="LineWrapLayout">
+        <attr name="magin" format="integer" />
+        <attr name="itemBg" format="reference"/>
+    </declare-styleable>
 
 </resources>

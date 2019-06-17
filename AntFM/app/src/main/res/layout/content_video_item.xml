@@ -9,6 +9,17 @@
     android:padding="10dp">
 
     <TextView
+        android:id="@+id/excellent"
+        android:layout_marginBottom="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/excellent_recommend"
+        android:textColor="@color/textColorTwo"
+        android:textSize="@dimen/font_size_36px"
+        android:textStyle="bold"
+        android:visibility="visible"/>
+
+    <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

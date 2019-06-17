@@ -1,0 +1,277 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+
+    <RelativeLayout
+        android:id="@+id/top"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        android:background="?attr/themeColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/personalcenter_bg"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="20dp"
+            android:text="个人中心"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_size_50px"
+            android:textStyle="bold" />
+
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top">
+
+
+        <RelativeLayout
+            android:id="@+id/recentListen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:padding="20dp">
+
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/historyIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="&#xe608;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_50px" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/historyIcon"
+                android:layout_marginStart="10dp"
+                android:text="历史记录"
+                android:textColor="@color/textColorTwo"
+                android:textSize="@dimen/font_size_28px" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_right" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/collect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/collectIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="&#xe62e;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_50px" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="我的收藏"
+                android:layout_toEndOf="@+id/collectIcon"
+                android:layout_marginStart="10dp"
+                android:textColor="@color/textColorTwo"
+                android:textSize="@dimen/font_size_28px" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_right" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/subscribe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/subscribeIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="&#xe62e;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_50px" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/subscribeIcon"
+                android:layout_marginStart="10dp"
+                android:text="我的订阅"
+                android:textColor="@color/textColorTwo"
+                android:textSize="@dimen/font_size_28px" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_right" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/accountAndSecurity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/accountAndSecurityIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="&#xe62e;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_50px" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/accountAndSecurityIcon"
+                android:layout_marginStart="10dp"
+                android:text="账号与安全"
+                android:textColor="@color/textColorTwo"
+                android:textSize="@dimen/font_size_28px" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_right" />
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/userLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/personal_center_user_bg"
+        android:elevation="2dp"
+        android:padding="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/headBg"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            app:actualImageScaleType="centerCrop"
+            app:placeholderImage="?attr/themeColor"
+            app:placeholderImageScaleType="centerCrop"
+            app:failureImage="?attr/themeColor"
+            app:failureImageScaleType="centerCrop"
+            app:viewAspectRatio="1"
+            app:roundAsCircle="true"
+            app:roundingBorderWidth="0dp"
+            app:roundingBorderColor="@color/white" />
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/head"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            app:actualImageScaleType="centerCrop"
+            app:placeholderImage="@drawable/ic_user4"
+            app:placeholderImageScaleType="centerCrop"
+            app:failureImage="@drawable/ic_user4"
+            app:failureImageScaleType="centerCrop"
+            app:viewAspectRatio="1"
+            app:roundAsCircle="true"
+            app:roundingBorderWidth="0dp"
+            app:roundingBorderColor="@color/white"
+            android:visibility="visible"/>
+
+        <LinearLayout
+            android:id="@+id/loginLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/head"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <TextView
+                android:id="@+id/userName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/font_size_30px"
+                android:textColor="@color/textColorTwo"
+                android:text="今晚打老虎"/>
+            <TextView
+                android:id="@+id/attentionNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textSize="@dimen/font_size_28px"
+                android:textColor="@color/textColorEight"
+                android:text="关注 :25"/>
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/font_size_30px"
+            android:textColor="@color/textColorTwo"
+            android:layout_toEndOf="@+id/head"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:text="点击登录"/>
+
+    </RelativeLayout>
+
+</android.support.constraint.ConstraintLayout>

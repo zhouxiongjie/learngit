@@ -178,9 +178,11 @@
     <color name="textColorNine">#666666</color>
     <color name="textColorTen">#515151</color>
     <color name="textColorEleven">#C7C7CC</color>
+    <color name="textColorTwelve">#B2B2B2</color>
 
 
-
+    <color name="dark_skeleton_color">#24000000</color>
+    <color name="light_skeleton_color">#0f000000</color>
 
 
 </resources>

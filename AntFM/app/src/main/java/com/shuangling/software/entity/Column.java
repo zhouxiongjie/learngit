@@ -28,7 +28,7 @@ public class Column implements Serializable {
     private int parent_id;
     private List<Column> children;
 
-    private List<ColumnContent> content;
+    //private List<ColumnContent> content;
 
 
 
@@ -104,11 +104,12 @@ public class Column implements Serializable {
         this.children = children;
     }
 
-    public List<ColumnContent> getContent() {
-        return content;
-    }
+//    public List<ColumnContent> getContent() {
+//        return content;
+//    }
+//
+//    public void setContent(List<ColumnContent> content) {
+//        this.content = content;
+//    }
 
-    public void setContent(List<ColumnContent> content) {
-        this.content = content;
-    }
 }

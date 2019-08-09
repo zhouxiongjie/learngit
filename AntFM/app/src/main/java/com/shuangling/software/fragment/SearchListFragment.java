@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -20,24 +22,22 @@ import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.shuangling.software.R;
-import com.shuangling.software.adapter.ColumnContentAdapter;
 import com.shuangling.software.adapter.SearchListAdapter;
-import com.shuangling.software.entity.City;
-import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.SearchResult;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ServerInfo;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import okhttp3.Call;
-import okhttp3.Response;
 
 
 public class SearchListFragment extends Fragment implements Handler.Callback {
@@ -49,13 +49,15 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
     Unbinder unbinder;
+    @BindView(R.id.noData)
+    LinearLayout noData;
 
     private Handler mHandler;
     private String mKeyword;
     private int mSearchType;
     private int mCurrentPage = 1;
 
-    private List<SearchResult> mSearchList=new ArrayList<>();
+    private List<SearchResult> mSearchList = new ArrayList<>();
     private SearchListAdapter mAdapter;
 
     @Override
@@ -65,7 +67,7 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
         Bundle args = getArguments();
         mKeyword = args.getString("keyword");
         mSearchType = args.getInt("search_type");
-        mHandler=new Handler(this);
+        mHandler = new Handler(this);
 
     }
 
@@ -76,7 +78,9 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
         unbinder = ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         //recyclerView.addItemDecoration(new MyItemDecoration());
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+        DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+        divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
+        recyclerView.addItemDecoration(divider);
         refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
         ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
         refreshLayout.setEnableLoadMore(false);
@@ -84,15 +88,19 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
+                mCurrentPage = 1;
+                mSearchList.clear();
                 getContent();
             }
         });
         refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore(RefreshLayout refreshLayout) {
+                mCurrentPage++;
+                getContent();
             }
         });
-
+        getContent();
         return view;
 
     }
@@ -100,7 +108,6 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
 
     @Override
     public void onResume() {
-        getContent();
         super.onResume();
     }
 
@@ -111,21 +118,21 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
         params.put("search_type", "" + mSearchType);
 
         params.put("query", mKeyword);
-        params.put("page", ""+mCurrentPage);
+        params.put("page", "" + mCurrentPage);
 
 
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
-                if(refreshLayout.isRefreshing()){
-                    refreshLayout.finishRefresh();
+                if (refreshLayout.isLoading()) {
+                    refreshLayout.finishLoadMore();
                 }
 
                 Message msg = Message.obtain();
                 msg.what = MSG_UPDATE_LIST;
-                msg.obj = response.body().string();
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
             }
@@ -133,8 +140,8 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
             @Override
             public void onFailure(Call call, IOException exception) {
 
-                if(refreshLayout.isRefreshing()){
-                    refreshLayout.finishRefresh();
+                if (refreshLayout.isLoading()) {
+                    refreshLayout.finishLoadMore();
                 }
             }
         });
@@ -151,21 +158,28 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
 
     @Override
     public boolean handleMessage(Message msg) {
-        switch (msg.what){
+        switch (msg.what) {
             case MSG_UPDATE_LIST:
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
-                        int pages=jsonObject.getJSONObject("data").getInteger("pages");
-                        if(pages==mCurrentPage){
+                        int pages = jsonObject.getJSONObject("data").getInteger("pages");
+                        if (pages == mCurrentPage) {
                             refreshLayout.setEnableLoadMore(false);
-                        }else {
+                        } else {
                             refreshLayout.setEnableLoadMore(true);
                         }
 
                         mSearchList.addAll(JSONArray.parseArray(jsonObject.getJSONObject("data").getJSONArray("list").toJSONString(), SearchResult.class));
+
+                        if (mSearchList.size() == 0) {
+                            noData.setVisibility(View.VISIBLE);
+                        } else {
+                            noData.setVisibility(View.GONE);
+                        }
+
                         if (mAdapter == null) {
                             mAdapter = new SearchListAdapter(getContext(), mSearchList);
                             mAdapter.setOnItemClickListener(new SearchListAdapter.OnItemClickListener() {
@@ -177,7 +191,7 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
                                 }
 
                                 @Override
-                                public void onItemClick( int pos) {
+                                public void onItemClick(int pos) {
 
                                 }
                             });

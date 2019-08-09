@@ -49,7 +49,7 @@ public class User {
     private int id;
     private String username;
     private int username_checked;
-    private long nickname;
+    private String nickname;
     private int password_checked;
     private String email;
     private int email_checked;
@@ -85,11 +85,11 @@ public class User {
         this.username_checked = username_checked;
     }
 
-    public long getNickname() {
+    public String getNickname() {
         return nickname;
     }
 
-    public void setNickname(long nickname) {
+    public void setNickname(String nickname) {
         this.nickname = nickname;
     }
 

@@ -27,21 +27,33 @@
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
-
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/application_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/AppThemeRed"
-        tools:replace="android:icon, android:label,roundIcon">
+        tools:replace="android:icon,android:theme,android:label,android:allowBackup">
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.shuangling.software.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/photo_path">
+            </meta-data>
+        </provider>
+
 
         <activity
             android:name=".activity.MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustPan|stateHidden"
             android:screenOrientation="portrait" >
 
         </activity>
@@ -49,12 +61,18 @@
         <activity
             android:name=".activity.StartupActivity"
             android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name=".activity.GuidePageActivity"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
 
         <activity
             android:name=".activity.AlbumDetailActivity"
@@ -71,10 +89,19 @@
         </activity>
         <activity
             android:name=".activity.AudioDetailActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name=".activity.SingleAudioDetailActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" >
+        </activity>
+
+
+        <activity
             android:name=".activity.LoginActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait" >
         </activity>
 
@@ -117,12 +144,125 @@
             android:screenOrientation="portrait" >
         </activity>
 
+        <activity
+            android:name=".activity.RadioDetailActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.TvDetailActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name=".activity.AccountAndSecurityActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.ModifyPasswordActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.PhoneBindActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.NewPhoneBindActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.CommentDetailActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.VideoDetailActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.FeedbackActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name=".activity.HistoryActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name=".activity.CollectActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name=".activity.SubscribeActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.MessageListActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.ServiceDetailActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.MoreServiceActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name=".activity.ContentActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name=".activity.WebViewActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.WebViewBackActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name=".activity.SettingActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name=".activity.AttentionActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.ModifyNicknameActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+
+        <activity
+            android:name=".activity.MoreAnchorOrOrganizationActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait" >
+        </activity>
 
 
         <service android:name=".service.AudioPlayerService" />
         <service android:name="com.amap.api.location.APSService"/>
 
-
+        <receiver
+            android:name=".push.MyAliPushMessageReceiver"
+            android:exported="false"> <!-- 为保证receiver安全，建议设置不可导出，如需对其他应用开放可通过android：permission进行限制 -->
+            <intent-filter>
+                <action android:name="com.alibaba.push2.action.NOTIFICATION_OPENED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.alibaba.push2.action.NOTIFICATION_REMOVED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.alibaba.sdk.android.push.RECEIVE" />
+            </intent-filter>
+        </receiver>
 
 
         <meta-data

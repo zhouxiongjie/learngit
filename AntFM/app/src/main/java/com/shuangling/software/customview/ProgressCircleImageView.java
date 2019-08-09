@@ -36,6 +36,7 @@ import android.support.annotation.DrawableRes;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 
+import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.shuangling.software.R;
 
 
@@ -48,7 +49,7 @@ public class ProgressCircleImageView extends AppCompatImageView {
 
     private static final int DEFAULT_BORDER_WIDTH = 0;
     private static final int DEFAULT_BORDER_COLOR = Color.BLACK;
-    private static final int DEFAULT_FILL_COLOR = Color.TRANSPARENT;
+    private static final int DEFAULT_FILL_COLOR = Color.WHITE;
     private static final boolean DEFAULT_BORDER_OVERLAY = false;
 
     private final RectF mDrawableRect = new RectF();
@@ -78,16 +79,15 @@ public class ProgressCircleImageView extends AppCompatImageView {
     private boolean mBorderOverlay;
     private boolean mDisableCircularTransformation;
 
-    private PlayCountDownTimer mTimer;               //计时器
-    private float mProgress;                        //录制视频的进度
+    //private PlayCountDownTimer mTimer;               //计时器
+    private long mDuration;
+    private long mProgress;                        //录制视频的进度
 
     public ProgressCircleImageView(Context context) {
         super(context);
 
         init();
     }
-
-
 
 
     public ProgressCircleImageView(Context context, AttributeSet attrs) {
@@ -109,17 +109,12 @@ public class ProgressCircleImageView extends AppCompatImageView {
         init();
     }
 
-
-    public void setTimer(long millisInFuture, long countDownInterval){
-        if(mTimer!=null){
-            mTimer.cancel();
-        }
-        mTimer=new PlayCountDownTimer(millisInFuture,countDownInterval);
-
+    public float getDuration() {
+        return mDuration;
     }
 
-    public PlayCountDownTimer getTimer(){
-        return mTimer;
+    public void setDuration(long duration) {
+        this.mDuration = duration;
     }
 
     private void init() {
@@ -163,15 +158,62 @@ public class ProgressCircleImageView extends AppCompatImageView {
             return;
         }
 
-        if (mFillColor != Color.TRANSPARENT) {
-            canvas.drawCircle(mDrawableRect.centerX(), mDrawableRect.centerY(), mDrawableRadius, mFillPaint);
-        }
-        canvas.drawCircle(mDrawableRect.centerX(), mDrawableRect.centerY(), mDrawableRadius, mBitmapPaint);
-        if (mBorderWidth > 0) {
+        if(getDrawable() instanceof GifDrawable){
+            if (mFillColor != Color.TRANSPARENT) {
+                canvas.drawCircle(mDrawableRect.centerX(), mDrawableRect.centerY(), mDrawableRadius, mFillPaint);
+            }
+            float sx=((float) (canvas.getWidth()-2*mBorderWidth))/canvas.getWidth();
+            float sy=sx;
+            canvas.save();
+            canvas.translate(mBorderWidth,mBorderWidth);
+            canvas.scale(sx,sy);
+            super.onDraw(canvas);
+            canvas.restore();
 
-            canvas.drawArc(mBorderRect, -90, mProgress, false, mBorderPaint);
-            //canvas.drawCircle(mBorderRect.centerX(), mBorderRect.centerY(), mBorderRadius, mBorderPaint);
+            //GifDrawable gifDrawable=(GifDrawable)getDrawable();
+
+//            if (gifDrawable == null) {
+//                return; // couldn't resolve the URI
+//            }
+//
+//            if (gifDrawable.getIntrinsicWidth() == 0 || gifDrawable.getIntrinsicHeight() == 0) {
+//                return;     // nothing to draw (empty bounds)
+//            }
+
+            //canvas.drawCircle(mDrawableRect.centerX(), mDrawableRect.centerY(), mDrawableRadius, mBitmapPaint);
+            if (mBorderWidth > 0) {
+
+                canvas.drawArc(mBorderRect, -90, mProgress, false, mBorderPaint);
+                //canvas.drawCircle(mBorderRect.centerX(), mBorderRect.centerY(), mBorderRadius, mBorderPaint);
+            }
+        }else{
+            if (mFillColor != Color.TRANSPARENT) {
+                canvas.drawCircle(mDrawableRect.centerX(), mDrawableRect.centerY(), mDrawableRadius, mFillPaint);
+            }
+//            super.onDraw(canvas);
+            canvas.drawCircle(mDrawableRect.centerX(), mDrawableRect.centerY(), mDrawableRadius, mBitmapPaint);
+            if (mBorderWidth > 0) {
+
+                canvas.drawArc(mBorderRect, -90, mProgress, false, mBorderPaint);
+                //canvas.drawCircle(mBorderRect.centerX(), mBorderRect.centerY(), mBorderRadius, mBorderPaint);
+            }
         }
+
+
+    }
+
+
+    public void updateProgress(long position){
+        if(mDuration==0){
+            mProgress = 0;
+        }else{
+            mProgress = 360*position/mDuration;
+        }
+
+        invalidate();
+
+
+
     }
 
     @Override
@@ -465,29 +507,5 @@ public class ProgressCircleImageView extends AppCompatImageView {
 
 
 
-    //录制视频计时器
-    public final class PlayCountDownTimer extends CountDownTimer {
-        private long mDuration;
-        public PlayCountDownTimer(long millisInFuture, long countDownInterval) {
-            super(millisInFuture, countDownInterval);
-            mDuration=millisInFuture;
-        }
-
-        @Override
-        public void onTick(long millisUntilFinished) {
-            updateProgress(millisUntilFinished);
-        }
-
-        @Override
-        public void onFinish() {
-            updateProgress(0);
-        }
-
-        //更新进度条
-        private void updateProgress(long millisUntilFinished) {
-            mProgress = 360f - millisUntilFinished / (float) mDuration * 360f;
-            invalidate();
-        }
-    }
 
 }

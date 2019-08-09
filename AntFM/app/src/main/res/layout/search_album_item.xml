@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        fresco:roundedCornerRadius="4dp"
+        fresco:roundedCornerRadius="2dp"
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImage="@drawable/article_placeholder"
         fresco:placeholderImageScaleType="centerCrop"
@@ -64,7 +64,7 @@
 
 
             <TextView
-                android:id="@+id/merchant"
+                android:id="@+id/name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -73,31 +73,31 @@
                 android:maxLines="1"
                 android:textColor="@color/textColorThree"
                 android:textSize="@dimen/font_size_24px"
-                tools:text="浏阳电台" />
+                tools:text="资讯文章内容中只有2张图片以下的资讯文章内容中只有2张图片以下的资讯文章内容中只有2张图片以下的资讯文章内容中只有2张图片以下的" />
 
-            <TextView
-                android:id="@+id/commentNum"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="15dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/textColorThree"
-                android:textSize="@dimen/font_size_24px"
-                tools:text="52评论" />
+            <!--<TextView-->
+                <!--android:id="@+id/commentNum"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:layout_marginEnd="15dp"-->
+                <!--android:ellipsize="end"-->
+                <!--android:maxLines="1"-->
+                <!--android:textColor="@color/textColorThree"-->
+                <!--android:textSize="@dimen/font_size_24px"-->
+                <!--tools:text="52评论" />-->
 
-            <TextView
-                android:id="@+id/publishTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="15dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/textColorThree"
-                android:textSize="@dimen/font_size_24px"
-                tools:text="5小时前" />
+            <!--<TextView-->
+                <!--android:id="@+id/publishTime"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:layout_marginEnd="15dp"-->
+                <!--android:ellipsize="end"-->
+                <!--android:maxLines="1"-->
+                <!--android:textColor="@color/textColorThree"-->
+                <!--android:textSize="@dimen/font_size_24px"-->
+                <!--tools:text="5小时前" />-->
 
 
         </LinearLayout>

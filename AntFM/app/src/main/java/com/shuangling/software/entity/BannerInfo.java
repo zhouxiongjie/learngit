@@ -8,6 +8,7 @@ public class BannerInfo extends BannerView.Banner implements Serializable {
 
     String logo;
     String title;
+    String url;
 
 
 
@@ -21,6 +22,10 @@ public class BannerInfo extends BannerView.Banner implements Serializable {
         this.title = title;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     @Override
     public String getLogo() {
         return logo;
@@ -30,6 +35,13 @@ public class BannerInfo extends BannerView.Banner implements Serializable {
     public String getTitle() {
         return title;
     }
+
+    @Override
+    public String getUrl() {
+        return url;
+    }
+
+
 
 
 

@@ -17,8 +17,9 @@ import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
-import com.viewpagerindicator.CirclePageIndicator;
+import com.shuangling.software.customview.CirclePageIndicator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +45,7 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
 	{
 		public abstract String getLogo();
 		public abstract String getTitle();
+		public abstract String getUrl();
 	}
 
 
@@ -109,18 +111,17 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
 			final T data=mData.get(i);
 			SimpleDraweeView view=new SimpleDraweeView(mContext);
 			GenericDraweeHierarchy hierarchy = view.getHierarchy();
-			hierarchy.setActualImageScaleType(ScalingUtils.ScaleType.CENTER_INSIDE);
+			hierarchy.setActualImageScaleType(ScalingUtils.ScaleType.FIT_XY);
 			RoundingParams rp = new RoundingParams();
 			rp.setRoundAsCircle(false);
 			rp.setCornersRadius(10);
 			hierarchy.setRoundingParams(rp);
 			view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 			view.setTag(data);
-
+			int width=CommonUtils.getScreenWidth()-CommonUtils.dip2px(40);
 			if(!TextUtils.isEmpty(data.getLogo())){
-
 				Uri uri = Uri.parse(data.getLogo());
-				ImageLoader.showThumb(uri, view, mWidth, mHeight);
+				ImageLoader.showThumb(uri, view, width, 10*width/23);
 			}
 			mAutoViews.add(view);
 			view.setOnClickListener(new OnClickListener() {
@@ -188,6 +189,35 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
 			mAutoViewPageIndicator.setCurrentItem(0);
 		}
 	}
+
+
+
+	private void measureView(View v) {
+		ViewGroup.LayoutParams lp = v.getLayoutParams();
+		if (lp == null) {
+			return;
+		}
+		int width;
+		int height;
+		if (lp.width > 0||lp.width==ViewGroup.LayoutParams.MATCH_PARENT) {
+			// xml文件中设置了该view的准确宽度值，例如android:layout_width="150dp"
+			width = View.MeasureSpec.makeMeasureSpec(lp.width, View.MeasureSpec.EXACTLY);
+		} else {
+			// xml文件中使用wrap_content设定该view宽度，例如android:layout_width="wrap_content"
+			width = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		}
+
+		if (lp.height > 0||lp.width==ViewGroup.LayoutParams.MATCH_PARENT) {
+			// xml文件中设置了该view的准确高度值，例如android:layout_height="50dp"
+			height = View.MeasureSpec.makeMeasureSpec(lp.height, View.MeasureSpec.EXACTLY);
+		} else {
+			// xml文件中使用wrap_content设定该view高度，例如android:layout_height="wrap_content"
+			height = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		}
+
+		v.measure(width, height);
+	}
+
 
 
 }

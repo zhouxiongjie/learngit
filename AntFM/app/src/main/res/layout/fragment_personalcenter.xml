@@ -9,7 +9,7 @@
     <RelativeLayout
         android:id="@+id/top"
         android:layout_width="0dp"
-        android:layout_height="180dp"
+        android:layout_height="120dp"
         android:background="?attr/themeColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,12 +29,13 @@
             android:text="个人中心"
             android:textColor="@color/white"
             android:textSize="@dimen/font_size_50px"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
 
     </RelativeLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/content"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -46,11 +47,11 @@
 
 
         <RelativeLayout
-            android:id="@+id/recentListen"
+            android:id="@+id/history"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="60dp"
-            android:padding="20dp">
+            android:padding="15dp">
 
 
             <com.shuangling.software.customview.FontIconView
@@ -58,9 +59,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="&#xe608;"
+                android:text="&#xe630;"
                 android:textColor="?attr/themeColor"
-                android:textSize="@dimen/font_size_50px" />
+                android:textSize="@dimen/font_size_36px" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -84,7 +85,8 @@
             android:id="@+id/collect"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp">
+            android:layout_below="@+id/history"
+            android:padding="15dp">
 
             <com.shuangling.software.customview.FontIconView
                 android:id="@+id/collectIcon"
@@ -93,7 +95,7 @@
                 android:layout_centerVertical="true"
                 android:text="&#xe62e;"
                 android:textColor="?attr/themeColor"
-                android:textSize="@dimen/font_size_50px" />
+                android:textSize="@dimen/font_size_36px" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -118,16 +120,17 @@
             android:id="@+id/subscribe"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp">
+            android:layout_below="@+id/collect"
+            android:padding="15dp">
 
             <com.shuangling.software.customview.FontIconView
                 android:id="@+id/subscribeIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="&#xe62e;"
+                android:text="&#xe609;"
                 android:textColor="?attr/themeColor"
-                android:textSize="@dimen/font_size_50px" />
+                android:textSize="@dimen/font_size_36px" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -152,14 +155,82 @@
             android:id="@+id/accountAndSecurity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp">
+            android:layout_below="@+id/subscribe"
+            android:padding="15dp">
 
             <com.shuangling.software.customview.FontIconView
                 android:id="@+id/accountAndSecurityIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="&#xe62e;"
+                android:text="&#xe615;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_36px" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@+id/accountAndSecurityIcon"
+                android:text="账号与安全"
+                android:layout_centerVertical="true"
+                android:textColor="@color/textColorTwo"
+                android:textSize="@dimen/font_size_28px" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_right" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/feedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/accountAndSecurity"
+            android:padding="15dp">
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/feedbackIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="&#xe636;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_36px" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@+id/feedbackIcon"
+                android:text="意见与反馈"
+                android:textColor="@color/textColorTwo"
+                android:textSize="@dimen/font_size_28px" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_right" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/brokeNews"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:visibility="gone">
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/brokeNewsIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="&#xe639;"
                 android:textColor="?attr/themeColor"
                 android:textSize="@dimen/font_size_50px" />
 
@@ -167,9 +238,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/accountAndSecurityIcon"
+                android:layout_toEndOf="@+id/brokeNewsIcon"
                 android:layout_marginStart="10dp"
-                android:text="账号与安全"
+                android:text="我要爆料"
                 android:textColor="@color/textColorTwo"
                 android:textSize="@dimen/font_size_28px" />
 
@@ -182,7 +253,53 @@
         </RelativeLayout>
 
 
-    </LinearLayout>
+        <RelativeLayout
+            android:id="@+id/setting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/feedback"
+            android:padding="15dp">
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/settingIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="&#xe64a;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_36px" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/settingIcon"
+                android:layout_marginStart="10dp"
+                android:text="系统设置"
+                android:textColor="@color/textColorTwo"
+                android:textSize="@dimen/font_size_28px" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_right" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/support"
+            android:layout_width="wrap_content"
+            android:layout_height="14dp"
+            android:layout_marginBottom="30dp"
+            android:text="湖南双菱电子科技有限公司提供技术支持"
+            android:textColor="#DCDCDC"
+            android:textSize="@dimen/font_size_22px"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"/>
+
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/userLayout"
@@ -273,5 +390,39 @@
             android:text="点击登录"/>
 
     </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/messageLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/userLayout"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/messageIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_message" />
+
+        <TextView
+            android:id="@+id/messageNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="10dp"
+            android:layout_gravity="right|top"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/red_circle_bg"
+            android:gravity="center"
+            android:padding="2dp"
+            tools:text="10"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_size_16px"
+            android:visibility="visible" />
+    </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

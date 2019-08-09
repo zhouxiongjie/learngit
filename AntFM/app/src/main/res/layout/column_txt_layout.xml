@@ -14,7 +14,6 @@
 		android:paddingLeft="15dp"
 		android:paddingRight="15dp"
 		android:paddingTop="8dp"
-		android:paddingBottom="8dp"
 		android:layout_gravity="center_horizontal"
 		android:text="人民的名义"
 
@@ -22,10 +21,11 @@
 	<com.facebook.drawee.view.SimpleDraweeView
 		android:id="@+id/indicator"
 		android:layout_width="20dp"
-		android:layout_height="2dp"
-		app:roundedCornerRadius="1dp"
+		android:layout_height="10dp"
 		app:placeholderImage="@color/white"
 		android:layout_marginTop="2dp"
+		app:actualImageScaleType="centerInside"
+		app:placeholderImageScaleType="centerInside"
 		android:layout_marginBottom="2dp"
 		android:layout_gravity="center_horizontal"
         />

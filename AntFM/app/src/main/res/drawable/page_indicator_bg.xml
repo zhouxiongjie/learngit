@@ -10,7 +10,7 @@
         android:top="5dp"
         />
     <!-- 填充色 -->
-    <solid android:color="#33333333"/>
+    <solid android:color="@color/transparent"/>
     <!-- 描边 设置线宽及颜色 -->
     <!--<stroke android:color="#33333333"-->
         <!--android:width="1dp"/>-->

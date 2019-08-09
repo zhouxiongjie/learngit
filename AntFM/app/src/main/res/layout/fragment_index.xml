@@ -36,9 +36,12 @@
                 android:layout_marginLeft="10dp"
                 android:drawableRight="@drawable/ic_xia"
                 android:drawablePadding="5dp"
-                android:text="长沙"
+                android:text="湘西土家族苗族自治州"
                 android:textColor="@color/white"
-                android:textSize="@dimen/font_size_28px" />
+                android:textSize="@dimen/font_size_28px"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:maxLength="4"/>
 
             <TextView
                 android:id="@+id/divide"
@@ -58,7 +61,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/divide"
-                android:text="16℃"
+                tools:text="16℃"
                 android:textColor="@color/white"
                 android:textSize="@dimen/font_size_28px" />
 
@@ -69,7 +72,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/temperature"
-                android:text="晴"
+                tools:text="晴"
                 android:textColor="@color/white"
                 android:textSize="@dimen/font_size_28px" />
 
@@ -97,6 +100,20 @@
 
         </RelativeLayout>
 
+        <HorizontalScrollView
+            android:id="@+id/columnScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+
+            <LinearLayout
+                android:id="@+id/columnContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
         <com.scwang.smartrefresh.layout.SmartRefreshLayout
             android:id="@+id/refreshLayout"
             android:layout_width="match_parent"
@@ -120,43 +137,95 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <com.shuangling.software.customview.BannerView
-                        android:id="@+id/bannerView"
-                        android:layout_width="match_parent"
-                        android:layout_height="180dp"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginRight="20dp" />
+                    <!--<com.shuangling.software.customview.BannerView-->
+                        <!--android:id="@+id/bannerView"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="180dp"-->
+                        <!--android:layout_marginLeft="20dp"-->
+                        <!--android:layout_marginTop="10dp"-->
+                        <!--android:layout_marginRight="20dp" />-->
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:background="@color/white">
+                    <!--<android.support.v4.view.ViewPager-->
+                        <!--android:id="@+id/moduleViewPager"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:background="@color/white"-->
+                        <!--android:layout_height="100dp" />-->
 
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="6dp"
-                            android:background="@color/divideColorTwo" />
+                    <!--<LinearLayout-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:orientation="vertical"-->
+                        <!--android:background="@color/white">-->
 
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@color/divideColorTwo"
-                            android:padding="10dp">
+                        <!--<ImageView-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="6dp"-->
+                            <!--android:background="@color/divideColorTwo" />-->
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentLeft="true"
-                                android:layout_centerVertical="true"
-                                android:text="热门主播"
-                                android:textColor="@color/textColorTwo"
-                                android:textSize="@dimen/font_size_36px"
-                                android:textStyle="bold"/>
+                        <!--<RelativeLayout-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:background="@color/divideColorTwo"-->
+                            <!--android:padding="10dp">-->
 
                             <!--<TextView-->
-                                <!--android:id="@+id/moreAnchors"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:layout_alignParentLeft="true"-->
+                                <!--android:layout_centerVertical="true"-->
+                                <!--android:text="热门主播"-->
+                                <!--android:textColor="@color/textColorTwo"-->
+                                <!--android:textSize="@dimen/font_size_36px"-->
+                                <!--android:textStyle="bold"/>-->
+
+                        <!--</RelativeLayout>-->
+
+
+                        <!--<HorizontalScrollView-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:background="@color/divideColorTwo"-->
+                            <!--android:scrollbars="none">-->
+                            <!--<LinearLayout-->
+                                <!--android:id="@+id/anchorsLayout"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:orientation="horizontal" />-->
+
+                        <!--</HorizontalScrollView>-->
+
+                    <!--</LinearLayout>-->
+
+                    <!--<LinearLayout-->
+                        <!--android:id="@+id/serviceLayout"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:background="@color/white"-->
+                        <!--android:orientation="vertical">-->
+
+                        <!--<ImageView-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="6dp"-->
+                            <!--android:background="@color/divideColorTwo" />-->
+
+                        <!--<RelativeLayout-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:padding="10dp">-->
+
+                            <!--<TextView-->
+
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:layout_alignParentLeft="true"-->
+                                <!--android:layout_centerVertical="true"-->
+                                <!--android:text="生活服务"-->
+                                <!--android:textColor="@color/textColorTwo"-->
+                                <!--android:textSize="@dimen/font_size_36px"-->
+                                <!--android:textStyle="bold"/>-->
+
+                            <!--<TextView-->
+                                <!--android:id="@+id/moreService"-->
                                 <!--android:layout_width="wrap_content"-->
                                 <!--android:layout_height="wrap_content"-->
                                 <!--android:layout_alignParentEnd="true"-->
@@ -166,10 +235,10 @@
                                 <!--android:text="更多"-->
                                 <!--android:textColor="@color/textColorSeven"-->
                                 <!--android:textSize="@dimen/font_size_26px" />-->
-                        </RelativeLayout>
+                        <!--</RelativeLayout>-->
 
                         <!--<com.shuangling.software.customview.MyGridView-->
-                            <!--android:id="@+id/anchors"-->
+                            <!--android:id="@+id/service"-->
                             <!--android:layout_width="match_parent"-->
                             <!--android:layout_height="wrap_content"-->
                             <!--android:cacheColorHint="@android:color/transparent"-->
@@ -178,80 +247,9 @@
                             <!--android:listSelector="@android:color/transparent"-->
                             <!--android:numColumns="4"-->
                             <!--android:stretchMode="columnWidth"-->
-                            <!--android:verticalSpacing="10dp"-->
-                            <!--android:layout_marginTop="10dp"-->
-                            <!--android:layout_marginBottom="10dp"/>-->
+                            <!--android:verticalSpacing="10dp" />-->
 
-                        <HorizontalScrollView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@color/divideColorTwo"
-                            android:scrollbars="none">
-                            <LinearLayout
-                                android:id="@+id/anchorsLayout"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal" />
-
-                        </HorizontalScrollView>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/serviceLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/white"
-                        android:orientation="vertical">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="6dp"
-                            android:background="@color/divideColorTwo" />
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-
-                            android:padding="10dp">
-
-                            <TextView
-
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentLeft="true"
-                                android:layout_centerVertical="true"
-                                android:text="生活服务"
-                                android:textColor="@color/textColorTwo"
-                                android:textSize="@dimen/font_size_36px"
-                                android:textStyle="bold"/>
-
-                            <TextView
-                                android:id="@+id/moreService"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:drawableRight="@drawable/ic_right"
-                                android:drawablePadding="10dp"
-                                android:text="更多"
-                                android:textColor="@color/textColorSeven"
-                                android:textSize="@dimen/font_size_26px" />
-                        </RelativeLayout>
-
-                        <com.shuangling.software.customview.MyGridView
-                            android:id="@+id/service"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:cacheColorHint="@android:color/transparent"
-                            android:gravity="center"
-                            android:horizontalSpacing="10dp"
-                            android:listSelector="@android:color/transparent"
-                            android:numColumns="4"
-                            android:stretchMode="columnWidth"
-                            android:verticalSpacing="10dp" />
-
-                    </LinearLayout>
+                    <!--</LinearLayout>-->
 
                 </LinearLayout>
 

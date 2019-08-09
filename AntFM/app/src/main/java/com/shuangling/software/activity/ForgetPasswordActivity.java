@@ -25,6 +25,7 @@ import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
+import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -36,7 +37,7 @@ import butterknife.OnClick;
 import okhttp3.Call;
 import okhttp3.Response;
 
-
+@EnableDragToClose()
 public class ForgetPasswordActivity extends AppCompatActivity implements Handler.Callback {
 
     private static final int MSG_GET_VERIFY_CODE = 0X00;
@@ -179,7 +180,7 @@ public class ForgetPasswordActivity extends AppCompatActivity implements Handler
                         verifyCodeLayout.setVisibility(View.GONE);
                         //1.倒计时
                         //2.设置提醒文本
-                        tip.setText(CommonUtils.tagKeyword("已向手机号" + phoneNum.getText().toString() + "发送短息验证码", phoneNum.getText().toString()));
+                        tip.setText(CommonUtils.tagKeyword("已向手机号" + phoneNum.getText().toString() + "发送短信验证码", phoneNum.getText().toString()));
                         mCountDownTimer = new CountDownTimer(60 * 1000, 500) {
                             @Override
                             public void onTick(long millisUntilFinished) {
@@ -251,10 +252,10 @@ public class ForgetPasswordActivity extends AppCompatActivity implements Handler
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
                 Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
-                msg.obj = response.body().string();
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
             }
@@ -286,10 +287,10 @@ public class ForgetPasswordActivity extends AppCompatActivity implements Handler
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
                 Message msg = mHandler.obtainMessage(MSG_RESET_PASSWORD);
-                msg.obj = response.body().string();
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
             }

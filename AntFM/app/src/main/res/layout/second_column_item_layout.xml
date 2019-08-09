@@ -4,7 +4,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:layout_marginEnd="0dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
     android:background="@drawable/search_record_bg">
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/logo"
@@ -21,12 +22,13 @@
         app:roundingBorderWidth="0dp"
         app:roundingBorderColor="@color/white"
         android:visibility="visible"
-        android:layout_marginEnd="10dp"/>
+        android:layout_marginEnd="5dp"/>
 
     <TextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
         android:textColor="@color/textColorTwo"
         android:textSize="@dimen/font_size_26px"
         android:text="音悦台"/>

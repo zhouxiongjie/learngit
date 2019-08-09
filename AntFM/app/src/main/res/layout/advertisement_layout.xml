@@ -16,15 +16,18 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="10dp"
         android:padding="3dp">
-		<com.viewpagerindicator.CirclePageIndicator
+		<com.shuangling.software.customview.CirclePageIndicator
 			android:id="@+id/autoPageIndicator"
 	        android:layout_height="wrap_content"
-	        android:layout_width="100dp"
-	        app:radius="4dp"
+	        android:layout_width="wrap_content"
+			android:background="@drawable/viewpager_indicator_bg"
+	        app:radius="2.5dp"
+            app:dotMargin="10dp"
             app:strokeWidth="0dp"
 			app:strokeColor="@color/gray"
 			app:pageColor="@color/gray"
 			app:fillColor="@color/white"
+			android:layout_centerHorizontal="true"
             />
 
 		<TextView

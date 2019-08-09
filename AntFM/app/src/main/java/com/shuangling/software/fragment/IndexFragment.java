@@ -1,20 +1,28 @@
 package com.shuangling.software.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,26 +30,45 @@ import android.widget.TextView;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.hjq.toast.ToastUtils;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.header.ClassicsHeader;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.activity.AnchorDetailActivity;
 import com.shuangling.software.activity.CityListActivity;
+import com.shuangling.software.activity.LoginActivity;
 import com.shuangling.software.activity.MainActivity;
+import com.shuangling.software.activity.MessageListActivity;
+import com.shuangling.software.activity.MoreAnchorOrOrganizationActivity;
+import com.shuangling.software.activity.MoreServiceActivity;
+import com.shuangling.software.activity.OrganizationDetailActivity;
+import com.shuangling.software.activity.RadioListActivity;
 import com.shuangling.software.activity.SearchActivity;
-import com.shuangling.software.adapter.AnchorGridViewAdapter;
+import com.shuangling.software.activity.ServiceDetailActivity;
+import com.shuangling.software.activity.WebViewActivity;
+import com.shuangling.software.activity.WebViewBackActivity;
 import com.shuangling.software.adapter.ColumnContentAdapter;
-import com.shuangling.software.adapter.ServiceGridViewAdapter;
+import com.shuangling.software.adapter.MoudleGridViewAdapter;
 import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.MyGridView;
 import com.shuangling.software.entity.Anchor;
 import com.shuangling.software.entity.BannerInfo;
 import com.shuangling.software.entity.Column;
-import com.shuangling.software.entity.LocalService;
+import com.shuangling.software.entity.ColumnContent;
+import com.shuangling.software.entity.DecorModule;
+import com.shuangling.software.entity.Organization;
+import com.shuangling.software.entity.Service;
+import com.shuangling.software.entity.Station;
+import com.shuangling.software.entity.User;
+import com.shuangling.software.entity.Weather;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
-import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 
@@ -59,8 +86,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
-import cn.jake.share.frdialog.dialog.FRDialog;
-import cn.jake.share.frdialog.interfaces.FRDialogClickListener;
 import okhttp3.Call;
 import okhttp3.Response;
 
@@ -69,9 +94,14 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
     public static final int MSG_GET_AHCHORS = 0x1;
     public static final int MSG_GET_SERVICE = 0x2;
-    public static final int MSG_GET_CITY_CONTNET = 0x3;
+    public static final int MSG_GET_ORGANIZATION = 0x3;
+    public static final int MSG_GET_CITY_CONTNET = 0x4;
+    public static final int MSG_GET_CITY_WEATHER = 0x5;
+    public static final int MSG_GET_INDEX_DECOR = 0x6;
+    public static final int MSG_ATTENTION_CALLBACK = 0x7;
+    public static final int MSG_GET_COLUMN = 0x8;
+    public static final int REQUEST_LOGIN = 0x9;
 
-    public static final int REQUEST_PERMISSION_CODE = 0x0110;
     @BindView(R.id.city)
     TextView city;
     @BindView(R.id.temperature)
@@ -80,30 +110,27 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     TextView weather;
     @BindView(R.id.search)
     TextView search;
-    @BindView(R.id.bannerView)
-    BannerView bannerView;
-    Unbinder unbinder;
-    @BindView(R.id.anchorsLayout)
-    LinearLayout anchorsLayout;
-    @BindView(R.id.moreService)
-    TextView moreService;
-    @BindView(R.id.service)
-    MyGridView service;
-    @BindView(R.id.serviceLayout)
-    LinearLayout serviceLayout;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
     @BindView(R.id.contentLayout)
     LinearLayout contentLayout;
     @BindView(R.id.backgroundImage)
     ImageView backgroundImage;
+    @BindView(R.id.columnContent)
+    LinearLayout columnContent;
+    Unbinder unbinder;
+
 
     private Handler mHandler;
-    //private AnchorGridViewAdapter mAnchorAdapter;
-    private ServiceGridViewAdapter mServiceAdapter;
+    private PagerAdapter mModulePageAdapter;
+    private LinearLayout anchorsLayout;
+    private LinearLayout organizationsLayout;
+    private LinearLayout servicesLayout;
+    private TextView moreService;
 
-    private int page = 1;
-    private int pageSize = 2;
+    private List<Column> mColumns;
+    private List<RecyclerView> mContentRecyclerView = new ArrayList<>();
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -119,61 +146,26 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_index, container, false);
         unbinder = ButterKnife.bind(this, view);
-        if(!TextUtils.isEmpty(MyApplication.getInstance().getBackgroundImage())){
+        if (!TextUtils.isEmpty(MyApplication.getInstance().getBackgroundImage())) {
             Uri uri = Uri.parse(MyApplication.getInstance().getBackgroundImage());
             backgroundImage.setImageURI(uri);
         }
-
-        mHandler.postDelayed(new Runnable() {
+        //refreshLayout.setPrimaryColorsId(R.color.transparent, android.R.color.black);
+        ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
+        //refreshLayout.setEnableLoadMore(false);
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
-            public void run() {
-                List<BannerView.Banner> banners = new ArrayList<>();
-                BannerInfo banner1 = new BannerInfo();
-                banner1.setLogo("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1558523555589&di=2bbf96e7f5bea35ab6f29f1a738a045c&imgtype=0&src=http%3A%2F%2Fimg2.ph.126.net%2FjH7TQ40YikZVm13azaOqRQ%3D%3D%2F6597262181193553397.jpg");
-                BannerInfo banner2 = new BannerInfo();
-                banner2.setLogo("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1558523671340&di=9883ee3f1ecdbfaf967add34eda852f4&imgtype=0&src=http%3A%2F%2Fs9.sinaimg.cn%2Fmw690%2F006hikKrzy7pzDEQbFe68%26690");
-                BannerInfo banner3 = new BannerInfo();
-                banner3.setLogo("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1558523671338&di=7a78d5289720a87e0dbedcea1ef3f420&imgtype=0&src=http%3A%2F%2Fimg2.ph.126.net%2F8Y1u9aYRhqT4KHumTO_y1w%3D%3D%2F6619210632305894354.jpg");
-                banners.add(banner1);
-                banners.add(banner2);
-                banners.add(banner3);
-                bannerView.setData(banners);
-            }
-        }, 1000);
-
-        temperature.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FloatWindowUtil.getInstance().addOnPermissionListener(new FloatWindowUtil.OnPermissionListener() {
-                    @Override
-                    public void showPermissionDialog() {
-                        FRDialog dialog = new FRDialog.MDBuilder(getContext())
-                                .setTitle("悬浮窗权限")
-                                .setMessage("您的手机没有授予悬浮窗权限，请开启后再试")
-                                .setPositiveContentAndListener("现在去开启", new FRDialogClickListener() {
-                                    @Override
-                                    public boolean onDialogClick(View view) {
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-                                            intent.setData(Uri.parse("package:" + getContext().getPackageName()));
-                                            startActivityForResult(intent, REQUEST_PERMISSION_CODE);
-                                        }
-                                        return true;
-                                    }
-                                }).setNegativeContentAndListener("暂不开启", new FRDialogClickListener() {
-                                    @Override
-                                    public boolean onDialogClick(View view) {
-                                        return true;
-                                    }
-                                }).create();
-                        dialog.show();
-                    }
-                });
-                FloatWindowUtil.getInstance().showFloatWindow(getContext());
+            public void onRefresh(RefreshLayout refreshlayout) {
+                indexDecorate();
             }
         });
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RefreshLayout refreshLayout) {
 
-
+            }
+        });
+        getRecommendColumns();
         return view;
 
     }
@@ -199,25 +191,61 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     }
 
 
-    public void getCityAnchors() {
+    public void indexDecorate() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.indexDecorate;
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                if (refreshLayout.isRefreshing()) {
+                    refreshLayout.finishRefresh();
+                }
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_INDEX_DECOR;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, IOException exception) {
+
+                if (refreshLayout.isRefreshing()) {
+                    refreshLayout.finishRefresh();
+                }
+            }
+        });
+
+
+    }
+
+
+    public void getCityAnchors(final int orderBy,int count) {
 
         String url = ServerInfo.serviceIP + ServerInfo.getCityAnchors;
         Map<String, String> params = new HashMap<String, String>();
         params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
-        params.put("order_by", "3");
+        params.put("order_by", ""+orderBy);
         params.put("page", "1");
-        params.put("page_size", "" + Integer.MAX_VALUE);
+        params.put("page_size", "" + count);
         params.put("type", "2");
         params.put("mode", "one");
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
 
                 Message msg = Message.obtain();
+                msg.arg1=orderBy;
                 msg.what = MSG_GET_AHCHORS;
-                msg.obj = response.body().string();
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
             }
@@ -233,22 +261,23 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     }
 
 
-    public void getCityService() {
+    public void getCityService(String orderBy,int count) {
 
         String url = ServerInfo.serviceIP + ServerInfo.getCityService;
         Map<String, String> params = new HashMap<String, String>();
         params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
-
+        params.put("order_by", orderBy);
+        params.put("limit", "" + count);
 
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_SERVICE;
-                msg.obj = response.body().string();
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
             }
@@ -260,29 +289,25 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             }
         });
 
-
     }
 
+    public void weather() {
 
-    public void getCityColumns() {
-
-        String url = ServerInfo.serviceIP + ServerInfo.getCityContent;
+        String url = ServerInfo.serviceIP + ServerInfo.weather;
         Map<String, String> params = new HashMap<String, String>();
-        params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
-        params.put("page", "" + page);
-        params.put("page_size", "" + pageSize);
-        params.put("sorce_type", "city");
+        params.put("location", "" + MainActivity.sCurrentCity.getCode() + "00");
+
 
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
+
 
                 Message msg = Message.obtain();
-                msg.what = MSG_GET_CITY_CONTNET;
-                msg.obj = response.body().string();
+                msg.what = MSG_GET_CITY_WEATHER;
+                msg.obj = response;
                 mHandler.sendMessage(msg);
-
 
             }
 
@@ -293,32 +318,241 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             }
         });
 
+    }
+
+
+    public void attention(Anchor anchor, final boolean follow, final View view) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.attention;
+        Map<String, String> params = new HashMap<>();
+        params.put("id", "" + anchor.getId());
+        if (follow) {
+            params.put("type", "1");
+        } else {
+            params.put("type", "0");
+        }
+
+        OkHttpUtils.post(url, params, new OkHttpCallback(getContext()) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_ATTENTION_CALLBACK;
+                msg.arg1 = follow ? 1 : 0;
+                msg.arg2 = 0;
+                Bundle bundle = new Bundle();
+                bundle.putString("response", response);
+                msg.setData(bundle);
+                msg.obj = view;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, IOException exception) {
+
+
+            }
+        });
 
     }
+
+
+    public void attention(Organization organization, final boolean follow, final View view) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.attention;
+        Map<String, String> params = new HashMap<>();
+        params.put("id", "" + organization.getId());
+        if (follow) {
+            params.put("type", "1");
+        } else {
+            params.put("type", "0");
+        }
+
+        OkHttpUtils.post(url, params, new OkHttpCallback(getContext()) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_ATTENTION_CALLBACK;
+                msg.arg1 = follow ? 1 : 0;
+                msg.arg2 = 1;
+                Bundle bundle = new Bundle();
+                bundle.putString("response", response);
+                msg.setData(bundle);
+                msg.obj = view;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, IOException exception) {
+
+
+            }
+        });
+
+    }
+
+
+    public void getCityOrganization(final int orderBy,int count) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.getCityAnchors;
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
+        params.put("order_by", ""+orderBy);
+        params.put("page", "1");
+        params.put("page_size", "" + count);
+        params.put("type", "1");
+        params.put("mode", "one");
+        OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_ORGANIZATION;
+                msg.arg1=orderBy;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, IOException exception) {
+
+
+            }
+        });
+
+    }
+
+
+    public void getContent(String typeId, String contentNumber, final int position) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.getColumnContent + typeId;
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("limit", contentNumber);
+        params.put("sorceType", "1");
+        params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
+        params.put("order_by", "1");
+
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_CITY_CONTNET;
+                msg.arg1 = position;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, IOException exception) {
+
+
+            }
+        });
+
+    }
+
+
+    public void getRecommendColumns() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.getRecommendColumns;
+        Map<String, String> params = new HashMap<>();
+        params.put("page", "1");
+        params.put("page_size", "" + Integer.MAX_VALUE);
+        OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_COLUMN;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, IOException exception) {
+                exception.printStackTrace();
+
+
+            }
+        });
+
+
+    }
+
 
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_GET_AHCHORS:
-
                 try {
                     String result = (String) msg.obj;
+                    final int orderBy=msg.arg1;
                     JSONObject jo = JSONObject.parseObject(result);
                     if (jo.getIntValue("code") == 100000 && jo.getJSONObject("data") != null && jo.getJSONObject("data").getJSONArray("data") != null) {
                         List<Anchor> anchorList = JSONArray.parseArray(jo.getJSONObject("data").getJSONArray("data").toJSONString(), Anchor.class);
 
-                        for (int i = 0; i < anchorList.size(); i++) {
-                            Anchor anchor = anchorList.get(i);
 
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip2px(140), LinearLayout.LayoutParams.WRAP_CONTENT);
-                            int margin = CommonUtils.dip2px(5);
-                            params.setMargins(margin, margin, margin, margin);
+
+                        for (int i = 0; i < anchorList.size(); i++) {
+                            final Anchor anchor = anchorList.get(i);
+
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip2px(120), LinearLayout.LayoutParams.WRAP_CONTENT);
+                            int marginLeft;
+                            if(i==0){
+                                marginLeft=CommonUtils.dip2px(20);
+                            }else{
+                                marginLeft=CommonUtils.dip2px(10);
+                            }
+                            int margin = CommonUtils.dip2px(10);
+                            params.setMargins(marginLeft, margin, margin, margin);
                             View anchorView = LayoutInflater.from(getContext()).inflate(R.layout.anchor_item_layout, anchorsLayout, false);
                             TextView anchorName = anchorView.findViewById(R.id.anchorName);
                             SimpleDraweeView logo = anchorView.findViewById(R.id.logo);
                             TextView desc = anchorView.findViewById(R.id.desc);
+                            desc.setVisibility(View.GONE);
                             TextView attention = anchorView.findViewById(R.id.attention);
+                            if (anchor.getIs_follow() == 0) {
+                                attention.setActivated(true);
+                            } else {
+                                attention.setActivated(false);
+                            }
 
+                            anchorView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent it = new Intent(getContext(), AnchorDetailActivity.class);
+                                    it.putExtra("anchorId", anchor.getId());
+                                    startActivity(it);
+                                }
+                            });
+                            attention.setTag(anchor);
+                            attention.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (User.getInstance() == null) {
+                                        startActivityForResult(new Intent(getContext(), LoginActivity.class), REQUEST_LOGIN);
+                                    } else {
+                                        attention(anchor, anchor.getIs_follow() == 0, v);
+                                    }
+
+                                }
+                            });
 
                             if (!TextUtils.isEmpty(anchor.getLogo())) {
                                 Uri uri = Uri.parse(anchor.getLogo());
@@ -328,15 +562,29 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                             }
                             anchorName.setText(anchor.getName());
                             desc.setText(anchor.getDes());
-                            attention.setOnClickListener(new View.OnClickListener() {
 
-                                @Override
-                                public void onClick(View v) {
-
-                                }
-                            });
                             anchorsLayout.addView(anchorView, i, params);
                         }
+                        //更多
+
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip2px(120), LinearLayout.LayoutParams.WRAP_CONTENT);
+                        int margin = CommonUtils.dip2px(5);
+                        params.setMargins(margin, margin, margin, margin);
+                        params.gravity=Gravity.CENTER_VERTICAL;
+                        View more = LayoutInflater.from(getContext()).inflate(R.layout.more_item_layout, anchorsLayout, false);
+
+                        more.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent it=new Intent(getContext(),MoreAnchorOrOrganizationActivity.class);
+                                it.putExtra("type",2);
+                                it.putExtra("orderBy",orderBy);
+                                startActivity(it);
+
+                            }
+                        });
+
+                        anchorsLayout.addView(more, params);
 
 
                     }
@@ -346,21 +594,135 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
                 }
                 break;
+            case MSG_GET_ORGANIZATION: {
+                try {
+                    String result = (String) msg.obj;
+                    final int orderBy =msg.arg1;
+                    JSONObject jo = JSONObject.parseObject(result);
+                    if (jo.getIntValue("code") == 100000 && jo.getJSONObject("data") != null && jo.getJSONObject("data").getJSONArray("data") != null) {
+                        List<Organization> organizationList = JSONArray.parseArray(jo.getJSONObject("data").getJSONArray("data").toJSONString(), Organization.class);
+
+                        for (int i = 0; i < organizationList.size(); i++) {
+                            final Organization organization = organizationList.get(i);
+
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip2px(120), LinearLayout.LayoutParams.WRAP_CONTENT);
+                            int marginLeft;
+                            if(i==0){
+                                marginLeft=CommonUtils.dip2px(20);
+                            }else{
+                                marginLeft=CommonUtils.dip2px(10);
+                            }
+                            int margin = CommonUtils.dip2px(10);
+                            params.setMargins(marginLeft, margin, margin, margin);
+                            View anchorView = LayoutInflater.from(getContext()).inflate(R.layout.anchor_item_layout, anchorsLayout, false);
+                            TextView anchorName = anchorView.findViewById(R.id.anchorName);
+                            SimpleDraweeView logo = anchorView.findViewById(R.id.logo);
+                            TextView desc = anchorView.findViewById(R.id.desc);
+                            ImageView authenticationLogo = anchorView.findViewById(R.id.authenticationLogo);
+                            authenticationLogo.setBackgroundResource(R.drawable.ic_org_authentication);
+                            desc.setVisibility(View.GONE);
+                            TextView attention = anchorView.findViewById(R.id.attention);
+                            if (organization.getIs_follow() == 0) {
+                                attention.setActivated(true);
+                            } else {
+                                attention.setActivated(false);
+                            }
+                            anchorView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent it = new Intent(getContext(), OrganizationDetailActivity.class);
+                                    it.putExtra("organizationId", organization.getId());
+                                    startActivity(it);
+                                }
+                            });
+                            attention.setTag(organization);
+                            attention.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (User.getInstance() == null) {
+                                        startActivityForResult(new Intent(getContext(), LoginActivity.class), REQUEST_LOGIN);
+                                    } else {
+                                        attention(organization, organization.getIs_follow() == 0, v);
+                                    }
+
+                                }
+                            });
+
+                            if (!TextUtils.isEmpty(organization.getLogo())) {
+                                Uri uri = Uri.parse(organization.getLogo());
+                                int width = CommonUtils.dip2px(65);
+                                int height = width;
+                                ImageLoader.showThumb(uri, logo, width, height);
+                            }
+                            anchorName.setText(organization.getName());
+                            desc.setText(organization.getDes());
+
+                            organizationsLayout.addView(anchorView, i, params);
+                        }
+
+
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip2px(120), LinearLayout.LayoutParams.WRAP_CONTENT);
+                        int margin = CommonUtils.dip2px(5);
+                        params.setMargins(margin, margin, margin, margin);
+                        params.gravity=Gravity.CENTER_VERTICAL;
+                        View more = LayoutInflater.from(getContext()).inflate(R.layout.more_item_layout, anchorsLayout, false);
+
+                        more.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent it=new Intent(getContext(),MoreAnchorOrOrganizationActivity.class);
+                                it.putExtra("type",1);
+                                it.putExtra("orderBy",orderBy);
+                                startActivity(it);
+                            }
+                        });
+
+                        organizationsLayout.addView(more, params);
+
+
+                    }
+
+
+                } catch (Exception e) {
+
+                }
+
+            }
+            break;
             case MSG_GET_SERVICE:
                 try {
                     String result = (String) msg.obj;
-                    LocalService localService = JSONObject.parseObject(result, LocalService.class);
-                    if (localService.getCode() == 100000 && localService.getData() != null) {
 
-                        if (getContext() == null) {
-                            return false;
-                        }
-                        if (mServiceAdapter == null) {
-                            mServiceAdapter = new ServiceGridViewAdapter(getContext(), localService);
-                            service.setAdapter(mServiceAdapter);
-                        } else {
-                            mServiceAdapter.setData(localService);
-                            mServiceAdapter.notifyDataSetChanged();
+                    JSONObject jo = JSONObject.parseObject(result);
+                    if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
+                        List<Service> serviceList = JSONArray.parseArray(jo.getJSONArray("data").toJSONString(), Service.class);
+
+                        for (int i = 0; i < serviceList.size(); i++) {
+                            final Service service = serviceList.get(i);
+
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                            int margin = CommonUtils.dip2px(5);
+                            params.setMargins(margin, margin, margin, margin);
+                            View serviceView = LayoutInflater.from(getContext()).inflate(R.layout.service_gridview_item, anchorsLayout, false);
+                            SimpleDraweeView logo = serviceView.findViewById(R.id.service);
+                            TextView serviceName = serviceView.findViewById(R.id.serviceName);
+
+                            if (!TextUtils.isEmpty(service.getCover())) {
+                                Uri uri = Uri.parse(service.getCover());
+                                int width = CommonUtils.dip2px(35);
+                                int height = width;
+                                ImageLoader.showThumb(uri, logo, width, height);
+                            }
+                            serviceName.setText(service.getTitle());
+                            serviceView.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent it=new Intent(getContext(),ServiceDetailActivity.class);
+                                    it.putExtra("service",service);
+                                    startActivity(it);
+                                }
+                            });
+                            servicesLayout.addView(serviceView, i, params);
                         }
 
                     }
@@ -375,69 +737,12 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                 try {
                     String result = (String) msg.obj;
                     JSONObject jo = JSONObject.parseObject(result);
-                    if (jo.getIntValue("code") == 100000 && jo.getJSONObject("data") != null && jo.getJSONObject("data").getJSONArray("data") != null) {
-                        List<Column> columnList = JSONArray.parseArray(jo.getJSONObject("data").getJSONArray("data").toJSONString(), Column.class);
-
-                        if (getContext() == null) {
-                            return false;
-                        }
-                        if (page == 1) {
-
-                            LayoutInflater inflater = LayoutInflater.from(getContext());
-                            for (int i = 0; i < columnList.size(); i++) {
-                                if (i == 0) {
-                                    View view = inflater.inflate(R.layout.index_column_item, contentLayout, false);
-
-
-                                    TextView column = view.findViewById(R.id.column);
-                                    column.setText(columnList.get(i).getName());
-                                    RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-                                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                                    recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-                                    TextView more = view.findViewById(R.id.more);
-                                    ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), columnList.get(i).getContent());
-                                    recyclerView.setAdapter(adapter);
-                                    contentLayout.addView(view, 1);
-                                } else {
-                                    View view = inflater.inflate(R.layout.index_column_item, contentLayout, false);
-
-                                    TextView column = view.findViewById(R.id.column);
-                                    column.setText(columnList.get(i).getName());
-                                    RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-                                    recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                                    //recyclerView.addItemDecoration(new MyItemDecoration());
-                                    recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-                                    TextView more = view.findViewById(R.id.more);
-                                    ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), columnList.get(i).getContent());
-                                    recyclerView.setAdapter(adapter);
-                                    contentLayout.addView(view, 3);
-                                }
-
-
-                            }
-                        } else {
-                            LayoutInflater inflater = LayoutInflater.from(getContext());
-                            for (int i = 0; i < columnList.size(); i++) {
-                                View view = inflater.inflate(R.layout.index_column_item, contentLayout, false);
-
-
-                                TextView column = view.findViewById(R.id.column);
-                                column.setText(columnList.get(i).getName());
-                                RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                                recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-                                TextView more = (TextView) view.findViewById(R.id.more);
-                                ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), columnList.get(i).getContent());
-                                recyclerView.setAdapter(adapter);
-                                contentLayout.addView(view);
-
-                            }
-
-
-                        }
-                        if (jo.getJSONObject("data").getIntValue("to") == pageSize) {
-                            page++;
-                        }
+                    int position = msg.arg1;
+                    if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
+                        List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
+                        RecyclerView recyclerView = mContentRecyclerView.get(position);
+                        ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), columnContents);
+                        recyclerView.setAdapter(adapter);
 
 
                     }
@@ -448,26 +753,481 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                 }
 
                 break;
-        }
-        return false;
-    }
+            case MSG_ATTENTION_CALLBACK:
+                try {
+                    String result = msg.getData().getString("response");
+                    boolean follow = msg.arg1 == 1 ? true : false;
+
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        ToastUtils.show(jsonObject.getString("msg"));
+                        TextView attention = (TextView) msg.obj;
+                        if (msg.arg2 == 0) {
+                            Anchor anchor = (Anchor) attention.getTag();
+                            if (follow) {
+                                attention.setText("已关注");
+                                attention.setActivated(false);
+                                anchor.setIs_follow(1);
+                            } else {
+                                attention.setText("关注");
+                                attention.setActivated(true);
+                                anchor.setIs_follow(0);
+
+                            }
+                        } else {
+                            Organization organization = (Organization) attention.getTag();
+                            if (follow) {
+                                attention.setText("已关注");
+                                attention.setActivated(false);
+                                organization.setIs_follow(1);
+                            } else {
+                                attention.setText("关注");
+                                attention.setActivated(true);
+                                organization.setIs_follow(0);
+
+                            }
+                        }
+
+                    }
 
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_PERMISSION_CODE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                } catch (Exception e) {
 
-                if (FloatWindowUtil.checkFloatWindowPermission(getContext())) {
-                    FloatWindowUtil.getInstance().showFloatWindow(getContext());
-                } else {
-                    //不显示悬浮窗 并提示
+                }
+                break;
+            case MSG_GET_CITY_WEATHER:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jo = JSONObject.parseObject(result);
+                    if (jo.getIntValue("code") == 100000 && jo.getJSONObject("data") != null) {
+                        Weather wea = JSONObject.parseObject(jo.getJSONObject("data").toJSONString(), Weather.class);
+                        if (wea.getWeather() != null && wea.getWeather().getHeWeather6() != null && wea.getWeather().getHeWeather6().get(0) != null && wea.getWeather().getHeWeather6().get(0).getNow() != null) {
+                            temperature.setText(wea.getWeather().getHeWeather6().get(0).getNow().getTmp() + "℃");
+                            weather.setText(wea.getWeather().getHeWeather6().get(0).getNow().getCond_txt());
+                        }
+
+                    }
+                } catch (Exception e) {
+
+                }
+                break;
+            case MSG_GET_INDEX_DECOR:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jo = JSONObject.parseObject(result);
+                    if (jo.getIntValue("code") == 100000 && jo.getJSONObject("data") != null) {
+
+                        List<DecorModule> decorModules = JSONObject.parseArray(jo.getJSONObject("data").getJSONArray("modules").toJSONString(), DecorModule.class);
+                        mContentRecyclerView.clear();
+                        contentLayout.removeAllViews();
+                        for (int i = 0; i < decorModules.size(); i++) {
+                            final DecorModule module = decorModules.get(i);
+                            //模块类型1轮播图，2金刚区，3主播，4生活服务，5机构，6资讯
+                            if (module.getType() == 1) {
+                                //轮播图
+                                if (module.getStatus() == 1) {
+                                    //显示轮播图
+
+                                    BannerView bannerView = new BannerView(getContext());
+                                    int width=CommonUtils.getScreenWidth()-CommonUtils.dip2px(40);
+                                    int height=10*width/23;
+                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height);
+                                    params.leftMargin = CommonUtils.dip2px(20);
+                                    params.rightMargin = CommonUtils.dip2px(20);
+                                    //params.topMargin = CommonUtils.dip2px(20);
+                                    contentLayout.addView(bannerView, params);
+                                    List<BannerView.Banner> banners = new ArrayList<>();
+                                    for (int j = 0; module.getContents() != null && j < module.getContents().size(); j++) {
+                                        BannerInfo banner = new BannerInfo();
+                                        banner.setLogo(module.getContents().get(j).getCover());
+                                        banner.setUrl(module.getContents().get(j).getSource_url());
+                                        banners.add(banner);
+
+                                    }
+                                    bannerView.setData(banners);
+                                    bannerView.setOnItemClickListener(new BannerView.OnItemClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            BannerInfo banner=(BannerInfo)view.getTag();
+
+                                            Intent it=new Intent(getContext(),WebViewBackActivity.class);
+                                            it.putExtra("url",banner.getUrl());
+                                            startActivity(it);
+                                        }
+                                    });
+
+
+                                } else {
+                                    //关闭轮播图
+                                }
+
+                            } else if (module.getType() == 2) {
+                                //金刚区
+                                if (module.getStatus() == 1) {
+                                    //显示金刚区
+
+                                    final int cols=module.getCols();
+                                    final int flip=module.getPage_animated();
+                                    if(flip==1){
+                                        //翻页
+                                        final ViewPager moduleViewPager = new ViewPager(getContext());
+                                        moduleViewPager.setBackgroundResource(R.color.white);
+                                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, CommonUtils.dip2px(100));
+                                        contentLayout.addView(moduleViewPager, params);
+//                                    if (mModulePageAdapter == null) {
+
+                                        mModulePageAdapter = new PagerAdapter() {
+
+
+                                            @Override
+                                            public int getItemPosition(Object object) {
+                                                return POSITION_NONE;
+                                            }
+
+                                            @Override
+                                            public void destroyItem(ViewGroup container, int position, Object object) {
+                                                container.removeView(container.findViewWithTag(position));
+                                            }
+
+                                            @Override
+                                            public Object instantiateItem(ViewGroup container, int position) {
+                                                LayoutInflater inflater = LayoutInflater.from(getActivity());
+                                                final View v = inflater.inflate(R.layout.index_module_item, moduleViewPager, false);
+                                                MyGridView gv = v.findViewById(R.id.gridView);
+                                                gv.setNumColumns(cols);
+                                                List<DecorModule.ContentsBean> contents = new ArrayList<>();
+                                                for (int i = position * cols; i < (position + 1) * cols && i < module.getContents().size(); i++) {
+                                                    contents.add(module.getContents().get(i));
+                                                }
+                                                final MoudleGridViewAdapter adapter = new MoudleGridViewAdapter(getActivity(), contents);
+                                                gv.setAdapter(adapter);
+                                                gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                                    @Override
+                                                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                                        DecorModule.ContentsBean cb=adapter.getItem(position);
+                                                        if(cb.getSource_url().endsWith("tv")){
+                                                            Intent it=new Intent(getContext(),RadioListActivity.class);
+                                                            it.putExtra("type","2");
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().endsWith("radios")){
+                                                            Intent it=new Intent(getContext(),RadioListActivity.class);
+                                                            it.putExtra("type","1");
+                                                            startActivity(it);
+                                                        }else if(cb.getTitle().endsWith("政务")){
+                                                            Intent it=new Intent(getContext(),WebViewActivity.class);
+                                                            it.putExtra("url",cb.getSource_url());
+                                                            startActivity(it);
+                                                        }else if(cb.getTitle().endsWith("党建")){
+                                                            Intent it=new Intent(getContext(),WebViewActivity.class);
+                                                            it.putExtra("url",cb.getSource_url());
+                                                            startActivity(it);
+                                                        }else {
+                                                            Intent it=new Intent(getContext(),WebViewBackActivity.class);
+                                                            it.putExtra("url",cb.getSource_url());
+                                                            it.putExtra("title",cb.getTitle());
+                                                            startActivity(it);
+                                                        }
+
+                                                    }
+                                                });
+                                                v.setTag(position);
+                                                container.addView(v);
+                                                if(position==0){
+                                                    v.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                                                        @Override
+                                                        public void onGlobalLayout() {
+                                                            int height=v.getHeight();
+                                                            ViewGroup.LayoutParams lp=moduleViewPager.getLayoutParams();
+                                                            lp.height=height;
+                                                            moduleViewPager.setLayoutParams(lp);
+                                                        }
+                                                    });
+                                                }
+                                                return v;
+                                            }
+
+                                            @Override
+                                            public boolean isViewFromObject(View arg0, Object arg1) {
+                                                return arg0 == arg1;
+                                            }
+
+                                            @Override
+                                            public int getCount() {
+                                                return (module.getContents().size() + cols-1) / cols;
+                                            }
+                                        };
+
+
+                                        moduleViewPager.setAdapter(mModulePageAdapter);
+                                        ViewPager.OnPageChangeListener pageChangeListener = new ViewPager.OnPageChangeListener() {
+
+                                            @Override
+                                            public void onPageScrolled(int i, float v, int i1) {
+
+                                            }
+
+                                            @Override
+                                            public void onPageSelected(int i) {
+
+
+                                            }
+
+                                            @Override
+                                            public void onPageScrollStateChanged(int i) {
+
+                                            }
+                                        };
+                                        moduleViewPager.addOnPageChangeListener(pageChangeListener);
+                                    }else{
+                                        //连续
+                                        LayoutInflater inflater = LayoutInflater.from(getContext());
+                                        View root = inflater.inflate(R.layout.index_module_layout, contentLayout, false);
+                                        LinearLayout moduleLayout = root.findViewById(R.id.moduleLayout);
+                                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                        contentLayout.addView(root, lp);
+
+                                        for (int j = 0; j < module.getContents().size(); j++) {
+                                            final DecorModule.ContentsBean content = module.getContents().get(j);
+
+                                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.getScreenWidth()/cols, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                            params.gravity=Gravity.CENTER;
+                                            params.topMargin=CommonUtils.dip2px(20);
+                                            params.bottomMargin=CommonUtils.dip2px(20);
+                                            View anchorView = LayoutInflater.from(getContext()).inflate(R.layout.anchor_gridview_item, moduleLayout, false);
+                                            TextView anchorName = anchorView.findViewById(R.id.anchorName);
+                                            SimpleDraweeView anchor = anchorView.findViewById(R.id.anchor);
+
+
+                                            if(!TextUtils.isEmpty(content.getCover())){
+                                                Uri uri = Uri.parse(content.getCover());
+                                                int width=CommonUtils.dip2px(35);
+                                                int height=width;
+                                                ImageLoader.showThumb(uri,anchor,width,height);
+
+                                            }
+
+                                            anchorName.setText(content.getTitle());
+
+                                            anchorView.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    if(content.getSource_url().endsWith("tv")){
+                                                        Intent it=new Intent(getContext(),RadioListActivity.class);
+                                                        it.putExtra("type","2");
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().endsWith("radios")){
+                                                        Intent it=new Intent(getContext(),RadioListActivity.class);
+                                                        it.putExtra("type","1");
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().endsWith("liveprogramlist")){
+                                                        Intent it=new Intent(getContext(),WebViewBackActivity.class);
+                                                        it.putExtra("url",content.getSource_url());
+                                                        startActivity(it);
+                                                    }else {
+                                                        Intent it=new Intent(getContext(),WebViewActivity.class);
+                                                        it.putExtra("url",content.getSource_url());
+                                                        startActivity(it);
+                                                    }
+                                                }
+                                            });
+
+
+                                            moduleLayout.addView(anchorView, j, params);
+                                        }
+                                    }
+
+
+                                } else {
+                                    //关闭金刚区
+
+                                }
+
+                            } else if (module.getType() == 3) {
+                                //主播
+
+                                LayoutInflater inflater = LayoutInflater.from(getContext());
+                                View anchorLayout = inflater.inflate(R.layout.index_anchor_layout, contentLayout, false);
+                                anchorsLayout = anchorLayout.findViewById(R.id.anchorsLayout);
+                                TextView anchorTitle = anchorLayout.findViewById(R.id.anchorTitle);
+                                anchorTitle.setText(module.getTitle());
+                                SimpleDraweeView logo=anchorLayout.findViewById(R.id.logo);
+                                Station station=MyApplication.getInstance().getStation();
+                                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
+                                    Uri uri = Uri.parse(station.getIcon2());
+                                    int width=CommonUtils.dip2px(15);
+                                    int height=width;
+                                    ImageLoader.showThumb(uri,logo,width,height);
+                                }else{
+                                    logo.setVisibility(View.GONE);
+                                }
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                contentLayout.addView(anchorLayout, params);
+                                getCityAnchors( module.getOrder_by(),module.getContent_number());
+
+
+                            } else if (module.getType() == 4) {
+                                //生活服务
+
+                                LayoutInflater inflater = LayoutInflater.from(getActivity());
+                                View serviceLayout = inflater.inflate(R.layout.index_service_layout, contentLayout, false);
+                                servicesLayout = serviceLayout.findViewById(R.id.servicesLayout);
+                                SimpleDraweeView logo=serviceLayout.findViewById(R.id.logo);
+                                Station station=MyApplication.getInstance().getStation();
+                                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
+                                    Uri uri = Uri.parse(station.getIcon2());
+                                    int width=CommonUtils.dip2px(15);
+                                    int height=width;
+                                    ImageLoader.showThumb(uri,logo,width,height);
+                                }else{
+                                    logo.setVisibility(View.GONE);
+                                }
+                                moreService = serviceLayout.findViewById(R.id.moreService);
+                                moreService.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        startActivity(new Intent(getContext(),MoreServiceActivity.class));
+                                    }
+                                });
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                contentLayout.addView(serviceLayout, params);
+                                if (module.getOrder_by() == 4) {
+                                    getCityService("1",module.getContent_number());
+                                } else {
+                                    getCityService("2",module.getContent_number());
+                                }
+
+
+                            } else if (module.getType() == 5) {
+                                //机构
+
+                                LayoutInflater inflater = LayoutInflater.from(getContext());
+                                View anchorLayout = inflater.inflate(R.layout.index_anchor_layout, contentLayout, false);
+                                TextView title = anchorLayout.findViewById(R.id.anchorTitle);
+
+                                title.setText("机构");
+                                SimpleDraweeView logo=anchorLayout.findViewById(R.id.logo);
+                                Station station=MyApplication.getInstance().getStation();
+                                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
+                                    Uri uri = Uri.parse(station.getIcon2());
+                                    int width=CommonUtils.dip2px(15);
+                                    int height=width;
+                                    ImageLoader.showThumb(uri,logo,width,height);
+                                }else{
+                                    logo.setVisibility(View.GONE);
+                                }
+
+                                organizationsLayout = anchorLayout.findViewById(R.id.anchorsLayout);
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                contentLayout.addView(anchorLayout, params);
+                                getCityOrganization( module.getOrder_by(),module.getContent_number());
+
+
+                            } else {
+                                //资讯
+                                LayoutInflater inflater = LayoutInflater.from(getContext());
+                                View clolumnLayout = inflater.inflate(R.layout.index_column_item, contentLayout, false);
+                                SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
+                                TextView column = clolumnLayout.findViewById(R.id.column);
+                                TextView more= clolumnLayout.findViewById(R.id.more);
+                                column.setText(module.getTitle());
+
+                                Station station=MyApplication.getInstance().getStation();
+                                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
+                                    Uri uri = Uri.parse(station.getIcon2());
+                                    int width=CommonUtils.dip2px(15);
+                                    int height=width;
+                                    ImageLoader.showThumb(uri,logo,width,height);
+                                }else{
+                                    logo.setVisibility(View.GONE);
+                                }
+
+
+                                String[] ids= module.getData_source_id().split(",");
+                                final String columnId=ids[ids.length-1];
+                                more.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Column switchColumn=new Column();
+                                        switchColumn.setId(Integer.parseInt(columnId));
+                                        ((MainActivity)getActivity()).switchRecommend(switchColumn);
+                                    }
+                                });
+                                RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);
+                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                recyclerView.addItemDecoration(divider);
+                                mContentRecyclerView.add(recyclerView);
+                                contentLayout.addView(clolumnLayout);
+                                getContent(columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
+
+                            }
+
+                        }
+
+
+                    }
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+
                 }
 
+                break;
+            case MSG_GET_COLUMN: {
+
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        JSONObject jo = jsonObject.getJSONObject("data");
+                        if (jo.getInteger("total") > 0) {
+                            mColumns = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), Column.class);
+
+                            for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
+                                Column column = mColumns.get(i);
+
+                                LayoutInflater inflater = getLayoutInflater();
+                                View view = inflater.inflate(R.layout.column_txt_layout, columnContent, false);
+                                TextView columnTextView = view.findViewById(R.id.text);
+                                SimpleDraweeView indicator = view.findViewById(R.id.indicator);
+                                //columnTextView.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
+                                columnTextView.setText(column.getName());
+                                columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
+                                columnTextView.setSelected(false);
+                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+                                indicator.setVisibility(View.INVISIBLE);
+                                view.setTag(column);
+                                view.setOnClickListener(new View.OnClickListener() {
+
+                                    @Override
+                                    public void onClick(View v) {
+                                        Column column=(Column)v.getTag();
+                                        ((MainActivity)getActivity()).switchRecommend(column);
+                                    }
+                                });
+                                columnContent.addView(view, i);
+                            }
+
+
+                        }
+                    } else {
+
+                    }
+
+
+                } catch (Exception e) {
+
+                }
 
             }
-        }
 
+
+            break;
+        }
+        return false;
     }
 
 
@@ -475,9 +1235,10 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     public void getEventBus(CommonEvent event) {
         if (event.getEventName().equals("onLocationChanged")) {
             city.setText(MainActivity.sCurrentCity.getName());
-            getCityAnchors();
-            getCityService();
-            getCityColumns();
+            //getCityAnchors();
+            weather();
+            //getCityColumns("");
+            indexDecorate();
         }
     }
 
@@ -486,5 +1247,14 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_LOGIN && resultCode == Activity.RESULT_OK) {
+            indexDecorate();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

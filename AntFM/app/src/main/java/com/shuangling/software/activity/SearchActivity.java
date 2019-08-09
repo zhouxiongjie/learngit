@@ -32,6 +32,7 @@ import com.shuangling.software.entity.SearchHistory;
 import com.shuangling.software.fragment.SearchListFragment;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.StatusBarManager;
+import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-
+@EnableDragToClose()
 public class SearchActivity extends AppCompatActivity {
 
     public static final String TAG = "SearchActivity";
@@ -102,8 +103,9 @@ public class SearchActivity extends AppCompatActivity {
         historyList.setOnItemClickListener(new LineWrapLayout.OnItemClickListener() {
             @Override
             public void onClick(View view) {
-                String keyword=((TextView) view).getText().toString();
+                String kw=((TextView) view).getText().toString();
                 //开始搜索
+                keyword.setText(kw);
                 searchResult.setVisibility(View.VISIBLE);
                 mFragmentPagerAdapter.notifyDataSetChanged();
 

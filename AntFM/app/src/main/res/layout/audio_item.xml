@@ -6,22 +6,35 @@
     android:padding="10dp" >
 
 
-    <TextView
-        android:id="@+id/index"
+
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="1"
-        android:padding="10dp"
-        android:textColor="@color/textColorNine"
-        android:textSize="@dimen/font_size_36px"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true">
+        <TextView
+            android:id="@+id/index"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:padding="10dp"
+            android:textColor="@color/textColorNine"
+            android:textSize="@dimen/font_size_36px" />
+
+        <com.shuangling.software.customview.AudioJumpView
+            android:id="@+id/audioJump"
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_centerVertical="true"
-        android:layout_toEndOf="@+id/index"
+        android:layout_toEndOf="@+id/frameLayout"
         android:layout_marginStart="20dp">
 
         <TextView
@@ -30,6 +43,7 @@
             android:layout_height="wrap_content"
             android:text="人间有情，世间有爱"
             android:textSize="@dimen/font_size_30px"
+            android:textStyle="bold"
             android:textColor="@color/textColorTwo"
             />
 

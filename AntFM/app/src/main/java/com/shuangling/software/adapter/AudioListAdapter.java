@@ -1,22 +1,20 @@
 package com.shuangling.software.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.text.TextUtils;
+import android.os.RemoteException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
-import com.shuangling.software.activity.AudioDetailActivity;
-import com.shuangling.software.entity.Audio;
-import com.shuangling.software.service.AudioPlayerService;
+import com.shuangling.software.customview.AudioJumpView;
+import com.shuangling.software.entity.AudioInfo;
+import com.shuangling.software.service.IAudioPlayer;
 import com.shuangling.software.utils.CommonUtils;
-import com.shuangling.software.utils.ImageLoader;
+import com.shuangling.software.utils.TimeUtil;
 
 import java.util.List;
 
@@ -25,31 +23,36 @@ import butterknife.ButterKnife;
 
 public class AudioListAdapter extends BaseAdapter {
 
-    private List<Audio> mAudios;
+    private List<AudioInfo> mAudios;
     private Context mContext;
+    private IAudioPlayer audioPlayer;
 
-
-    public AudioListAdapter(Context context, List<Audio> audios) {
+    public AudioListAdapter(Context context, List<AudioInfo> audios, IAudioPlayer audioPlayer) {
         super();
         // TODO Auto-generated constructor stub
         this.mAudios = audios;
         this.mContext = context;
+        this.audioPlayer=audioPlayer;
     }
 
 
-    public void setData(List<Audio> audios) {
+    public void updateView(List<AudioInfo> audios) {
         this.mAudios = audios;
+        notifyDataSetChanged();
     }
 
 
     @Override
     public int getCount() {
+        if (mAudios == null) {
+            return 0;
+        }
         return mAudios.size();
     }
 
 
     @Override
-    public Audio getItem(int position) {
+    public AudioInfo getItem(int position) {
         return mAudios.get(position);
     }
 
@@ -62,29 +65,39 @@ public class AudioListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view;
-        ViewHolder vh;
-        if (convertView != null) {
-            view = convertView;
-            vh = new ViewHolder(view);;
-        } else {
-            view = LayoutInflater.from(mContext).inflate(R.layout.audio_item, parent, false);
-            vh = new ViewHolder(view);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.audio_item, parent, false);
 
         }
-        Audio audio=getItem(position);
-        vh.title.setText(audio.getAudios().get(0).getTitle());
-        vh.publishTime.setText(audio.getAudios().get(0).getPublish_at());
-        vh.duration.setText(""+audio.getAudios().get(0).getAudio().getDuration());
+        ViewHolder vh = new ViewHolder(convertView);
+        AudioInfo audio = getItem(position);
+        vh.index.setText("" + audio.getIndex());
+        vh.title.setText(audio.getTitle());
+        vh.publishTime.setText(TimeUtil.formatDateTime(audio.getPublish_at()));
+        vh.duration.setText(CommonUtils.getShowTime((long) Float.parseFloat(audio.getDuration()) * 1000));
+        try{
+            if (audioPlayer.getCurrentAudio()!=null&&audioPlayer.getCurrentAudio().getId()==audio.getId()){
+                vh.index.setVisibility(View.GONE);
+                vh.audioJump.setVisibility(View.VISIBLE);
+            }else{
+                vh.index.setVisibility(View.VISIBLE);
+                vh.audioJump.setVisibility(View.GONE);
+            }
+        }catch (RemoteException e){
 
-        return view;
+        }
+
+        return convertView;
     }
 
 
-
-    class ViewHolder {
+    static class ViewHolder {
         @BindView(R.id.index)
         TextView index;
+        @BindView(R.id.audioJump)
+        AudioJumpView audioJump;
+        @BindView(R.id.frameLayout)
+        FrameLayout frameLayout;
         @BindView(R.id.title)
         TextView title;
         @BindView(R.id.publishTime)
@@ -96,4 +109,6 @@ public class AudioListAdapter extends BaseAdapter {
             ButterKnife.bind(this, view);
         }
     }
+
+
 }

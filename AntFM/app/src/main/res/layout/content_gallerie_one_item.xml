@@ -7,29 +7,45 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <TextView
+    <RelativeLayout
         android:id="@+id/excellent"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/excellent_recommend"
-        android:textColor="@color/textColorTwo"
-        android:textSize="@dimen/font_size_36px"
-        android:textStyle="bold"
-        android:visibility="gone"/>
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:visibility="gone">
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/excellentLogo"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="5dp"/>
+
+        <TextView
+            android:layout_marginBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/excellentLogo"
+            android:text="@string/excellent_recommend"
+            android:textColor="@color/textColorTwo"
+            android:textSize="@dimen/font_size_36px"
+            android:textStyle="bold"
+            android:visibility="visible"/>
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="10dp">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/logo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            fresco:roundedCornerRadius="4dp"
+            fresco:roundedCornerRadius="2dp"
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/video_placeholder"
             fresco:placeholderImageScaleType="centerCrop"
@@ -70,7 +86,7 @@
         android:ellipsize="end"
         android:lineSpacingExtra="5dp"
         android:lineSpacingMultiplier="1.0"
-        android:lines="2"
+        android:maxLines="2"
         android:padding="10dp"
         android:textColor="@color/textColorTwo"
         android:textSize="@dimen/font_size_34px"
@@ -84,7 +100,19 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:orientation="horizontal">
-
+        <TextView
+            android:id="@+id/top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/top_text_bg"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/top"
+            android:textColor="@color/textColorFour"
+            android:textSize="@dimen/font_size_18px"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/merchant"

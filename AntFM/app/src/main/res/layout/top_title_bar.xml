@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="10dp"
@@ -16,6 +17,15 @@
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:src="@drawable/ic_left"/>
+        <!--<com.shuangling.software.customview.FontIconView-->
+            <!--android:id="@+id/img_back"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_vertical"-->
+            <!--android:text="&#xe612;"-->
+            <!--android:textColor="@color/gray"-->
+            <!--android:textSize="@dimen/font_size_50px" />-->
+
         <TextView
             android:id="@+id/txt_back"
             android:layout_width="wrap_content"
@@ -33,6 +43,7 @@
         android:lines="1"
         android:maxLength="15"
         android:ellipsize="end"
+        android:textStyle="bold"
         android:textSize="@dimen/font_size_34px"
         android:textColor="@color/textColorTwo"/>
     <LinearLayout
@@ -45,14 +56,16 @@
         <ImageView
             android:id="@+id/img_more"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"/>
+
         <TextView
             android:id="@+id/txt_more"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:textSize="@dimen/font_size_30px"
-            android:textColor="@color/white"
-            android:text="更多"/>
+            android:textColor="@color/textColorTwo"
+            tools:text="更多"/>
     </LinearLayout>
 </RelativeLayout>

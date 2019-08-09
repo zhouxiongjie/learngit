@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F7F9">
+
+    <com.shuangling.software.customview.TopTitleBar
+        android:id="@+id/activtyTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleText="意见与反馈"
+        android:background="@color/white"
+
+        app:canBack="true" />
+
+    <EditText
+        android:id="@+id/suggestion"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_below="@+id/activtyTitle"
+        android:padding="10dp"
+        android:textSize="@dimen/font_size_36px"
+        android:textColor="@color/textColorTwelve"
+        android:gravity="left|top"
+        android:maxLength="500"
+        android:background="@color/white"
+        android:hint="请输入您的意见..."
+        android:inputType="text" />
+    <TextView
+        android:id="@+id/textNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/suggestion"
+        android:padding="10dp"
+        android:textSize="@dimen/font_size_26px"
+        android:textColor="@color/textColorThree"
+        android:gravity="right"
+        android:background="@color/white"
+        android:hint="0/500"
+        android:inputType="text" />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textNumber"
+        android:padding="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/white">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/font_size_30px"
+            android:textColor="@color/textColorTwo"
+            android:text="手机号"/>
+
+
+        <EditText
+            android:id="@+id/phoneNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/font_size_26px"
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/textColorTwelve"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:hint="请输入手机号"
+            android:inputType="phone" />
+
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/submit"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="20dp"
+        android:background="@drawable/submit_button_round_bg"
+        android:gravity="center"
+        android:text="提交"
+        android:enabled="false"
+        android:textColor="@color/submit_text_selector"
+        android:textSize="@dimen/font_size_36px"
+        android:layout_marginTop="30dp"/>
+
+
+</RelativeLayout>

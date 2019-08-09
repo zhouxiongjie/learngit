@@ -7,17 +7,24 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.sdk.android.push.CloudPushService;
+import com.alibaba.sdk.android.push.CommonCallback;
+import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
+import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,7 +44,6 @@ public class StartupActivity extends Activity implements Handler.Callback {
     @BindView(R.id.background)
     ImageView background;
 
-    private ImageView mBackground;
     private Handler mHandler;
 
 
@@ -71,8 +77,8 @@ public class StartupActivity extends Activity implements Handler.Callback {
             }
         }, 4000);
 
-        initTheme();
-
+        //initTheme();
+        verifyUserInfo();
     }
 
     public void initTheme() {
@@ -80,15 +86,15 @@ public class StartupActivity extends Activity implements Handler.Callback {
         String url = ServerInfo.serviceIP + ServerInfo.globalDecorate;
         Map<String, String> params = new HashMap<String, String>();
 
-        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+        OkHttpUtils.getNotAuthorization(url, params, new OkHttpCallback(this) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GLOBAL_DECORATE;
-                msg.obj = response.body().string();
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
             }
@@ -107,22 +113,30 @@ public class StartupActivity extends Activity implements Handler.Callback {
     private void gotoHome() {
 
         startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 
     private void verifyUserInfo() {
-        String username = SharedPreferencesUtils.getUserName();
-        String password = SharedPreferencesUtils.getPassWord();
+        User.setInstance(SharedPreferencesUtils.getUser());
+        final CloudPushService pushService = PushServiceFactory.getCloudPushService();
+        if(SharedPreferencesUtils.getUser()!=null){
+            pushService.bindAccount(SharedPreferencesUtils.getUser().getUsername(), new CommonCallback() {
+                @Override
+                public void onSuccess(String s) {
+                    Log.i("bindAccount-onSuccess",s);
+                }
 
-        if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)) {
-
-            loginVerify(username, password);
-
+                @Override
+                public void onFailed(String s, String s1) {
+                    Log.i("bindAccount-onFailed",s);
+                    Log.i("bindAccount-onFailed",s1);
+                }
+            });
         }
-    }
-
-    private void loginVerify(String username, String password) {
 
     }
+
+
 
 
     @Override

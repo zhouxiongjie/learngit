@@ -66,11 +66,22 @@
     <style name="TabTextStyle" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="tabIndicatorColor">@color/textColorOne</item>
+        <item name="tabIndicatorColor">?attr/themeColor</item>
         <item name="tabTextColor">@color/black</item>
         <item name="tabIndicatorHeight">4dp</item>
-        <item name="tabSelectedTextColor">@color/textColorOne</item>
+        <item name="tabSelectedTextColor">?attr/themeColor</item>
         <item name="tabIndicatorFullWidth">false</item>
+    </style>
+
+
+    <style name="CheckboxStyle" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/check_box_selector</item>
+    </style>
+
+    <style name="WebViewProgressBar" parent="android:Widget.ProgressBar.Horizontal">
+        <item name="android:indeterminateDrawable">@null</item>
+        <item name="android:minHeight">4dp</item>
+        <item name="android:maxHeight">4dp</item>
     </style>
 
 

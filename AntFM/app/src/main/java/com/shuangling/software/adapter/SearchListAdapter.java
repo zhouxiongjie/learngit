@@ -8,14 +8,20 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
+import com.shuangling.software.activity.AnchorDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.RadioDetailActivity;
+import com.shuangling.software.activity.RadioListActivity;
+import com.shuangling.software.activity.SingleAudioDetailActivity;
+import com.shuangling.software.activity.SpecialDetailActivity;
+import com.shuangling.software.activity.TvDetailActivity;
+import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.entity.SearchResult;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
@@ -114,15 +120,15 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                 int height = width;
                 ImageLoader.showThumb(uri, audioViewHolder.logo, width, height);
             }
-            audioViewHolder.name.setText(content.getName());
-            audioViewHolder.duration.setText(content.getDuration());
+            //audioViewHolder.name.setText(content.getName());
+            audioViewHolder.duration.setText(CommonUtils.getShowTime((long) Float.parseFloat(content.getDuration())));
             audioViewHolder.title.setText(content.getTitle());
             audioViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    Intent it = new Intent(mContext, AlbumDetailActivity.class);
-//                    it.putExtra("albumId", content.getId());
-//                    mContext.startActivity(it);
+                    Intent it = new Intent(mContext, SingleAudioDetailActivity.class);
+                    it.putExtra("audioId", content.getId());
+                    mContext.startActivity(it);
                 }
             });
 
@@ -134,16 +140,13 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                 int height = width;
                 ImageLoader.showThumb(uri, albumViewHolder.logo, width, height);
             }
-//            albumViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
-//            albumViewHolder.publishTime.setText(content.getUpdate_time());
             albumViewHolder.title.setText(content.getTitle());
-//            albumViewHolder.commentNum.setText("" + content.getComment() + "评论");
+            albumViewHolder.name.setText(content.getDes());
             albumViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent it = new Intent(mContext, AlbumDetailActivity.class);
                     it.putExtra("albumId", content.getId());
-
                     mContext.startActivity(it);
                 }
             });
@@ -157,10 +160,7 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                 int height = width;
                 ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
             }
-//            articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
-//            articleViewHolder.publishTime.setText(content.getUpdate_time());
             articleViewHolder.title.setText(content.getTitle());
-//            articleViewHolder.commentNum.setText("" + content.getComment() + "评论");
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -178,10 +178,21 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                 int height = width;
                 ImageLoader.showThumb(uri, videoViewHolder.logo, width, height);
             }
-//            videoViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
-//            videoViewHolder.publishTime.setText(content.getUpdate_time());
             videoViewHolder.title.setText(content.getTitle());
-//            videoViewHolder.commentNum.setText("" + content.getComment() + "评论");
+            if(!TextUtils.isEmpty(content.getDuration())){
+                videoViewHolder.duration.setText(CommonUtils.getShowTime((long) Float.parseFloat(content.getDuration())));
+            }else{
+                videoViewHolder.duration.setText("00:00");
+            }
+            videoViewHolder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent it = new Intent(mContext, VideoDetailActivity.class);
+                    it.putExtra("videoId", content.getId());
+                    mContext.startActivity(it);
+                }
+            });
+
         } else if (getItemViewType(position) == TYPE_SPECIAL) {
             SpecialViewHolder specialViewHolder = (SpecialViewHolder) holder;
 
@@ -191,56 +202,80 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                 int height = width;
                 ImageLoader.showThumb(uri, specialViewHolder.logo, width, height);
             }
-//            specialViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
-//            specialViewHolder.publishTime.setText(content.getUpdate_time());
+            specialViewHolder.merchant.setText(content.getName());
             specialViewHolder.title.setText(content.getTitle());
-//            specialViewHolder.commentNum.setText("" + content.getComment() + "评论");
+            specialViewHolder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent it = new Intent(mContext, SpecialDetailActivity.class);
+                    it.putExtra("specialId", content.getId());
+                    mContext.startActivity(it);
+                }
+            });
 
 
         } else if (getItemViewType(position) == TYPE_RADIO) {
-            RadioViewHolder specialViewHolder = (RadioViewHolder) holder;
+            RadioViewHolder radioViewHolder = (RadioViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
                 Uri uri = Uri.parse(content.getCover());
                 int width = CommonUtils.dip2px(70);
                 int height = width;
-                ImageLoader.showThumb(uri, specialViewHolder.logo, width, height);
+                ImageLoader.showThumb(uri, radioViewHolder.logo, width, height);
             }
-//            specialViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
-//            specialViewHolder.publishTime.setText(content.getUpdate_time());
-            specialViewHolder.title.setText(content.getTitle());
-//            specialViewHolder.commentNum.setText("" + content.getComment() + "评论");
+            radioViewHolder.title.setText(content.getName());
+            radioViewHolder.name.setText("正在直播:"+content.getDes());
+            radioViewHolder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Intent it=new Intent(mContext,RadioDetailActivity.class);
+                    it.putExtra("radioId",content.getId());
+                    mContext.startActivity(it);
+                }
+            });
 
 
         } else if (getItemViewType(position) == TYPE_ANCHOR) {
-            AnchorViewHolder specialViewHolder = (AnchorViewHolder) holder;
+            AnchorViewHolder anchorViewHolder = (AnchorViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
                 Uri uri = Uri.parse(content.getCover());
                 int width = CommonUtils.dip2px(70);
                 int height = width;
-                ImageLoader.showThumb(uri, specialViewHolder.logo, width, height);
+                ImageLoader.showThumb(uri, anchorViewHolder.logo, width, height);
             }
-//            specialViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
-//            specialViewHolder.publishTime.setText(content.getUpdate_time());
-            specialViewHolder.title.setText(content.getTitle());
-//            specialViewHolder.commentNum.setText("" + content.getComment() + "评论");
 
+            anchorViewHolder.title.setText(content.getName());
+            anchorViewHolder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent it=new Intent(mContext,AnchorDetailActivity.class);
+                    it.putExtra("anchorId",content.getId());
+                    mContext.startActivity(it);
+                }
+            });
 
         } else {
-            TvViewHolder specialViewHolder = (TvViewHolder) holder;
+            TvViewHolder tvViewHolder = (TvViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
                 Uri uri = Uri.parse(content.getCover());
                 int width = CommonUtils.dip2px(70);
                 int height = width;
-                ImageLoader.showThumb(uri, specialViewHolder.logo, width, height);
+                ImageLoader.showThumb(uri, tvViewHolder.logo, width, height);
             }
-//            specialViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
-//            specialViewHolder.publishTime.setText(content.getUpdate_time());
-            specialViewHolder.title.setText(content.getTitle());
-//            specialViewHolder.commentNum.setText("" + content.getComment() + "评论");
 
+            tvViewHolder.title.setText(content.getName());
+            tvViewHolder.name.setText("正在直播:"+content.getDes());
+            tvViewHolder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent it=new Intent(mContext,TvDetailActivity.class);
+                    it.putExtra("radioId",content.getId());
+                    mContext.startActivity(it);
+                }
+            });
 
         }
     }
@@ -290,12 +325,8 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
         SimpleDraweeView logo;
         @BindView(R.id.title)
         TextView title;
-        @BindView(R.id.merchant)
-        TextView merchant;
-        @BindView(R.id.commentNum)
-        TextView commentNum;
-        @BindView(R.id.publishTime)
-        TextView publishTime;
+        @BindView(R.id.name)
+        TextView name;
         @BindView(R.id.root)
         RelativeLayout root;
 

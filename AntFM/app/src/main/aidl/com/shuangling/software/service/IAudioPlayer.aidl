@@ -2,7 +2,8 @@
 package com.shuangling.software.service;
 
 import com.shuangling.software.entity.Audio;
-
+import com.shuangling.software.entity.AudioDetail;
+import com.shuangling.software.entity.AudioInfo;
 
 // Declare any non-default types here with import statements
 
@@ -15,11 +16,15 @@ interface IAudioPlayer {
     //void playAudio();
 
 
-    void setPlayerList(in List<Audio> list);
+//    void setPlayerList(in List<Audio> list);
 
-    List<Audio> getPlayerList();
+    void setPlayerList(in List<AudioInfo> list);
 
-    Audio getCurrentAudio();
+//    List<Audio> getPlayerList();
+
+    List<AudioInfo> getPlayerList();
+
+    AudioInfo getCurrentAudio();
 
     void setScreenBrightness(in int brightness);
 
@@ -53,7 +58,9 @@ interface IAudioPlayer {
 
     int getPlayerState();
 
-    void playAudio(in Audio audio);
+//    void playAudio(in Audio audio);
+//    void playAudioDetail(in AudioDetail audio);
+    void playAudio(in AudioInfo audio);
 
     void setTimerType(in int type);
 

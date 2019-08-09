@@ -1,48 +1,79 @@
 package com.shuangling.software.activity;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.jaeger.library.StatusBarUtil;
+import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.customview.ArrowRectangleView;
+import com.shuangling.software.customview.PopupMenu;
+import com.shuangling.software.customview.ReadMoreTextViewWithIcon;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.Organization;
+import com.shuangling.software.entity.OrganizationMenus;
+import com.shuangling.software.entity.Station;
+import com.shuangling.software.entity.User;
+import com.shuangling.software.fragment.ProgramAnchorFragment;
+import com.shuangling.software.fragment.ProgramContentFragment;
+import com.shuangling.software.fragment.ProgramRadioFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
-import com.shuangling.software.utils.StatusBarManager;
+import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
-import okhttp3.Response;
 
-
+@EnableDragToClose()
 public class OrganizationDetailActivity extends BaseActivity implements Handler.Callback {
 
     public static final String TAG = "AnchorDetailActivity";
 
-    private static final String[] category = new String[]{"电台","主播","资讯","专辑","视频"};
-
     public static final int MSG_GET_ORGANIZATION_DETAIL = 0x1;
+
+    public static final int MSG_GET_RECOMMEND_ORGANIZATION = 0x2;
+
+    public static final int MSG_ATTENTION_CALLBACK = 0x3;
+
+    public static final int MSG_ATTENTION_OTHER_CALLBACK = 0x4;
+
+    public static final int MSG_GET_ORGANIZATION_MENUS = 0x5;
+
+    public static final int REQUEST_LOGIN = 0x6;
+
+    private static final int[] category = new int[]{R.string.radio, R.string.anchor, R.string.article, R.string.album, R.string.video, R.string.special, R.string.photo};
+    //private static final int[] category = new int[]{ R.string.article,R.string.album, R.string.video, R.string.special, R.string.photo};
+
     @BindView(R.id.activity_title)
     TopTitleBar activityTitle;
     @BindView(R.id.logo)
@@ -58,18 +89,34 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
     @BindView(R.id.more)
     ImageView more;
     @BindView(R.id.desc)
-    TextView desc;
+    ReadMoreTextViewWithIcon desc;
     @BindView(R.id.tabPageIndicator)
     TabLayout tabPageIndicator;
     @BindView(R.id.viewPager)
     ViewPager viewPager;
+    @BindView(R.id.anchorLogo)
+    SimpleDraweeView anchorLogo;
+    @BindView(R.id.anchorsLayout)
+    LinearLayout anchorsLayout;
+    @BindView(R.id.anchors)
+    LinearLayout anchors;
+    @BindView(R.id.menus)
+    LinearLayout menus;
+    @BindView(R.id.authentication)
+    TextView authentication;
 
+    private FragmentAdapter mFragmentPagerAdapter;
 
     private int mOrganizationId;
     private Organization mOrganization;
 
+    private List<Organization> mOrganizations;
+    private List<OrganizationMenus> mOrganizationMenus;
+
+
     private Handler mHandler;
 
+    private PopupMenu mPopupMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,16 +124,22 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
         setTheme(MyApplication.getInstance().getCurrentTheme());
         setContentView(R.layout.activity_organization_detail);
         ButterKnife.bind(this);
-        StatusBarUtil.setTransparent(this);
-        StatusBarManager.setImmersiveStatusBar(this, true);
         mHandler = new Handler(this);
 
-
-        getAlbumDetail();
+        init();
+        getOrganizationDetail();
+        getOrganizationMenus();
 
     }
 
-    private void getAlbumDetail() {
+
+    private void init() {
+        mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(mFragmentPagerAdapter);
+        tabPageIndicator.setupWithViewPager(viewPager);
+    }
+
+    private void getOrganizationDetail() {
         mOrganizationId = getIntent().getIntExtra("organizationId", 0);
 
         String url = ServerInfo.serviceIP + ServerInfo.anchorDetail + mOrganizationId;
@@ -95,11 +148,138 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_ORGANIZATION_DETAIL;
-                msg.obj = response.body().string();
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, IOException exception) {
+
+
+            }
+        });
+    }
+
+
+    private void getOrganizationMenus() {
+        mOrganizationId = getIntent().getIntExtra("organizationId", 0);
+
+        String url = ServerInfo.serviceIP + ServerInfo.getOrganizationMenus + mOrganizationId;
+        Map<String, String> params = new HashMap<>();
+        params.put("type", "1");
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_ORGANIZATION_MENUS;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, IOException exception) {
+
+
+            }
+        });
+    }
+
+
+    public void attention(final boolean attention) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.attention;
+        Map<String, String> params = new HashMap<>();
+        params.put("id", "" + mOrganization.getId());
+        if (attention) {
+            params.put("type", "1");
+        } else {
+            params.put("type", "0");
+        }
+
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_ATTENTION_CALLBACK;
+                msg.arg1 = attention ? 1 : 0;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, IOException exception) {
+
+
+            }
+        });
+
+    }
+
+
+    public void attention(Organization organization, final boolean follow, final View view) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.attention;
+        Map<String, String> params = new HashMap<>();
+        params.put("id", "" + organization.getId());
+        if (follow) {
+            params.put("type", "1");
+        } else {
+            params.put("type", "0");
+        }
+
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_ATTENTION_OTHER_CALLBACK;
+                msg.arg1 = follow ? 1 : 0;
+                Bundle bundle = new Bundle();
+                bundle.putString("response", response);
+                msg.setData(bundle);
+                msg.obj = view;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, IOException exception) {
+
+
+            }
+        });
+
+    }
+
+
+    private void getRecommendOrganization() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.getRecommendAnchor + mOrganizationId;
+        Map<String, String> params = new HashMap<>();
+        params.put("page", "1");
+        params.put("page_size", "" + Constant.PAGE_SIZE);
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_RECOMMEND_ORGANIZATION;
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
 
@@ -130,13 +310,55 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
                             int height = width;
                             ImageLoader.showThumb(uri, logo, width, height);
                         }
-
+                        authentication.setText(mOrganization.getName()+"官方账号");
                         activityTitle.setTitleText(mOrganization.getName());
-                        count.setText("" + mOrganization.getOthers().getCount());
-                        follows.setText("" + mOrganization.getOthers().getFollows());
-                        likes.setText("" + mOrganization.getOthers().getLikes());
-                        desc.setText(mOrganization.getDes());
+                        if (mOrganization.getOthers() != null) {
+                            count.setText("" + mOrganization.getOthers().getCount());
+                            follows.setText("" + mOrganization.getOthers().getFollows());
+                            likes.setText("" + mOrganization.getOthers().getLikes());
+                        }
 
+                        if (!TextUtils.isEmpty(mOrganization.getDes())) {
+                            desc.setText(mOrganization.getDes());
+                        } else {
+                            desc.setText("暂无简介");
+                        }
+
+                        if (mOrganization.getIs_follow() == 0) {
+                            attention.setText("关注");
+                            attention.setActivated(true);
+                            more.setActivated(true);
+                        } else {
+                            attention.setActivated(false);
+                            attention.setText("已关注");
+                            more.setActivated(false);
+                        }
+
+                        attention.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (User.getInstance() == null) {
+                                    startActivityForResult(new Intent(OrganizationDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                } else {
+                                    attention(mOrganization.getIs_follow() == 0);
+                                }
+                            }
+                        });
+
+                        more.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (anchors.getVisibility() == View.GONE) {
+                                    getRecommendOrganization();
+                                } else {
+                                    anchorsLayout.removeAllViews();
+                                    anchors.setVisibility(View.GONE);
+                                    more.setImageResource(R.drawable.anchor_more_down_selector);
+
+                                }
+
+                            }
+                        });
 
 
                     }
@@ -148,51 +370,297 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
 
 
                 break;
+            case MSG_GET_ORGANIZATION_MENUS:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        mOrganizationMenus = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), OrganizationMenus.class);
+
+                        if (mOrganizationMenus.size() > 0 && mOrganizationMenus.get(0).getContent() != null) {
+
+                            for (int i = 0; i < mOrganizationMenus.get(0).getContent().size(); i++) {
+
+                                final OrganizationMenus.ContentBean contentBean = mOrganizationMenus.get(0).getContent().get(i);
+
+                                LayoutInflater inflater = getLayoutInflater();
+                                View view = inflater.inflate(R.layout.menu_item, menus, false);
+                                TextView menu = view.findViewById(R.id.menu);
+                                ImageView divide = view.findViewById(R.id.divide);
+                                if (i == mOrganizationMenus.get(0).getContent().size() - 1) {
+                                    divide.setVisibility(View.INVISIBLE);
+                                }
+                                menu.setText(contentBean.getName());
+
+                                view.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if (contentBean.getAction() == 1) {
+                                            //打开二级菜单
+                                            if (contentBean.getChilds() != null && contentBean.getChilds().size() > 0) {
+                                                //
+                                                ArrowRectangleView menuLayout = (ArrowRectangleView) getLayoutInflater().inflate(R.layout.level_two_menu, null);
+
+                                                for (int j = 0; j < contentBean.getChilds().size(); j++) {
+                                                    TextView textView = new TextView(OrganizationDetailActivity.this);
+                                                    int paddingLeftRight = CommonUtils.dip2px(10);
+                                                    int paddingTopBottom = CommonUtils.dip2px(5);
+                                                    textView.setPadding(paddingLeftRight, paddingTopBottom, paddingLeftRight, paddingTopBottom);
+                                                    textView.setMinWidth(CommonUtils.dip2px(60));
+                                                    textView.setGravity(Gravity.CENTER);
+                                                    textView.setTextColor(getResources().getColor(R.color.textColorTwo));
+                                                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                                                    textView.setText(contentBean.getChilds().get(j).getName());
+                                                    textView.setTag(contentBean.getChilds().get(j));
+                                                    menuLayout.addView(textView, new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                                                }
+
+                                                mPopupMenu = new PopupMenu((ViewGroup) menuLayout);
+                                                mPopupMenu.setMenuItemBackgroundColor(0xffb1df83);
+                                                mPopupMenu.setMenuItemHoverBackgroundColor(0x22000000);
+                                                mPopupMenu.setOnMenuItemSelectedListener(new PopupMenu.OnMenuItemSelectedListener() {
+                                                    @Override
+                                                    public void onMenuItemSelected(View menuItem) {
+                                                        OrganizationMenus.ContentBean.ChildsBean levelTwoMenu = (OrganizationMenus.ContentBean.ChildsBean) menuItem.getTag();
+                                                        Intent it = new Intent(OrganizationDetailActivity.this, WebViewActivity.class);
+                                                        it.putExtra("url", levelTwoMenu.getUrl());
+                                                        startActivity(it);
+                                                    }
+                                                });
+                                                if (mPopupMenu.isShowing()) {
+                                                    mPopupMenu.dismiss();
+                                                } else {
+                                                    // based on bottom-left, need take menu width and menu icon width into account
+                                                    //mPopupMenu.show(menus, (int) 0, (int)0);
+
+
+                                                    menuLayout.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                                                    int measuredWidth = menuLayout.getMeasuredWidth();
+                                                    int measuredHeight = menuLayout.getMeasuredHeight();
+
+                                                    int[] location = new int[2];
+                                                    v.getLocationOnScreen(location);
+                                                    //popupWindow.showAsDropDown(v);//在v的下面
+                                                    //显示在上方
+                                                    mPopupMenu.showAtLocation(v, Gravity.NO_GRAVITY, location[0] + v.getWidth() / 2 - measuredWidth / 2, location[1] - measuredHeight);
+                                                    //显示在正上方
+                                                    //popupWindow.showAtLocation(v, Gravity.NO_GRAVITY, (location[0] + v.getWidth() / 2) - measuredWidth / 2, location[1]-measuredHeight);
+                                                    //显示在左方
+                                                    //popupWindow.showAtLocation(v,Gravity.NO_GRAVITY,location[0]-popupWindow.getWidth(),location[1]);
+                                                    //显示在下方
+                                                    //popupWindow.showAtLocation(v,Gravity.NO_GRAVITY,location[0]+v.getWidth(),location[1]);
+                                                    mPopupMenu.setAnimationStyle(android.R.style.Animation_Translucent);//设置动画
+
+
+                                                }
+
+                                            }
+
+                                        } else {
+                                            //跳转链接
+                                            Intent it = new Intent(OrganizationDetailActivity.this, WebViewActivity.class);
+                                            it.putExtra("url", contentBean.getUrl());
+                                            startActivity(it);
+                                        }
+                                    }
+                                });
+                                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                lp.weight = 1;
+                                menus.addView(view, lp);
+
+
+                            }
+
+                        }
+
+                    }
+
+
+                } catch (Exception e) {
+
+                }
+                break;
+
+            case MSG_GET_RECOMMEND_ORGANIZATION:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        mOrganizations = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), Organization.class);
+                        if (mOrganizations.size() > 0) {
+                            more.setImageResource(R.drawable.anchor_more_up_selector);
+                            anchorsLayout.removeAllViews();
+                            anchors.setVisibility(View.VISIBLE);
+                            Station station = MyApplication.getInstance().getStation();
+                            if (station != null && !TextUtils.isEmpty(station.getIcon2())) {
+                                Uri uri = Uri.parse(station.getIcon2());
+                                int width = CommonUtils.dip2px(15);
+                                int height = width;
+                                ImageLoader.showThumb(uri, anchorLogo, width, height);
+                            } else {
+                                anchorLogo.setVisibility(View.GONE);
+                            }
+
+
+                            for (int i = 0; i < mOrganizations.size(); i++) {
+                                final Organization organization = mOrganizations.get(i);
+
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip2px(120), LinearLayout.LayoutParams.WRAP_CONTENT);
+                                int marginLeft;
+                                if (i == 0) {
+                                    marginLeft = CommonUtils.dip2px(20);
+                                } else {
+                                    marginLeft = CommonUtils.dip2px(10);
+                                }
+                                int margin = CommonUtils.dip2px(10);
+                                params.setMargins(marginLeft, margin, margin, margin);
+                                View anchorView = LayoutInflater.from(this).inflate(R.layout.anchor_item_layout, anchorsLayout, false);
+                                TextView anchorName = anchorView.findViewById(R.id.anchorName);
+                                SimpleDraweeView logo = anchorView.findViewById(R.id.logo);
+                                ImageView authenticationLogo = anchorView.findViewById(R.id.authenticationLogo);
+                                authenticationLogo.setBackgroundResource(R.drawable.ic_org_authentication);
+                                TextView desc = anchorView.findViewById(R.id.desc);
+                                desc.setVisibility(View.GONE);
+                                TextView attention = anchorView.findViewById(R.id.attention);
+                                if (organization.getIs_follow() == 0) {
+                                    attention.setActivated(true);
+                                } else {
+                                    attention.setActivated(false);
+                                }
+
+                                anchorView.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent it = new Intent(OrganizationDetailActivity.this, OrganizationDetailActivity.class);
+                                        it.putExtra("organizationId", organization.getId());
+                                        startActivity(it);
+                                    }
+                                });
+                                attention.setTag(organization);
+                                attention.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if (User.getInstance() == null) {
+                                            startActivityForResult(new Intent(OrganizationDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                        } else {
+                                            attention(organization, organization.getIs_follow() == 0, v);
+                                        }
+
+                                    }
+                                });
+
+                                if (!TextUtils.isEmpty(organization.getLogo())) {
+                                    Uri uri = Uri.parse(organization.getLogo());
+                                    int width = CommonUtils.dip2px(65);
+                                    int height = width;
+                                    ImageLoader.showThumb(uri, logo, width, height);
+                                }
+                                anchorName.setText(organization.getName());
+                                desc.setText(organization.getDes());
+
+                                anchorsLayout.addView(anchorView, i, params);
+                            }
+                            //更多
+
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip2px(120), LinearLayout.LayoutParams.WRAP_CONTENT);
+                            int margin = CommonUtils.dip2px(5);
+                            params.setMargins(margin, margin, margin, margin);
+                            params.gravity = Gravity.CENTER_VERTICAL;
+                            View more = LayoutInflater.from(this).inflate(R.layout.more_item_layout, anchorsLayout, false);
+
+                            more.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent it = new Intent(OrganizationDetailActivity.this, MoreAnchorOrOrganizationActivity.class);
+                                    it.putExtra("type", 1);
+                                    it.putExtra("orderBy", 1);
+                                    startActivity(it);
+
+                                }
+                            });
+
+                            anchorsLayout.addView(more, params);
+                        }
+
+
+                    }
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+
+            case MSG_ATTENTION_CALLBACK:
+                try {
+                    String result = (String) msg.obj;
+                    boolean follow = msg.arg1 == 1 ? true : false;
+
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        ToastUtils.show(jsonObject.getString("msg"));
+
+                        if (follow) {
+                            attention.setText("已关注");
+                            attention.setActivated(false);
+                            more.setActivated(false);
+                            mOrganization.setIs_follow(1);
+
+                            if (anchors.getVisibility() == View.GONE) {
+                                getRecommendOrganization();
+                            }
+                        } else {
+                            attention.setText("关注");
+                            attention.setActivated(true);
+                            more.setActivated(true);
+                            mOrganization.setIs_follow(0);
+                            if (anchors.getVisibility() == View.VISIBLE) {
+                                anchorsLayout.removeAllViews();
+                                anchors.setVisibility(View.GONE);
+                                more.setImageResource(R.drawable.anchor_more_down_selector);
+                            }
+                        }
+
+
+                    }
+
+
+                } catch (Exception e) {
+
+                }
+                break;
+            case MSG_ATTENTION_OTHER_CALLBACK:
+                try {
+                    String result = msg.getData().getString("response");
+                    boolean follow = msg.arg1 == 1 ? true : false;
+
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        ToastUtils.show(jsonObject.getString("msg"));
+                        TextView attention = (TextView) msg.obj;
+                        Organization organization = (Organization) attention.getTag();
+                        if (follow) {
+                            attention.setText("已关注");
+                            attention.setActivated(false);
+                            organization.setIs_follow(1);
+                        } else {
+                            attention.setText("关注");
+                            attention.setActivated(true);
+                            organization.setIs_follow(0);
+
+                        }
+
+                    }
+
+
+                } catch (Exception e) {
+
+                }
+                break;
         }
         return false;
-    }
-
-
-    private void initFragment() {
-//        mFragments.clear();
-//        AlbumIntroduceFragment introduceFragment = new AlbumIntroduceFragment();
-//        Bundle introduceData = new Bundle();
-//        introduceData.putString("introduction", mAlbum.getDes());
-//        introduceFragment.setArguments(introduceData);
-//
-//        AlbumAudiosFragment audiosFragment = new AlbumAudiosFragment();
-//        Bundle audiosData = new Bundle();
-//        audiosData.putInt("albumId", mAlbum.getId());
-//        audiosFragment.setArguments(audiosData);
-//
-//        AlbumRecommendFragment recommendFragment = new AlbumRecommendFragment();
-//        Bundle recommendData = new Bundle();
-//        recommendData.putInt("albumId", mAlbum.getId());
-//        recommendFragment.setArguments(recommendData);
-//
-//
-//        mFragments.add(introduceFragment);
-//        mFragments.add(audiosFragment);
-//        mFragments.add(recommendFragment);
-//        MyFragmentPagerAdapter mAdapetr = new MyFragmentPagerAdapter(getSupportFragmentManager(), mFragments);
-//        viewPager.setAdapter(mAdapetr);
-//        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//            @Override
-//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//
-//            }
-//
-//            @Override
-//            public void onPageSelected(int position) {
-//
-//            }
-//
-//            @Override
-//            public void onPageScrollStateChanged(int state) {
-//
-//            }
-//        });
-
     }
 
 
@@ -210,5 +678,74 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
             case R.id.more:
                 break;
         }
+    }
+
+
+    public class FragmentAdapter extends FragmentStatePagerAdapter {
+
+        private FragmentManager fm;
+
+        public FragmentAdapter(FragmentManager fm) {
+            super(fm);
+            this.fm = fm;
+        }
+
+
+        @Override
+        public int getCount() {
+            return category.length;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+
+            if (category[position] == R.string.radio) {
+                //电台
+                ProgramRadioFragment fragment = new ProgramRadioFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("organizationId", "" + mOrganizationId);
+                bundle.putString("category", getResources().getString(category[position]));
+                fragment.setArguments(bundle);
+                return fragment;
+            } else if (category[position] == R.string.anchor) {
+                //主播
+                ProgramAnchorFragment fragment = new ProgramAnchorFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("organizationId", "" + mOrganizationId);
+                bundle.putString("category", getResources().getString(category[position]));
+                fragment.setArguments(bundle);
+                return fragment;
+            } else {
+                ProgramContentFragment fragment = new ProgramContentFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("organizationId", "" + mOrganizationId);
+                bundle.putString("category", getResources().getString(category[position]));
+                fragment.setArguments(bundle);
+                return fragment;
+            }
+
+
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return getResources().getString(category[position]);
+        }
+
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
+
+
+        @Override
+        public Object instantiateItem(ViewGroup container, final int position) {
+            //得到缓存的fragment
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+
+            return fragment;
+        }
+
     }
 }

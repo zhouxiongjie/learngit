@@ -8,8 +8,8 @@
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/service"
-        android:layout_width="65dp"
-        android:layout_height="65dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_gravity="center_horizontal"
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImage="@drawable/head_placeholder"
@@ -18,7 +18,9 @@
         fresco:failureImageScaleType="centerCrop"
         fresco:viewAspectRatio="1"
         fresco:roundingBorderWidth="0dp"
-        fresco:roundingBorderColor="@color/ghostwhite" />
+        fresco:roundingBorderColor="@color/ghostwhite"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"/>
 
     <TextView
         android:id="@+id/serviceName"
@@ -26,7 +28,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:maxWidth="100dp"
+        android:minWidth="100dp"
+        android:layout_marginBottom="15dp"
         android:textSize="@dimen/font_size_28px"
         android:textColor="@color/textColorTwo"
         android:textStyle="bold"

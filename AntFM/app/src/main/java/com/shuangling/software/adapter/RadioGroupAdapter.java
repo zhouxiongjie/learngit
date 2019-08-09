@@ -9,7 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.shuangling.software.R;
-import com.shuangling.software.entity.RadioGroup;
+import com.shuangling.software.entity.RadioSet;
 
 import java.util.List;
 
@@ -18,21 +18,21 @@ import butterknife.ButterKnife;
 
 
 public class RadioGroupAdapter extends BaseAdapter {
-    private List<RadioGroup> list;
-    private RadioGroup selected;
+    private List<RadioSet> list;
+    private RadioSet selected;
     private Context mContext;
 
-    public RadioGroup getSelected() {
+    public RadioSet getSelected() {
         return selected;
     }
 
-    public void setSelected(RadioGroup selected) {
+    public void setSelected(RadioSet selected) {
         this.selected = selected;
         notifyDataSetChanged();
     }
 
 
-    public RadioGroupAdapter(Context mContext, List<RadioGroup> list) {
+    public RadioGroupAdapter(Context mContext, List<RadioSet> list) {
         this.mContext = mContext;
         this.list = list;
     }
@@ -44,16 +44,21 @@ public class RadioGroupAdapter extends BaseAdapter {
      *
      * @param list
      */
-    public void updateListView(List<RadioGroup> list) {
+    public void updateListView(List<RadioSet> list) {
         this.list = list;
         notifyDataSetChanged();
     }
 
     public int getCount() {
-        return this.list.size();
+        if(list!=null){
+            return this.list.size();
+        }else{
+            return 0;
+        }
+
     }
 
-    public RadioGroup getItem(int position) {
+    public RadioSet getItem(int position) {
         return list.get(position);
     }
 
@@ -63,7 +68,7 @@ public class RadioGroupAdapter extends BaseAdapter {
 
     public View getView(final int position, View view, ViewGroup viewGroup) {
         ViewHolder viewHolder;
-        final RadioGroup listBean = list.get(position);
+        final RadioSet listBean = list.get(position);
         if (view == null) {
             view = LayoutInflater.from(mContext).inflate(R.layout.radio_group_item_one, null);
 

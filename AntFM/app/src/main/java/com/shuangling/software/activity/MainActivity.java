@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -32,6 +33,7 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.entity.City;
+import com.shuangling.software.entity.Column;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.fragment.DiscoverFragment;
 import com.shuangling.software.fragment.IndexFragment;
@@ -42,6 +44,8 @@ import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ServerInfo;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.youngfeng.snake.Snake;
+import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -58,7 +62,7 @@ import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 import okhttp3.Response;
 
-
+@EnableDragToClose()
 public class MainActivity extends AppCompatActivity implements AMapLocationListener, Handler.Callback {
 
     public static final String TAG = "MainActivity";
@@ -89,17 +93,6 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     @BindView(R.id.personalCenterLayout)
     LinearLayout personalCenterLayout;
 
-//    @BindView(R.id.index)
-//    TextView index;
-//    @BindView(R.id.recommend)
-//    TextView recommend;
-//    @BindView(R.id.discover)
-//    TextView discover;
-//    @BindView(R.id.personalCenter)
-//    TextView personalCenter;
-//    @BindView(R.id.content)
-//    FrameLayout content;
-
 
     private Fragment indexFragment;
     private Fragment recommendFragment;
@@ -122,19 +115,60 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     public static City sCurrentCity;   //默认城市长沙
     public static List<City> sCityList;
 
+    private static long lastClickTime;
+    private static final int MIN_CLICK_DELAY_TIME = 2000;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
         setContentView(R.layout.activity_main);
-//        StatusBarUtil.setTransparent(this);
-//        StatusBarManager.setImmersiveStatusBar(this, true);
+        Snake.addDragListener(this, new Snake.OnDragListener() {
+            @Override
+            public void onDragStart(View view) {
+                super.onDragStart(view);
+            }
+
+            @Override
+            public void onDrag(View view, int left, boolean isSetlling) {
+                super.onDrag(view, left, isSetlling);
+            }
+
+            @Override
+            public void onRelease(View view, float xVelocity) {
+                super.onRelease(view, xVelocity);
+            }
+
+            @Override
+            public void onBackToStartCompleted(View view) {
+                super.onBackToStartCompleted(view);
+            }
+        });
         ButterKnife.bind(this);
         mHandler = new Handler(this);
         showFragment(0);
-        showFloatWindow();
+        showFloatWindowPermission();
         getCityList();
 
+    }
+
+
+    public void switchRecommend(Column column) {
+        settingBackgound(recommend);
+        settingBackgound(recommendIcon);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (recommendFragment == null) {
+            recommendFragment = new RecommendFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("column",column);
+            recommendFragment.setArguments(bundle);
+            transaction.add(R.id.content, recommendFragment);
+        } else {
+
+            transaction.show(recommendFragment);
+            ((RecommendFragment)recommendFragment).switchColumn(column);
+        }
+        hideFragments(transaction);
+        transaction.commit();
     }
 
 
@@ -216,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         builder.create().show();
     }
 
-    private void showFloatWindow() {
+    private void showFloatWindowPermission() {
         FloatWindowUtil.getInstance().addOnPermissionListener(new FloatWindowUtil.OnPermissionListener() {
             @Override
             public void showPermissionDialog() {
@@ -242,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                 dialog.show();
             }
         });
-        FloatWindowUtil.getInstance().showFloatWindow(this);
+        FloatWindowUtil.getInstance().setPermission();
     }
 
 
@@ -394,8 +428,8 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         if (requestCode == REQUEST_PERMISSION_CODE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-                if (FloatWindowUtil.checkFloatWindowPermission(this)) {
-                    FloatWindowUtil.getInstance().showFloatWindow(this);
+                if (FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
+                    //FloatWindowUtil02.getInstance().showFloatWindow();
                 } else {
                     //不显示悬浮窗 并提示
                 }
@@ -413,15 +447,14 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         int error = aMapLocation.getErrorCode();
         if (aMapLocation != null && aMapLocation.getErrorCode() == 0) {
 
-            String cityCode = aMapLocation.getCityCode();
+            String cityCode = aMapLocation.getAdCode();
+            //cityCode=cityCode.substring(0,4);
 
             for (int i = 0; i < sCityList.size(); i++) {
                 if (cityCode.equals(sCityList.get(i).getCode())) {
                     if (sCurrentCity == null) {
                         sCurrentCity = sCityList.get(i);
                         //通知城市已改变
-                        EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
-
                     }
 
                     break;
@@ -429,6 +462,8 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
             }
             if (sCurrentCity == null) {
                 sCurrentCity = new City(4301, "长沙市", "C");
+                EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
+            }else{
                 EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
             }
 
@@ -459,11 +494,11 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         OkHttpUtils.get(url, null, new OkHttpCallback(this) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_CITY_LIST;
-                msg.obj = response.body().string();
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
 
@@ -511,5 +546,19 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         return false;
     }
 
+
+
+    @Override
+    public void onBackPressed() {
+        long curClickTime = System.currentTimeMillis();
+        if ((curClickTime - lastClickTime) >= MIN_CLICK_DELAY_TIME) {
+            ToastUtils.show("再按一次退出应用");
+            lastClickTime = curClickTime;
+        } else {
+            lastClickTime = curClickTime;
+            super.onBackPressed();
+        }
+
+    }
 
 }

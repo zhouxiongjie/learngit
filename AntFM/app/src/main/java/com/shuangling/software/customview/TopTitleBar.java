@@ -25,6 +25,7 @@ public class TopTitleBar extends RelativeLayout {
     private String moreText;
     private int moreImg;
     private TextView tvMore;
+    LinearLayout backBtn;
 
 
     public TopTitleBar(Context context, AttributeSet attrs) {
@@ -44,12 +45,12 @@ public class TopTitleBar extends RelativeLayout {
     }
 
     private void setUpView(Context context){
-        TextView tvTitle = (TextView) findViewById(R.id.title);
+        TextView tvTitle = findViewById(R.id.title);
         tvTitle.setText(titleText);
-        LinearLayout backBtn = (LinearLayout) findViewById(R.id.title_back);
+        backBtn =  findViewById(R.id.title_back);
         backBtn.setVisibility(canBack ? VISIBLE : INVISIBLE);
         if (canBack){
-            TextView tvBack = (TextView) findViewById(R.id.txt_back);
+            TextView tvBack = findViewById(R.id.txt_back);
             tvBack.setText(backText);
             backBtn.setOnClickListener(new OnClickListener() {
                 @Override
@@ -59,13 +60,28 @@ public class TopTitleBar extends RelativeLayout {
             });
         }
         if (moreImg != 0){
-            ImageView moreImgView = (ImageView) findViewById(R.id.img_more);
+            ImageView moreImgView =  findViewById(R.id.img_more);
             moreImgView.setImageDrawable(ContextCompat.getDrawable(context,moreImg));
         }
-        tvMore = (TextView) findViewById(R.id.txt_more);
+        tvMore =  findViewById(R.id.txt_more);
         tvMore.setText(moreText);
     }
 
+
+    public void setCanBack(boolean canBack) {
+        this.canBack = canBack;
+        backBtn.setVisibility(canBack ? VISIBLE : INVISIBLE);
+//        if (canBack){
+//            TextView tvBack = findViewById(R.id.txt_back);
+//            tvBack.setText(backText);
+//            backBtn.setOnClickListener(new OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    ((Activity) getContext()).finish();
+//                }
+//            });
+//        }
+    }
 
     /**
      * 标题控件
@@ -74,7 +90,7 @@ public class TopTitleBar extends RelativeLayout {
      */
     public void setTitleText(String titleText){
         this.titleText = titleText;
-        TextView tvTitle = (TextView) findViewById(R.id.title);
+        TextView tvTitle =  findViewById(R.id.title);
         tvTitle.setText(titleText);
     }
 
@@ -85,7 +101,7 @@ public class TopTitleBar extends RelativeLayout {
      */
     public void setMoreImg(int img){
         moreImg = img;
-        ImageView moreImgView = (ImageView) findViewById(R.id.img_more);
+        ImageView moreImgView = findViewById(R.id.img_more);
         moreImgView.setImageDrawable(getContext().getResources().getDrawable(moreImg));
     }
 
@@ -95,43 +111,38 @@ public class TopTitleBar extends RelativeLayout {
      *
      * @param listener 事件监听
      */
-    public void setMoreImgAction(OnClickListener listener){
-        ImageView moreImgView = (ImageView) findViewById(R.id.img_more);
-        moreImgView.setOnClickListener(listener);
+    public void setMoreAction(OnClickListener listener){
+        LinearLayout moreLayout = findViewById(R.id.btn_more);
+        moreLayout.setOnClickListener(listener);
     }
 
 
 
-    /**
-     * 设置更多按钮事件
-     *
-     * @param listener 事件监听
-     */
-    public void setMoreTextAction(OnClickListener listener){
-        tvMore.setOnClickListener(listener);
-    }
+
 
 
     /**
      * 设置更多文字内容
      * @param text 更多文本
      */
-    public void setMoreTextContext(String text){
+    public void setMoreText(String text){
         tvMore.setText(text);
     }
 
 
-
+    public String  getMoreText(){
+        return tvMore.getText().toString();
+    }
     /**
      * 设置返回按钮事件
      *
      * @param listener 事件监听
      */
     public void setBackListener(OnClickListener listener){
-        if (canBack){
-            LinearLayout backBtn = (LinearLayout) findViewById(R.id.title_back);
+//        if (canBack){
+            LinearLayout backBtn = findViewById(R.id.title_back);
             backBtn.setOnClickListener(listener);
-        }
+//        }
     }
 
 

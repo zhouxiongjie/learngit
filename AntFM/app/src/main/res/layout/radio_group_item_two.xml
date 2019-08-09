@@ -21,8 +21,8 @@
         android:padding="15dp"
         android:layout_alignParentStart="true"
         android:textSize="@dimen/font_size_28px"
-        android:textColor="@color/login_text_color_selector"
-        android:background="@drawable/radio_group_bg_selector"
+        android:textColor="@color/textColorSeven"
+        android:background="@color/white"
         android:text="长沙"/>
 
 

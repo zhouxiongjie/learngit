@@ -21,6 +21,8 @@ public class Anchor {
     private int type;
     private int parent_id;
     private String des;
+    //为适应机构下的主播手动添加
+    private int follows;
     private int is_follow;
     private Merchant merchant;
     private Others others;
@@ -71,6 +73,14 @@ public class Anchor {
 
     public void setDes(String des) {
         this.des = des;
+    }
+
+    public int getFollows() {
+        return follows;
+    }
+
+    public void setFollows(int follows) {
+        this.follows = follows;
     }
 
     public int getIs_follow() {

@@ -1,0 +1,433 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+
+    <com.shuangling.software.customview.TopTitleBar
+        android:id="@+id/activity_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        fresco:moreImg="@drawable/ic_more"
+        fresco:canBack="true" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divideColorOne" />
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="vertical">
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="340dp"
+                android:background="@drawable/radio_bg">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/programName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/font_size_40px"
+                        android:textColor="@color/white"
+                        tools:text="中国交通广播"
+                        android:layout_gravity="center_horizontal"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/font_size_30px"
+                            android:textColor="#F6FAFF"
+                            android:text="主播:"
+                            android:layout_gravity="center_horizontal"
+                            />
+                        <TextView
+                            android:id="@+id/anchorName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/font_size_30px"
+                            android:textColor="#F6FAFF"
+                            tools:text="李四"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginStart="10dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:id="@+id/startTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/font_size_30px"
+                            android:textColor="#F6FAFF"
+                            tools:text="09:30"
+                            android:layout_gravity="center_horizontal"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/font_size_30px"
+                            android:textColor="#F6FAFF"
+                            android:text="－"
+                            android:layout_gravity="center_horizontal" />
+                        <TextView
+                            android:id="@+id/finishTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/font_size_30px"
+                            android:textColor="#F6FAFF"
+                            tools:text="16:00"
+                            android:layout_gravity="center_horizontal" />
+                    </LinearLayout>
+
+
+
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/currentTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="20dp"
+                    android:text="00:00"
+                    android:textColor="@color/textColorSix"
+                    android:textSize="@dimen/font_size_26px" />
+
+                <TextView
+                    android:id="@+id/endTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="20dp"
+                    android:text="00:00"
+                    android:textColor="@color/textColorSix"
+                    android:textSize="@dimen/font_size_26px" />
+
+
+                <SeekBar
+                    android:id="@+id/seekBar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@+id/currentTime"
+                    android:layout_toStartOf="@+id/endTime"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:maxHeight="5dp"
+                    android:minHeight="5dp"
+
+                    android:progressDrawable="@drawable/my_seekbar_style"
+                    android:splitTrack="false"
+                    android:thumb="@drawable/seekbar_thumb" />
+
+
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/actionBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp">
+
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="30dp">
+
+                    <TextView
+                        android:id="@+id/list"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:drawableTop="@drawable/ic_list"
+                        android:drawablePadding="5dp"
+                        android:text="节目单"
+                        android:textColor="@color/textColorTen"
+                        android:textSize="@dimen/font_size_26px" />
+                </RelativeLayout>
+
+                <!--<ImageButton-->
+                    <!--android:id="@+id/play"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_centerInParent="true"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:background="@drawable/ic_play" />-->
+                <com.shuangling.software.customview.FontIconView
+                    android:id="@+id/play"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="&#xe607;"
+                    android:textColor="?attr/themeColor"
+                    android:textSize="75sp"/>
+
+                <!--<ImageButton-->
+                    <!--android:id="@+id/previous"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:layout_marginRight="30dp"-->
+                    <!--android:layout_toLeftOf="@+id/play"-->
+                    <!--android:background="@drawable/ic_back_off" />-->
+
+
+                <com.shuangling.software.customview.FontIconView
+                    android:id="@+id/previous"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="30dp"
+                    android:text="&#xe620;"
+                    android:textColor="?attr/themeColor"
+                    android:layout_toLeftOf="@+id/play"
+                    android:textSize="25sp"/>
+
+                <!--<ImageButton-->
+                    <!--android:id="@+id/next"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:layout_marginLeft="30dp"-->
+                    <!--android:layout_toRightOf="@+id/play"-->
+                    <!--android:background="@drawable/ic_fast_forward" />-->
+
+                <com.shuangling.software.customview.FontIconView
+                    android:id="@+id/next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="30dp"
+                    android:layout_toRightOf="@+id/play"
+                    android:text="&#xe622;"
+                    android:textColor="?attr/themeColor"
+                    android:textSize="25sp" />
+
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="30dp">
+
+                    <TextView
+                        android:id="@+id/timer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:drawableTop="@drawable/ic_timing"
+                        android:text="定时"
+                        android:textSize="@dimen/font_size_26px"
+                        android:drawablePadding="5dp"
+                        android:textColor="@color/textColorTen"/>
+
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+
+
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:background="@color/divideColorTwo" />
+
+
+            <RelativeLayout
+                android:id="@+id/root"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/logo"
+                    android:layout_width="65dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    fresco:roundedCornerRadius="4dp"
+                    fresco:actualImageScaleType="centerCrop"
+                    fresco:placeholderImage="@drawable/article_placeholder"
+                    fresco:placeholderImageScaleType="centerCrop"
+                    fresco:viewAspectRatio="1" />
+
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@+id/logo"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/radio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:lineSpacingExtra="5dp"
+                        android:lineSpacingMultiplier="1.0"
+                        android:lines="1"
+                        android:maxLines="1"
+                        android:textColor="@color/textColorTwo"
+                        android:textSize="@dimen/font_size_30px"
+                        android:textStyle="bold"
+                        tools:text="资讯文章内容中只有2张图片以下的，按左图右文的方式显示（左图为封面图）" />
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp">
+
+                        <TextView
+                            android:id="@+id/organization"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawableStart="@drawable/ic_organization1"
+                            android:drawablePadding="2dp"
+                            android:ellipsize="end"
+                            android:lineSpacingExtra="5dp"
+                            android:layout_centerVertical="true"
+                            android:lineSpacingMultiplier="1.0"
+                            android:lines="1"
+                            android:textColor="@color/textColorNine"
+                            android:textSize="@dimen/font_size_26px"
+                            android:text="正在直播"
+                            />
+
+
+                        <TextView
+                            android:id="@+id/collect"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:minWidth="70dp"
+                            android:minHeight="30dp"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:gravity="center"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentEnd="true"
+                            android:textColor="@color/collect_color_selector"
+                            android:textSize="@dimen/font_size_24px"
+                            android:drawableStart="@drawable/collect_selector"
+                            android:drawablePadding="0dp"
+                            android:text="未收藏"
+                            android:background="@drawable/collect_bg"/>
+
+
+                        <!--<LinearLayout-->
+                            <!--android:id="@+id/collectLayout"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_alignParentEnd="true"-->
+                            <!--android:layout_centerVertical="true"-->
+                            <!--android:background="@drawable/subscribe_text_bg"-->
+                            <!--android:padding="5dp"-->
+                            <!--android:orientation="horizontal">-->
+
+                            <!--<ImageView-->
+                                <!--android:id="@+id/collectIcon"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:background="@drawable/ic_collect"-->
+                                <!--android:layout_gravity="center_vertical"/>-->
+                            <!--<TextView-->
+                                <!--android:id="@+id/collect"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:layout_gravity="center_vertical"-->
+                                <!--android:textColor="@color/textColorFive"-->
+                                <!--android:textSize="@dimen/font_size_24px"-->
+                                <!--android:layout_marginStart="5dp"-->
+                                <!--tools:text="收藏" />-->
+                        <!--</LinearLayout>-->
+
+
+
+
+                    </RelativeLayout>
+
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:background="@color/divideColorTwo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="相关推荐"
+                android:textColor="@color/textColorTwo"
+                android:textSize="@dimen/font_size_36px" />
+
+
+            <com.shuangling.software.customview.MyListView
+                android:id="@+id/listView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+            </com.shuangling.software.customview.MyListView>
+
+
+        </LinearLayout>
+
+
+    </android.support.v4.widget.NestedScrollView>
+
+
+</LinearLayout>
+
+

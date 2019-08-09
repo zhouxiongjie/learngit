@@ -1,46 +1,78 @@
 package com.shuangling.software.activity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.hjq.toast.ToastUtils;
 import com.jaeger.library.StatusBarUtil;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
-import com.shuangling.software.adapter.MyFragmentPagerAdapter;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.Album;
+import com.shuangling.software.entity.User;
 import com.shuangling.software.fragment.AlbumAudiosFragment;
 import com.shuangling.software.fragment.AlbumIntroduceFragment;
-import com.shuangling.software.fragment.AlbumRecommendFragment;
+import com.shuangling.software.fragment.SearchListFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.StatusBarManager;
+import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.PlatformActionListener;
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.onekeyshare.OnekeyShare;
+import cn.sharesdk.onekeyshare.ShareContentCustomizeCallback;
+import cn.sharesdk.sina.weibo.SinaWeibo;
+import cn.sharesdk.tencent.qq.QQ;
+import cn.sharesdk.wechat.favorite.WechatFavorite;
+import cn.sharesdk.wechat.friends.Wechat;
+import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 import okhttp3.Response;
 
-
+@EnableDragToClose()
 public class AlbumDetailActivity extends BaseActivity implements Handler.Callback {
 
-    public static final String TAG = "AlbumDetailActivity";
+    private static final String[] category = new String[]{"简介", "节目"};
 
     public static final int MSG_GET_ALBUM_DETAIL = 0x1;
+
+    public static final int MSG_SUBSCRIBE_CALLBACK = 0x2;
+
+    public static final int REQUEST_LOGIN = 0x3;
+
+    private static final int SHARE_SUCCESS = 0x4;
+
+    private static final int SHARE_FAILED = 0x5;
 
     @BindView(R.id.activity_title)
     TopTitleBar activityTitle;
@@ -59,39 +91,38 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
     TextView name;
     @BindView(R.id.albumTitle)
     TextView albumTitle;
-    @BindView(R.id.indicator1)
-    SimpleDraweeView indicator1;
-    @BindView(R.id.indicator2)
-    SimpleDraweeView indicator2;
-    @BindView(R.id.indicator3)
-    SimpleDraweeView indicator3;
-    @BindView(R.id.introduction)
-    LinearLayout introduction;
-    @BindView(R.id.program)
-    LinearLayout program;
-    @BindView(R.id.recommend)
-    LinearLayout recommend;
+    @BindView(R.id.tabPageIndicator)
+    TabLayout tabPageIndicator;
+
 
     private Handler mHandler;
 
     private int mAlbumId;
     private Album mAlbum;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
-
+    private FragmentAdapter mFragmentAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(MyApplication.getInstance().getCurrentTheme());
         setContentView(R.layout.activity_album_detail);
         ButterKnife.bind(this);
         StatusBarUtil.setTransparent(this);
         StatusBarManager.setImmersiveStatusBar(this, true);
         mHandler = new Handler(this);
 
-
-
         getAlbumDetail();
+
+        activityTitle.setMoreAction(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mAlbum!=null){
+                    showShare(mAlbum.getTitle(),mAlbum.getDes(),mAlbum.getCover(),ServerInfo.h5IP+"/albums/"+mAlbumId);
+                    //shareTest();
+                }
+
+            }
+        });
 
     }
 
@@ -102,11 +133,11 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
         OkHttpUtils.get(url, null, new OkHttpCallback(this) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_ALBUM_DETAIL;
-                msg.obj = response.body().string();
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
 
@@ -121,22 +152,40 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
     }
 
 
-    @OnClick({R.id.subscribe, R.id.introduction, R.id.program, R.id.recommend})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.subscribe:
-                break;
-            case R.id.introduction:
-                selectPage(0);
-                break;
-            case R.id.program:
-                selectPage(1);
-                break;
-            case R.id.recommend:
-                selectPage(2);
-                break;
+    public void subscribe(final boolean subscribe) {
+
+
+        String url = ServerInfo.serviceIP + ServerInfo.subscribes;
+        Map<String, String> params = new HashMap<>();
+        params.put("id", "" + mAlbum.getId());
+        if (subscribe) {
+            params.put("type", "1");
+        } else {
+            params.put("type", "0");
         }
+
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_SUBSCRIBE_CALLBACK;
+                msg.arg1 = subscribe ? 1 : 0;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, IOException exception) {
+
+
+            }
+        });
+
     }
+
 
     @Override
     public boolean handleMessage(Message msg) {
@@ -166,14 +215,39 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
                                 ImageLoader.showThumb(uri, head, width, height);
                             }
                         }
+
+                        head.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (mAlbum.getAuthor_info() != null && mAlbum.getAuthor_info().getMerchant() != null) {
+                                    Intent it = new Intent(AlbumDetailActivity.this, OrganizationDetailActivity.class);
+                                    it.putExtra("organizationId", mAlbum.getAuthor_info().getMerchant().getId());
+                                    startActivity(it);
+                                }
+
+                            }
+                        });
+
                         if (mAlbum.getIs_sub() == 1) {
                             subscribe.setText(getResources().getString(R.string.has_subscribe));
+                            subscribe.setActivated(false);
                         } else {
                             subscribe.setText(getResources().getString(R.string.subscribe));
+                            subscribe.setActivated(true);
                         }
+
+                        subscribe.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (User.getInstance() == null) {
+                                    startActivityForResult(new Intent(AlbumDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                } else {
+                                    subscribe(mAlbum.getIs_sub() == 0);
+                                }
+                            }
+                        });
                         albumTitle.setText(mAlbum.getTitle());
                         initFragment();
-                        selectPage(0);
 
                     }
 
@@ -184,83 +258,288 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
 
 
                 break;
+            case MSG_SUBSCRIBE_CALLBACK:
+                try {
+                    String result = (String) msg.obj;
+                    boolean sub = msg.arg1 == 1 ? true : false;
+
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        ToastUtils.show(jsonObject.getString("msg"));
+
+                        if (sub) {
+                            subscribe.setText("已订阅");
+                            subscribe.setActivated(false);
+                            mAlbum.setIs_sub(1);
+                        } else {
+                            subscribe.setText("订阅");
+                            subscribe.setActivated(true);
+                            mAlbum.setIs_sub(0);
+
+                        }
+
+
+                    }
+
+
+                } catch (Exception e) {
+
+                }
+                break;
         }
         return false;
     }
 
 
     private void initFragment() {
-        mFragments.clear();
-        AlbumIntroduceFragment introduceFragment = new AlbumIntroduceFragment();
-        Bundle introduceData = new Bundle();
-        introduceData.putString("introduction", mAlbum.getDes());
-        introduceFragment.setArguments(introduceData);
-
-        AlbumAudiosFragment audiosFragment = new AlbumAudiosFragment();
-        Bundle audiosData = new Bundle();
-        audiosData.putInt("albumId", mAlbum.getId());
-        audiosFragment.setArguments(audiosData);
-
-        AlbumRecommendFragment recommendFragment = new AlbumRecommendFragment();
-        Bundle recommendData = new Bundle();
-        recommendData.putInt("albumId", mAlbum.getId());
-        recommendFragment.setArguments(recommendData);
-
-
-        mFragments.add(introduceFragment);
-        mFragments.add(audiosFragment);
-        mFragments.add(recommendFragment);
-        MyFragmentPagerAdapter mAdapetr = new MyFragmentPagerAdapter(getSupportFragmentManager(), mFragments);
-        viewPager.setAdapter(mAdapetr);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
+        if (mFragmentAdapter != null) {
+            return;
+        }
+        mFragmentAdapter = new FragmentAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(mFragmentAdapter);
+        tabPageIndicator.setupWithViewPager(viewPager);
+        viewPager.setCurrentItem(1);
 
     }
 
 
-    private void selectPage(int page) {
-        viewPager.setCurrentItem(page);
-        if (page == 0) {
-            introduction.setSelected(true);
-            program.setSelected(false);
-            recommend.setSelected(false);
-            indicator1.setVisibility(View.VISIBLE);
-            indicator2.setVisibility(View.INVISIBLE);
-            indicator3.setVisibility(View.INVISIBLE);
-        } else if (page == 1) {
-            introduction.setSelected(false);
-            program.setSelected(true);
-            recommend.setSelected(false);
-            indicator1.setVisibility(View.INVISIBLE);
-            indicator2.setVisibility(View.VISIBLE);
-            indicator3.setVisibility(View.INVISIBLE);
-        } else {
-            introduction.setSelected(false);
-            program.setSelected(false);
-            recommend.setSelected(true);
-            indicator1.setVisibility(View.INVISIBLE);
-            indicator2.setVisibility(View.INVISIBLE);
-            indicator3.setVisibility(View.VISIBLE);
+    public class FragmentAdapter extends FragmentStatePagerAdapter {
+
+        private FragmentManager fm;
+
+        public FragmentAdapter(FragmentManager fm) {
+            super(fm);
+            this.fm = fm;
+        }
+
+
+        @Override
+        public int getCount() {
+            return category.length;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+
+            if (position == 0) {
+                AlbumIntroduceFragment introduceFragment = new AlbumIntroduceFragment();
+                Bundle introduceData = new Bundle();
+                introduceData.putString("introduction", mAlbum.getDes());
+                introduceData.putInt("albumId", mAlbum.getId());
+                introduceFragment.setArguments(introduceData);
+                return introduceFragment;
+            } else {
+                AlbumAudiosFragment audiosFragment = new AlbumAudiosFragment();
+                Bundle audiosData = new Bundle();
+                audiosData.putInt("albumId", mAlbum.getId());
+                audiosFragment.setArguments(audiosData);
+                return audiosFragment;
+            }
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return category[position];
+        }
+
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
+
+
+        @Override
+        public Object instantiateItem(ViewGroup container, final int position) {
+            //得到缓存的fragment
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            return fragment;
         }
 
     }
 
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_LOGIN && resultCode == Activity.RESULT_OK) {
+            getAlbumDetail();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    private void showShare(final String title, final String desc, final String logo, final String url) {
+        final String cover;
+        if(logo.startsWith("http://")){
+            cover=logo.replace("http://","https://");
+        }else{
+            cover=logo;
+        }
+        OnekeyShare oks = new OnekeyShare();
+        //关闭sso授权
+        oks.disableSSOWhenAuthorize();
+        final Platform qq = ShareSDK.getPlatform(QQ.NAME);
+        if (!qq.isClientValid()) {
+            oks.addHiddenPlatform(QQ.NAME);
+        }
+        final Platform sina = ShareSDK.getPlatform(SinaWeibo.NAME);
+        if (!sina.isClientValid()) {
+            oks.addHiddenPlatform(SinaWeibo.NAME);
+        }
+        oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+            //自定义分享的回调想要函数
+            @Override
+            public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
+                //点击新浪微博
+                if (SinaWeibo.NAME.equals(platform.getName())) {
+                    //限制微博分享的文字不能超过20
+                    if (!TextUtils.isEmpty(cover)) {
+                        paramsToShare.setImageUrl(cover);
+                    }
+                    paramsToShare.setText(title + url);
+                } else if (QQ.NAME.equals(platform.getName())) {
+                    paramsToShare.setTitle(title);
+                    if (!TextUtils.isEmpty(cover)) {
+                        paramsToShare.setImageUrl(cover);
+                    }
+                    paramsToShare.setTitleUrl(url);
+                    paramsToShare.setText(desc);
+
+                } else if (Wechat.NAME.equals(platform.getName())) {
+                    paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
+                    paramsToShare.setTitle(title);
+                    paramsToShare.setUrl(url);
+                    if (!TextUtils.isEmpty(cover)) {
+                        paramsToShare.setImageUrl(cover);
+                    }
+                    paramsToShare.setText(desc);
+
+                    Log.d("ShareSDK", paramsToShare.toMap().toString());
+                } else if (WechatMoments.NAME.equals(platform.getName())) {
+                    paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
+                    paramsToShare.setTitle(title);
+                    paramsToShare.setUrl(url);
+                    if (!TextUtils.isEmpty(cover)) {
+                        paramsToShare.setImageUrl(cover);
+                    }
+                } else if (WechatFavorite.NAME.equals(platform.getName())) {
+                    paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
+                    paramsToShare.setTitle(title);
+                    paramsToShare.setUrl(url);
+                    if (!TextUtils.isEmpty(cover)) {
+                        paramsToShare.setImageUrl(cover);
+                    }
+                }
+            }
+        });
+        oks.setCallback(new PlatformActionListener() {
+            @Override
+            public void onError(Platform arg0, int arg1, Throwable arg2) {
+                Message msg = Message.obtain();
+                msg.what = SHARE_FAILED;
+                msg.obj = arg2.getMessage();
+                mHandler.sendMessage(msg);
+            }
+            @Override
+            public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
+                Message msg = Message.obtain();
+                msg.what = SHARE_SUCCESS;
+                mHandler.sendMessage(msg);
+            }
+            @Override
+            public void onCancel(Platform arg0, int arg1) {
+
+            }
+        });
+        // 启动分享GUI
+        oks.show(this);
+    }
+
+
+    public void shareTest(){
+        OnekeyShare oks = new OnekeyShare();
+        oks.disableSSOWhenAuthorize();
+        oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+            @Override
+            public void onShare(Platform platform, cn.sharesdk.framework.Platform.ShareParams paramsToShare) {
+                if ("SinaWeibo".equals(platform.getName())) {
+                    paramsToShare.setText("玩美夏日，护肤也要肆意玩酷！" + "www.mob.com");
+                    paramsToShare.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
+                }
+                if ("Wechat".equals(platform.getName())) {
+                    paramsToShare.setTitle("小岳岳");
+                    paramsToShare.setText("岳云鹏，德云社相声演员。1985年4月15日出生于河南省濮阳市，2004年师从郭德纲学习相声。");
+                    //paramsToShare.setImageUrl("http://sl-cms.static.slradio.cn/merchants/1/imges/FaD108PBeCCB7mPiJy8Xyj69KfFbpXnx1552461501810.jpg");
+                    paramsToShare.setUrl("http://www-cms-c.review.slradio.cn/albums/61");
+                    paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
+
+                    Log.d("ShareSDK", paramsToShare.toMap().toString());
+
+                }
+                if ("WechatMoments".equals(platform.getName())) {
+                    paramsToShare.setTitle("标题");
+                    paramsToShare.setText("我是共用的参数，这几个平台都有text参数要求，提取出来啦");
+                    paramsToShare.setImageUrl("http://img.ugoshop.com/ugoimg/share/img/poster/190703/6d98eff22454c681834ea9ec44a71496.png");
+                    paramsToShare.setShareType(Platform.SHARE_IMAGE);
+                    Log.d("ShareSDK", paramsToShare.toMap().toString());
+                }
+                if ("QQ".equals(platform.getName())) {
+                    paramsToShare.setTitle("标题");
+                    paramsToShare.setTitleUrl("http://sharesdk.cn");
+                    paramsToShare.setText("我是共用的参数，这几个平台都有text参数要求，提取出来啦");
+                    paramsToShare.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
+//                  paramsToShare.setImagePath("/storage/emulated/0/abcd.gif");
+                    Log.d("ShareSDK", paramsToShare.toMap().toString());
+                }
+                if ("WhatsApp".equals(platform.getName())) {
+                    paramsToShare.setText("我是共用的参数，这几个平台都有text参数要求，提取出来啦");
+                    paramsToShare.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
+                }
+                if("Twitter".equals(platform.getName())){
+                    paramsToShare.setText("我是共用的参数，这几个平台都有text参数要求，提取出来啦");
+                    paramsToShare.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
+                    /*paramsToShare.setUrl("http://sharesdk.cn");*/
+                }
+            }
+        });
+
+ /*Bitmap logo = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+        String label = "ShareSDK";
+        OnClickListener listener = new OnClickListener() {
+            public void onClick(View v) {
+
+            }
+        };
+        oks.setCustomerLogo(logo, label, listener);*/
+
+        oks.setCallback(new PlatformActionListener() {
+            @Override
+            public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
+                Log.d("ShareLogin", "onComplete ---->  分享成功");
+                platform.getName();
+                Toast.makeText(AlbumDetailActivity.this, "HHHHHHHHHH", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(Platform platform, int i, Throwable throwable) {
+                Log.d("ShareLogin", "onError ---->  失败" + throwable.getStackTrace());
+                Log.d("ShareLogin", "onError ---->  失败" + throwable.getMessage());
+                throwable.printStackTrace();
+            }
+
+            @Override
+            public void onCancel(Platform platform, int i) {
+                Log.d("ShareLogin", "onCancel ---->  分享取消");
+            }
+        });
+
+// 启动分享GUI
+        oks.show(this);
+
     }
 }

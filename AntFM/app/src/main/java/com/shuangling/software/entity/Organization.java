@@ -23,6 +23,11 @@ public class Organization {
     private String des;
     private int is_follow;
     private Object merchant;
+
+
+
+    private int follows;
+
     private Others others;
 
     public int getId() {
@@ -87,6 +92,14 @@ public class Organization {
 
     public void setMerchant(Object merchant) {
         this.merchant = merchant;
+    }
+
+    public int getFollows() {
+        return follows;
+    }
+
+    public void setFollows(int follows) {
+        this.follows = follows;
     }
 
     public Others getOthers() {

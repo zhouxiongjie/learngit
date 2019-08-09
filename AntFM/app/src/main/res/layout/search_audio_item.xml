@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        fresco:roundedCornerRadius="4dp"
+        fresco:roundedCornerRadius="2dp"
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImage="@drawable/article_placeholder"
         fresco:placeholderImageScaleType="centerCrop"
@@ -68,22 +68,50 @@
             android:textColor="@color/textColorTwo"
             android:textSize="@dimen/font_size_26px"
             tools:text="资讯文章内容中只有2张图片以下的"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:visibility="invisible"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <com.shuangling.software.customview.FontIconView
+            android:id="@+id/indexIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="&#xe623;"
+            android:textColor="@color/textColorThree"
+            android:textSize="@dimen/font_size_24px" />
 
         <TextView
             android:id="@+id/duration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
             android:ellipsize="end"
-            android:lineSpacingExtra="5dp"
-            android:lineSpacingMultiplier="1.0"
             android:lines="1"
             android:textColor="@color/textColorThree"
             android:textSize="@dimen/font_size_24px"
-            tools:text="24:00"
-            android:drawableStart="@drawable/ic_timing"
-            android:drawablePadding="10dp"
-            android:layout_marginTop="10dp"/>
+            tools:text="24:00" />
+    </LinearLayout>
+
+        <!--<TextView-->
+            <!--android:id="@+id/duration"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:ellipsize="end"-->
+            <!--android:lineSpacingExtra="5dp"-->
+            <!--android:lineSpacingMultiplier="1.0"-->
+            <!--android:lines="1"-->
+            <!--android:textColor="@color/textColorThree"-->
+            <!--android:textSize="@dimen/font_size_24px"-->
+            <!--tools:text="24:00"-->
+            <!--android:drawableStart="@drawable/ic_timing"-->
+            <!--android:drawablePadding="10dp"-->
+            <!--android:layout_marginTop="10dp"/>-->
 
         <!--<LinearLayout-->
             <!--android:layout_width="wrap_content"-->

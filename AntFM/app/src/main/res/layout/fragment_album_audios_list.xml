@@ -37,9 +37,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:drawableStart="@drawable/audios_sort"
+            android:drawableStart="@drawable/order_asc"
             android:drawablePadding="3dp"
-            android:text="排序"
+            android:text="正序"
             android:textColor="@color/textColorEight"
             android:textSize="@dimen/font_size_30px" />
 
@@ -54,7 +54,7 @@
             android:textSize="@dimen/font_size_30px"
             android:textColor="@color/textColorEight"
             android:layout_centerVertical="true"
-            android:text="排序"/>
+            android:text="选集"/>
 
     </RelativeLayout>
 
@@ -64,6 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/topBar"
+        android:divider="@drawable/recycleview_divider_drawable"
         android:visibility="visible">
 
 

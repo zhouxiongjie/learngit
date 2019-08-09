@@ -5,14 +5,29 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven { url "http://mvn.mob.com/android" }
+        maven { url 'https://dl.bintray.com/umsdk/release' }
+        maven {
+            url 'http://maven.aliyun.com/nexus/content/repositories/releases/'
+        }
+
+
+
     }
+
+    apply from: 'thirdparty-lib/config.gradle'
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
 
-        classpath 'com.mob.sdk:MobSDK-Impl:2018.0710.1743'
+//        classpath 'com.mob.sdk:MobSDK-Impl:2018.0710.1743'
+        //classpath 'com.mob.sdk:MobSDK-Impl:2018.0710.1720'
+        //classpath 'com.mob.sdk:MobSDK:+'
+        classpath "com.mob.sdk:MobSDK:2018.0319.1724"
         classpath 'org.greenrobot:greendao-gradle-plugin:3.2.2'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+        // 添加emas-services插件
+        classpath 'com.aliyun.ams:emas-services:1.0.1'
     }
 }
 
@@ -20,6 +35,12 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven { url "http://mvn.mob.com/android" }
+        maven { url 'https://dl.bintray.com/umsdk/release' }
+        maven {
+            url 'http://maven.aliyun.com/nexus/content/repositories/releases/'
+        }
+
     }
 }
 

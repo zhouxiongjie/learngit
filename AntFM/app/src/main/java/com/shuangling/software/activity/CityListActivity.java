@@ -25,6 +25,7 @@ import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.StatusBarManager;
+import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -39,7 +40,7 @@ import butterknife.ButterKnife;
 import okhttp3.Call;
 import okhttp3.Response;
 
-
+@EnableDragToClose()
 public class CityListActivity extends AppCompatActivity implements Handler.Callback {
 
     public static final String TAG = "CityListActivity";
@@ -83,11 +84,11 @@ public class CityListActivity extends AppCompatActivity implements Handler.Callb
         OkHttpUtils.get(url, null, new OkHttpCallback(this) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_CITY_LIST;
-                msg.obj = response.body().string();
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
 
@@ -104,7 +105,9 @@ public class CityListActivity extends AppCompatActivity implements Handler.Callb
     }
 
     private void init() {
-        activityTitle.setTitleText("当前城市-"+MainActivity.sCurrentCity.getName());
+        if(MainActivity.sCurrentCity!=null){
+            activityTitle.setTitleText("当前城市-"+MainActivity.sCurrentCity.getName());
+        }
         refreshLayout.setEnableRefresh(false);
         refreshLayout.setEnableLoadMore(false);
         sidebar.setTextView(letters);

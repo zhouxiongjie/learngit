@@ -3,7 +3,7 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:background="@color/transparent"
     android:descendantFocusability="blocksDescendants">
 
 
@@ -14,7 +14,7 @@
         android:padding="15dp"
         android:gravity="center"
         android:textSize="@dimen/font_size_28px"
-        android:textColor="@color/login_text_color_selector"
+        android:textColor="@color/radio_group_text_selector"
         android:background="@drawable/radio_group_bg_selector"
         android:text="长沙"/>
 

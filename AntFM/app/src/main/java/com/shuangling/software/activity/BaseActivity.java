@@ -23,34 +23,22 @@ public class BaseActivity extends AppCompatActivity {
 
     public static final String TAG = "BaseActivity";
     public IAudioPlayer mAudioPlayer;
-    public WindowManager mWindowManager;
-    public View mFloatPlayer;
+
+
+
+    public OnServiceConnectionListener mOnServiceConnectionListener;
+
+    public void setmOnServiceConnectionListener(OnServiceConnectionListener mOnServiceConnectionListener) {
+        this.mOnServiceConnectionListener = mOnServiceConnectionListener;
+    }
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mAudioPlayer=IAudioPlayer.Stub.asInterface(service);
-
-            try{
-                int state=mAudioPlayer.getPlayerState();
-                if(mAudioPlayer.getPlayerState()==IAliyunVodPlayer.PlayerState.Started.ordinal()
-                      ||mAudioPlayer.getPlayerState()==IAliyunVodPlayer.PlayerState.Prepared.ordinal()
-                      ||mAudioPlayer.getPlayerState()==IAliyunVodPlayer.PlayerState.Paused.ordinal()){
-
-                    mWindowManager = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
-                    WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-                    layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL;
-                    layoutParams.token = getWindow().getDecorView().getWindowToken(); // 必须要
-                    mFloatPlayer =LayoutInflater.from(BaseActivity.this).inflate(R.layout.anchor_gridview_item,null,false);
-                    mWindowManager.addView(mFloatPlayer, layoutParams);
-
-                }
-
-            }catch (RemoteException e){
-                e.printStackTrace();
+            if(mOnServiceConnectionListener!=null){
+                mOnServiceConnectionListener.onServiceConnection(mAudioPlayer);
             }
-
-
 
         }
 
@@ -78,10 +66,13 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if(mWindowManager!=null&&mFloatPlayer!=null){
-            mWindowManager.removeViewImmediate(mFloatPlayer);
-        }
         unbindService(mConnection);
         super.onDestroy();
+    }
+
+
+    public interface OnServiceConnectionListener {
+
+        void onServiceConnection(IAudioPlayer audioPlayer);
     }
 }

@@ -2,11 +2,11 @@ package com.shuangling.software.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -15,7 +15,6 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,21 +24,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.sdk.android.push.CloudPushService;
+import com.alibaba.sdk.android.push.CommonCallback;
+import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.hjq.toast.ToastUtils;
-import com.mylhyl.circledialog.CircleDialog;
-import com.mylhyl.circledialog.callback.ConfigDialog;
-import com.mylhyl.circledialog.params.DialogParams;
-import com.mylhyl.circledialog.res.drawable.CircleDrawable;
-import com.mylhyl.circledialog.res.values.CircleColor;
-import com.mylhyl.circledialog.res.values.CircleDimen;
-import com.mylhyl.circledialog.view.listener.OnCreateBodyViewListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
+import com.shuangling.software.utils.SharedPreferencesUtils;
+import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,9 +58,8 @@ import cn.sharesdk.sina.weibo.SinaWeibo;
 import cn.sharesdk.tencent.qq.QQ;
 import cn.sharesdk.wechat.friends.Wechat;
 import okhttp3.Call;
-import okhttp3.Response;
 
-
+@EnableDragToClose()
 public class LoginActivity extends AppCompatActivity implements Handler.Callback, PlatformActionListener {
 
 
@@ -69,7 +68,8 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
     private static final int MSG_AUTH_COMPLETE = 2;
 
     private static final int MSG_LOGIN_CALLBACK = 3;
-    private static final int MSG_GET_VERIFY_CODE=4;
+    private static final int MSG_GET_VERIFY_CODE = 4;
+    private static final int LOGIN_VERIFY_REQUEST = 5;
 
 
     @BindView(R.id.verifyCodeLogin)
@@ -84,12 +84,17 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
     ImageView qq;
     @BindView(R.id.weiBo)
     ImageView weiBo;
+    @BindView(R.id.activtyTitle)
+    TopTitleBar activtyTitle;
+    @BindView(R.id.head)
+    SimpleDraweeView head;
 
     private List<View> mLoginViews = new ArrayList<View>();
     private Handler mHandler;
 
     private String mPhoneNumber;
     private DialogFragment mDialogFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,15 +103,27 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
         ButterKnife.bind(this);
         mHandler = new Handler(this);
 
-        initViewPager();
+        init();
 
 
     }
 
-    private void initViewPager() {
+    private void init() {
+
+        if(!TextUtils.isEmpty(MyApplication.getInstance().getStation().getImage())){
+            Uri uri = Uri.parse(MyApplication.getInstance().getStation().getImage());
+            ImageLoader.showThumb(uri, head, CommonUtils.dip2px(70), CommonUtils.dip2px(70));
+        }
+
+        activtyTitle.setBackListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
         View verifyCodeLoginView = LayoutInflater.from(this).inflate(R.layout.veritfy_code_login, null);
-        final VerifyCodeViewHolder verifyCodeViewHolder=new VerifyCodeViewHolder(verifyCodeLoginView);
+        final VerifyCodeViewHolder verifyCodeViewHolder = new VerifyCodeViewHolder(verifyCodeLoginView);
         verifyCodeViewHolder.phoneNum.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -122,7 +139,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
             public void afterTextChanged(Editable s) {
                 if (CommonUtils.isMobileNO(s.toString())) {
                     verifyCodeViewHolder.login.setEnabled(true);
-                }else {
+                } else {
                     verifyCodeViewHolder.login.setEnabled(false);
                 }
 
@@ -132,7 +149,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
         verifyCodeViewHolder.login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPhoneNumber=verifyCodeViewHolder.phoneNum.getText().toString();
+                mPhoneNumber = verifyCodeViewHolder.phoneNum.getText().toString();
                 getVerifyCode(mPhoneNumber);
             }
         });
@@ -376,23 +393,40 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
                         User.setInstance(user);
+                        SharedPreferencesUtils.saveUser(user);
+                        final CloudPushService pushService = PushServiceFactory.getCloudPushService();
+                        pushService.bindAccount(user.getUsername(), new CommonCallback() {
+                            @Override
+                            public void onSuccess(String s) {
+                                Log.i("bindAccount-onSuccess", s);
+                            }
+
+                            @Override
+                            public void onFailed(String s, String s1) {
+                                Log.i("bindAccount-onFailed", s);
+                                Log.i("bindAccount-onFailed", s1);
+                            }
+                        });
+                        ToastUtils.show("登录成功");
                         setResult(Activity.RESULT_OK);
                         finish();
+                    } else {
+                        ToastUtils.show(jsonObject.getString("msg"));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
             break;
-            case MSG_GET_VERIFY_CODE:{
+            case MSG_GET_VERIFY_CODE: {
                 try {
                     mDialogFragment.dismiss();
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        Intent it=new Intent(this,VerifyCodeLoginActivity.class);
-                        it.putExtra("PhoneNumber",mPhoneNumber);
-                        startActivity(it);
+                        Intent it = new Intent(this, VerifyCodeLoginActivity.class);
+                        it.putExtra("PhoneNumber", mPhoneNumber);
+                        startActivityForResult(it, LOGIN_VERIFY_REQUEST);
                     } else if (jsonObject != null) {
                         ToastUtils.show(jsonObject.getString("msg"));
                     }
@@ -441,7 +475,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
 
     private void accountLogin(String phone, String pwd) {
 
-        mDialogFragment=CommonUtils.showLoadingDialog(getSupportFragmentManager());
+        mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
         String url = ServerInfo.serviceIP + ServerInfo.login;
         Map<String, String> params = new HashMap<String, String>();
         params.put("type", "0");
@@ -451,10 +485,10 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
                 Message msg = mHandler.obtainMessage(MSG_LOGIN_CALLBACK);
-                msg.obj = response.body().string();
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
             }
@@ -476,7 +510,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
 
 
     private void getVerifyCode(String phone) {
-        mDialogFragment=CommonUtils.showLoadingDialog(getSupportFragmentManager());
+        mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
 
         String url = ServerInfo.serviceIP + ServerInfo.getVerifyCode;
         Map<String, String> params = new HashMap<String, String>();
@@ -486,10 +520,10 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
                 Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
-                msg.obj = response.body().string();
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
             }
@@ -511,4 +545,18 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
     }
 
 
+    @Override
+    public void onBackPressed() {
+        User.setInstance(null);
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == LOGIN_VERIFY_REQUEST && resultCode == RESULT_OK) {
+            setResult(Activity.RESULT_OK);
+            finish();
+        }
+        //super.onActivityResult(requestCode, resultCode, data);
+    }
 }

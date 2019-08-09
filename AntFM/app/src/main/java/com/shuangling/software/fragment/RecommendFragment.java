@@ -1,6 +1,7 @@
 package com.shuangling.software.fragment;
 
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -9,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -21,10 +23,14 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.Column;
+import com.shuangling.software.entity.Station;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 
 import java.io.IOException;
@@ -65,19 +71,33 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
      * 屏幕宽度
      */
     private int mScreenWidth = 0;
-
     private Handler mHandler;
+
+    private Column mSwitchColumn;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
-        DisplayMetrics dm = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
-        mScreenWidth = dm.widthPixels;
+        mScreenWidth = CommonUtils.getScreenWidth();
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            mSwitchColumn = (Column)bundle.getSerializable("column");
+        }
         mHandler = new Handler(this);
     }
 
+
+    public void switchColumn(Column switchColumn) {
+
+        for(int i=0;i<mColumns.size();i++){
+            if(mColumns.get(i).getId()==switchColumn.getId()){
+                mColumnSelectIndex =i;
+                break;
+            }
+        }
+        viewPager.setCurrentItem(mColumnSelectIndex);
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -95,10 +115,22 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
             MyselfFragmentPagerAdapter mAdapetr = new MyselfFragmentPagerAdapter(getChildFragmentManager(), mColumns);
             viewPager.setAdapter(mAdapetr);
             viewPager.addOnPageChangeListener(mPageListener);
+            //viewPager.setCurrentItem(mColumnSelectIndex);
         }
 
+        if(mSwitchColumn!=null){
+            mHandler.postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    switchColumn(mSwitchColumn);
+                }
+            },500);
+        }
 
     }
+
+
 
 
     public ViewPager.OnPageChangeListener mPageListener = new ViewPager.OnPageChangeListener() {
@@ -114,7 +146,7 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
         @Override
         public void onPageSelected(int position) {
             // TODO Auto-generated method stub
-            viewPager.setCurrentItem(position);
+            //viewPager.setCurrentItem(position);
 
             for (int i = 0; i < columnContent.getChildCount(); i++) {
                 View checkView = columnContent.getChildAt(i);
@@ -129,6 +161,13 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
                         columnScrollView.scrollTo((int) checkView.getLeft() - mScreenWidth / 2, 0);
                     }
                     mColumnSelectIndex = position;
+                    Station station=MyApplication.getInstance().getStation();
+                    if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
+                        Uri uri = Uri.parse(station.getIcon1());
+                        int width=CommonUtils.dip2px(15);
+                        int height=width;
+                        ImageLoader.showThumb(uri,indicator,width,height);
+                    }
 
                 } else {
                     ischeck = false;
@@ -158,14 +197,14 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
         Map<String, String> params = new HashMap<>();
         params.put("page", "1");
         params.put("page_size", "" + Integer.MAX_VALUE);
-        OkHttpUtils.get(url, null, new OkHttpCallback(getContext()) {
+        OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(Call call, String response) throws IOException {
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_COLUMN;
-                msg.obj = response.body().string();
+                msg.obj = response;
                 mHandler.sendMessage(msg);
 
 
@@ -207,7 +246,7 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
         public Fragment getItem(int position) {
             Bundle data = new Bundle();
             data.putSerializable("Column",mColumns.get(position));
-            if(mColumns.get(position).getId()==1){
+            if(mColumns.get(position).getType()==1){
                 ContentHotFragment contentFragment = new ContentHotFragment();
                 contentFragment.setArguments(data);
                 return contentFragment;
@@ -271,13 +310,25 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
                                 //columnTextView.setGravity(Gravity.CENTER);
                                 //columnTextView.setPadding(40, 20, 40, 20);
 
-                                columnTextView.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
+                                //columnTextView.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
                                 columnTextView.setText(column.getName());
                                 columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
+
+
+
+
                                 if (mColumnSelectIndex == i) {
                                     columnTextView.setSelected(true);
                                     columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
                                     indicator.setVisibility(View.VISIBLE);
+                                    Station station=MyApplication.getInstance().getStation();
+                                    if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
+                                        Uri uri = Uri.parse(station.getIcon1());
+                                        int width=CommonUtils.dip2px(15);
+                                        int height=width;
+                                        ImageLoader.showThumb(uri,indicator,width,height);
+                                    }
+
                                 } else {
                                     columnTextView.setSelected(false);
                                     columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
@@ -294,11 +345,19 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
                                             if (localView != v) {
                                                 columnTextView.setSelected(false);
                                                 indicator.setVisibility(View.INVISIBLE);
+
                                                 columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
                                             } else {
                                                 mColumnSelectIndex = i;
                                                 columnTextView.setSelected(true);
                                                 indicator.setVisibility(View.VISIBLE);
+                                                Station station=MyApplication.getInstance().getStation();
+                                                if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
+                                                    Uri uri = Uri.parse(station.getIcon1());
+                                                    int width=CommonUtils.dip2px(15);
+                                                    int height=width;
+                                                    ImageLoader.showThumb(uri,indicator,width,height);
+                                                }
                                                 columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
                                                 viewPager.setCurrentItem(mColumnSelectIndex);
                                             }
@@ -316,7 +375,7 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
 
 
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                 }
 
             }

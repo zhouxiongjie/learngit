@@ -12,7 +12,10 @@ import android.view.WindowManager;
 import com.aliyun.vodplayer.media.AliyunLocalSource;
 import com.aliyun.vodplayer.media.AliyunVodPlayer;
 import com.aliyun.vodplayer.media.IAliyunVodPlayer;
+import com.hjq.toast.ToastUtils;
 import com.shuangling.software.entity.Audio;
+import com.shuangling.software.entity.AudioDetail;
+import com.shuangling.software.entity.AudioInfo;
 import com.shuangling.software.event.PlayerEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -55,14 +58,17 @@ public class AudioPlayerService extends Service {
     private TimerType mTimerType=TimerType.Cancel;
     private PlaySpeed mPlaySpeed=PlaySpeed.Speed100;
     private AliyunVodPlayer mAliyunVodPlayer;
-    private Audio mCurrentAudio;
+
+    //private AudioDetail mCurrentAudioDetail;
+    //private AudioInfo mCurrentAudioInfo;
 
 //    private static AudioPlayerService sService;
 //    public static AudioPlayerService getInstance() {
 //        return sService;
 //    }
-    private List<Audio> mAudioList;
-
+    private AudioInfo mCurrentAudio;
+    private List<AudioInfo> mAudioList;
+    //private List<AudioInfo> mAudioInfoList;
 
     private WindowManager.LayoutParams mLayoutParams;
     private WindowManager mWindowManager;
@@ -112,50 +118,135 @@ public class AudioPlayerService extends Service {
 
 
         //设置播放列表
+//        @Override
+//        public void setPlayerList(List<Audio> list) throws RemoteException {
+//            mAudioList=list;
+//        }
+
         @Override
-        public void setPlayerList(List<Audio> list) throws RemoteException {
+        public void setPlayerList(List<AudioInfo> list) throws RemoteException {
             mAudioList=list;
         }
 
         //获取播放列表
+//        @Override
+//        public List<Audio> getPlayerList() throws RemoteException{
+//            return mAudioList;
+//        }
+
         @Override
-        public List<Audio> getPlayerList() throws RemoteException{
+        public List<AudioInfo> getPlayerList() throws RemoteException{
             return mAudioList;
         }
 
         //获取当前播放音频
         @Override
-        public Audio getCurrentAudio(){
+        public AudioInfo getCurrentAudio(){
             return mCurrentAudio;
         }
 
         //如果要播放的和当前正在播放的是同一个音频，则跳过
+//        @Override
+//        public void playAudio(Audio audio) throws RemoteException{
+//            if (mCurrentAudio == null) {
+//                mCurrentAudio = audio;
+//                AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
+//                asb.setSource(audio.getAudios().get(0).getAudio().getUrl());
+//                //aliyunVodPlayer.setLocalSource(asb.build());
+//                AliyunLocalSource mLocalSource = asb.build();
+//                mAliyunVodPlayer.prepareAsync(mLocalSource);
+//            } else {
+//                if (mCurrentAudio.getPost_audio_id() == audio.getPost_audio_id()) {
+//                    //如果处于暂停状态，则开始播放
+//
+//
+//                    //如果正在播放，则暂停播放
+//                } else {
+//                    mCurrentAudio = audio;
+//                    AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
+//                    asb.setSource(audio.getAudios().get(0).getAudio().getUrl());
+//                    //aliyunVodPlayer.setLocalSource(asb.build());
+//                    AliyunLocalSource mLocalSource = asb.build();
+//                    mAliyunVodPlayer.prepareAsync(mLocalSource);
+//                }
+//            }
+//
+//        }
+
+
         @Override
-        public void playAudio(Audio audio) throws RemoteException{
+        public void playAudio (AudioInfo audioInfo) throws RemoteException{
             if (mCurrentAudio == null) {
-                mCurrentAudio = audio;
+                mCurrentAudio = audioInfo;
                 AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
-                asb.setSource(audio.getAudios().get(0).getAudio().getUrl());
+                asb.setSource(audioInfo.getUrl());
                 //aliyunVodPlayer.setLocalSource(asb.build());
                 AliyunLocalSource mLocalSource = asb.build();
                 mAliyunVodPlayer.prepareAsync(mLocalSource);
             } else {
-                if (mCurrentAudio.getPost_audio_id() == audio.getPost_audio_id()) {
+                if (mCurrentAudio.getId() == audioInfo.getId()) {
                     //如果处于暂停状态，则开始播放
-
+                    IAliyunVodPlayer.PlayerState playerState=mAliyunVodPlayer.getPlayerState();
+                    if(mAliyunVodPlayer.getPlayerState()!=IAliyunVodPlayer.PlayerState.Prepared&&
+                            mAliyunVodPlayer.getPlayerState()!=IAliyunVodPlayer.PlayerState.Started&&
+                            mAliyunVodPlayer.getPlayerState()!=IAliyunVodPlayer.PlayerState.Paused){
+                        mCurrentAudio = audioInfo;
+                        AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
+                        asb.setSource(audioInfo.getUrl());
+                        //aliyunVodPlayer.setLocalSource(asb.build());
+                        AliyunLocalSource mLocalSource = asb.build();
+                        mAliyunVodPlayer.prepareAsync(mLocalSource);
+                    }else{
+                        EventBus.getDefault().post(new PlayerEvent("OnPrepared",mCurrentAudio));
+                    }
 
                     //如果正在播放，则暂停播放
                 } else {
-                    mCurrentAudio = audio;
+                    mCurrentAudio = audioInfo;
                     AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
-                    asb.setSource(audio.getAudios().get(0).getAudio().getUrl());
+                    asb.setSource(audioInfo.getUrl());
                     //aliyunVodPlayer.setLocalSource(asb.build());
                     AliyunLocalSource mLocalSource = asb.build();
                     mAliyunVodPlayer.prepareAsync(mLocalSource);
                 }
             }
-
         }
+
+
+//        @Override
+//        public void playAudioDetail (AudioDetail audioDetail) throws RemoteException{
+//            if (mCurrentAudioDetail == null) {
+//                mCurrentAudioDetail = audioDetail;
+//                AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
+//                asb.setSource(audioDetail.getAudio().getUrl());
+//                //aliyunVodPlayer.setLocalSource(asb.build());
+//                AliyunLocalSource mLocalSource = asb.build();
+//                mAliyunVodPlayer.prepareAsync(mLocalSource);
+//            } else {
+//                if (mCurrentAudioDetail.getAudio().getPost_id() == audioDetail.getAudio().getPost_id()) {
+//                    //如果处于暂停状态，则开始播放
+//                        if(mAliyunVodPlayer.getPlayerState()!=IAliyunVodPlayer.PlayerState.Prepared||
+//                                mAliyunVodPlayer.getPlayerState()!=IAliyunVodPlayer.PlayerState.Started||
+//                                mAliyunVodPlayer.getPlayerState()!=IAliyunVodPlayer.PlayerState.Paused){
+//                            mCurrentAudioDetail = audioDetail;
+//                            AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
+//                            asb.setSource(audioDetail.getAudio().getUrl());
+//                            //aliyunVodPlayer.setLocalSource(asb.build());
+//                            AliyunLocalSource mLocalSource = asb.build();
+//                            mAliyunVodPlayer.prepareAsync(mLocalSource);
+//                        }
+//
+//                    //如果正在播放，则暂停播放
+//                } else {
+//                    mCurrentAudioDetail = audioDetail;
+//                    AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
+//                    asb.setSource(audioDetail.getAudio().getUrl());
+//                    //aliyunVodPlayer.setLocalSource(asb.build());
+//                    AliyunLocalSource mLocalSource = asb.build();
+//                    mAliyunVodPlayer.prepareAsync(mLocalSource);
+//                }
+//            }
+//        }
 
         //设置播放器定时类型
         @Override
@@ -199,18 +290,21 @@ public class AudioPlayerService extends Service {
         //开始播放
         @Override
         public void start() throws RemoteException{
+            EventBus.getDefault().post(new PlayerEvent("OnStart",mCurrentAudio));
             mAliyunVodPlayer.start();
         }
 
         //停止播放，在开始播放之后调用
         @Override
         public void stop() throws RemoteException{
+            EventBus.getDefault().post(new PlayerEvent("OnStop",mCurrentAudio));
             mAliyunVodPlayer.stop();
         }
 
         //暂停播放
         @Override
         public void pause() throws RemoteException{
+            EventBus.getDefault().post(new PlayerEvent("OnPause",mCurrentAudio));
             mAliyunVodPlayer.pause();
         }
 
@@ -265,6 +359,7 @@ public class AudioPlayerService extends Service {
             }else if(PlaySpeed.values()[speed]==PlaySpeed.Speed150){
                 mAliyunVodPlayer.setPlaySpeed(1.5f);
             }
+            EventBus.getDefault().post(new PlayerEvent("SpeedChanged",mPlaySpeed));
 
         }
         //倍数播放支持0.5~2倍的设置，支持音频变速不变调
@@ -307,39 +402,69 @@ public class AudioPlayerService extends Service {
         @Override
         public void next() throws RemoteException{
 
-            if(sPlayOrder==PLAY_CIRCLE){
-                playAudio(mCurrentAudio);
+//            if(sPlayOrder==PLAY_CIRCLE){
+//                playAudio(mCurrentAudio);
+//            }
+            if(sPlayOrder==PLAY_CIRCLE||sPlayOrder==PLAY_ORDER){
 
-            }else if(sPlayOrder==PLAY_ORDER){
-
-                for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
-                    Audio pi = mAudioList.get(i);
-                    if (pi.getId()==mCurrentAudio.getId()) {
-                        if (i < mAudioList.size() - 1) {
-                            i++;
-                            playAudio(mAudioList.get(i));
+                if(sSequence==POSITIVE){
+                    for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
+                        AudioInfo pi = mAudioList.get(i);
+                        if (pi.getId()==mCurrentAudio.getId()) {
+                            if (i < mAudioList.size() - 1) {
+                                i++;
+                                playAudio(mAudioList.get(i));
+                            }
+                            break;
                         }
-                        break;
+                    }
+                }else{
+                    for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
+                        AudioInfo pi = mAudioList.get(i);
+                        if (pi.getId()==mCurrentAudio.getId()) {
+                            if (i >0) {
+                                i--;
+                                playAudio(mAudioList.get(i));
+                            }
+                            break;
+                        }
                     }
                 }
+
 
             }else if(sPlayOrder==PLAY_RANDOM){
                 Random random = new Random();
                 int rand = random.nextInt(mAudioList.size() - 1);
                 playAudio(mAudioList.get(rand));
             }else{
-                for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
-                    Audio pi = mAudioList.get(i);
-                    if (pi.getId()==mCurrentAudio.getId()) {
-                        if (i ==mAudioList.size()-1) {
-                            i=0;
-                        }else{
-                            i++;
+                if(sSequence==POSITIVE){
+                    for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
+                        AudioInfo pi = mAudioList.get(i);
+                        if (pi.getId()==mCurrentAudio.getId()) {
+                            if (i ==mAudioList.size()-1) {
+                                i=0;
+                            }else{
+                                i++;
+                            }
+                            playAudio(mAudioList.get(i));
+                            break;
                         }
-                        playAudio(mAudioList.get(i));
-                        break;
+                    }
+                }else {
+                    for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
+                        AudioInfo pi = mAudioList.get(i);
+                        if (pi.getId()==mCurrentAudio.getId()) {
+                            if (i ==0) {
+                                i=mAudioList.size()-1;
+                            }else{
+                                i--;
+                            }
+                            playAudio(mAudioList.get(i));
+                            break;
+                        }
                     }
                 }
+
             }
         }
 
@@ -350,34 +475,65 @@ public class AudioPlayerService extends Service {
             if(sPlayOrder==PLAY_CIRCLE){
                 playAudio(mCurrentAudio);
             }else if(sPlayOrder==PLAY_ORDER){
-                for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
-                    Audio pi = mAudioList.get(i);
-                    if (pi.getId()==mCurrentAudio.getId()) {
-                        if (i >0) {
-                            i--;
-                            playAudio(mAudioList.get(i));
+
+                if(sSequence==POSITIVE){
+                    for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
+                        AudioInfo pi = mAudioList.get(i);
+                        if (pi.getId()==mCurrentAudio.getId()) {
+                            if (i >0) {
+                                i--;
+                                playAudio(mAudioList.get(i));
+                            }
+                            break;
                         }
-                        break;
+                    }
+                }else{
+                    for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
+                        AudioInfo pi = mAudioList.get(i);
+                        if (pi.getId()==mCurrentAudio.getId()) {
+                            if (i <mAudioList.size()-1) {
+                                i++;
+                                playAudio(mAudioList.get(i));
+                            }
+                            break;
+                        }
                     }
                 }
+
             }else if(sPlayOrder==PLAY_RANDOM){
                 Random random = new Random();
                 int rand = random.nextInt(mAudioList.size() - 1);
                 playAudio(mAudioList.get(rand));
             }else{
                 //LOOP
-                for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
-                    Audio pi = mAudioList.get(i);
-                    if (pi.getId()==mCurrentAudio.getId()) {
-                        if (i ==0) {
-                            i=mAudioList.size()-1;
-                        }else{
-                            i--;
+                if(sSequence==POSITIVE){
+                    for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
+                        AudioInfo pi = mAudioList.get(i);
+                        if (pi.getId()==mCurrentAudio.getId()) {
+                            if (i ==0) {
+                                i=mAudioList.size()-1;
+                            }else{
+                                i--;
+                            }
+                            playAudio(mAudioList.get(i));
+                            break;
                         }
-                        playAudio(mAudioList.get(i));
-                        break;
+                    }
+                }else {
+                    for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
+                        AudioInfo pi = mAudioList.get(i);
+                        if (pi.getId()==mCurrentAudio.getId()) {
+                            if (i ==mAudioList.size()-1) {
+                                i=0;
+                            }else{
+                                i++;
+                            }
+                            playAudio(mAudioList.get(i));
+                            break;
+                        }
                     }
                 }
+
             }
         }
 
@@ -418,14 +574,21 @@ public class AudioPlayerService extends Service {
             @Override
             public void onError(int arg0, int arg1, String msg) {
                 //出错时处理，查看接口文档中的错误码和错误消息
+                ToastUtils.show("播放异常");
             }
         });
         mAliyunVodPlayer.setOnCompletionListener(new IAliyunVodPlayer.OnCompletionListener() {
             @Override
             public void onCompletion() {
                 //播放正常完成时触发
+                EventBus.getDefault().post(new PlayerEvent("OnCompleted",mCurrentAudio));
                 try {
-                    ((IAudioPlayer.Stub)mBinder).next();
+                    if(sPlayOrder==PLAY_CIRCLE){
+                        ((IAudioPlayer.Stub)mBinder).playAudio(mCurrentAudio);
+                    }else{
+                        ((IAudioPlayer.Stub)mBinder).next();
+                    }
+
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }

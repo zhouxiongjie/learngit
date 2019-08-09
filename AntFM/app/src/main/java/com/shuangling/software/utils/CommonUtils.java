@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -17,21 +18,26 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.ColorInt;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigDialog;
@@ -41,7 +47,6 @@ import com.mylhyl.circledialog.res.values.CircleDimen;
 import com.mylhyl.circledialog.view.listener.OnCreateBodyViewListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -69,102 +74,62 @@ public class CommonUtils {
     public static final int NETWORKTYPE_INVALID = 0x3;
 
     private static AudioManager am;
-    public static String getStoragePublicDirectory() {
-        String state = Environment.getExternalStorageState();// 判断是否存在外部存储设备
+    public static String getStoragePublicDirectory(String dirType) {
+        String state = Environment.getExternalStorageState();
+        Context context=MyApplication.getInstance();
         if (!state.equals(Environment.MEDIA_MOUNTED)) {
 
-            File file = MyApplication.getInstance().getFilesDir();
+            File file = context.getFilesDir();
             if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    Log.e("test", "StoragePublicDirectory not created");
-                }
+                file.mkdirs();
             }
             return file.getAbsolutePath();
         } else {
-            File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+            //Environment.DIRECTORY_DOCUMENTS
+            //此文件目录在app被卸载时不会删除掉
+            File file = Environment.getExternalStoragePublicDirectory(dirType);
             if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    Log.e("test", "StoragePublicDirectory not created");
-                }
+                file.mkdirs();
             }
             return file.getAbsolutePath();
         }
     }
 
 
-    public static String getPictureStorageDir(Context context) {
-        String state = Environment.getExternalStorageState();// 判断是否存在外部存储设备
+    public static String getStoragePrivateDirectory(String dirType) {
+        String state = Environment.getExternalStorageState();
+        Context context=MyApplication.getInstance();
         if (!state.equals(Environment.MEDIA_MOUNTED)) {
 
             File file = context.getFilesDir();
             if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    Log.e("test", "PictureStorageDir not created");
-                }
+                file.mkdirs();
             }
             return file.getAbsolutePath();
         } else {
-            File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+            //Environment.DIRECTORY_DOCUMENTS
+            //此文件目录在app被卸载时会删除掉
+            File file = context.getExternalFilesDir(dirType);
             if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    Log.e("test", "PictureStorageDir not created");
-                }
-            }
-            return file.getAbsolutePath();
-        }
-
-    }
-
-    public static String getMusicStorageDir(Context context) {
-        String state = Environment.getExternalStorageState();// 判断是否存在外部存储设备
-        if (!state.equals(Environment.MEDIA_MOUNTED)) {
-
-            File file = context.getFilesDir();
-            if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    Log.e("test", "PictureStorageDir not created");
-                }
-            }
-            return file.getAbsolutePath();
-        } else {
-            File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-            if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    Log.e("test", "PictureStorageDir not created");
-                }
+                file.mkdirs();
             }
             return file.getAbsolutePath();
         }
     }
 
 
-    public static String getMoviesStorageDir(Context context) {
-        String state = Environment.getExternalStorageState();// 判断是否存在外部存储设备
-        if (!state.equals(Environment.MEDIA_MOUNTED)) {
-
-            File file = context.getFilesDir();
-            if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    Log.e("test", "PictureStorageDir not created");
-                }
-            }
-            return file.getAbsolutePath();
-        } else {
-            File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-            if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    Log.e("test", "PictureStorageDir not created");
-                }
-            }
-            return file.getAbsolutePath();
-        }
-
+    public static @ColorInt int getThemeColor(Context context ) {
+        int[] attrs = new int[] {R.attr.themeColor};
+        TypedArray typedArray = context.obtainStyledAttributes(attrs);
+        int color = typedArray.getColor(0, 0xffffffff);
+        typedArray.recycle();
+        return color;
     }
 
 
     public static String saveBitmap(Bitmap b) {
 
-        String path = getStoragePublicDirectory();
+        String path = getStoragePrivateDirectory(Environment.DIRECTORY_PICTURES);
         long dataTake = System.currentTimeMillis();
         String jpegName = path + File.separator + "picture_" + dataTake + ".jpg";
         try {
@@ -948,6 +913,16 @@ public class CommonUtils {
         return spannableString;
     }
 
+    public static SpannableString tagKeyword(String str, String keyword,int color){
+        int start=str.indexOf(keyword);
+        int length=keyword.length();
+        SpannableString spannableString = new SpannableString(str);
+        ForegroundColorSpan colorSpan = new ForegroundColorSpan(color);
+        spannableString.setSpan(colorSpan, start, start+length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        return spannableString;
+    }
+
+
 
 
      public static DialogFragment showLoadingDialog(FragmentManager manager){
@@ -974,5 +949,62 @@ public class CommonUtils {
                 .setCancelable(false)
                 .show(manager);
         return dialogFragment;
+    }
+
+
+
+    /**
+     * 设置textView结尾...后面显示的文字和颜色
+     * @param context 上下文
+     * @param textView textview
+     * @param minLines 最少的行数
+     * @param originText 原文本
+     * @param endText 结尾文字
+     * @param endColorID 结尾文字颜色id
+     * @param isExpand 当前是否是展开状态
+     */
+    public void toggleEllipsize(final Context context,
+                                final TextView textView,
+                                final int minLines,
+                                final String originText,
+                                final String endText,
+                                final int endColorID,
+                                final boolean isExpand) {
+        if (TextUtils.isEmpty(originText)) {
+            return;
+        }
+        textView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver
+                .OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (isExpand) {
+                    textView.setText(originText);
+                } else {
+                    int paddingLeft = textView.getPaddingLeft();
+                    int paddingRight = textView.getPaddingRight();
+                    TextPaint paint = textView.getPaint();
+                    float moreText = textView.getTextSize() * endText.length();
+                    float availableTextWidth = (textView.getWidth() - paddingLeft - paddingRight) *
+                            minLines - moreText;
+                    CharSequence ellipsizeStr = TextUtils.ellipsize(originText, paint,
+                            availableTextWidth, TextUtils.TruncateAt.END);
+                    if (ellipsizeStr.length() < originText.length()) {
+                        CharSequence temp = ellipsizeStr + endText;
+                        SpannableStringBuilder ssb = new SpannableStringBuilder(temp);
+                        ssb.setSpan(new ForegroundColorSpan(context.getResources().getColor
+                                        (endColorID)),
+                                temp.length() - endText.length(), temp.length(),    Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+                        textView.setText(ssb);
+                    } else {
+                        textView.setText(originText);
+                    }
+                }
+                if (Build.VERSION.SDK_INT >= 16) {
+                    textView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                } else {
+                    textView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
+            }
+        });
     }
 }

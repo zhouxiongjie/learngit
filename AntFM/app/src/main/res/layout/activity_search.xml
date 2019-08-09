@@ -31,7 +31,7 @@
             android:layout_marginRight="10dp"
             android:layout_toLeftOf="@+id/searchCancel"
             android:background="@drawable/search_box_1_bg"
-            android:drawableLeft="@drawable/ic_search"
+            android:drawableLeft="@drawable/ic_search_gray"
             android:drawablePadding="5dp"
             android:hint="请输入搜索内容"
             android:paddingLeft="10dp"
@@ -82,7 +82,7 @@
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
                         android:text="清空"
-                        android:textColor="#1CA0FF"
+                        android:textColor="?attr/themeColor"
                         android:textSize="@dimen/font_size_26px" />
 
                 </RelativeLayout>
@@ -109,14 +109,14 @@
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/font_size_30px"
                 android:textStyle="bold"
-                app:tabMode="scrollable"
-                app:tabIndicatorHeight="2dp"
-                app:tabIndicatorColor="@color/textColorOne"
-                app:tabSelectedTextColor="@color/textColorOne"
-                app:tabTextColor="@color/black"
+                app:tabIndicatorColor="?attr/themeColor"
                 app:tabIndicatorFullWidth="false"
+                app:tabIndicatorHeight="2dp"
                 app:tabMaxWidth="80dp"
+                app:tabMode="scrollable"
+                app:tabSelectedTextColor="?attr/themeColor"
                 app:tabTextAppearance="@style/TabTextStyle"
+                app:tabTextColor="@color/black"
                 />
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewPager"

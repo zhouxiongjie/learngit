@@ -33,8 +33,8 @@ public class AccountAndSecurityActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_and_security);
         ButterKnife.bind(this);
     }

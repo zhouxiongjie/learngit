@@ -142,8 +142,9 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
     private OssService mOssService;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_modify_userinfo);
         ButterKnife.bind(this);
         init();
@@ -265,7 +266,7 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -335,7 +336,7 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -359,19 +360,19 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
                 Toast.makeText(this, "用户取消拍照", Toast.LENGTH_SHORT).show();
             }
         } else if (requestCode == CHOOSE_PHOTO) {
+
             if (resultCode == RESULT_OK && data != null) {
-                if (resultCode == RESULT_OK && data != null) {
 
-                    List<String> paths=Matisse.obtainPathResult(data);
-                    //List<Uri> selects = Matisse.obtainResult(data);
-                    //File file = new File(CommonUtils.getRealFilePath(this, selects.get(0)));
-                    File file = new File(paths.get(0));
-                    clipImage(Uri.fromFile(file));
+                List<String> paths=Matisse.obtainPathResult(data);
+                //List<Uri> selects = Matisse.obtainResult(data);
+                //File file = new File(CommonUtils.getRealFilePath(this, selects.get(0)));
+                File file = new File(paths.get(0));
+                clipImage(Uri.fromFile(file));
 
-                } else {
-                    ToastUtils.show("用户取消拍照");
-                }
+            } else {
+                ToastUtils.show("用户取消拍照");
             }
+
         } else if (requestCode == CUT_OK) {
             if (resultCode == RESULT_OK && data != null) {
                 // 获取裁剪的图片数据
@@ -617,6 +618,7 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
                 User.setInstance(null);
                 SharedPreferencesUtils.resetUser();
                 finish();
+                EventBus.getDefault().post(new CommonEvent("OnQuitLogin"));
                 //注销用户信息
                 break;
         }
@@ -735,7 +737,7 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }

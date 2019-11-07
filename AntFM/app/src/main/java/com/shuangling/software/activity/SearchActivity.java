@@ -71,8 +71,9 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_search);
         StatusBarUtil.setTransparent(this);
         StatusBarManager.setImmersiveStatusBar(this, true);

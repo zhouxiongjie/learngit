@@ -41,6 +41,7 @@ import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigInput;
 import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
+import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.ColumnContentAdapter;
 import com.shuangling.software.adapter.CommentListAdapter;
@@ -201,6 +202,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
             }
         });
+        setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_detail);
         ButterKnife.bind(this);
@@ -249,6 +251,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
         aliyunVodPlayerView.setTheme(AliyunVodPlayerView.Theme.Blue);
         //aliyunVodPlayerView.setCirclePlay(true);
         aliyunVodPlayerView.setAutoPlay(true);
+        aliyunVodPlayerView.setReferer(ServerInfo.h5IP);
 
         if(mNetPlay==0){
             //每次提醒
@@ -304,7 +307,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -330,7 +333,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -357,7 +360,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -386,7 +389,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -419,7 +422,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -454,7 +457,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -488,7 +491,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -520,7 +523,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -550,7 +553,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -577,7 +580,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -980,24 +983,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                                         .show(getSupportFragmentManager());
                             }
                         });
-//                        if (mCommentListAdapter == null) {
-//                            mCommentListAdapter = new CommentListAdapter(this, mComments);
-//                            mCommentListAdapter.setOnPraise(new CommentListAdapter.OnPraise() {
-//                                @Override
-//                                public void praiseItem(Comment comment) {
-//                                    if (User.getInstance() != null) {
-//                                        praise("" + comment.getId());
-//                                    } else {
-//                                        Intent it = new Intent(VideoDetailActivity.this, LoginActivity.class);
-//                                        startActivityForResult(it, REQUEST_LOGIN);
-//                                    }
-//
-//                                }
-//                            });
-//                            listView.setAdapter(mCommentListAdapter);
-//                        } else {
-//                            mCommentListAdapter.updateView(mComments);
-//                        }
+
 
                     }
                 } catch (Exception e) {
@@ -1011,7 +997,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                     String result = (String)msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        ToastUtils.show(jsonObject.getString("msg"));
+                        ToastUtils.show("删除成功");
                         getComments();
                     }
 
@@ -1261,13 +1247,16 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             @Override
             public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
                 //点击新浪微博
+                String chanel="1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
                     //限制微博分享的文字不能超过20
+                    chanel="2";
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setText(title + url);
                 } else if (QQ.NAME.equals(platform.getName())) {
+                    chanel="3";
                     paramsToShare.setTitle(title);
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
@@ -1300,6 +1289,8 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                         paramsToShare.setImageUrl(cover);
                     }
                 }
+
+                shareStatistics(chanel,""+mVideoDetail.getId(),url);
             }
         });
         oks.setCallback(new PlatformActionListener() {
@@ -1315,6 +1306,8 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                 Message msg = Message.obtain();
                 msg.what = SHARE_SUCCESS;
                 mHandler.sendMessage(msg);
+
+
             }
             @Override
             public void onCancel(Platform arg0, int arg1) {
@@ -1337,5 +1330,34 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
         }
         super.onDestroy();
+    }
+
+
+    public void shareStatistics(String channel,String postId,String shardUrl) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
+        Map<String, String> params = new HashMap<>();
+        if(User.getInstance()!=null){
+            params.put("user_id", ""+User.getInstance().getId());
+        }
+        params.put("channel", channel);
+        params.put("post_id", postId);
+        params.put("source_type", "3");
+        params.put("type", "1");
+        params.put("shard_url", shardUrl);
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.i("test",response);
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                Log.i("test",exception.toString());
+
+            }
+        });
+
     }
 }

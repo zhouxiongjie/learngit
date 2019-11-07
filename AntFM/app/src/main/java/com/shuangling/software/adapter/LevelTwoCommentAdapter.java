@@ -1,7 +1,6 @@
 package com.shuangling.software.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -9,25 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
-import com.shuangling.software.activity.AlbumDetailActivity;
-import com.shuangling.software.activity.CommentDetailActivity;
-import com.shuangling.software.activity.SingleAudioDetailActivity;
-import com.shuangling.software.customview.ExpandableTextView;
-import com.shuangling.software.customview.FontIconView;
-import com.shuangling.software.customview.MySpannableTextView;
 import com.shuangling.software.customview.ReadMoreTextView;
 import com.shuangling.software.entity.Comment;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.TimeUtil;
-
 import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

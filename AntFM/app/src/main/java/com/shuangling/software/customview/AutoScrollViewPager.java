@@ -52,7 +52,7 @@ public class AutoScrollViewPager extends ViewPager {
     /** whether automatic cycle when auto scroll reaching the last or first item, default is true **/
     private boolean                isCycle                     = true;
     /** whether stop auto scroll when touching, default is true **/
-    private boolean                stopScrollWhenTouch         = true;
+    private boolean                stopScrollWhenTouch         = false;
     /** how to process when sliding at the last or first item, default is {@link #SLIDE_BORDER_MODE_NONE} **/
     private int                    slideBorderMode             = SLIDE_BORDER_MODE_NONE;
     /** whether animating when auto scroll at the last or first item **/

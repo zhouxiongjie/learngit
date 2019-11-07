@@ -80,8 +80,9 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_content);
         ButterKnife.bind(this);
         init();
@@ -98,7 +99,7 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
         recyclerView.addItemDecoration(divider);
         refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
         ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
-        //refreshLayout.setEnableLoadMore(false);
+        refreshLayout.setEnableAutoLoadMore(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
@@ -140,10 +141,10 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
 
         if (getContent == GetContent.Refresh) {
             params.put("operation", "up");
-            params.put("update_time", mColumnContents.size() > 0 ? mColumnContents.get(0).getUpdate_time() : "");
+            params.put("publish_at", mColumnContents.size() > 0 ? mColumnContents.get(0).getPublish_at() : "");
         } else if (getContent == GetContent.LoadMore) {
             params.put("operation", "down");
-            params.put("update_time", mColumnContents.size() > 0 ? mColumnContents.get(mColumnContents.size() - 1).getUpdate_time() : "");
+            params.put("publish_at", mColumnContents.size() > 0 ? mColumnContents.get(mColumnContents.size() - 1).getPublish_at() : "");
         }
         //params.put("mobile_source", "app");
         params.put("order_by", mOrderBy);
@@ -181,7 +182,7 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
                 mHandler.post(new Runnable() {
                     @Override

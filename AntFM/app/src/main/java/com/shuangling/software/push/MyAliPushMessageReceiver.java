@@ -1,10 +1,14 @@
 package com.shuangling.software.push;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.alibaba.sdk.android.push.MessageReceiver;
 import com.alibaba.sdk.android.push.notification.CPushMessage;
+import com.shuangling.software.activity.WebViewBackActivity;
+
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.Map;
 
@@ -27,10 +31,25 @@ public class MyAliPushMessageReceiver extends MessageReceiver {
     @Override
     public void onNotificationOpened(Context context, String title, String summary, String extraMap) {
         Log.e("MyMessageReceiver", "onNotificationOpened, title: " + title + ", summary: " + summary + ", extraMap:" + extraMap);
+
+//        JSONObject jsonObject = JSONObject.parseObject(extraMap);
+//        Intent intent = new Intent(context,WebViewBackActivity.class);
+//        intent.putExtra("title",title);
+//        intent.putExtra("url",jsonObject.getString("url"));
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        context.startActivity(intent);
+
     }
     @Override
     protected void onNotificationClickedWithNoAction(Context context, String title, String summary, String extraMap) {
         Log.e("MyMessageReceiver", "onNotificationClickedWithNoAction, title: " + title + ", summary: " + summary + ", extraMap:" + extraMap);
+        JSONObject jsonObject = JSONObject.parseObject(extraMap);
+        Intent intent = new Intent(context,WebViewBackActivity.class);
+        intent.putExtra("title",title);
+        intent.putExtra("url",jsonObject.getString("url"));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+
     }
     @Override
     protected void onNotificationReceivedInApp(Context context, String title, String summary, Map<String, String> extraMap, int openType, String openActivity, String openUrl) {

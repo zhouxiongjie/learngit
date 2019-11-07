@@ -19,8 +19,8 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
-import com.shuangling.software.activity.SingleAudioDetailActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.entity.ColumnContent;
@@ -46,11 +46,12 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
     public static final int TYPE_AUDIO = 0;             //音频
     public static final int TYPE_ALBUM = 1;             //专辑
     public static final int TYPE_ARTICLE = 2;           //文章
-    public static final int TYPE_VIDEO = 3;             //视频
-    public static final int TYPE_SPECIAL = 4;           //专题
-    public static final int TYPE_GALLERIE_ONE = 5;      //一图集
-    public static final int TYPE_GALLERIE_THREE = 6;    //三图集
-    public static final int TYPE_HEAD = 7;              //头
+    public static final int TYPE_ARTICLE_THREE = 3;     //文章
+    public static final int TYPE_VIDEO = 4;             //视频
+    public static final int TYPE_SPECIAL = 5;           //专题
+    public static final int TYPE_GALLERIE_ONE = 6;      //一图集
+    public static final int TYPE_GALLERIE_THREE = 7;    //三图集
+    public static final int TYPE_HEAD = 8;              //头
 
     private Context mContext;
     private List<ColumnContent> mColumnContent;
@@ -124,6 +125,8 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             return new AlbumViewHolder(inflater.inflate(R.layout.content_album_item, parent, false));
         } else if (viewType == TYPE_ARTICLE) {
             return new ArticleViewHolder(inflater.inflate(R.layout.content_article_item, parent, false));
+        }  else if (viewType == TYPE_ARTICLE_THREE) {
+            return new ArticleViewThreeHolder(inflater.inflate(R.layout.content_article_three_item, parent, false));
         } else if (viewType == TYPE_VIDEO) {
             if (isVideo()) {
                 return new VideoViewHolder(inflater.inflate(R.layout.content_video_item_one, parent, false));
@@ -169,10 +172,10 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
 //            }
         }
 
+        int itemViewType=getItemViewType(position);
+        if ( itemViewType== TYPE_HEAD) {
 
-        if (getItemViewType(position) == TYPE_HEAD) {
-
-        } else if (getItemViewType(position) == TYPE_AUDIO) {
+        } else if (itemViewType == TYPE_AUDIO) {
             AudioViewHolder audioViewHolder = (AudioViewHolder) holder;
             if (showExcellent) {
                 audioViewHolder.excellent.setVisibility(View.VISIBLE);
@@ -207,19 +210,19 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 audioViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
 
-            audioViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getUpdate_time()));
+            audioViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             audioViewHolder.title.setText(content.getTitle());
             //audioViewHolder.commentNum.setText(""+content.getComment()+"评论");
             audioViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, SingleAudioDetailActivity.class);
+                    Intent it = new Intent(mContext, AudioDetailActivity.class);
                     it.putExtra("audioId", content.getId());
                     mContext.startActivity(it);
                 }
             });
 
-        } else if (getItemViewType(position) == TYPE_ALBUM) {
+        } else if (itemViewType == TYPE_ALBUM) {
             final AlbumViewHolder albumViewHolder = (AlbumViewHolder) holder;
             if (showExcellent) {
                 albumViewHolder.excellent.setVisibility(View.VISIBLE);
@@ -294,87 +297,12 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                         }
 
                     }
-                    return false;
+                    return true;
                 }
             };
             albumViewHolder.title.setTag(listener);
             albumViewHolder.title.getViewTreeObserver().addOnPreDrawListener(listener);
-//            albumViewHolder.title.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-//
-//                @Override
-//                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-//                    //albumViewHolder.title.removeOnLayoutChangeListener(this);
-//                    // Get height here
-//                    Log.i("test_width",""+albumViewHolder.layout.getWidth());
-//                    Log.i("test_title",""+content.getTitle());
-//                    Log.i("test_title_width",""+albumViewHolder.title.getWidth());
-//                    if(albumViewHolder.title.getLineCount()>2){
-//                        Log.i("test","getLineCount>2");
-//                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-//                        layoutParams.topMargin = CommonUtils.dip2px(5);
-//                        layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
-//                        albumViewHolder.layout.setLayoutParams(layoutParams);
-//                    } else{
-//
-//
-//                        if(albumViewHolder.layout.getWidth()>albumViewHolder.title.getWidth()){
-//                            Log.i("test","layout.getWidth()>title.getWidth()");
-//                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-//                            layoutParams.topMargin = CommonUtils.dip2px(5);
-//                            layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
-//                            albumViewHolder.layout.setLayoutParams(layoutParams);
-//
-//                        }else{
-//                            Log.i("test","layout.getWidth()<title.getWidth()");
-//                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-//                            layoutParams.topMargin = CommonUtils.dip2px(5);
-//                            layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM,R.id.logo);
-//                            albumViewHolder.layout.setLayoutParams(layoutParams);
-//                        }
-//
-//                    }
-//                }
-//            });
-//            albumViewHolder.title.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//                @Override
-//                public void onGlobalLayout() {
-//                    ViewTreeObserver obs = albumViewHolder.title.getViewTreeObserver();
-//                    obs.removeOnGlobalLayoutListener(this);
-//                    Log.i("test_width",""+albumViewHolder.layout.getWidth());
-//                    Log.i("test_title",""+content.getTitle());
-//                    Log.i("test_title_width",""+albumViewHolder.title.getWidth());
-//                    if(albumViewHolder.title.getLineCount()>2){
-//                        Log.i("test","getLineCount>2");
-//                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-//                        layoutParams.topMargin = CommonUtils.dip2px(5);
-//                        layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
-//                        albumViewHolder.layout.setLayoutParams(layoutParams);
-//                    } else{
-//
-//
-//                        if(albumViewHolder.layout.getWidth()>albumViewHolder.title.getWidth()){
-//                            Log.i("test","layout.getWidth()>title.getWidth()");
-//                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-//                            layoutParams.topMargin = CommonUtils.dip2px(5);
-//                            layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
-//                            albumViewHolder.layout.setLayoutParams(layoutParams);
-//
-//                        }else{
-//                            Log.i("test","layout.getWidth()<title.getWidth()");
-//                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-//                            layoutParams.topMargin = CommonUtils.dip2px(5);
-//                            layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM,R.id.logo);
-//                            albumViewHolder.layout.setLayoutParams(layoutParams);
-//                        }
-//
-//                    }
-//
-//
-//                }
-//
-//
-//            });
-            albumViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getUpdate_time()));
+            albumViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             if(content.getAlbums().getStatus()==1){
                 //已完结
                 albumViewHolder.title.setText(CommonUtils.tagKeyword("完~"+content.getTitle(),"完~",CommonUtils.getThemeColor(mContext)));
@@ -394,7 +322,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 }
             });
 
-        } else if (getItemViewType(position) == TYPE_ARTICLE) {
+        } else if (itemViewType == TYPE_ARTICLE) {
             final ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
 
             if (showExcellent) {
@@ -413,18 +341,28 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             }
             if(content.getTop()!=null){
                 articleViewHolder.top.setVisibility(View.VISIBLE);
+                if (!TextUtils.isEmpty(content.getCover())) {
+                    articleViewHolder.logo.setVisibility(View.VISIBLE);
+                    Uri uri = Uri.parse(content.getCover());
+                    int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
+                    int height = (int) (2f * width / 3f);
+                    ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
+                }else{
+                    articleViewHolder.logo.setVisibility(View.GONE);
+                }
             }else{
                 articleViewHolder.top.setVisibility(View.GONE);
+                if (content.getArticle().getCovers().size()>0&&!TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
+                    articleViewHolder.logo.setVisibility(View.VISIBLE);
+                    Uri uri = Uri.parse(content.getArticle().getCovers().get(0));
+                    int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
+                    int height = (int) (2f * width / 3f);
+                    ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
+                }else{
+                    articleViewHolder.logo.setVisibility(View.GONE);
+                }
             }
-            if (!TextUtils.isEmpty(content.getCover())) {
-                articleViewHolder.logo.setVisibility(View.VISIBLE);
-                Uri uri = Uri.parse(content.getCover());
-                int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
-                int height = (int) (2f * width / 3f);
-                ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
-            }else{
-                articleViewHolder.logo.setVisibility(View.GONE);
-            }
+
 
             articleViewHolder.title.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
@@ -469,14 +407,14 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     }
 
 
-                    return false;
+                    return true;
                 }
             });
 
 
             articleViewHolder.title.setText(content.getTitle());
 
-            articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getUpdate_time()));
+            articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             articleViewHolder.commentNum.setText("" + content.getComment() + "评论");
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
@@ -491,7 +429,74 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     mContext.startActivity(it);
                 }
             });
-        } else if (getItemViewType(position) == TYPE_VIDEO) {
+        }  else if (itemViewType == TYPE_ARTICLE_THREE) {
+            final ArticleViewThreeHolder articleViewHolder = (ArticleViewThreeHolder) holder;
+
+            if (showExcellent) {
+                articleViewHolder.excellent.setVisibility(View.VISIBLE);
+                Station station=MyApplication.getInstance().getStation();
+                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
+                    Uri uri = Uri.parse(station.getIcon2());
+                    int width=CommonUtils.dip2px(15);
+                    int height=width;
+                    ImageLoader.showThumb(uri,articleViewHolder.excellentLogo,width,height);
+                }else{
+                    articleViewHolder.excellentLogo.setVisibility(View.GONE);
+                }
+            } else {
+                articleViewHolder.excellent.setVisibility(View.GONE);
+            }
+            if(content.getTop()!=null){
+                articleViewHolder.top.setVisibility(View.VISIBLE);
+            }else{
+                articleViewHolder.top.setVisibility(View.GONE);
+            }
+
+            if (!TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
+                Uri uri = Uri.parse(content.getArticle().getCovers().get(0));
+                int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
+                int height = (int) (2f * width / 3f);
+                ImageLoader.showThumb(uri, articleViewHolder.pic1, width, height);
+            }else{
+                ImageLoader.showThumb(articleViewHolder.pic1, R.drawable.video_placeholder);
+            }
+            if (!TextUtils.isEmpty(content.getArticle().getCovers().get(1))) {
+                Uri uri = Uri.parse(content.getArticle().getCovers().get(1));
+                int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
+                int height = (int) (2f * width / 3f);
+                ImageLoader.showThumb(uri, articleViewHolder.pic2, width, height);
+            }else{
+                ImageLoader.showThumb(articleViewHolder.pic2, R.drawable.video_placeholder);
+            }
+            if (!TextUtils.isEmpty(content.getArticle().getCovers().get(2))) {
+                Uri uri = Uri.parse(content.getArticle().getCovers().get(2));
+                int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
+                int height = (int) (2f * width / 3f);
+                ImageLoader.showThumb(uri, articleViewHolder.pic3, width, height);
+            }else{
+                ImageLoader.showThumb(articleViewHolder.pic3, R.drawable.video_placeholder);
+            }
+
+
+
+            articleViewHolder.title.setText(content.getTitle());
+
+            articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
+            articleViewHolder.commentNum.setText("" + content.getComment() + "评论");
+            if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
+                articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
+            }
+
+
+            articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent it = new Intent(mContext, ArticleDetailActivity.class);
+                    it.putExtra("articleId", content.getId());
+                    mContext.startActivity(it);
+                }
+            });
+        }else if (itemViewType == TYPE_VIDEO) {
             VideoViewHolder videoViewHolder = (VideoViewHolder) holder;
 
             if (showExcellent) {
@@ -537,7 +542,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             }else{
                 videoViewHolder.duration.setText("00:00");
             }
-            videoViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getUpdate_time()));
+            videoViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             videoViewHolder.title.setText(content.getTitle());
             videoViewHolder.commentNum.setText( content.getComment()+"评论" );
             videoViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -548,7 +553,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     mContext.startActivity(it);
                 }
             });
-        } else if (getItemViewType(position) == TYPE_GALLERIE_ONE) {
+        } else if (itemViewType== TYPE_GALLERIE_ONE) {
             GallerieOneViewHolder gallerieOneViewHolder = (GallerieOneViewHolder) holder;
 
             if (showExcellent) {
@@ -581,7 +586,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 gallerieOneViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
-            gallerieOneViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getUpdate_time()));
+            gallerieOneViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieOneViewHolder.title.setText(content.getTitle());
             gallerieOneViewHolder.commentNum.setText("" + content.getComment() + "评论");
             gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
@@ -594,7 +599,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 }
             });
 
-        } else if (getItemViewType(position) == TYPE_GALLERIE_THREE) {
+        } else if (itemViewType == TYPE_GALLERIE_THREE) {
             GallerieViewThreeHolder gallerieViewThreeHolder = (GallerieViewThreeHolder) holder;
 
             if (showExcellent) {
@@ -643,7 +648,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 gallerieViewThreeHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
-            gallerieViewThreeHolder.publishTime.setText(TimeUtil.formatDateTime(content.getUpdate_time()));
+            gallerieViewThreeHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieViewThreeHolder.title.setText(content.getTitle());
             gallerieViewThreeHolder.commentNum.setText("" + content.getComment() + "评论");
             gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
@@ -732,14 +737,14 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     }
 
 
-                    return false;
+                    return true;
                 }
             });
             specialViewHolder.title.setText(content.getTitle());
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 specialViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
-            specialViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getUpdate_time()));
+            specialViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
 
             specialViewHolder.commentNum.setText("" + content.getComment() + "评论");
             specialViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -988,6 +993,40 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
     }
 
 
+
+    public class ArticleViewThreeHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.title)
+        TextView title;
+        @BindView(R.id.top)
+        TextView top;
+        @BindView(R.id.pic1)
+        SimpleDraweeView pic1;
+        @BindView(R.id.pic2)
+        SimpleDraweeView pic2;
+        @BindView(R.id.pic3)
+        SimpleDraweeView pic3;
+        @BindView(R.id.count)
+        TextView count;
+        @BindView(R.id.merchant)
+        TextView merchant;
+        @BindView(R.id.commentNum)
+        TextView commentNum;
+        @BindView(R.id.publishTime)
+        TextView publishTime;
+        @BindView(R.id.root)
+        LinearLayout root;
+        @BindView(R.id.excellent)
+        RelativeLayout excellent;
+        @BindView(R.id.excellentLogo)
+        SimpleDraweeView excellentLogo;
+
+        public ArticleViewThreeHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
+    }
+
+
     @Override
     public int getItemCount() {
         if (mHeaderView != null) {
@@ -1017,7 +1056,17 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 } else if (mColumnContent.get(position - 1).getType() == 2) {
                     return TYPE_ALBUM;
                 } else if (mColumnContent.get(position - 1).getType() == 3) {
-                    return TYPE_ARTICLE;
+                    if (mColumnContent.get(position - 1).getArticle().getType() == 1) {
+                        return TYPE_ARTICLE;
+                    } else if (mColumnContent.get(position - 1).getArticle().getType() == 2) {
+                        return TYPE_ARTICLE_THREE;
+                    } else {
+                        if (mColumnContent.get(position - 1).getArticle().getCovers().size() >2) {
+                            return TYPE_ARTICLE_THREE;
+                        } else {
+                            return TYPE_ARTICLE;
+                        }
+                    }
                 } else if (mColumnContent.get(position - 1).getType() == 4) {
                     return TYPE_VIDEO;
                 } else if (mColumnContent.get(position - 1).getType() == 5) {
@@ -1045,7 +1094,22 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             } else if (mColumnContent.get(position).getType() == 2) {
                 return TYPE_ALBUM;
             } else if (mColumnContent.get(position).getType() == 3) {
-                return TYPE_ARTICLE;
+                if(mColumnContent.get(position).getTop()!=null){
+                    return TYPE_ARTICLE;
+                }else{
+                    if (mColumnContent.get(position).getArticle().getType() == 1) {
+                        return TYPE_ARTICLE;
+                    } else if (mColumnContent.get(position).getArticle().getType() == 2) {
+                        return TYPE_ARTICLE_THREE;
+                    } else {
+                        if (mColumnContent.get(position).getArticle().getCovers().size() >2) {
+                            return TYPE_ARTICLE_THREE;
+                        } else {
+                            return TYPE_ARTICLE;
+                        }
+                    }
+                }
+
             } else if (mColumnContent.get(position).getType() == 4) {
                 return TYPE_VIDEO;
             } else if (mColumnContent.get(position).getType() == 5) {

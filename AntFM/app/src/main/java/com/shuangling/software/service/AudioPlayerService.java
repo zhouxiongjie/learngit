@@ -17,6 +17,7 @@ import com.shuangling.software.entity.Audio;
 import com.shuangling.software.entity.AudioDetail;
 import com.shuangling.software.entity.AudioInfo;
 import com.shuangling.software.event.PlayerEvent;
+import com.shuangling.software.utils.ServerInfo;
 
 import org.greenrobot.eventbus.EventBus;
 import java.util.List;
@@ -556,6 +557,7 @@ public class AudioPlayerService extends Service {
         super.onCreate();
         mAliyunVodPlayer = new AliyunVodPlayer(this);
         mAliyunVodPlayer.setAutoPlay(true);
+        mAliyunVodPlayer.setReferer(ServerInfo.h5IP);
         mAliyunVodPlayer.setOnPreparedListener(new IAliyunVodPlayer.OnPreparedListener() {
             @Override
             public void onPrepared() {

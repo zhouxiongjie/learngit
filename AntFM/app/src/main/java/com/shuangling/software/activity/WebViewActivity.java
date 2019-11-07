@@ -1,33 +1,43 @@
 package com.shuangling.software.activity;
 
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.network.OkHttpCallback;
+import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,6 +51,7 @@ import cn.sharesdk.tencent.qq.QQ;
 import cn.sharesdk.wechat.favorite.WechatFavorite;
 import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
+import okhttp3.Call;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -53,6 +64,10 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
     private static final int SHARE_SUCCESS = 0x3;
     private static final int SHARE_FAILED = 0x4;
 
+    private ValueCallback<Uri> mUploadMessage;
+    public ValueCallback<Uri[]> uploadMessage;
+    public static final int REQUEST_SELECT_FILE = 100;
+    private final static int FILECHOOSER_RESULTCODE = 2;
 
     @BindView(R.id.webView)
     WebView webView;
@@ -65,8 +80,9 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_webview);
         ButterKnife.bind(this);
         init();
@@ -192,6 +208,59 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
             public void onReceivedTitle(WebView view, String title) {
                 super.onReceivedTitle(view, title);
             }
+
+
+            // For 3.0+ Devices (Start)
+            // onActivityResult attached before constructor
+
+            protected void openFileChooser(ValueCallback uploadMsg, String acceptType) {
+                mUploadMessage = uploadMsg;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("image/*");
+                startActivityForResult(Intent.createChooser(i, "File Browser"), FILECHOOSER_RESULTCODE);
+            }
+
+
+            // For Lollipop 5.0+ Devices
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+            public boolean onShowFileChooser(WebView mWebView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
+                if (uploadMessage != null) {
+                    uploadMessage.onReceiveValue(null);
+                    uploadMessage = null;
+                }
+
+                uploadMessage = filePathCallback;
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                //startActivityForResult(intent, REQUEST_SELECT_FILE);
+                //Intent intent = fileChooserParams.createIntent();
+                try {
+                    startActivityForResult(intent, REQUEST_SELECT_FILE);
+                } catch (ActivityNotFoundException e) {
+                    uploadMessage = null;
+                    Toast.makeText(getBaseContext(), "Cannot Open File Chooser", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+                return true;
+            }
+
+            //For Android 4.1 only
+            protected void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+                mUploadMessage = uploadMsg;
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("image/*");
+                startActivityForResult(Intent.createChooser(intent, "File Browser"), FILECHOOSER_RESULTCODE);
+            }
+
+
+            protected void openFileChooser(ValueCallback<Uri> uploadMsg) {
+                mUploadMessage = uploadMsg;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("image/*");
+                startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+            }
         });
         webView.addJavascriptInterface(new JsToAndroid(), "clientJS");
         webView.loadUrl(mUrl);
@@ -270,7 +339,7 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
                 public void run() {
                     //1音频、2专辑、3文章、4视频、5专题、7图集
                     if (type.equals("1")) {
-                        Intent it = new Intent(WebViewActivity.this, SingleAudioDetailActivity.class);
+                        Intent it = new Intent(WebViewActivity.this, AudioDetailActivity.class);
                         it.putExtra("audioId", Integer.parseInt(id));
                         startActivity(it);
 
@@ -381,13 +450,14 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
             //自定义分享的回调想要函数
             @Override
             public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
-
+                String chanel="1";
                 //点击新浪微博
                 if (SinaWeibo.NAME.equals(platform.getName())) {
                     //限制微博分享的文字不能超过20
-
+                    chanel="2";
                     paramsToShare.setText("刺激好玩的活动" + ServerInfo.activity + "qaa/game-result/" + id);
                 } else if (QQ.NAME.equals(platform.getName())) {
+                    chanel="3";
 //                        paramsToShare.setTitle(mArticle.getTitle());
 //                        if(mArticle.getArticle().getCovers().size()>0){
 //                            paramsToShare.setImageUrl(mArticle.getArticle().getCovers().get(0));
@@ -418,7 +488,7 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
 //                            paramsToShare.setImageUrl(mArticle.getArticle().getCovers().get(0));
 //                        }
                 }
-
+                shareStatistics(chanel,""+id,ServerInfo.activity + "qaa/game-result/" + id);
 
             }
         });
@@ -438,6 +508,8 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
                 Message msg = Message.obtain();
                 msg.what = SHARE_SUCCESS;
                 mHandler.sendMessage(msg);
+
+
             }
 
             @Override
@@ -459,6 +531,34 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
         } else {
             super.onBackPressed();
         }
+
+    }
+
+    public void shareStatistics(String channel,String postId,String shardUrl) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
+        Map<String, String> params = new HashMap<>();
+        if(User.getInstance()!=null){
+            params.put("user_id", ""+User.getInstance().getId());
+        }
+        params.put("channel", channel);
+        params.put("post_id", postId);
+        params.put("source_type", "3");
+        params.put("type", "1");
+        params.put("shard_url", shardUrl);
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.i("test",response);
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                Log.i("test",exception.toString());
+
+            }
+        });
 
     }
 }

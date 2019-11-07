@@ -67,8 +67,9 @@ public class MessageListActivity extends AppCompatActivity implements Handler.Ca
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_message_list);
         ButterKnife.bind(this);
         init();
@@ -143,7 +144,7 @@ public class MessageListActivity extends AppCompatActivity implements Handler.Ca
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
                 if (getContent == GetContent.Refresh) {
                     if (refreshLayout.isRefreshing()) {
@@ -175,7 +176,7 @@ public class MessageListActivity extends AppCompatActivity implements Handler.Ca
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }

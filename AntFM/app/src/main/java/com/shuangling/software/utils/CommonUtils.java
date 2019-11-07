@@ -87,6 +87,7 @@ public class CommonUtils {
         } else {
             //Environment.DIRECTORY_DOCUMENTS
             //此文件目录在app被卸载时不会删除掉
+            File file1 = Environment.getExternalStorageDirectory();
             File file = Environment.getExternalStoragePublicDirectory(dirType);
             if (!file.exists()) {
                 file.mkdirs();

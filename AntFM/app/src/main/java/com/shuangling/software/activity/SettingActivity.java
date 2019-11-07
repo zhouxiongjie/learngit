@@ -27,6 +27,7 @@ import com.mylhyl.circledialog.params.TitleParams;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
+import com.shuangling.software.utils.ACache;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.DataCleanManager;
 import com.shuangling.software.utils.SharedPreferencesUtils;
@@ -65,8 +66,9 @@ public class SettingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_setting);
         ButterKnife.bind(this);
         init();
@@ -138,7 +140,7 @@ public class SettingActivity extends AppCompatActivity {
                         .configDialog(new ConfigDialog() {
                             @Override
                             public void onConfig(DialogParams params) {
-                                params.backgroundColorPress = Color.CYAN;
+                                //params.backgroundColorPress = Color.CYAN;
                                 //增加弹出动画
                                 params.animStyle = R.style.dialogWindowAnim;
                             }
@@ -179,7 +181,7 @@ public class SettingActivity extends AppCompatActivity {
                         .configDialog(new ConfigDialog() {
                             @Override
                             public void onConfig(DialogParams params) {
-                                params.backgroundColorPress = Color.CYAN;
+                                //params.backgroundColorPress = Color.CYAN;
                                 //增加弹出动画
                                 params.animStyle = R.style.dialogWindowAnim;
                             }
@@ -234,7 +236,7 @@ public class SettingActivity extends AppCompatActivity {
         ImagePipeline imagePipeline = Fresco.getImagePipeline();
         imagePipeline.clearMemoryCaches();
         imagePipeline.clearDiskCaches();
-
+        ACache.get(this).clear();
         RxPermissions rxPermissions = new RxPermissions(this);
 
         rxPermissions.request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)

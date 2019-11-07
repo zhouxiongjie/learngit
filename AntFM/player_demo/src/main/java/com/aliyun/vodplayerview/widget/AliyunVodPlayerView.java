@@ -1037,6 +1037,11 @@ public class AliyunVodPlayerView extends RelativeLayout implements ITheme {
     }
 
 
+    public void setReferer(String str){
+        mAliyunVodPlayer.setReferer(str);
+    }
+
+
     /**
      * 初始化播放器
      */

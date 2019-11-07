@@ -67,8 +67,9 @@ public class FeedbackActivity extends AppCompatActivity implements Handler.Callb
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_feedback);
         ButterKnife.bind(this);
         init();
@@ -99,7 +100,7 @@ public class FeedbackActivity extends AppCompatActivity implements Handler.Callb
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }

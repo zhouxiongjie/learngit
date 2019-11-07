@@ -23,6 +23,7 @@ import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.GuidePage;
 import com.shuangling.software.entity.Service;
@@ -60,6 +61,7 @@ public class GuidePageActivity extends AppCompatActivity implements Handler.Call
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         boolean firstRun = SharedPreferencesUtils.getBooleanValue(FIRST_RUN, true);
         if (firstRun) {
@@ -81,7 +83,7 @@ public class GuidePageActivity extends AppCompatActivity implements Handler.Call
 
         String url = ServerInfo.serviceIP + ServerInfo.guides;
         Map<String, String> params = new HashMap<>();
-        params.put("version", "v" + getVersionName());
+        params.put("version", "V" + getVersionName());
 
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
 
@@ -97,7 +99,7 @@ public class GuidePageActivity extends AppCompatActivity implements Handler.Call
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
 

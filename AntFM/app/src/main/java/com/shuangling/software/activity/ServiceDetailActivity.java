@@ -64,8 +64,9 @@ public class ServiceDetailActivity extends AppCompatActivity implements Handler.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_service_details);
         ButterKnife.bind(this);
         init();
@@ -208,7 +209,7 @@ public class ServiceDetailActivity extends AppCompatActivity implements Handler.
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -288,7 +289,7 @@ public class ServiceDetailActivity extends AppCompatActivity implements Handler.
                 public void run() {
                     //1音频、2专辑、3文章、4视频、5专题、7图集
                     if (type.equals("1")) {
-                        Intent it = new Intent(ServiceDetailActivity.this, SingleAudioDetailActivity.class);
+                        Intent it = new Intent(ServiceDetailActivity.this, AudioDetailActivity.class);
                         it.putExtra("audioId", Integer.parseInt(id));
                         startActivity(it);
 

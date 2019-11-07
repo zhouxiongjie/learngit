@@ -6,12 +6,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
@@ -19,11 +17,14 @@ import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -49,9 +50,9 @@ public class StartupActivity extends Activity implements Handler.Callback {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_startup);
@@ -100,7 +101,7 @@ public class StartupActivity extends Activity implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -133,6 +134,7 @@ public class StartupActivity extends Activity implements Handler.Callback {
                 }
             });
         }
+        EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
 
     }
 

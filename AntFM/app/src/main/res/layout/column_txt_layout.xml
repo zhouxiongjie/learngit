@@ -21,8 +21,8 @@
 	<com.facebook.drawee.view.SimpleDraweeView
 		android:id="@+id/indicator"
 		android:layout_width="20dp"
-		android:layout_height="10dp"
-		app:placeholderImage="@color/white"
+		android:layout_height="2dp"
+		app:placeholderImage="@drawable/indicator_line_bg"
 		android:layout_marginTop="2dp"
 		app:actualImageScaleType="centerInside"
 		app:placeholderImageScaleType="centerInside"

@@ -113,7 +113,10 @@ public class ImageLoader {
                 .setOldController(draweeView.getController())
                 .setControllerListener(new BaseControllerListener<ImageInfo>())
                 .build();
+
         draweeView.setController(controller);
+
+
     }
 
 

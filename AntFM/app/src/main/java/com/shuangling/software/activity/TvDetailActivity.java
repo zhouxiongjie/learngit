@@ -169,8 +169,9 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
 
             }
         });
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_tv_detail);
         ButterKnife.bind(this);
         init();
@@ -218,7 +219,7 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -297,7 +298,7 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -320,7 +321,7 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
             }
         });
@@ -346,7 +347,7 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -374,7 +375,7 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -825,13 +826,16 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
             @Override
             public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
                 //点击新浪微博
+                String chanel="1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
+                    chanel="2";
                     //限制微博分享的文字不能超过20
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setText(title + url);
                 } else if (QQ.NAME.equals(platform.getName())) {
+                    chanel="3";
                     paramsToShare.setTitle(title);
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
@@ -864,6 +868,7 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
                         paramsToShare.setImageUrl(cover);
                     }
                 }
+                shareStatistics(chanel,""+mRadioDetail.getChannel().getId(),url);
             }
         });
         oks.setCallback(new PlatformActionListener() {
@@ -879,6 +884,8 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
                 Message msg = Message.obtain();
                 msg.what = SHARE_SUCCESS;
                 mHandler.sendMessage(msg);
+
+
             }
             @Override
             public void onCancel(Platform arg0, int arg1) {
@@ -897,4 +904,35 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
         }
         //super.onActivityResult(requestCode, resultCode, data);
     }
+
+
+
+    public void shareStatistics(String channel,String postId,String shardUrl) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
+        Map<String, String> params = new HashMap<>();
+        if(User.getInstance()!=null){
+            params.put("user_id", ""+User.getInstance().getId());
+        }
+        params.put("channel", channel);
+        params.put("post_id", postId);
+        params.put("source_type", "3");
+        params.put("type", "1");
+        params.put("shard_url", shardUrl);
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.i("test",response);
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                Log.i("test",exception.toString());
+
+            }
+        });
+
+    }
+
 }

@@ -311,7 +311,7 @@ public class ColumnContent  implements Serializable {
         private int id;
         private int post_id;
         private int count;
-        private String covers;
+        private List<String> covers;
         private int type;
 
         public int getId() {
@@ -338,11 +338,11 @@ public class ColumnContent  implements Serializable {
             this.count = count;
         }
 
-        public String getCovers() {
+        public List<String> getCovers() {
             return covers;
         }
 
-        public void setCovers(String covers) {
+        public void setCovers(List<String> covers) {
             this.covers = covers;
         }
 

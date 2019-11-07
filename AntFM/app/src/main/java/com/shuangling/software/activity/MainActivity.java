@@ -3,24 +3,33 @@ package com.shuangling.software.activity;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Color;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -29,11 +38,18 @@ import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.hjq.toast.ToastUtils;
+import com.liulishuo.filedownloader.BaseDownloadTask;
+import com.liulishuo.filedownloader.FileDownloadListener;
+import com.liulishuo.filedownloader.FileDownloadQueueSet;
+import com.liulishuo.filedownloader.FileDownloader;
+import com.mylhyl.circledialog.CircleDialog;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.FontIconView;
+import com.shuangling.software.dialog.UpdateDialog;
 import com.shuangling.software.entity.City;
 import com.shuangling.software.entity.Column;
+import com.shuangling.software.entity.UpdateInfo;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.fragment.DiscoverFragment;
 import com.shuangling.software.fragment.IndexFragment;
@@ -41,6 +57,7 @@ import com.shuangling.software.fragment.PersonalCenterFragment;
 import com.shuangling.software.fragment.RecommendFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ServerInfo;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -49,9 +66,14 @@ import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -62,12 +84,15 @@ import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 import okhttp3.Response;
 
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
+
 @EnableDragToClose()
 public class MainActivity extends AppCompatActivity implements AMapLocationListener, Handler.Callback {
 
     public static final String TAG = "MainActivity";
     public static final int REQUEST_PERMISSION_CODE = 0x0110;
     public static final int MSG_GET_CITY_LIST = 0x1;
+    public static final int MSG_GET_UPDATE_INFO = 0x2;
     @BindView(R.id.indexIcon)
     FontIconView indexIcon;
     @BindView(R.id.index)
@@ -119,35 +144,22 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     private static final int MIN_CLICK_DELAY_TIME = 2000;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Snake.addDragListener(this, new Snake.OnDragListener() {
-            @Override
-            public void onDragStart(View view) {
-                super.onDragStart(view);
-            }
-
-            @Override
-            public void onDrag(View view, int left, boolean isSetlling) {
-                super.onDrag(view, left, isSetlling);
-            }
-
-            @Override
-            public void onRelease(View view, float xVelocity) {
-                super.onRelease(view, xVelocity);
-            }
-
-            @Override
-            public void onBackToStartCompleted(View view) {
-                super.onBackToStartCompleted(view);
-            }
-        });
         ButterKnife.bind(this);
         mHandler = new Handler(this);
         showFragment(0);
         showFloatWindowPermission();
-        getCityList();
+        //getCityList();
+        if(MyApplication.getInstance().getStation()!=null&&MyApplication.getInstance().getStation().getIs_league()==0){
+            sCurrentCity = new City(Integer.parseInt(MyApplication.getInstance().getStation().getCity_info().getCode()), MyApplication.getInstance().getStation().getCity_info().getName(), "#");
+            EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
+        }else{
+            initLocation();
+            startLocation();
+        }
+
 
     }
 
@@ -190,11 +202,23 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     @Override
                     public void accept(Boolean granted) throws Exception {
                         if (granted) {
-                            checkWifiSetting();
+                            if(isLocServiceEnable(MainActivity.this)){
+                                //checkWifiSetting();
+                                //设置定位参数
+                                mLocationClient.setLocationOption(getOption());
+                                // 启动定位
+                                mLocationClient.startLocation();
+                            }else {
+                                ToastUtils.show("定位失败,和位置相关的功能可能无法使用");
+                                sCurrentCity = new City(4301, "长沙市", "C");
+                                EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
+                            }
+
+                            //checkWifiSetting();
                             //设置定位参数
-                            mLocationClient.setLocationOption(getOption());
-                            // 启动定位
-                            mLocationClient.startLocation();
+//                            mLocationClient.setLocationOption(getOption());
+//                            // 启动定位
+//                            mLocationClient.startLocation();
                         } else {
                             ToastUtils.show("未能获取定位相关权限，和定位相关的功能可能无法使用");
                             sCurrentCity = new City(4301, "长沙市", "C");
@@ -416,6 +440,11 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         }
     }
 
+    @Override
+    protected void onResume() {
+        getUpdateInfo();
+        super.onResume();
+    }
 
     @Override
     protected void onDestroy() {
@@ -448,24 +477,26 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         if (aMapLocation != null && aMapLocation.getErrorCode() == 0) {
 
             String cityCode = aMapLocation.getAdCode();
-            //cityCode=cityCode.substring(0,4);
+            cityCode=cityCode.substring(0,4);
 
-            for (int i = 0; i < sCityList.size(); i++) {
-                if (cityCode.equals(sCityList.get(i).getCode())) {
-                    if (sCurrentCity == null) {
-                        sCurrentCity = sCityList.get(i);
-                        //通知城市已改变
-                    }
+//            for (int i = 0; i < sCityList.size(); i++) {
+//                if (cityCode.equals(sCityList.get(i).getCode())) {
+//                    if (sCurrentCity == null) {
+//                        sCurrentCity = sCityList.get(i);
+//                        //通知城市已改变
+//                    }
+//
+//                    break;
+//                }
+//            }
 
-                    break;
-                }
-            }
-            if (sCurrentCity == null) {
-                sCurrentCity = new City(4301, "长沙市", "C");
-                EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
-            }else{
-                EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
-            }
+
+//            if (sCurrentCity == null) {
+            sCurrentCity = new City(Integer.parseInt(cityCode), aMapLocation.getCity(), "#");
+            EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
+//            }else{
+//                EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
+//            }
 
 
 //            aMapLocation.getCountry();//国家信息
@@ -505,7 +536,37 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+
+
+    }
+
+
+    public void getUpdateInfo() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.updateInfo;
+        Map<String,String> params =new HashMap<>();
+        params.put("version","v"+getVersionName());
+        params.put("type","android");
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_UPDATE_INFO;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -542,6 +603,32 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
 
                 break;
+            case MSG_GET_UPDATE_INFO:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        UpdateInfo updateInfo=JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), UpdateInfo.class);
+                        if(updateInfo.isSupport()){
+                            UpdateDialog dialog=UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(),updateInfo.getNew_version().getContent());
+                            dialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
+                                @Override
+                                public void download() {
+                                    downloadApk();
+                                }
+                            });
+                            dialog.show(getSupportFragmentManager(), "UpdateDialog");
+                        }
+
+                    }
+
+
+                } catch (Exception e) {
+
+                }
+
+
+                break;
         }
         return false;
     }
@@ -561,4 +648,176 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
     }
 
+
+    public String getVersionName(){
+        try{
+            return  getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public void downloadApk(){
+
+
+        RxPermissions rxPermissions = new RxPermissions(this);
+        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean granted) throws Exception {
+                        if (granted) {
+
+                            File file=new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator +   "ltsj.apk");
+                            if(file.exists()){
+                                file.delete();
+                            }
+
+                            final CircleDialog.Builder builder=new CircleDialog.Builder();
+                            DialogFragment dialogFragment =builder
+                                    .setCancelable(false)
+                                    .setCanceledOnTouchOutside(false)
+//                                    .configDialog(params -> params.backgroundColor = Color.CYAN)
+                                    .setTitle("下载")
+                                    .setProgressText("已经下载")
+                                    //.setProgressText("已经下载%s了")
+                                    .setProgressDrawable(R.drawable.bg_progress_h)
+                                    //.setNegative("取消", v -> timer.cancel())
+                                    .show(getSupportFragmentManager());
+//                            TimerTask timerTask = new TimerTask() {
+//                                final int max = 222;
+//                                int progress = 0;
+//
+//                                @Override
+//                                public void run() {
+//                                    progress++;
+//                                    if (progress >= max) {
+//                                        MainActivity.this.runOnUiThread(() -> {
+//                                            builder.setProgressText("下载完成").refresh();
+//                                            timer.cancel();
+//                                        });
+//                                    } else {
+//                                        builder.setProgress(max, progress).refresh();
+//                                    }
+//                                }
+//                            };
+//                            timer.schedule(timerTask, 0, 50);
+
+                            final FileDownloadListener downloadListener = new FileDownloadListener() {
+                                @Override
+                                protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                                    Log.i("test","pending");
+                                }
+
+                                @Override
+                                protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
+                                    Log.i("test","connected");
+                                }
+
+                                @Override
+                                protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                                    //StyledDialog.updateProgress(dialog, (int)((long)soFarBytes * 100 / (long)totalBytes), 100, "素材下载中...", true);
+                                    builder.setProgress(totalBytes, soFarBytes).create();
+                                }
+
+                                @Override
+                                protected void blockComplete(BaseDownloadTask task) {
+                                    try{
+                                        Intent intent = new Intent();
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        intent.setAction(android.content.Intent.ACTION_VIEW);
+                                        File file=new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator +   "ltsj.apk");
+                                        boolean exist=file.exists();
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                            String packageName = getPackageName();
+                                            Uri contentUri = FileProvider.getUriForFile(MainActivity.this
+                                                    , packageName+".fileprovider"
+                                                    , file);
+
+
+                                            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+                                        } else {
+                                            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+                                        }
+                                        startActivity(intent);
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+
+                                }
+
+                                @Override
+                                protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
+                                    Log.i("test",ex.toString());
+
+                                }
+
+                                @Override
+                                protected void completed(BaseDownloadTask task) {
+
+                                }
+
+                                @Override
+                                protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                                }
+
+                                @Override
+                                protected void error(BaseDownloadTask task, Throwable e) {
+                                    Log.i("test",e.toString());
+                                }
+
+                                @Override
+                                protected void warn(BaseDownloadTask task) {
+                                }
+                            };
+
+                            final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(downloadListener);
+
+                            final List<BaseDownloadTask> tasks = new ArrayList<>();
+
+                            tasks.add(FileDownloader.getImpl().create(ServerInfo.apkDownloadAddr).setPath(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator +   "ltsj.apk"));
+                            //queueSet.setCallbackProgressMinInterval(200);
+                            //queueSet.disableCallbackProgressTimes();
+                            // 由于是队列任务, 这里是我们假设了现在不需要每个任务都回调`FileDownloadListener#progress`, 我们只关系每个任务是否完成, 所以这里这样设置可以很有效的减少ipc.
+                            // 所有任务在下载失败的时候都自动重试一次
+                            queueSet.setAutoRetryTimes(1);
+                            // 串行执行该任务队列
+                            queueSet.downloadSequentially(tasks);
+                            //queueSet.downloadTogether(tasks);
+                            queueSet.start();
+
+                        }
+
+                    }
+                });
+
+    }
+
+
+    public static boolean isLocServiceEnable(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        //boolean network = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        //if (gps || network) {
+        if (gps) {
+            return true;
+        }
+        return false;
+    }
+
+
+    private String getImagePath(Uri uri, String selection) {
+        String path = null;
+        Cursor cursor = getContentResolver().query(uri, null, selection, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+
+            cursor.close();
+        }
+        return path;
+    }
 }

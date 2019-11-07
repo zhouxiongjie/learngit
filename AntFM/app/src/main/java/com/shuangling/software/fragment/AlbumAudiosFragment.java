@@ -17,36 +17,29 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.alibaba.fastjson.JSONObject;
 import com.shuangling.software.R;
+import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.BaseActivity;
-import com.shuangling.software.activity.SingleAudioDetailActivity;
 import com.shuangling.software.adapter.AudioListAdapter;
-import com.shuangling.software.adapter.SelectionsGridViewAdapter;
-import com.shuangling.software.customview.MyGridView;
 import com.shuangling.software.dialog.AudioSelectionsDialog;
-import com.shuangling.software.dialog.AudioSpeedDialog;
 import com.shuangling.software.entity.Audio;
 import com.shuangling.software.entity.AudioInfo;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.utils.ServerInfo;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import okhttp3.Call;
-import okhttp3.Response;
 
 
 public class AlbumAudiosFragment extends Fragment implements Handler.Callback {
@@ -117,7 +110,7 @@ public class AlbumAudiosFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -157,7 +150,7 @@ public class AlbumAudiosFragment extends Fragment implements Handler.Callback {
                             public void onClick(View v) {
                                 if(mAudios.size()>1){
                                     AudioInfo audio = mAudios.get(0);
-                                    Intent it = new Intent(getContext(), SingleAudioDetailActivity.class);
+                                    Intent it = new Intent(getContext(), AudioDetailActivity.class);
                                     it.putExtra("audioId", audio.getId());
                                     getContext().startActivity(it);
                                 }
@@ -181,7 +174,7 @@ public class AlbumAudiosFragment extends Fragment implements Handler.Callback {
 
 //                                            ((BaseActivity)getActivity()).mAudioPlayer.setPlayerList(mAudios);
                                     AudioInfo audio = mAdapter.getItem(position);
-                                    Intent it = new Intent(getContext(), SingleAudioDetailActivity.class);
+                                    Intent it = new Intent(getContext(), AudioDetailActivity.class);
                                     it.putExtra("audioId", audio.getId());
                                     getContext().startActivity(it);
 

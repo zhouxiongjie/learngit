@@ -1,0 +1,107 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:clickable="true">
+
+
+    <com.shuangling.software.customview.TopTitleBar
+        android:id="@+id/activity_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        fresco:moreImg="@drawable/ic_more"
+        fresco:canBack="true" />
+
+    <ImageView
+        android:id="@+id/divideOne"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/activity_title"
+        android:background="@color/divideColorOne" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/divideOne"
+        android:layout_above="@+id/bottom"
+        />
+
+
+    <LinearLayout
+        android:id="@+id/bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        android:orientation="vertical">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/divideColorTwo"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp">
+            <TextView
+                android:id="@+id/writeComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/commentNumLayout"
+                android:drawablePadding="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="10dp"
+                android:textSize="@dimen/font_size_30px"
+                android:textColor="#BCBCBC"
+                android:background="@drawable/write_comment_bg"
+                android:drawableLeft="@drawable/ic_comments"
+                android:text="写评论..."/>
+
+            <FrameLayout
+                android:id="@+id/commentNumLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true">
+
+                <ImageView
+                    android:id="@+id/commentsIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_checkcomments" />
+
+                <TextView
+                    android:id="@+id/commentNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="15dp"
+                    android:layout_gravity="right|top"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/red_circle_bg"
+                    android:gravity="center"
+                    android:padding="2dp"
+                    android:text="0"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/font_size_16px"
+                    android:visibility="visible" />
+            </FrameLayout>
+
+
+
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>
+
+

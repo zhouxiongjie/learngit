@@ -156,23 +156,36 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
                 if (i == position) {
                     ischeck = true;
                     indicator.setVisibility(View.VISIBLE);
-                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
                     if (checkView.getLeft() > mScreenWidth / 2) {
                         columnScrollView.scrollTo((int) checkView.getLeft() - mScreenWidth / 2, 0);
                     }
                     mColumnSelectIndex = position;
-                    Station station=MyApplication.getInstance().getStation();
-                    if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
-                        Uri uri = Uri.parse(station.getIcon1());
-                        int width=CommonUtils.dip2px(15);
-                        int height=width;
-                        ImageLoader.showThumb(uri,indicator,width,height);
-                    }
+//                    Station station=MyApplication.getInstance().getStation();
+//                    if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
+//                        ViewGroup.LayoutParams lp=indicator.getLayoutParams();
+//                        lp.width=CommonUtils.dip2px(20);
+//                        lp.height=lp.width/2;
+//                        indicator.setLayoutParams(lp);
+//
+//                        Uri uri = Uri.parse(station.getIcon1());
+//                        int width=CommonUtils.dip2px(20);
+//                        int height=width/2;
+//                        ImageLoader.showThumb(uri,indicator,width,height);
+//                    }else{
+//                        ViewGroup.LayoutParams lp=indicator.getLayoutParams();
+//                        lp.width=CommonUtils.dip2px(20);
+//                        lp.height=CommonUtils.dip2px(2);
+//                        indicator.setLayoutParams(lp);
+//                        ImageLoader.showThumb(indicator,R.drawable.indicator_line_bg);
+//                    }
 
                 } else {
                     ischeck = false;
                     indicator.setVisibility(View.INVISIBLE);
-                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
                 }
                 columnTextView.setSelected(ischeck);
             }
@@ -211,7 +224,7 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -319,19 +332,32 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
 
                                 if (mColumnSelectIndex == i) {
                                     columnTextView.setSelected(true);
-                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
                                     indicator.setVisibility(View.VISIBLE);
-                                    Station station=MyApplication.getInstance().getStation();
-                                    if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
-                                        Uri uri = Uri.parse(station.getIcon1());
-                                        int width=CommonUtils.dip2px(15);
-                                        int height=width;
-                                        ImageLoader.showThumb(uri,indicator,width,height);
-                                    }
+//                                    Station station=MyApplication.getInstance().getStation();
+//                                    if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
+//                                        ViewGroup.LayoutParams lp=indicator.getLayoutParams();
+//                                        lp.width=CommonUtils.dip2px(20);
+//                                        lp.height=lp.width/2;
+//                                        indicator.setLayoutParams(lp);
+//
+//                                        Uri uri = Uri.parse(station.getIcon1());
+//                                        int width=CommonUtils.dip2px(20);
+//                                        int height=width/2;
+//                                        ImageLoader.showThumb(uri,indicator,width,height);
+//                                    }else{
+//                                        ViewGroup.LayoutParams lp=indicator.getLayoutParams();
+//                                        lp.width=CommonUtils.dip2px(20);
+//                                        lp.height=CommonUtils.dip2px(2);
+//                                        indicator.setLayoutParams(lp);
+//                                        ImageLoader.showThumb(indicator,R.drawable.indicator_line_bg);
+//                                    }
 
                                 } else {
                                     columnTextView.setSelected(false);
-                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
                                     indicator.setVisibility(View.INVISIBLE);
                                 }
                                 view.setOnClickListener(new OnClickListener() {
@@ -346,19 +372,21 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
                                                 columnTextView.setSelected(false);
                                                 indicator.setVisibility(View.INVISIBLE);
 
-                                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+                                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                                                columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
                                             } else {
                                                 mColumnSelectIndex = i;
                                                 columnTextView.setSelected(true);
                                                 indicator.setVisibility(View.VISIBLE);
-                                                Station station=MyApplication.getInstance().getStation();
-                                                if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
-                                                    Uri uri = Uri.parse(station.getIcon1());
-                                                    int width=CommonUtils.dip2px(15);
-                                                    int height=width;
-                                                    ImageLoader.showThumb(uri,indicator,width,height);
-                                                }
-                                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+//                                                Station station=MyApplication.getInstance().getStation();
+//                                                if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
+//                                                    Uri uri = Uri.parse(station.getIcon1());
+//                                                    int width=CommonUtils.dip2px(15);
+//                                                    int height=width;
+//                                                    ImageLoader.showThumb(uri,indicator,width,height);
+//                                                }
+                                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                                columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
                                                 viewPager.setCurrentItem(mColumnSelectIndex);
                                             }
                                         }

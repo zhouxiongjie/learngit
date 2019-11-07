@@ -104,8 +104,9 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_detail);
+        super.onCreate(savedInstanceState);
+
         ButterKnife.bind(this);
         StatusBarUtil.setTransparent(this);
         StatusBarManager.setImmersiveStatusBar(this, true);
@@ -144,7 +145,7 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -178,7 +179,7 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -396,13 +397,16 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
             @Override
             public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
                 //点击新浪微博
+                String chanel="1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
                     //限制微博分享的文字不能超过20
+                    chanel="2";
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setText(title + url);
                 } else if (QQ.NAME.equals(platform.getName())) {
+                    chanel="3";
                     paramsToShare.setTitle(title);
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
@@ -435,6 +439,7 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
                         paramsToShare.setImageUrl(cover);
                     }
                 }
+                shareStatistics(chanel,""+mAlbum.getId(),url);
             }
         });
         oks.setCallback(new PlatformActionListener() {
@@ -450,6 +455,7 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
                 Message msg = Message.obtain();
                 msg.what = SHARE_SUCCESS;
                 mHandler.sendMessage(msg);
+
             }
             @Override
             public void onCancel(Platform arg0, int arg1) {
@@ -508,14 +514,6 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
             }
         });
 
- /*Bitmap logo = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
-        String label = "ShareSDK";
-        OnClickListener listener = new OnClickListener() {
-            public void onClick(View v) {
-
-            }
-        };
-        oks.setCustomerLogo(logo, label, listener);*/
 
         oks.setCallback(new PlatformActionListener() {
             @Override
@@ -540,6 +538,37 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
 
 // 启动分享GUI
         oks.show(this);
+
+    }
+
+
+
+
+    public void shareStatistics(String channel,String postId,String shardUrl) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
+        Map<String, String> params = new HashMap<>();
+        if(User.getInstance()!=null){
+            params.put("user_id", ""+User.getInstance().getId());
+        }
+        params.put("channel", channel);
+        params.put("post_id", postId);
+        params.put("source_type", "3");
+        params.put("type", "1");
+        params.put("shard_url", shardUrl);
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.i("test",response);
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                Log.i("test",exception.toString());
+
+            }
+        });
 
     }
 }

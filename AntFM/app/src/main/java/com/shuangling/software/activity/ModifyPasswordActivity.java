@@ -55,8 +55,9 @@ public class ModifyPasswordActivity extends AppCompatActivity implements Handler
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_modify_password);
         ButterKnife.bind(this);
 
@@ -92,7 +93,7 @@ public class ModifyPasswordActivity extends AppCompatActivity implements Handler
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
                 mHandler.post(new Runnable() {
                     @Override

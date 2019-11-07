@@ -63,8 +63,8 @@ ext {
     externalMinSdkVersion = 21
     externalPlayerMinSdkVersion = 16
     externalLiveMinSdkVersion = 18
-    externalTargetSdkVersion = 22
+    externalTargetSdkVersion = 26
 
-    externalVersionCode =24
-    externalVersionName ='2.4'
+    externalVersionCode =201
+    externalVersionName ='2.0.2'
 }

@@ -14,8 +14,8 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
-import com.shuangling.software.activity.SingleAudioDetailActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.utils.CommonUtils;
@@ -142,7 +142,7 @@ public class RecommendContentGridAdapter extends RecyclerView.Adapter implements
             audioViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, SingleAudioDetailActivity.class);
+                    Intent it = new Intent(mContext, AudioDetailActivity.class);
                     it.putExtra("audioId", content.getId());
                     mContext.startActivity(it);
                 }

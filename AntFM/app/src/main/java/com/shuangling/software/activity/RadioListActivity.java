@@ -28,6 +28,7 @@ import com.youngfeng.snake.annotations.EnableDragToClose;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -59,8 +60,9 @@ public class RadioListActivity extends AppCompatActivity implements Handler.Call
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_radio_list);
         ButterKnife.bind(this);
 //        StatusBarUtil.setTransparent(this);
@@ -92,7 +94,7 @@ public class RadioListActivity extends AppCompatActivity implements Handler.Call
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -125,6 +127,15 @@ public class RadioListActivity extends AppCompatActivity implements Handler.Call
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
                         final List<RadioSet> radioGroups=JSONArray.parseArray(jsonObject.getJSONArray("data").toJSONString(), RadioSet.class);
+
+                        Iterator<RadioSet> iterator = radioGroups.iterator();
+                        while (iterator.hasNext()) {
+                            RadioSet radioSet = iterator.next();
+                            if (radioSet.getList()==null||radioSet.getList().size()==0) {
+                                iterator.remove();
+                            }
+                        }
+
 
                         if(mRadioGroupAdapter==null){
                             mRadioGroupAdapter=new RadioGroupAdapter(this,radioGroups) ;

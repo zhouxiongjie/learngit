@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
-import com.shuangling.software.activity.SingleAudioDetailActivity;
 import com.shuangling.software.entity.HistoryRadio;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;

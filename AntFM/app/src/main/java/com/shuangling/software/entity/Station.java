@@ -18,15 +18,21 @@ public class Station {
      * icon1 : http://sl-cdn.slradio.cn/cms/icon/imges/XWJmsaB7kFmMHrpsZYWHZXfjFnxtTPAE1563348607213.png
      * icon2 : https://sl-cms.static.slradio.cn/platform/imges/pshyhGdP0MjE3xmir5FE1XRszwMyhfYQ1562317752848.png
      * icon3 : https://sl-cms.static.slradio.cn/platform/imges/wMHxzbsRdcMDEEJExtP0MmaPTJnipH931562314158773.png
-     * record : 粤ICP 0208222号
-     * record_url : http://www.sina.com
+     * record : 湘ICP备XXXXX号-X
+     * record_url : http://www.shuangln.com/
      * created_at : 2019-07-03 09:12:11
-     * updated_at : 2019-07-17 15:30:13
+     * updated_at : 2019-09-17 18:28:44
      * h5_logo : https://sl-cms.static.slradio.cn/platform/imges/8xzrfkxR3ps8XF4kwKwXp44M4bhpERnk1562804725968.png
      * tv_show : 1
      * tv_name : 看电视
      * radio_show : 1
      * radio_name : 听广播
+     * is_league : 1
+     * province :
+     * city :
+     * county :
+     * city_info : null
+     * province_info : null
      */
 
     private int id;
@@ -52,6 +58,12 @@ public class Station {
     private String tv_name;
     private int radio_show;
     private String radio_name;
+    private int is_league;
+    private String province;
+    private String city;
+    private String county;
+    private City city_info;
+    private Province province_info;
 
     public int getId() {
         return id;
@@ -235,5 +247,102 @@ public class Station {
 
     public void setRadio_name(String radio_name) {
         this.radio_name = radio_name;
+    }
+
+    public int getIs_league() {
+        return is_league;
+    }
+
+    public void setIs_league(int is_league) {
+        this.is_league = is_league;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCounty() {
+        return county;
+    }
+
+    public void setCounty(String county) {
+        this.county = county;
+    }
+
+    public City getCity_info() {
+        return city_info;
+    }
+
+    public void setCity_info(City city_info) {
+        this.city_info = city_info;
+    }
+
+    public Object getProvince_info() {
+        return province_info;
+    }
+
+    public void setProvince_info(Province province_info) {
+        this.province_info = province_info;
+    }
+
+
+    public static class Province {
+
+
+
+        private String name;
+        private String code;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+    }
+
+    public static class City {
+
+
+
+        private String name;
+        private String code;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
     }
 }

@@ -27,12 +27,15 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -81,8 +84,9 @@ public class VerifyCodeLoginActivity extends AppCompatActivity implements Handle
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_verify_code_login);
         ButterKnife.bind(this);
         mHandler = new Handler(this);
@@ -206,7 +210,10 @@ public class VerifyCodeLoginActivity extends AppCompatActivity implements Handle
                         });
                         ToastUtils.show("登录成功");
                         setResult(RESULT_OK);
+                        EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
                         finish();
+                    }else{
+                        ToastUtils.show(jsonObject.getString("msg"));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -258,7 +265,7 @@ public class VerifyCodeLoginActivity extends AppCompatActivity implements Handle
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
                 ToastUtils.show("获取验证码请求异常");
 
@@ -289,7 +296,7 @@ public class VerifyCodeLoginActivity extends AppCompatActivity implements Handle
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
                 ToastUtils.show("登陆异常");
 
@@ -319,7 +326,7 @@ public class VerifyCodeLoginActivity extends AppCompatActivity implements Handle
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
                 ToastUtils.show("IO异常");
 

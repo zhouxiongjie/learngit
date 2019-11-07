@@ -33,6 +33,8 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.event.CommonEvent;
+import com.shuangling.software.event.PlayerEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
@@ -40,6 +42,8 @@ import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -97,8 +101,9 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
         mHandler = new Handler(this);
@@ -110,8 +115,8 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
 
     private void init() {
 
-        if(!TextUtils.isEmpty(MyApplication.getInstance().getStation().getImage())){
-            Uri uri = Uri.parse(MyApplication.getInstance().getStation().getImage());
+        if(MyApplication.getInstance().getStation()!=null&&!TextUtils.isEmpty(MyApplication.getInstance().getStation().getH5_logo())){
+            Uri uri = Uri.parse(MyApplication.getInstance().getStation().getH5_logo());
             ImageLoader.showThumb(uri, head, CommonUtils.dip2px(70), CommonUtils.dip2px(70));
         }
 
@@ -409,6 +414,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
                         });
                         ToastUtils.show("登录成功");
                         setResult(Activity.RESULT_OK);
+                        EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
                         finish();
                     } else {
                         ToastUtils.show(jsonObject.getString("msg"));
@@ -494,7 +500,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -529,7 +535,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {

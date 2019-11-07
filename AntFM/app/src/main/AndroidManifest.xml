@@ -26,6 +26,7 @@
     <!--用于申请获取蓝牙信息进行室内定位-->
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
 
     <application
         android:name=".MyApplication"
@@ -42,11 +43,17 @@
             android:authorities="com.shuangling.software.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
+            <!--<meta-data-->
+                <!--android:name="android.support.FILE_PROVIDER_PATHS"-->
+                <!--android:resource="@xml/photo_path">-->
+            <!--</meta-data>-->
+
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/photo_path">
-            </meta-data>
+                android:resource="@xml/file_paths" />
         </provider>
+
+
 
 
         <activity
@@ -183,7 +190,10 @@
             android:name=".activity.FeedbackActivity"
             android:screenOrientation="portrait" >
         </activity>
-
+        <activity
+            android:name=".activity.CluesActivity"
+            android:screenOrientation="portrait" >
+        </activity>
         <activity
             android:name=".activity.HistoryActivity"
             android:screenOrientation="portrait" >

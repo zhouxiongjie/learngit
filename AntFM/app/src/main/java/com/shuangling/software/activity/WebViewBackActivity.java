@@ -25,10 +25,14 @@ import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.network.OkHttpCallback;
+import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,6 +46,7 @@ import cn.sharesdk.tencent.qq.QQ;
 import cn.sharesdk.wechat.favorite.WechatFavorite;
 import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
+import okhttp3.Call;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -69,8 +74,9 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_webview_back);
         ButterKnife.bind(this);
         init();
@@ -274,7 +280,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
                 public void run() {
                     //1音频、2专辑、3文章、4视频、5专题、7图集
                     if (type.equals("1")) {
-                        Intent it = new Intent(WebViewBackActivity.this, SingleAudioDetailActivity.class);
+                        Intent it = new Intent(WebViewBackActivity.this, AudioDetailActivity.class);
                         it.putExtra("audioId", Integer.parseInt(id));
                         startActivity(it);
 
@@ -387,11 +393,13 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
             public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
 
                 //点击新浪微博
+                String chanel="1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
                     //限制微博分享的文字不能超过20
-
+                    chanel="2";
                     paramsToShare.setText("刺激好玩的活动" + ServerInfo.activity + "qaa/game-result/" + id);
                 } else if (QQ.NAME.equals(platform.getName())) {
+                    chanel="3";
 //                        paramsToShare.setTitle(mArticle.getTitle());
 //                        if(mArticle.getArticle().getCovers().size()>0){
 //                            paramsToShare.setImageUrl(mArticle.getArticle().getCovers().get(0));
@@ -422,7 +430,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
 //                            paramsToShare.setImageUrl(mArticle.getArticle().getCovers().get(0));
 //                        }
                 }
-
+                shareStatistics(chanel,""+id,ServerInfo.activity + "qaa/game-result/" + id);
 
             }
         });
@@ -442,6 +450,9 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
                 Message msg = Message.obtain();
                 msg.what = SHARE_SUCCESS;
                 mHandler.sendMessage(msg);
+
+
+
             }
 
             @Override
@@ -463,6 +474,34 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
         } else {
             super.onBackPressed();
         }
+
+    }
+
+    public void shareStatistics(String channel,String postId,String shardUrl) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
+        Map<String, String> params = new HashMap<>();
+        if(User.getInstance()!=null){
+            params.put("user_id", ""+User.getInstance().getId());
+        }
+        params.put("channel", channel);
+        params.put("post_id", postId);
+        params.put("source_type", "3");
+        params.put("type", "1");
+        params.put("shard_url", shardUrl);
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.i("test",response);
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                Log.i("test",exception.toString());
+
+            }
+        });
 
     }
 }

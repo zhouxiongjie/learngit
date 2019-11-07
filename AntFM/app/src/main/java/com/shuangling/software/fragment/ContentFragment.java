@@ -78,9 +78,6 @@ public class ContentFragment extends Fragment implements Handler.Callback {
         Normal
     }
 
-    ;
-
-
     private ACache mACache;
     private RecyclerViewSkeletonScreen mSkeletonScreen;
 
@@ -231,14 +228,14 @@ public class ContentFragment extends Fragment implements Handler.Callback {
         String url = ServerInfo.serviceIP + ServerInfo.getColumnContent + mColumn.getId();
         Map<String, String> params = new HashMap<String, String>();
         params.put("limit", "" + Constant.PAGE_SIZE);
-        params.put("sorceType", "0");
+        params.put("sorce_type", "0");
 
         if (getContent == GetContent.Refresh) {
             params.put("operation", "up");
-            params.put("update_time", mColumnContents.size() > 0 ? mColumnContents.get(0).getUpdate_time() : "");
+            params.put("publish_at", mColumnContents.size() > 0 ? mColumnContents.get(0).getPublish_at() : "");
         } else if (getContent == GetContent.LoadMore) {
             params.put("operation", "down");
-            params.put("update_time", mColumnContents.size() > 0 ? mColumnContents.get(mColumnContents.size() - 1).getUpdate_time() : "");
+            params.put("publish_at", mColumnContents.size() > 0 ? mColumnContents.get(mColumnContents.size() - 1).getPublish_at() : "");
         }
         //params.put("mobile_source", "app");
         params.put("order_by", mOrderBy);
@@ -276,7 +273,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
                 mHandler.post(new Runnable() {
                     @Override

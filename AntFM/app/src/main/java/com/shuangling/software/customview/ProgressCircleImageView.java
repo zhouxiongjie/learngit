@@ -37,7 +37,9 @@ import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 
 import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.utils.CommonUtils;
 
 
 public class ProgressCircleImageView extends AppCompatImageView {
@@ -100,7 +102,12 @@ public class ProgressCircleImageView extends AppCompatImageView {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ProgressCircleImageView, defStyle, 0);
 
         mBorderWidth = a.getDimensionPixelSize(R.styleable.ProgressCircleImageView_civ_border_width, DEFAULT_BORDER_WIDTH);
-        mBorderColor = a.getColor(R.styleable.ProgressCircleImageView_civ_border_color, DEFAULT_BORDER_COLOR);
+        //mBorderColor = a.getColor(R.styleable.ProgressCircleImageView_civ_border_color, DEFAULT_BORDER_COLOR);
+
+        int[] attr = new int[]{R.attr.themeColor};
+        TypedArray array = context.obtainStyledAttributes(MyApplication.getInstance().getCurrentTheme(), attr);
+        mBorderColor = array.getColor(0  , Color.RED );
+        array.recycle();
         mBorderOverlay = a.getBoolean(R.styleable.ProgressCircleImageView_civ_border_overlay, DEFAULT_BORDER_OVERLAY);
         mFillColor = a.getColor(R.styleable.ProgressCircleImageView_civ_fill_color, DEFAULT_FILL_COLOR);
 

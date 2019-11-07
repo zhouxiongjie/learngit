@@ -18,17 +18,15 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
-import com.shuangling.software.activity.SingleAudioDetailActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.TimeUtil;
-
 import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -150,10 +148,10 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
         } else {
             content = mColumnContent.get(position);
         }
+        int itemViewType=getItemViewType(position);
+        if ( itemViewType== TYPE_HEAD) {
 
-        if (getItemViewType(position) == TYPE_HEAD) {
-
-        } else if (getItemViewType(position) == TYPE_AUDIO) {
+        } else if (itemViewType == TYPE_AUDIO) {
             AudioViewHolder audioViewHolder = (AudioViewHolder) holder;
             if (!TextUtils.isEmpty(content.getCover())) {
                 Uri uri = Uri.parse(content.getCover());
@@ -165,13 +163,13 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
                 audioViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
 
-            //audioViewHolder.publishTime.setText(content.getUpdate_time());
+            //audioViewHolder.publishTime.setText(content.getPublish_at());
             audioViewHolder.title.setText(content.getTitle());
             //audioViewHolder.commentNum.setText(""+content.getComment()+"评论");
             audioViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it=new Intent(mContext,SingleAudioDetailActivity.class);
+                    Intent it=new Intent(mContext,AudioDetailActivity.class);
                     it.putExtra("audioId",content.getId());
                     mContext.startActivity(it);
                 }
@@ -224,7 +222,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
                         }
 
                     }
-                    return false;
+                    return true;
                 }
             });
 
@@ -235,7 +233,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
             }else{
                 albumViewHolder.title.setText(content.getTitle());
             }
-            albumViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getUpdate_time()));
+            albumViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             albumViewHolder.count.setText("" + content.getAlbums().getCount() + "集");
             albumViewHolder.commentNum.setText(content.getComment()+"评论");
             albumViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -248,7 +246,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
                 }
             });
 
-        } else if (getItemViewType(position) == TYPE_ARTICLE) {
+        } else if (itemViewType == TYPE_ARTICLE) {
             final ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
@@ -302,14 +300,14 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
                     }
 
 
-                    return false;
+                    return true;
                 }
             });
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
 
-            articleViewHolder.publishTime.setText(content.getUpdate_time());
+            articleViewHolder.publishTime.setText(content.getPublish_at());
             articleViewHolder.title.setText(content.getTitle());
             articleViewHolder.commentNum.setText("" + content.getComment() + "评论");
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -320,7 +318,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
                     mContext.startActivity(it);
                 }
             });
-        } else if (getItemViewType(position) == TYPE_VIDEO) {
+        } else if (itemViewType == TYPE_VIDEO) {
             VideoViewHolder videoViewHolder = (VideoViewHolder) holder;
             if (!TextUtils.isEmpty(content.getCover())) {
                 Uri uri = Uri.parse(content.getCover());
@@ -345,7 +343,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
                 videoViewHolder.duration.setText("00:00");
             }
 
-            videoViewHolder.publishTime.setText(content.getUpdate_time());
+            videoViewHolder.publishTime.setText(content.getPublish_at());
             videoViewHolder.title.setText(content.getTitle());
             videoViewHolder.commentNum.setText("" + content.getComment() + "评论");
             videoViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -356,7 +354,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
                     mContext.startActivity(it);
                 }
             });
-        } else if(getItemViewType(position) == TYPE_GALLERIE_ONE) {
+        } else if(itemViewType == TYPE_GALLERIE_ONE) {
             GallerieOneViewHolder gallerieOneViewHolder = (GallerieOneViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
@@ -368,7 +366,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 gallerieOneViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
-            gallerieOneViewHolder.publishTime.setText(content.getUpdate_time());
+            gallerieOneViewHolder.publishTime.setText(content.getPublish_at());
             gallerieOneViewHolder.title.setText(content.getTitle());
             gallerieOneViewHolder.commentNum.setText("" + content.getComment() + "评论");
             //gallerieOneViewHolder.count.setText(content.getGallerie().getCount()+"图");
@@ -381,7 +379,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
                 }
             });
 
-        }else if(getItemViewType(position) == TYPE_GALLERIE_THREE) {
+        }else if(itemViewType == TYPE_GALLERIE_THREE) {
             GallerieViewThreeHolder gallerieViewThreeHolder = (GallerieViewThreeHolder) holder;
 
             if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(0))) {
@@ -405,7 +403,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 gallerieViewThreeHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
-            gallerieViewThreeHolder.publishTime.setText(content.getUpdate_time());
+            gallerieViewThreeHolder.publishTime.setText(content.getPublish_at());
             gallerieViewThreeHolder.title.setText(content.getTitle());
             gallerieViewThreeHolder.commentNum.setText("" + content.getComment() + "评论");
             gallerieViewThreeHolder.count.setText(content.getGallerie().getCount()+"图");
@@ -468,7 +466,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
                     }
 
 
-                    return false;
+                    return true;
                 }
             });
 
@@ -477,7 +475,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
                 specialViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
 
-            specialViewHolder.publishTime.setText(content.getUpdate_time());
+            specialViewHolder.publishTime.setText(content.getPublish_at());
             specialViewHolder.title.setText(content.getTitle());
             specialViewHolder.commentNum.setText("" + content.getComment() + "评论");
             specialViewHolder.root.setOnClickListener(new View.OnClickListener() {

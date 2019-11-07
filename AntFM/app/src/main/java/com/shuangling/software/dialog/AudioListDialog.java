@@ -20,8 +20,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.mylhyl.circledialog.BaseCircleDialog;
+import com.mylhyl.circledialog.CircleDialog;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AudioDetailActivity;
+import com.shuangling.software.activity.SettingActivity;
 import com.shuangling.software.adapter.AudioListAdapter;
 import com.shuangling.software.entity.Audio;
 import com.shuangling.software.entity.AudioInfo;
@@ -29,6 +31,7 @@ import com.shuangling.software.event.PlayerEvent;
 import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.service.IAudioPlayer;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.SharedPreferencesUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -63,6 +66,8 @@ public class AudioListDialog extends BaseCircleDialog implements View.OnClickLis
 
     private AudioListAdapter mAdapter;
     private IAudioPlayer mAudioPlayer;
+    private int mNetPlay;
+    private int mNeedTipPlay;
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
@@ -81,23 +86,75 @@ public class AudioListDialog extends BaseCircleDialog implements View.OnClickLis
                     newAudios=audios;
                 }
                 mAdapter = new AudioListAdapter(getContext(),newAudios,mAudioPlayer);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-
-                    }
-                });
                 listView.setAdapter(mAdapter);
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        try{
-                            mAudioPlayer.playAudio(mAdapter.getItem(position));
+                    public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                        }catch (RemoteException e){
-                            e.printStackTrace();
+                        //判断网络环境
+                        if (CommonUtils.getNetWorkType(getContext()) == CommonUtils.NETWORKTYPE_MOBILE) {
+                            if(mNetPlay==0){
+                                //每次提醒
+                                new CircleDialog.Builder()
+                                        .setCanceledOnTouchOutside(false)
+                                        .setCancelable(false)
+
+                                        .setText("当前非WiFi环境，是否使用流量播放")
+                                        .setNegative("暂停播放", null)
+                                        .setPositive("继续播放", new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                try{
+                                                    mAudioPlayer.playAudio(mAdapter.getItem(position));
+                                                }catch (RemoteException e){
+
+                                                }
+
+                                            }
+                                        })
+                                        .show(getFragmentManager());
+                            }else{
+                                //提醒一次
+                                if(mNeedTipPlay==1) {
+                                    new CircleDialog.Builder()
+                                            .setCanceledOnTouchOutside(false)
+                                            .setCancelable(false)
+
+                                            .setText("当前非WiFi环境，是否使用流量播放")
+                                            .setNegative("暂停播放", null)
+                                            .setPositive("继续播放", new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    try{
+                                                        mAudioPlayer.playAudio(mAdapter.getItem(position));
+                                                    }catch (RemoteException e){
+
+                                                    }
+
+                                                }
+                                            })
+                                            .show(getFragmentManager());
+                                }else{
+                                    try{
+                                        mAudioPlayer.playAudio(mAdapter.getItem(position));
+
+                                    }catch (RemoteException e){
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+
+                        }else{
+                            try{
+                                mAudioPlayer.playAudio(mAdapter.getItem(position));
+
+                            }catch (RemoteException e){
+                                e.printStackTrace();
+                            }
                         }
+
+
                     }
                 });
             }catch (RemoteException e){
@@ -135,6 +192,8 @@ public class AudioListDialog extends BaseCircleDialog implements View.OnClickLis
         playOrder=view.findViewById(R.id.playOrder);
         showOrder=view.findViewById(R.id.showOrder);
         listView=view.findViewById(R.id.listView);
+        mNetPlay=SharedPreferencesUtils.getIntValue(SettingActivity.NET_PLAY,0);
+        mNeedTipPlay=SharedPreferencesUtils.getIntValue(SettingActivity.NEED_TIP_PLAY,0);
         Intent it = new Intent(getContext(), AudioPlayerService.class);
         getContext().bindService(it, mConnection, Context.BIND_AUTO_CREATE);
 

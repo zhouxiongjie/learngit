@@ -118,7 +118,7 @@ public class AlbumIntroduceFragment extends Fragment implements Handler.Callback
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }

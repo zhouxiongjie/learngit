@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.RemoteException;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,14 +17,13 @@ import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
-
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
+import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.LoginActivity;
 import com.shuangling.software.activity.MainActivity;
@@ -32,10 +32,23 @@ import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.customview.TopTitleBar;
+import com.shuangling.software.entity.AudioInfo;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.event.CommonEvent;
+import com.shuangling.software.event.PlayerEvent;
+import com.shuangling.software.network.OkHttpCallback;
+import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.service.AudioPlayerService;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,9 +63,7 @@ import cn.sharesdk.tencent.qq.QQ;
 import cn.sharesdk.wechat.favorite.WechatFavorite;
 import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
-
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
+import okhttp3.Call;
 
 
 public class DiscoverFragment extends Fragment implements Handler.Callback {
@@ -94,8 +105,12 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
     }
 
 
-    private void init() {
 
+
+
+
+    private void init() {
+        EventBus.getDefault().register(this);
         activtyTitle.setBackListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,21 +165,34 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
             public void onPageFinished(WebView view, String url) {
                 //progressBar.setVisibility(View.GONE);
                 super.onPageFinished(view, url);
-                long id=Thread.currentThread().getId();
-                if(!webView.canGoBack()){
+
+                if(url.startsWith(ServerInfo.h5IP + "/find")){
                     activtyTitle.setCanBack(false);
                 }else{
                     activtyTitle.setCanBack(true);
-
                 }
-
-
+//                if(!webView.canGoBack()){
+//
+//                }else{
+//                    activtyTitle.setCanBack(true);
+//
+//                }
 
             }
 
             // WebView加载的所有资源url
             @Override
             public void onLoadResource(WebView view, String url) {
+//                if(url.startsWith(ServerInfo.serviceIP + "/v1/services")){
+//                    activtyTitle.setCanBack(true);
+//                }else if(url.startsWith(ServerInfo.h5IP + "/find")){
+//                    activtyTitle.setCanBack(false);
+//                }
+//                if(!webView.canGoBack()){
+//                    activtyTitle.setCanBack(true);
+//                }else{
+//                    activtyTitle.setCanBack(false);
+//                }
                 super.onLoadResource(view, url);
             }
 
@@ -291,7 +319,7 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
                 public void run() {
                     //1音频、2专辑、3文章、4视频、5专题、7图集
                     if (type.equals("1")) {
-                        Intent it = new Intent(getContext(), SingleAudioDetailActivity.class);
+                        Intent it = new Intent(getContext(), AudioDetailActivity.class);
                         it.putExtra("audioId", Integer.parseInt(id));
                         startActivity(it);
 
@@ -322,14 +350,23 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
 
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        if (hidden) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if (event.getEventName().equals("OnLoginSuccess")) {
+//            String url = webView.getUrl();
+//            if(url.indexOf("?")>0){
+//                url = url.substring(0, url.indexOf("?"));
+//                if (User.getInstance() == null) {
+//                    url = url + "?app=android";
+//                } else {
+//                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+//                }
+//
+//            }
+//            webView.loadUrl(url);
+
+
             String url = ServerInfo.h5IP + "/find";
 
             if (User.getInstance() == null) {
@@ -345,9 +382,64 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
                 } else {
                     url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
                 }
+            }
+            webView.loadUrl(url);
+
+        }else if(event.getEventName().equals("OnQuitLogin")){
+//            String url = webView.getUrl();
+//            if(url.indexOf("?")>0){
+//                url = url.substring(0, url.indexOf("?"));
+//                if (User.getInstance() == null) {
+//                    url = url + "?app=android";
+//                } else {
+//                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+//                }
+//
+//            }
+
+
+            String url = ServerInfo.h5IP + "/find";
+
+            if (User.getInstance() == null) {
+                if (MainActivity.sCurrentCity != null) {
+                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
+                } else {
+                    url = url + "?app=android";
+                }
+
+            } else {
+                if (MainActivity.sCurrentCity != null) {
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                } else {
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }
+            }
+            webView.loadUrl(url);
+        }
+    }
+
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        if (hidden) {
+            String url = ServerInfo.h5IP + "/find";
+            if (User.getInstance() == null) {
+                if (MainActivity.sCurrentCity != null) {
+                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
+                } else {
+                    url = url + "?app=android";
+                }
+            } else {
+                if (MainActivity.sCurrentCity != null) {
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                } else {
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }
 
             }
             webView.loadUrl(url);
+            webView.clearHistory();
+            activtyTitle.setCanBack(false);
         }
         super.onHiddenChanged(hidden);
     }
@@ -360,8 +452,10 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+        webView.destroy();
         unbinder.unbind();
+        super.onDestroyView();
     }
 
 
@@ -405,12 +499,14 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
             //自定义分享的回调想要函数
             @Override
             public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
-
+                String chanel="1";
                 //点击新浪微博
                 if (SinaWeibo.NAME.equals(platform.getName())) {
                     //限制微博分享的文字不能超过20
+                    chanel="2";
                     paramsToShare.setText(title + ServerInfo.activity + "qaa/game-result/" + id);
                 } else if (QQ.NAME.equals(platform.getName())) {
+                    chanel="3";
                     paramsToShare.setTitle(title);
                     if (!TextUtils.isEmpty(logo)) {
                         paramsToShare.setImageUrl(logo);
@@ -441,7 +537,7 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
                         paramsToShare.setImageUrl(logo);
                     }
                 }
-
+                shareStatistics(chanel,""+id,ServerInfo.activity + "qaa/game-result/" + id);
 
             }
         });
@@ -461,6 +557,7 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
                 Message msg = Message.obtain();
                 msg.what = SHARE_SUCCESS;
                 mHandler.sendMessage(msg);
+
             }
 
             @Override
@@ -470,6 +567,36 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
         });
         // 启动分享GUI
         oks.show(getContext());
+
+    }
+
+
+
+    public void shareStatistics(String channel,String postId,String shardUrl) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
+        Map<String, String> params = new HashMap<>();
+        if(User.getInstance()!=null){
+            params.put("user_id", ""+User.getInstance().getId());
+        }
+        params.put("channel", channel);
+        params.put("post_id", postId);
+        params.put("source_type", "3");
+        params.put("type", "1");
+        params.put("shard_url", shardUrl);
+        OkHttpUtils.post(url, params, new OkHttpCallback(getContext()) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.i("test",response);
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                Log.i("test",exception.toString());
+
+            }
+        });
 
     }
 

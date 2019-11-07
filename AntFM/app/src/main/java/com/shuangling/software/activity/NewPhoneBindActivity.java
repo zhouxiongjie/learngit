@@ -65,8 +65,9 @@ public class NewPhoneBindActivity extends AppCompatActivity implements Handler.C
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_new_phone_bind);
         ButterKnife.bind(this);
 
@@ -145,7 +146,7 @@ public class NewPhoneBindActivity extends AppCompatActivity implements Handler.C
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -179,7 +180,7 @@ public class NewPhoneBindActivity extends AppCompatActivity implements Handler.C
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -237,7 +238,7 @@ public class NewPhoneBindActivity extends AppCompatActivity implements Handler.C
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        User.getInstance().setPhone(Long.parseLong(phoneNum.getText().toString()));
+                        User.getInstance().setPhone(phoneNum.getText().toString());
                         finish();
                     } else if (jsonObject != null) {
                         ToastUtils.show(jsonObject.getString("msg"));

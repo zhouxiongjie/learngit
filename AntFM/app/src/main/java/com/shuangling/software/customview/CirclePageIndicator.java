@@ -272,7 +272,7 @@ public class CirclePageIndicator extends View implements PageIndicator {
         }
 
         //Draw stroked circles
-        for (int iLoop = 0; iLoop < count; iLoop++) {
+        for (int iLoop = 1; iLoop < count-1; iLoop++) {
             float drawLong = longOffset + (iLoop * threeRadius);
             if (mOrientation == HORIZONTAL) {
                 dX = drawLong;
@@ -293,18 +293,50 @@ public class CirclePageIndicator extends View implements PageIndicator {
         }
 
         //Draw the filled circle according to the current scroll
-        float cx = (mSnap ? mSnapPage : mCurrentPage) * threeRadius;
-        if (!mSnap) {
-            cx += mPageOffset * threeRadius;
+        if(mSnap){
+            if(!(mSnapPage==0||mSnapPage==count-1)){
+                float cx =  mSnapPage  * threeRadius;
+
+                if (mOrientation == HORIZONTAL) {
+                    dX = longOffset + cx;
+                    dY = shortOffset;
+                } else {
+                    dX = shortOffset;
+                    dY = longOffset + cx;
+                }
+                canvas.drawCircle(dX, dY, mRadius, mPaintFill);
+            }
+        }else{
+            if(!(mCurrentPage==0||mCurrentPage==count-1)){
+                float cx =  mCurrentPage * threeRadius;
+                cx += mPageOffset * threeRadius;
+
+                if (mOrientation == HORIZONTAL) {
+                    dX = longOffset + cx;
+                    dY = shortOffset;
+                } else {
+                    dX = shortOffset;
+                    dY = longOffset + cx;
+                }
+                canvas.drawCircle(dX, dY, mRadius, mPaintFill);
+            }
+
         }
-        if (mOrientation == HORIZONTAL) {
-            dX = longOffset + cx;
-            dY = shortOffset;
-        } else {
-            dX = shortOffset;
-            dY = longOffset + cx;
-        }
-        canvas.drawCircle(dX, dY, mRadius, mPaintFill);
+//        if(!(mCurrentPage==0||mCurrentPage==count-1)){
+//            float cx = (mSnap ? mSnapPage : mCurrentPage) * threeRadius;
+//            if (!mSnap) {
+//                cx += mPageOffset * threeRadius;
+//            }
+//            if (mOrientation == HORIZONTAL) {
+//                dX = longOffset + cx;
+//                dY = shortOffset;
+//            } else {
+//                dX = shortOffset;
+//                dY = longOffset + cx;
+//            }
+//            canvas.drawCircle(dX, dY, mRadius, mPaintFill);
+//        }
+
     }
 
     public boolean onTouchEvent(MotionEvent ev) {
@@ -470,6 +502,7 @@ public class CirclePageIndicator extends View implements PageIndicator {
      *
      * @see android.view.View#onMeasure(int, int)
      */
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (mOrientation == HORIZONTAL) {
@@ -498,7 +531,7 @@ public class CirclePageIndicator extends View implements PageIndicator {
             //Calculate the width according the views count
             final int count = mViewPager.getAdapter().getCount();
             result = (int)(getPaddingLeft() + getPaddingRight()
-                    + (count * 2 * mRadius) + (count - 1) * mRadius + 1);
+                    + ((count-2) * 2 * mRadius) + (count - 3) * mRadius + 1);
             //Respect AT_MOST value if that was what is called for by measureSpec
             if (specMode == MeasureSpec.AT_MOST) {
                 result = Math.min(result, specSize);

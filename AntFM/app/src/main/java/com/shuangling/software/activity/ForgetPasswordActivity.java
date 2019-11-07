@@ -73,8 +73,9 @@ public class ForgetPasswordActivity extends AppCompatActivity implements Handler
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_forget_password);
         ButterKnife.bind(this);
         mHandler = new Handler(this);
@@ -261,7 +262,7 @@ public class ForgetPasswordActivity extends AppCompatActivity implements Handler
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -296,7 +297,7 @@ public class ForgetPasswordActivity extends AppCompatActivity implements Handler
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {

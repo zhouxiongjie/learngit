@@ -26,22 +26,22 @@ import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
+import com.facebook.cache.disk.DiskCacheConfig;
+import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.hjq.toast.IToastStyle;
 import com.hjq.toast.ToastUtils;
 import com.hjq.toast.style.ToastBlackStyle;
+import com.liulishuo.filedownloader.FileDownloader;
 import com.mob.MobSDK;
-import com.scwang.smartrefresh.layout.SmartRefreshLayout;
-import com.scwang.smartrefresh.layout.api.DefaultRefreshHeaderCreater;
-import com.scwang.smartrefresh.layout.api.RefreshHeader;
-import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.shuangling.software.dao.DaoMaster;
 import com.shuangling.software.dao.DaoSession;
 import com.shuangling.software.entity.Album;
 import com.shuangling.software.entity.OssInfo;
 import com.shuangling.software.entity.Station;
+import com.shuangling.software.network.ElnImageDownloaderFetcher;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.oss.OSSAKSKCredentialProvider;
@@ -52,6 +52,7 @@ import com.shuangling.software.utils.MyToastStyle;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.Snake;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -59,6 +60,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.Call;
+import okhttp3.OkHttpClient;
+
+import static com.taobao.accs.client.AccsConfig.build;
 
 public class MyApplication extends MultiDexApplication {
 
@@ -76,19 +80,31 @@ public class MyApplication extends MultiDexApplication {
         return station;
     }
 
+    public void setStation( Station station ){
+        this.station=station;
+    }
+
 	@Override
 	public void onCreate() {
 
 		super.onCreate();
 		sInstance = this;
 
-        Fresco.initialize(this);
+//        OkHttpClient okHttpClient=OkHttpUtils.okHttpClient;
+//        ImagePipelineConfig config = OkHttpImagePipelineConfigFactory
+//                .newBuilder(this, okHttpClient)
+//                .build();
+//
+//        Fresco.initialize(this, config);
+//        Fresco.initialize(this);
+        initFresco();
+
 		MobSDK.init(this);
 		ToastUtils.init(this);
         ToastUtils.initStyle(new MyToastStyle());
         // 对Snake进行初始化
         Snake.init(this);
-
+        FileDownloader.setup(this);
         initPushService(this);
         // android 7.0系统解决拍照的问题
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -168,6 +184,19 @@ public class MyApplication extends MultiDexApplication {
 	}
 
 
+    private void initFresco(){
+//        DiskCacheConfig diskCacheConfig = DiskCacheConfig.newBuilder()
+//                .setBaseDirectoryPath(new File(MultiCard.getInstance(this).getRootDir()))
+//                .setBaseDirectoryName("image_cache")
+//                .setMaxCacheSize(50 * ByteConstants.MB)
+//                .setMaxCacheSizeOnLowDiskSpace(10 * ByteConstants.MB)
+//                .setMaxCacheSizeOnVeryLowDiskSpace(2 * ByteConstants.MB)
+//                .build();
+        ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
+                .setNetworkFetcher(new ElnImageDownloaderFetcher())
+                .build();
+        Fresco.initialize(this, config);
+    }
 
 
 	public static MyApplication getInstance() {
@@ -288,14 +317,19 @@ public class MyApplication extends MultiDexApplication {
                         if(today.after(startTime)&&today.before(endTime)){
                             if(Color.parseColor(jo.getString("background_color"))==getResources().getColor(R.color.themeBlue)){
                                 MyApplication.getInstance().setCurrentTheme(R.style.AppThemeBlue);
+                                MyApplication.getInstance().setTheme(R.style.AppThemeBlue);
                             }else if(Color.parseColor(jo.getString("background_color"))==getResources().getColor(R.color.themePurple)){
                                 MyApplication.getInstance().setCurrentTheme(R.style.AppThemePurple);
+                                MyApplication.getInstance().setTheme(R.style.AppThemePurple);
                             }else if(Color.parseColor(jo.getString("background_color"))==getResources().getColor(R.color.themeRed)){
                                 MyApplication.getInstance().setCurrentTheme(R.style.AppThemeRed);
+                                MyApplication.getInstance().setTheme(R.style.AppThemeRed);
                             }else if(Color.parseColor(jo.getString("background_color"))==getResources().getColor(R.color.themeGreen)){
                                 MyApplication.getInstance().setCurrentTheme(R.style.AppThemeGreen);
+                                MyApplication.getInstance().setTheme(R.style.AppThemeGreen);
                             }else if(Color.parseColor(jo.getString("background_color"))==getResources().getColor(R.color.themeOrange)){
                                 MyApplication.getInstance().setCurrentTheme(R.style.AppThemeOrange);
+                                MyApplication.getInstance().setTheme(R.style.AppThemeOrange);
                             }
                             MyApplication.getInstance().setBackgroundImage(jo.getString("background_image"));
 
@@ -311,7 +345,7 @@ public class MyApplication extends MultiDexApplication {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -349,7 +383,7 @@ public class MyApplication extends MultiDexApplication {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }

@@ -18,7 +18,7 @@ public abstract class OkHttpCallback {
         return mContext;
     }
 
-    public abstract void onFailure(Call call, IOException e);
+    public abstract void onFailure(Call call, Exception e);
 
     //public abstract void onResponse(Call call, Response response) throws IOException;
 

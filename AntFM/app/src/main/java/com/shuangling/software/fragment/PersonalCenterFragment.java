@@ -20,6 +20,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AccountAndSecurityActivity;
 import com.shuangling.software.activity.AttentionActivity;
+import com.shuangling.software.activity.CluesActivity;
 import com.shuangling.software.activity.CollectActivity;
 import com.shuangling.software.activity.FeedbackActivity;
 import com.shuangling.software.activity.HistoryActivity;
@@ -28,6 +29,7 @@ import com.shuangling.software.activity.MessageListActivity;
 import com.shuangling.software.activity.ModifyUserInfoActivity;
 import com.shuangling.software.activity.SettingActivity;
 import com.shuangling.software.activity.SubscribeActivity;
+import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
@@ -178,6 +180,14 @@ public class PersonalCenterFragment extends Fragment {
                 }
                 break;
             case R.id.brokeNews:
+                if (User.getInstance() != null) {
+                    Intent it = new Intent(getContext(), CluesActivity.class);
+                    it.putExtra("url",ServerInfo.scs+"/broke-create");
+                    startActivity(it);
+                } else {
+                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    startActivity(it);
+                }
                 break;
             case R.id.messageLayout:
                 if (User.getInstance() != null) {
@@ -282,7 +292,7 @@ public class PersonalCenterFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }

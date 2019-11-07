@@ -2,17 +2,55 @@ package com.shuangling.software.utils;
 
 public class ServerInfo {
 
-	
 
 
 
-	//public static String serviceIP="http://api-cms.slradio.cn";
+
+
 
 	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
 
 	public static String h5IP="http://www-cms-c.staging.slradio.cn";
 
+	public static String h5HttpsIP="https://www-cms-c.staging.slradio.cn";
+
 	public static String activity="https://www-asc-c.staging.slradio.cn/";
+
+	public static String scs="http://www-scs-c.staging.slradio.cn";
+
+
+//	public static String serviceIP="http://api-cms.on-radio.cn";
+//
+//	public static String h5IP="http://cms.on-radio.cn";
+//
+//	public static String h5HttpsIP="http://cms.on-radio.cn";
+//
+//	public static String activity="http://asc.on-radio.cn/";
+//
+//	public static String scs="http://scs.on-radio.cn";
+
+    public static String apkDownloadAddr="https://shuangln-cdn.on-radio.cn/cms/apk/ltsj.apk";
+
+
+//	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
+//
+//	public static String h5IP="http://www-cms-c.staging.slradio.cn";
+//
+//	public static String h5HttpsIP="https://www-cms-c.staging.slradio.cn";
+//
+//	public static String activity="https://www-asc-c.staging.slradio.cn/";
+//
+//	public static String scs="http://www-scs-c.staging.slradio.cn";
+
+
+
+	//双菱
+//	public static String serviceIP="http://api-cms.on-radio.cn";
+//
+//	public static String h5IP="http://cms.on-radio.cn";
+//
+//	public static String activity="http://asc.on-radio.cn/";
+
 
 	public static String getRecommendColumns="/v1/c_cassifies";    				//推荐栏目
 
@@ -47,7 +85,9 @@ public class ServerInfo {
 	public static String getAlbumAudios="/v1/c_audios/";						//专辑下所有音频
 
 	//登录模块
-	public static String login="/v1/consumer/login";							//账号密码登陆
+	public static String login="/v1/consumer/app_login";						//账号密码登陆
+
+	public static String refreshTokenLogin="/v1/consumer/login_by_token";		//APP通过RefreshToke登录
 
 	public static String getVerifyCode="/v1/consumer/phone_captcha";			//获取验证码
 
@@ -133,5 +173,11 @@ public class ServerInfo {
 
 	public static String addRadioHistory="/v1/mobile/channel/view";				//收听量记录
 
-	public static String serviceClick="/v1/c_service/";						//服务点击
+	public static String serviceClick="/v1/c_service/";							//服务点击
+
+	public static String updateInfo="/v1/consumer/app_version";					//APP获取是否需要更新
+
+	public static String shareStatistics="/v2/share";							//分享添加来记录
+
+    public static String bottomMenus="/v2/consumer/menus";					    //C端获取底部菜单
 }

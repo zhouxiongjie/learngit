@@ -72,8 +72,9 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_article_details);
         ButterKnife.bind(this);
 //        StatusBarUtil.setTransparent(this);
@@ -101,7 +102,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -289,7 +290,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
                         if (mArticle.getArticle().getCovers().size() > 0) {
                             logo = mArticle.getArticle().getCovers().get(0);
                         }
-                        showShare(mArticle.getTitle(), mArticle.getArticle().getContent(), logo, ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?app=android");
+                        showShare(mArticle.getTitle(), mArticle.getDes(), logo, ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?app=android");
                     }
 
 
@@ -306,7 +307,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
                 public void run() {
                     //1音频、2专辑、3文章、4视频、5专题、7图集
                     if (type.equals("1")) {
-                        Intent it = new Intent(ArticleDetailActivity.this, SingleAudioDetailActivity.class);
+                        Intent it = new Intent(ArticleDetailActivity.this, AudioDetailActivity.class);
                         it.putExtra("audioId", Integer.parseInt(id));
                         startActivity(it);
 
@@ -399,13 +400,16 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
             @Override
             public void onShare(Platform platform, ShareParams paramsToShare) {
                 //点击新浪微博
+                String chanel="1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
+                    chanel="2";
                     //限制微博分享的文字不能超过20
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setText(title + url);
                 } else if (QQ.NAME.equals(platform.getName())) {
+                    chanel="3";
                     paramsToShare.setTitle(title);
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
@@ -438,6 +442,8 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
                         paramsToShare.setImageUrl(cover);
                     }
                 }
+
+                shareStatistics(chanel,""+mArticle.getId(),ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?app=android");
             }
         });
         oks.setCallback(new PlatformActionListener() {
@@ -466,98 +472,33 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
     }
 
 
-    private void showShare() {
-
-        if (mArticle != null) {
-            OnekeyShare oks = new OnekeyShare();
-            //关闭sso授权
-            oks.disableSSOWhenAuthorize();
-            final Platform qq = ShareSDK.getPlatform(QQ.NAME);
-            if (!qq.isClientValid()) {
-                oks.addHiddenPlatform(QQ.NAME);
-            }
-
-            final Platform sina = ShareSDK.getPlatform(SinaWeibo.NAME);
-            if (!sina.isClientValid()) {
-                oks.addHiddenPlatform(SinaWeibo.NAME);
-            }
 
 
-            oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
-                //自定义分享的回调想要函数
-                @Override
-                public void onShare(Platform platform, ShareParams paramsToShare) {
+    public void shareStatistics(String channel,String postId,String shardUrl) {
 
-                    //点击新浪微博
-                    if (SinaWeibo.NAME.equals(platform.getName())) {
-                        //限制微博分享的文字不能超过20
-                        if (mArticle.getArticle().getCovers().size() > 0) {
-                            paramsToShare.setImageUrl(mArticle.getArticle().getCovers().get(0));
-                        }
-                        paramsToShare.setText(mArticle.getTitle() + ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?app=android");
-                    } else if (QQ.NAME.equals(platform.getName())) {
-                        paramsToShare.setTitle(mArticle.getTitle());
-                        if (mArticle.getArticle().getCovers().size() > 0) {
-                            paramsToShare.setImageUrl(mArticle.getArticle().getCovers().get(0));
-                        }
-                        paramsToShare.setTitleUrl(ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?app=android");
-                        paramsToShare.setText(mArticle.getArticle().getContent());
-
-                    } else if (Wechat.NAME.equals(platform.getName())) {
-                        paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
-                        paramsToShare.setTitle(mArticle.getTitle());
-                        paramsToShare.setUrl(ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?app=android");
-                        if (mArticle.getArticle().getCovers().size() > 0) {
-                            paramsToShare.setImageUrl(mArticle.getArticle().getCovers().get(0));
-                        }
-                        paramsToShare.setText(mArticle.getArticle().getContent());
-                    } else if (WechatMoments.NAME.equals(platform.getName())) {
-                        paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
-                        paramsToShare.setTitle(mArticle.getTitle());
-                        paramsToShare.setUrl(ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?app=android");
-                        if (mArticle.getArticle().getCovers().size() > 0) {
-                            paramsToShare.setImageUrl(mArticle.getArticle().getCovers().get(0));
-                        }
-                    } else if (WechatFavorite.NAME.equals(platform.getName())) {
-                        paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
-                        paramsToShare.setTitle(mArticle.getTitle());
-                        paramsToShare.setUrl(ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?app=android");
-                        if (mArticle.getArticle().getCovers().size() > 0) {
-                            paramsToShare.setImageUrl(mArticle.getArticle().getCovers().get(0));
-                        }
-                    }
-
-
-                }
-            });
-            oks.setCallback(new PlatformActionListener() {
-
-                @Override
-                public void onError(Platform arg0, int arg1, Throwable arg2) {
-                    Message msg = Message.obtain();
-                    msg.what = SHARE_FAILED;
-                    msg.obj = arg2.getMessage();
-                    mHandler.sendMessage(msg);
-                }
-
-                @Override
-                public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
-
-                    Message msg = Message.obtain();
-                    msg.what = SHARE_SUCCESS;
-                    mHandler.sendMessage(msg);
-                }
-
-                @Override
-                public void onCancel(Platform arg0, int arg1) {
-
-                }
-            });
-            // 启动分享GUI
-            oks.show(this);
+        String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
+        Map<String, String> params = new HashMap<>();
+        if(User.getInstance()!=null){
+            params.put("user_id", ""+User.getInstance().getId());
         }
+        params.put("channel", channel);
+        params.put("post_id", postId);
+        params.put("source_type", "3");
+        params.put("type", "1");
+        params.put("shard_url", shardUrl);
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.i("test",response);
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                Log.i("test",exception.toString());
+
+            }
+        });
 
     }
-
 }

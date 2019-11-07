@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
@@ -64,8 +65,9 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
     private int mSpecialId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_galleria);
         ButterKnife.bind(this);
         init();
@@ -90,7 +92,7 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -287,7 +289,7 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
                 public void run() {
                     //1音频、2专辑、3文章、4视频、5专题、7图集
                     if (type.equals("1")) {
-                        Intent it = new Intent(SpecialDetailActivity.this, SingleAudioDetailActivity.class);
+                        Intent it = new Intent(SpecialDetailActivity.this, AudioDetailActivity.class);
                         it.putExtra("audioId", Integer.parseInt(id));
                         startActivity(it);
 
@@ -380,15 +382,17 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
                 //自定义分享的回调想要函数
                 @Override
                 public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
-
+                    String chanel="1";
                     //点击新浪微博
                     if (SinaWeibo.NAME.equals(platform.getName())) {
+                        chanel="2";
                         //限制微博分享的文字不能超过20
                         if (!TextUtils.isEmpty(mSpecial.getCover())) {
                             paramsToShare.setImageUrl(mSpecial.getCover());
                         }
                         paramsToShare.setText(mSpecial.getTitle() + ServerInfo.h5IP + ServerInfo.getSpecialPage + mSpecialId + "?app=android");
                     } else if (QQ.NAME.equals(platform.getName())) {
+                        chanel="3";
                         paramsToShare.setTitle(mSpecial.getTitle());
                         if (!TextUtils.isEmpty(mSpecial.getCover())) {
                             paramsToShare.setImageUrl(mSpecial.getCover());
@@ -419,6 +423,7 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
                             paramsToShare.setImageUrl(mSpecial.getCover());
                         }
                     }
+                    shareStatistics(chanel,""+mSpecial.getId(),ServerInfo.h5IP + ServerInfo.getSpecialPage + mSpecialId + "?app=android");
 
 
                 }
@@ -439,6 +444,9 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
                     Message msg = Message.obtain();
                     msg.what = SHARE_SUCCESS;
                     mHandler.sendMessage(msg);
+
+
+
                 }
 
                 @Override
@@ -450,6 +458,35 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
             oks.show(this);
         }
 
+
+    }
+
+
+    public void shareStatistics(String channel,String postId,String shardUrl) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
+        Map<String, String> params = new HashMap<>();
+        if(User.getInstance()!=null){
+            params.put("user_id", ""+User.getInstance().getId());
+        }
+        params.put("channel", channel);
+        params.put("post_id", postId);
+        params.put("source_type", "3");
+        params.put("type", "1");
+        params.put("shard_url", shardUrl);
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.i("test",response);
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                Log.i("test",exception.toString());
+
+            }
+        });
 
     }
 

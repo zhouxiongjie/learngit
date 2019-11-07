@@ -207,7 +207,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
                 if (getContent == GetContent.Normal || getContent == GetContent.Refresh) {
                     getExcellentPost(getContent);
@@ -258,7 +258,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {

@@ -1,30 +1,47 @@
 package com.shuangling.software.entity;
 
-import android.text.TextUtils;
-
-import static android.content.Context.MODE_PRIVATE;
-
 public class User {
 
 
+
+
+    private static User sUser;
     /**
-     * id : 64
-     * username : sl_15111141073
+     * id : 781
+     * username : sl_151111410731
      * username_checked : 0
-     * nickname : 15111141073
+     * nickname : 151****1073
      * password_checked : 0
      * email :
      * email_checked : 0
      * phone : 15111141073
      * phone_checked : 0
-     * avatar :
+     * avatar : http://sl-cdn.slradio.cn/cms/user/head.jpg
      * status : 0
      * reg_from_app_id : 0
-     * created_at : 2019-05-21 19:26:00
-     * Authorization : c4b5abb09ca20d2ee648fecc0218b2aa
+     * created_at : 2019-07-10 09:39:11
+     * is_talk : 0
+     * Authorization : b6f867d752e2c4ec544b2001f8641c39
+     * refresh_token : 11fcbce99bd97d8165377772a903bf1f
      */
 
-    private static User sUser;
+    private int id;
+    private String username;
+    private int username_checked;
+    private String nickname;
+    private int password_checked;
+    private String email;
+    private int email_checked;
+    private String phone;
+    private int phone_checked;
+    private String avatar;
+    private int status;
+    private int reg_from_app_id;
+    private String created_at;
+    private int is_talk;
+    private String Authorization;
+    private String refresh_token;
+
     public static User getInstance(){
 //        if(sUser==null){
 //            synchronized (User.class){
@@ -40,26 +57,6 @@ public class User {
         sUser=user;
     }
 
-
-
-
-
-
-
-    private int id;
-    private String username;
-    private int username_checked;
-    private String nickname;
-    private int password_checked;
-    private String email;
-    private int email_checked;
-    private long phone;
-    private int phone_checked;
-    private String avatar;
-    private int status;
-    private int reg_from_app_id;
-    private String created_at;
-    private String Authorization;
 
     public int getId() {
         return id;
@@ -117,11 +114,11 @@ public class User {
         this.email_checked = email_checked;
     }
 
-    public long getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(long phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 
@@ -165,11 +162,27 @@ public class User {
         this.created_at = created_at;
     }
 
+    public int getIs_talk() {
+        return is_talk;
+    }
+
+    public void setIs_talk(int is_talk) {
+        this.is_talk = is_talk;
+    }
+
     public String getAuthorization() {
         return Authorization;
     }
 
     public void setAuthorization(String Authorization) {
         this.Authorization = Authorization;
+    }
+
+    public String getRefresh_token() {
+        return refresh_token;
+    }
+
+    public void setRefresh_token(String refresh_token) {
+        this.refresh_token = refresh_token;
     }
 }

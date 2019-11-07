@@ -38,6 +38,8 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
 	private List<View> mAutoViews = new ArrayList<View>();
 	private PagerAdapter mAutoViewPageAdapter;
 
+	private int mCurponsition;//记录当前显示的索引
+
 	private int mWidth;
 	private int mHeight;
 
@@ -98,13 +100,17 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
 
 
 	public void setData(List<T> datas) {
-		mData=datas;
+
 		if (datas.size() > 0) {
 			setVisibility(View.VISIBLE);
 		}else{
 			setVisibility(View.GONE);
 			return;
 		}
+        mData=new ArrayList<>();
+		mData.addAll(datas);
+        mData.add(0,datas.get(datas.size()-1));
+        mData.add(datas.get(0));
 		mAutoViews.clear();
 
 		for(int i=0;i<mData.size();i++){
@@ -176,17 +182,31 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
 
 				@Override
 				public void onPageSelected(int position) {
+					mCurponsition = position;//记录当前显示的索引
 					T adv =(T) mAutoViews.get(position).getTag();
 					mAdvertDesc.setText(adv.getTitle());
+					if (mCurponsition == 0){
+						mAutoScrollViewPager.setCurrentItem(mAutoViews.size()-2, false);//切换，不要动画效果
+					} else if (mCurponsition ==mAutoViews.size()-1) {
+						mAutoScrollViewPager.setCurrentItem(1, false);//切换，不要动画效果
+					}
 				}
 
 				@Override
 				public void onPageScrollStateChanged(int state) {
+                    //验证当前的滑动是否结束
+//                    if (state == ViewPager.SCROLL_STATE_IDLE) {
+//                        if (mCurponsition == 0){
+//                            mAutoScrollViewPager.setCurrentItem(mAutoViews.size()-2, false);//切换，不要动画效果
+//                        } else if (mCurponsition ==mAutoViews.size()-1) {
+//                            mAutoScrollViewPager.setCurrentItem(1, false);//切换，不要动画效果
+//                        }
+//                    }
 
 				}
 			});
 			mAutoScrollViewPager.startAutoScroll();
-			mAutoViewPageIndicator.setCurrentItem(0);
+			mAutoViewPageIndicator.setCurrentItem(1);
 		}
 	}
 

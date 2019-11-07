@@ -251,8 +251,9 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(MyApplication.getInstance().getCurrentTheme());
+        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_audio_detail);
         ButterKnife.bind(this);
         init();
@@ -321,7 +322,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -352,7 +353,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -384,7 +385,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -411,7 +412,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -441,7 +442,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -475,7 +476,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -505,7 +506,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -535,7 +536,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -936,7 +937,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        ToastUtils.show(jsonObject.getString("msg"));
+                        ToastUtils.show("删除成功");
                         getComments();
                     }
 

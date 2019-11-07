@@ -8,22 +8,23 @@ public class Article implements Serializable {
 
 
     /**
-     * id : 2011
-     * title : 121212121212121212
+     * id : 3361
+     * title : 这条微博，必须为中国女排转！九连胜，姑娘们好样的！继续加油，期待#中国女排总冠军#[心] ​​​
      * like : 1
-     * author_id : 5
-     * publish_at : 2019-07-04 10:10:19
-     * view : 28
+     * author_id : 358
+     * publish_at : 2019-09-27 16:12:59
+     * view : 68
      * is_comment : 1
-     * merchant_id : 4
+     * merchant_id : 328
      * type : 3
      * comment : 0
+     * des : 这条微博，必须为中国女排转！九连胜，姑娘们好样的！继续加油，期待#中国女排总冠军#[心]报道来源:微博转载此文是出于传递更多的信息之目的，若有来源标注错误或者侵犯您的合法权益，请作者持权属证明与本网联
      * is_follow : 0
      * is_likes : 0
      * is_collection : 0
-     * article : {"id":786,"post_id":2011,"content":"<p>1212121212121<\/p>","created_at":"2019-07-04 10:10:20","updated_at":"2019-07-04 10:10:20","count":0,"website_name":"","origin_url":"","originator":"","covers":[],"type":3,"source_type":2}
-     * author_info : {"id":5,"merchant_id":4,"staff_name":"黄庚","user_id":1,"merchant":{"id":4,"name":"黄庚的机构勿删勿改","logo":"http://sl-ucenter.static.slradio.cn/merchants/4/imges/s3neE6NZzbQ7Cc6kD7J9mFk64QAaT8kC1555641918048.png","type":1,"parent_id":0}}
-     * categories : [{"id":10,"name":"儿童","icon":"http://sl-cms.static.slradio.cn/platform/tQPP5jCF2tGjNsemsar4MKCJ4dc3tZYe1552638288675.jpg","display":1,"type":0,"sort":17,"created_at":"2019-03-15 16:25:05","updated_at":"2019-06-03 15:11:09","post_type":0,"parent_id":0,"merchant_id":null,"pivot":{"post_id":2011,"category_id":10},"parent":null}]
+     * article : {"id":1679,"post_id":3361,"content":"<p style=\"text-align:center\"><img src=\"https://sl-cdn.slradio.cn/vms/merchants//weiboimg/2019/20190927/2656274875/e68c97b9e84e329d3a52a7a4a7fb3abc.jpg\"/><\/p><p>这条微博，必须为中国女排转！九连胜，姑娘们好样的！继续加油，期待#中国女排总冠军#[心]<\/p><p style=\"margin-top: 10px;color: rgba(153, 153, 153, 1)\">报道来源:微博<\/p><p style=\"color: rgba(153, 153, 153, 1);margin-top: 10px\">转载此文是出于传递更多的信息之目的，若有来源标注错误或者侵犯您的合法权益，请作者持权属证明与本网联系，我们将及时更正、删除，谢谢<\/p><p><br/><\/p>","created_at":"2019-09-27 16:12:59","updated_at":"2019-09-27 16:12:59","count":0,"website_name":"","origin_url":"http://weibo.com/2656274875/I8SCX2Oeq","originator":"","covers":[],"type":3,"source_type":3,"source_app":"scs","clue_id":0}
+     * author_info : {"id":358,"merchant_id":328,"staff_name":"江平","user_id":804,"merchant":{"id":328,"name":"广播V8测试机构","logo":"http://sl-cdn.slradio.cn/ucenter/avatar/k5n3E4HSddCpcHEK1565775526093.jpg","type":1,"parent_id":0}}
+     * categories : [{"id":43,"name":"实时热点","icon":"https://sl-cms.static.slradio.cn/platform/FrQTpnYyxkh4cW5exBkEHkxcwT8ZPrBk1560828435438.jpg","display":1,"type":0,"sort":1,"created_at":"2019-06-10 09:15:12","updated_at":"2019-07-23 16:15:29","post_type":0,"parent_id":12,"merchant_id":null,"pivot":{"post_id":3361,"category_id":43},"parent":{"id":12,"name":"社会热点","icon":"http://sl-cms.static.slradio.cn/platform/KPWphkh6xrAcDKAxTXKsRMCshF5JzkeS1552655015809.jpg","display":1,"type":0,"sort":11,"post_type":0,"parent_id":0}}]
      */
 
     private int id;
@@ -36,6 +37,7 @@ public class Article implements Serializable {
     private int merchant_id;
     private int type;
     private int comment;
+    private String des;
     private int is_follow;
     private int is_likes;
     private int is_collection;
@@ -123,6 +125,14 @@ public class Article implements Serializable {
         this.comment = comment;
     }
 
+    public String getDes() {
+        return des;
+    }
+
+    public void setDes(String des) {
+        this.des = des;
+    }
+
     public int getIs_follow() {
         return is_follow;
     }
@@ -173,18 +183,20 @@ public class Article implements Serializable {
 
     public static class ArticleBean {
         /**
-         * id : 786
-         * post_id : 2011
-         * content : <p>1212121212121</p>
-         * created_at : 2019-07-04 10:10:20
-         * updated_at : 2019-07-04 10:10:20
+         * id : 1679
+         * post_id : 3361
+         * content : <p style="text-align:center"><img src="https://sl-cdn.slradio.cn/vms/merchants//weiboimg/2019/20190927/2656274875/e68c97b9e84e329d3a52a7a4a7fb3abc.jpg"/></p><p>这条微博，必须为中国女排转！九连胜，姑娘们好样的！继续加油，期待#中国女排总冠军#[心]</p><p style="margin-top: 10px;color: rgba(153, 153, 153, 1)">报道来源:微博</p><p style="color: rgba(153, 153, 153, 1);margin-top: 10px">转载此文是出于传递更多的信息之目的，若有来源标注错误或者侵犯您的合法权益，请作者持权属证明与本网联系，我们将及时更正、删除，谢谢</p><p><br/></p>
+         * created_at : 2019-09-27 16:12:59
+         * updated_at : 2019-09-27 16:12:59
          * count : 0
          * website_name :
-         * origin_url :
+         * origin_url : http://weibo.com/2656274875/I8SCX2Oeq
          * originator :
          * covers : []
          * type : 3
-         * source_type : 2
+         * source_type : 3
+         * source_app : scs
+         * clue_id : 0
          */
 
         private int id;
@@ -198,6 +210,8 @@ public class Article implements Serializable {
         private String originator;
         private int type;
         private int source_type;
+        private String source_app;
+        private int clue_id;
         private List<String> covers;
 
         public int getId() {
@@ -288,6 +302,22 @@ public class Article implements Serializable {
             this.source_type = source_type;
         }
 
+        public String getSource_app() {
+            return source_app;
+        }
+
+        public void setSource_app(String source_app) {
+            this.source_app = source_app;
+        }
+
+        public int getClue_id() {
+            return clue_id;
+        }
+
+        public void setClue_id(int clue_id) {
+            this.clue_id = clue_id;
+        }
+
         public List<String> getCovers() {
             return covers;
         }
@@ -299,11 +329,11 @@ public class Article implements Serializable {
 
     public static class AuthorInfoBean {
         /**
-         * id : 5
-         * merchant_id : 4
-         * staff_name : 黄庚
-         * user_id : 1
-         * merchant : {"id":4,"name":"黄庚的机构勿删勿改","logo":"http://sl-ucenter.static.slradio.cn/merchants/4/imges/s3neE6NZzbQ7Cc6kD7J9mFk64QAaT8kC1555641918048.png","type":1,"parent_id":0}
+         * id : 358
+         * merchant_id : 328
+         * staff_name : 江平
+         * user_id : 804
+         * merchant : {"id":328,"name":"广播V8测试机构","logo":"http://sl-cdn.slradio.cn/ucenter/avatar/k5n3E4HSddCpcHEK1565775526093.jpg","type":1,"parent_id":0}
          */
 
         private int id;
@@ -354,9 +384,9 @@ public class Article implements Serializable {
 
         public static class MerchantBean {
             /**
-             * id : 4
-             * name : 黄庚的机构勿删勿改
-             * logo : http://sl-ucenter.static.slradio.cn/merchants/4/imges/s3neE6NZzbQ7Cc6kD7J9mFk64QAaT8kC1555641918048.png
+             * id : 328
+             * name : 广播V8测试机构
+             * logo : http://sl-cdn.slradio.cn/ucenter/avatar/k5n3E4HSddCpcHEK1565775526093.jpg
              * type : 1
              * parent_id : 0
              */
@@ -411,19 +441,19 @@ public class Article implements Serializable {
 
     public static class CategoriesBean {
         /**
-         * id : 10
-         * name : 儿童
-         * icon : http://sl-cms.static.slradio.cn/platform/tQPP5jCF2tGjNsemsar4MKCJ4dc3tZYe1552638288675.jpg
+         * id : 43
+         * name : 实时热点
+         * icon : https://sl-cms.static.slradio.cn/platform/FrQTpnYyxkh4cW5exBkEHkxcwT8ZPrBk1560828435438.jpg
          * display : 1
          * type : 0
-         * sort : 17
-         * created_at : 2019-03-15 16:25:05
-         * updated_at : 2019-06-03 15:11:09
+         * sort : 1
+         * created_at : 2019-06-10 09:15:12
+         * updated_at : 2019-07-23 16:15:29
          * post_type : 0
-         * parent_id : 0
+         * parent_id : 12
          * merchant_id : null
-         * pivot : {"post_id":2011,"category_id":10}
-         * parent : null
+         * pivot : {"post_id":3361,"category_id":43}
+         * parent : {"id":12,"name":"社会热点","icon":"http://sl-cms.static.slradio.cn/platform/KPWphkh6xrAcDKAxTXKsRMCshF5JzkeS1552655015809.jpg","display":1,"type":0,"sort":11,"post_type":0,"parent_id":0}
          */
 
         private int id;
@@ -438,7 +468,7 @@ public class Article implements Serializable {
         private int parent_id;
         private Object merchant_id;
         private PivotBean pivot;
-        private Object parent;
+        private ParentBean parent;
 
         public int getId() {
             return id;
@@ -536,18 +566,18 @@ public class Article implements Serializable {
             this.pivot = pivot;
         }
 
-        public Object getParent() {
+        public ParentBean getParent() {
             return parent;
         }
 
-        public void setParent(Object parent) {
+        public void setParent(ParentBean parent) {
             this.parent = parent;
         }
 
         public static class PivotBean {
             /**
-             * post_id : 2011
-             * category_id : 10
+             * post_id : 3361
+             * category_id : 43
              */
 
             private int post_id;
@@ -567,6 +597,92 @@ public class Article implements Serializable {
 
             public void setCategory_id(int category_id) {
                 this.category_id = category_id;
+            }
+        }
+
+        public static class ParentBean {
+            /**
+             * id : 12
+             * name : 社会热点
+             * icon : http://sl-cms.static.slradio.cn/platform/KPWphkh6xrAcDKAxTXKsRMCshF5JzkeS1552655015809.jpg
+             * display : 1
+             * type : 0
+             * sort : 11
+             * post_type : 0
+             * parent_id : 0
+             */
+
+            private int id;
+            private String name;
+            private String icon;
+            private int display;
+            private int type;
+            private int sort;
+            private int post_type;
+            private int parent_id;
+
+            public int getId() {
+                return id;
+            }
+
+            public void setId(int id) {
+                this.id = id;
+            }
+
+            public String getName() {
+                return name;
+            }
+
+            public void setName(String name) {
+                this.name = name;
+            }
+
+            public String getIcon() {
+                return icon;
+            }
+
+            public void setIcon(String icon) {
+                this.icon = icon;
+            }
+
+            public int getDisplay() {
+                return display;
+            }
+
+            public void setDisplay(int display) {
+                this.display = display;
+            }
+
+            public int getType() {
+                return type;
+            }
+
+            public void setType(int type) {
+                this.type = type;
+            }
+
+            public int getSort() {
+                return sort;
+            }
+
+            public void setSort(int sort) {
+                this.sort = sort;
+            }
+
+            public int getPost_type() {
+                return post_type;
+            }
+
+            public void setPost_type(int post_type) {
+                this.post_type = post_type;
+            }
+
+            public int getParent_id() {
+                return parent_id;
+            }
+
+            public void setParent_id(int parent_id) {
+                this.parent_id = parent_id;
             }
         }
     }

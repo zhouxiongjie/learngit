@@ -24,28 +24,22 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.BounceInterpolator;
-import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
 import com.aliyun.vodplayer.media.IAliyunVodPlayer;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
-import com.shuangling.software.activity.SingleAudioDetailActivity;
 import com.shuangling.software.customview.FloatView;
 import com.shuangling.software.customview.ProgressCircleImageView;
 import com.shuangling.software.entity.AudioInfo;
 import com.shuangling.software.event.PlayerEvent;
 import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.service.IAudioPlayer;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -344,7 +338,7 @@ public class FloatWindowUtil {
                     try{
                         AudioInfo audio=mAudioPlayer.getCurrentAudio();
                         if(audio.getIsRadio()==0){
-                            Intent it=new Intent(mContext,SingleAudioDetailActivity.class);
+                            Intent it=new Intent(mContext,AudioDetailActivity.class);
                             it.putExtra("audioId",audio.getId());
                             it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
                             mContext.startActivity(it);

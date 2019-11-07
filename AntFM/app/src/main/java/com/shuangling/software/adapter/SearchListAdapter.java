@@ -16,18 +16,15 @@ import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.AnchorDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
-import com.shuangling.software.activity.RadioListActivity;
-import com.shuangling.software.activity.SingleAudioDetailActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.TvDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.entity.SearchResult;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
-
 import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -126,7 +123,7 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             audioViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, SingleAudioDetailActivity.class);
+                    Intent it = new Intent(mContext,AudioDetailActivity.class);
                     it.putExtra("audioId", content.getId());
                     mContext.startActivity(it);
                 }

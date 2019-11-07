@@ -38,17 +38,26 @@ import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.AnchorDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.CityListActivity;
+import com.shuangling.software.activity.ContentActivity;
+import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.LoginActivity;
 import com.shuangling.software.activity.MainActivity;
 import com.shuangling.software.activity.MessageListActivity;
 import com.shuangling.software.activity.MoreAnchorOrOrganizationActivity;
 import com.shuangling.software.activity.MoreServiceActivity;
 import com.shuangling.software.activity.OrganizationDetailActivity;
+import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.activity.RadioListActivity;
 import com.shuangling.software.activity.SearchActivity;
 import com.shuangling.software.activity.ServiceDetailActivity;
+import com.shuangling.software.activity.SpecialDetailActivity;
+import com.shuangling.software.activity.TvDetailActivity;
+import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.activity.WebViewBackActivity;
 import com.shuangling.software.adapter.ColumnContentAdapter;
@@ -56,7 +65,9 @@ import com.shuangling.software.adapter.MoudleGridViewAdapter;
 import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.MyGridView;
 import com.shuangling.software.entity.Anchor;
+import com.shuangling.software.entity.AudioInfo;
 import com.shuangling.software.entity.BannerInfo;
+import com.shuangling.software.entity.City;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.DecorModule;
@@ -87,7 +98,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import okhttp3.Call;
-import okhttp3.Response;
+
 
 
 public class IndexFragment extends Fragment implements Handler.Callback {
@@ -156,7 +167,8 @@ public class IndexFragment extends Fragment implements Handler.Callback {
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
-                indexDecorate();
+                initStation();
+                //indexDecorate();
             }
         });
         refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
@@ -165,7 +177,17 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
             }
         });
+        if(MyApplication.getInstance().getStation()!=null&&MyApplication.getInstance().getStation().getIs_league()==0){
+           city.setCompoundDrawables(null, null, null, null);
+        }
         getRecommendColumns();
+        if(MainActivity.sCurrentCity!=null){
+            city.setText(MainActivity.sCurrentCity.getName());
+            //getCityAnchors();
+            weather();
+            //getCityColumns("");
+            indexDecorate();
+        }
         return view;
 
     }
@@ -181,7 +203,11 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.city:
-                startActivity(new Intent(getContext(), CityListActivity.class));
+                if(MyApplication.getInstance().getStation()!=null&&MyApplication.getInstance().getStation().getIs_league()==1){
+                    //固定
+                    startActivity(new Intent(getContext(), CityListActivity.class));
+                }
+
                 break;
             case R.id.search:
                 startActivity(new Intent(getContext(), SearchActivity.class));
@@ -190,6 +216,53 @@ public class IndexFragment extends Fragment implements Handler.Callback {
         }
     }
 
+
+
+    public void initStation(){
+        String url = ServerInfo.serviceIP + ServerInfo.getStationInfo;
+        Map<String, String> params = new HashMap<String, String>();
+
+        OkHttpUtils.getNotAuthorization(url, params, new OkHttpCallback(getContext()) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                if (refreshLayout.isRefreshing()) {
+                    refreshLayout.finishRefresh();
+                }
+                try{
+
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        Station station = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), Station.class);
+                        MyApplication.getInstance().setStation(station);
+
+                        if(MyApplication.getInstance().getStation()!=null&&MyApplication.getInstance().getStation().getIs_league()==0){
+                            MainActivity.sCurrentCity = new City(Integer.parseInt(MyApplication.getInstance().getStation().getCity_info().getCode()), MyApplication.getInstance().getStation().getCity_info().getName(), "#");
+                        }
+                    }
+
+                    EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
+
+
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                if (refreshLayout.isRefreshing()) {
+                    refreshLayout.finishRefresh();
+                }
+                EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
+
+            }
+        });
+    }
 
     public void indexDecorate() {
 
@@ -214,7 +287,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
                 if (refreshLayout.isRefreshing()) {
                     refreshLayout.finishRefresh();
@@ -251,7 +324,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -283,7 +356,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -312,7 +385,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -350,7 +423,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -388,7 +461,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -422,7 +495,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -436,7 +509,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
         String url = ServerInfo.serviceIP + ServerInfo.getColumnContent + typeId;
         Map<String, String> params = new HashMap<String, String>();
         params.put("limit", contentNumber);
-        params.put("sorceType", "1");
+        params.put("sorce_type", "1");
         params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
         params.put("order_by", "1");
 
@@ -456,7 +529,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
 
             }
@@ -485,7 +558,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
                 exception.printStackTrace();
 
 
@@ -834,6 +907,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height);
                                     params.leftMargin = CommonUtils.dip2px(20);
                                     params.rightMargin = CommonUtils.dip2px(20);
+                                    params.bottomMargin=CommonUtils.dip2px(5);
                                     //params.topMargin = CommonUtils.dip2px(20);
                                     contentLayout.addView(bannerView, params);
                                     List<BannerView.Banner> banners = new ArrayList<>();
@@ -896,7 +970,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                                 MyGridView gv = v.findViewById(R.id.gridView);
                                                 gv.setNumColumns(cols);
                                                 List<DecorModule.ContentsBean> contents = new ArrayList<>();
-                                                for (int i = position * cols; i < (position + 1) * cols && i < module.getContents().size(); i++) {
+                                                for (int i = position * cols*2; i < (position + 1) * cols*2 && i < module.getContents().size(); i++) {
                                                     contents.add(module.getContents().get(i));
                                                 }
                                                 final MoudleGridViewAdapter adapter = new MoudleGridViewAdapter(getActivity(), contents);
@@ -905,21 +979,100 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                                     @Override
                                                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                                                         DecorModule.ContentsBean cb=adapter.getItem(position);
-                                                        if(cb.getSource_url().endsWith("tv")){
+                                                        if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/tv")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/tv")){
                                                             Intent it=new Intent(getContext(),RadioListActivity.class);
                                                             it.putExtra("type","2");
                                                             startActivity(it);
-                                                        }else if(cb.getSource_url().endsWith("radios")){
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/radios/")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/radios/")){
+                                                            String radioId=cb.getSource_url().substring(cb.getSource_url().lastIndexOf("/")+1);
+                                                            Intent it=new Intent(getContext(),TvDetailActivity.class);
+                                                            it.putExtra("radioId",Integer.parseInt(radioId));
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/radios")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/radios")){
                                                             Intent it=new Intent(getContext(),RadioListActivity.class);
                                                             it.putExtra("type","1");
                                                             startActivity(it);
-                                                        }else if(cb.getTitle().endsWith("政务")){
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/radios/")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/radios/")){
+                                                            String radioId=cb.getSource_url().substring(cb.getSource_url().lastIndexOf("/")+1);
+                                                            Intent it=new Intent(getContext(),RadioDetailActivity.class);
+                                                            it.putExtra("radioId",Integer.parseInt(radioId));
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/gover")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/gover")){
                                                             Intent it=new Intent(getContext(),WebViewActivity.class);
                                                             it.putExtra("url",cb.getSource_url());
                                                             startActivity(it);
-                                                        }else if(cb.getTitle().endsWith("党建")){
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/dj")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/dj")){
                                                             Intent it=new Intent(getContext(),WebViewActivity.class);
                                                             it.putExtra("url",cb.getSource_url());
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/cates/")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/cates/")){
+                                                            //跳转栏目
+                                                            String columnid=cb.getSource_url().substring(cb.getSource_url().lastIndexOf("/")+1);
+                                                            Column column=new Column();
+                                                            column.setId(Integer.parseInt(columnid));
+                                                            ((MainActivity)getActivity()).switchRecommend(column);
+
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/specials/")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/specials/")){
+                                                            //跳转栏目
+                                                            int columnid=0;
+                                                            for(int i=0;i<mColumns.size();i++){
+                                                                if(mColumns.get(i).getType()==1){
+                                                                    columnid=mColumns.get(i).getId();
+                                                                    break;
+                                                                }
+                                                            }
+                                                            Column column=new Column();
+                                                            column.setId(columnid);
+                                                            ((MainActivity)getActivity()).switchRecommend(column);
+
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/orgs/")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/orgs/")){
+                                                            String organizationId=cb.getSource_url().substring(cb.getSource_url().lastIndexOf("/")+1);
+                                                            Intent it = new Intent(getContext(), OrganizationDetailActivity.class);
+                                                            it.putExtra("organizationId", Integer.parseInt(organizationId));
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/anchors/")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/anchors/")){
+                                                            String anchorId=cb.getSource_url().substring(cb.getSource_url().lastIndexOf("/")+1);
+                                                            Intent it = new Intent(getContext(), AnchorDetailActivity.class);
+                                                            it.putExtra("anchorId", Integer.parseInt(anchorId));
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/atlas/")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/atlas/")){
+                                                            String galleriaId=cb.getSource_url().substring(cb.getSource_url().lastIndexOf("/")+1);
+                                                            Intent it = new Intent(getContext(), GalleriaActivity.class);
+                                                            it.putExtra("galleriaId", Integer.parseInt(galleriaId));
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/albums/")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/albums/")){
+                                                            String albumId=cb.getSource_url().substring(cb.getSource_url().lastIndexOf("/")+1);
+                                                            Intent it = new Intent(getContext(), AlbumDetailActivity.class);
+                                                            it.putExtra("albumId", Integer.parseInt(albumId));
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/audios/")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/audios/")){
+                                                            String audioId=cb.getSource_url().substring(cb.getSource_url().lastIndexOf("/")+1);
+                                                            Intent it = new Intent(getContext(), AudioDetailActivity.class);
+                                                            it.putExtra("audioId", Integer.parseInt(audioId));
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/posts/")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/posts/")){
+                                                            String articleId=cb.getSource_url().substring(cb.getSource_url().lastIndexOf("/")+1);
+                                                            Intent it = new Intent(getContext(), ArticleDetailActivity.class);
+                                                            it.putExtra("articleId", Integer.parseInt(articleId));
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/specials/")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/specials/")){
+                                                            String specialId=cb.getSource_url().substring(cb.getSource_url().lastIndexOf("/")+1);
+                                                            Intent it = new Intent(getContext(), SpecialDetailActivity.class);
+                                                            it.putExtra("specialId", Integer.parseInt(specialId));
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/videos/")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/videos/")){
+                                                            String videoId=cb.getSource_url().substring(cb.getSource_url().lastIndexOf("/")+1);
+                                                            Intent it = new Intent(getContext(), VideoDetailActivity.class);
+                                                            it.putExtra("videoId",Integer.parseInt(videoId));
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/subcates/")||cb.getSource_url().startsWith(ServerInfo.h5IP+"/subcates/")){
+                                                            String url=cb.getSource_url();
+                                                            String columnid=url.substring(url.lastIndexOf("/")+1,url.lastIndexOf("?"));
+                                                            Column column=new Column();
+                                                            column.setId(Integer.parseInt(columnid));
+                                                            column.setName(url.substring(url.lastIndexOf("=")+1));
+                                                            Intent it = new Intent(getContext(), ContentActivity.class);
+                                                            it.putExtra("column", column);
                                                             startActivity(it);
                                                         }else {
                                                             Intent it=new Intent(getContext(),WebViewBackActivity.class);
@@ -953,7 +1106,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
                                             @Override
                                             public int getCount() {
-                                                return (module.getContents().size() + cols-1) / cols;
+                                                return (module.getContents().size() + cols*2-1) / (cols*2);
                                             }
                                         };
 
@@ -1011,23 +1164,112 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                             anchorView.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
-                                                    if(content.getSource_url().endsWith("tv")){
+
+                                                    if(content.getSource_url().startsWith(ServerInfo.h5IP+"/tv")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/tv")){
                                                         Intent it=new Intent(getContext(),RadioListActivity.class);
                                                         it.putExtra("type","2");
                                                         startActivity(it);
-                                                    }else if(content.getSource_url().endsWith("radios")){
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/radios/")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/radios/")){
+                                                        String radioId=content.getSource_url().substring(content.getSource_url().lastIndexOf("/")+1);
+                                                        Intent it=new Intent(getContext(),TvDetailActivity.class);
+                                                        it.putExtra("radioId",Integer.parseInt(radioId));
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/radios")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/radios")){
                                                         Intent it=new Intent(getContext(),RadioListActivity.class);
                                                         it.putExtra("type","1");
                                                         startActivity(it);
-                                                    }else if(content.getSource_url().endsWith("liveprogramlist")){
-                                                        Intent it=new Intent(getContext(),WebViewBackActivity.class);
-                                                        it.putExtra("url",content.getSource_url());
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/radios/")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/radios/")){
+                                                        String radioId=content.getSource_url().substring(content.getSource_url().lastIndexOf("/")+1);
+                                                        Intent it=new Intent(getContext(),RadioDetailActivity.class);
+                                                        it.putExtra("radioId",Integer.parseInt(radioId));
                                                         startActivity(it);
-                                                    }else {
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/gover")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/gover")){
                                                         Intent it=new Intent(getContext(),WebViewActivity.class);
                                                         it.putExtra("url",content.getSource_url());
                                                         startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/dj")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/dj")){
+                                                        Intent it=new Intent(getContext(),WebViewActivity.class);
+                                                        it.putExtra("url",content.getSource_url());
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/cates/")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/cates/")){
+                                                        //跳转栏目
+                                                        String columnid=content.getSource_url().substring(content.getSource_url().lastIndexOf("/")+1);
+                                                        Column column=new Column();
+                                                        column.setId(Integer.parseInt(columnid));
+                                                        ((MainActivity)getActivity()).switchRecommend(column);
+
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/specials/")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/specials/")){
+                                                        //跳转栏目
+                                                        int columnid=0;
+                                                        for(int i=0;i<mColumns.size();i++){
+                                                            if(mColumns.get(i).getType()==1){
+                                                                columnid=mColumns.get(i).getId();
+                                                                break;
+                                                            }
+                                                        }
+                                                        Column column=new Column();
+                                                        column.setId(columnid);
+                                                        ((MainActivity)getActivity()).switchRecommend(column);
+
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/orgs/")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/orgs/")){
+                                                        String organizationId=content.getSource_url().substring(content.getSource_url().lastIndexOf("/")+1);
+                                                        Intent it = new Intent(getContext(), OrganizationDetailActivity.class);
+                                                        it.putExtra("organizationId", Integer.parseInt(organizationId));
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/anchors/")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/anchors/")){
+                                                        String anchorId=content.getSource_url().substring(content.getSource_url().lastIndexOf("/")+1);
+                                                        Intent it = new Intent(getContext(), AnchorDetailActivity.class);
+                                                        it.putExtra("anchorId", Integer.parseInt(anchorId));
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/atlas/")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/atlas/")){
+                                                        String galleriaId=content.getSource_url().substring(content.getSource_url().lastIndexOf("/")+1);
+                                                        Intent it = new Intent(getContext(), GalleriaActivity.class);
+                                                        it.putExtra("galleriaId", Integer.parseInt(galleriaId));
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/albums/")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/albums/")){
+                                                        String albumId=content.getSource_url().substring(content.getSource_url().lastIndexOf("/")+1);
+                                                        Intent it = new Intent(getContext(), AlbumDetailActivity.class);
+                                                        it.putExtra("albumId", Integer.parseInt(albumId));
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/audios/")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/audios/")){
+                                                        String audioId=content.getSource_url().substring(content.getSource_url().lastIndexOf("/")+1);
+                                                        Intent it = new Intent(getContext(), AudioDetailActivity.class);
+                                                        it.putExtra("audioId", Integer.parseInt(audioId));
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/posts/")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/posts/")){
+                                                        String articleId=content.getSource_url().substring(content.getSource_url().lastIndexOf("/")+1);
+                                                        Intent it = new Intent(getContext(), ArticleDetailActivity.class);
+                                                        it.putExtra("articleId", Integer.parseInt(articleId));
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/specials/")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/specials/")){
+                                                        String specialId=content.getSource_url().substring(content.getSource_url().lastIndexOf("/")+1);
+                                                        Intent it = new Intent(getContext(), SpecialDetailActivity.class);
+                                                        it.putExtra("specialId", Integer.parseInt(specialId));
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/videos/")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/videos/")){
+                                                        String videoId=content.getSource_url().substring(content.getSource_url().lastIndexOf("/")+1);
+                                                        Intent it = new Intent(getContext(), VideoDetailActivity.class);
+                                                        it.putExtra("videoId",Integer.parseInt(videoId));
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/subcates/")||content.getSource_url().startsWith(ServerInfo.h5IP+"/subcates/")){
+                                                        String url=content.getSource_url();
+                                                        String columnid=url.substring(url.lastIndexOf("/")+1,url.lastIndexOf("?"));
+                                                        Column column=new Column();
+                                                        column.setId(Integer.parseInt(columnid));
+                                                        column.setName(url.substring(url.lastIndexOf("=")+1));
+                                                        Intent it = new Intent(getContext(), ContentActivity.class);
+                                                        it.putExtra("column", column);
+                                                        startActivity(it);
+                                                    }else {
+                                                        Intent it=new Intent(getContext(),WebViewBackActivity.class);
+                                                        it.putExtra("url",content.getSource_url());
+                                                        it.putExtra("title",content.getTitle());
+                                                        startActivity(it);
                                                     }
+
+
+
+
                                                 }
                                             });
 
@@ -1052,10 +1294,10 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                 anchorTitle.setText(module.getTitle());
                                 SimpleDraweeView logo=anchorLayout.findViewById(R.id.logo);
                                 Station station=MyApplication.getInstance().getStation();
-                                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
-                                    Uri uri = Uri.parse(station.getIcon2());
-                                    int width=CommonUtils.dip2px(15);
-                                    int height=width;
+                                if(station!=null&&!TextUtils.isEmpty(station.getIcon3())){
+                                    Uri uri = Uri.parse(station.getIcon3());
+                                    int width=CommonUtils.dip2px(9);
+                                    int height=width*2;
                                     ImageLoader.showThumb(uri,logo,width,height);
                                 }else{
                                     logo.setVisibility(View.GONE);
@@ -1073,10 +1315,10 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                 servicesLayout = serviceLayout.findViewById(R.id.servicesLayout);
                                 SimpleDraweeView logo=serviceLayout.findViewById(R.id.logo);
                                 Station station=MyApplication.getInstance().getStation();
-                                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
-                                    Uri uri = Uri.parse(station.getIcon2());
-                                    int width=CommonUtils.dip2px(15);
-                                    int height=width;
+                                if(station!=null&&!TextUtils.isEmpty(station.getIcon3())){
+                                    Uri uri = Uri.parse(station.getIcon3());
+                                    int width=CommonUtils.dip2px(9);
+                                    int height=width*2;
                                     ImageLoader.showThumb(uri,logo,width,height);
                                 }else{
                                     logo.setVisibility(View.GONE);
@@ -1107,10 +1349,10 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                 title.setText("机构");
                                 SimpleDraweeView logo=anchorLayout.findViewById(R.id.logo);
                                 Station station=MyApplication.getInstance().getStation();
-                                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
-                                    Uri uri = Uri.parse(station.getIcon2());
-                                    int width=CommonUtils.dip2px(15);
-                                    int height=width;
+                                if(station!=null&&!TextUtils.isEmpty(station.getIcon3())){
+                                    Uri uri = Uri.parse(station.getIcon3());
+                                    int width=CommonUtils.dip2px(9);
+                                    int height=width*2;
                                     ImageLoader.showThumb(uri,logo,width,height);
                                 }else{
                                     logo.setVisibility(View.GONE);
@@ -1122,7 +1364,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                 getCityOrganization( module.getOrder_by(),module.getContent_number());
 
 
-                            } else {
+                            } else if (module.getType() == 6){
                                 //资讯
                                 LayoutInflater inflater = LayoutInflater.from(getContext());
                                 View clolumnLayout = inflater.inflate(R.layout.index_column_item, contentLayout, false);
@@ -1132,10 +1374,10 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                 column.setText(module.getTitle());
 
                                 Station station=MyApplication.getInstance().getStation();
-                                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
-                                    Uri uri = Uri.parse(station.getIcon2());
-                                    int width=CommonUtils.dip2px(15);
-                                    int height=width;
+                                if(station!=null&&!TextUtils.isEmpty(station.getIcon3())){
+                                    Uri uri = Uri.parse(station.getIcon3());
+                                    int width=CommonUtils.dip2px(9);
+                                    int height=width*2;
                                     ImageLoader.showThumb(uri,logo,width,height);
                                 }else{
                                     logo.setVisibility(View.GONE);

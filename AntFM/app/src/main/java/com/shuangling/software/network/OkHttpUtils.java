@@ -9,6 +9,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.activity.LoginActivity;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.utils.ServerInfo;
+import com.shuangling.software.utils.SharedPreferencesUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +54,7 @@ public class OkHttpUtils {
 
 
 
-	public static void post(String url, Map<String,String> params, List<File> files, final OkHttpCallback callback){
+	public static void post(final String url, final Map<String,String> params, final List<File> files, final OkHttpCallback callback){
 		Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 		if(params!=null&&params.size()>0){
 			for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -104,20 +106,28 @@ public class OkHttpUtils {
 					JSONObject jsonObject = JSONObject.parseObject(resp);
 					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
 						//授权失败，token过期
-						mHandler.post(new Runnable() {
-							@Override
-							public void run() {
-								ToastUtils.show("您的登录信息已失效，请重新登录");
-								Intent it=new Intent(callback.getContext(),LoginActivity.class);
-								callback.getContext().startActivity(it);
-							}
-						});
+//						mHandler.post(new Runnable() {
+//							@Override
+//							public void run() {
+//
+//								Map<String,String> par=new HashMap<>();
+//								par.put("refresh_token",User.getInstance().getRefresh_token());
+//								post(ServerInfo.serviceIP + ServerInfo.refreshTokenLogin,par,);
+//
+//								ToastUtils.show("您的登录信息已失效，请重新登录");
+//								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+//								callback.getContext().startActivity(it);
+//							}
+//						});
+						postRefreshTokenLogin(url, params, files, callback);
+
+
 
 					}else{
 						callback.onResponse(call,resp);
 					}
 				}catch (Exception e){
-
+					callback.onFailure(call,e);
 				}
 
 
@@ -133,7 +143,7 @@ public class OkHttpUtils {
 
 
 
-	public static void postWithFile(String url, Map<String, String> textMap, Map<String, String> fileMap, final OkHttpCallback callback){
+	public static void postWithFile(final String url, final Map<String, String> textMap, final Map<String, String> fileMap, final OkHttpCallback callback){
 		Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 		if(textMap!=null&&textMap.size()>0){
 			for (Map.Entry<String, String> entry : textMap.entrySet()) {
@@ -189,26 +199,53 @@ public class OkHttpUtils {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
+//				try{
+//					int code=response.code();
+//					String resp=response.body().string();
+//					JSONObject jsonObject = JSONObject.parseObject(resp);
+//					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
+//						//授权失败，token过期
+//						mHandler.post(new Runnable() {
+//							@Override
+//							public void run() {
+//								ToastUtils.show("您的登录信息已失效，请重新登录");
+//								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+//								callback.getContext().startActivity(it);
+//							}
+//						});
+//
+//					}else{
+//						callback.onResponse(call,resp);
+//					}
+//				}catch (Exception e){
+//
+//				}
 				try{
 					int code=response.code();
 					String resp=response.body().string();
 					JSONObject jsonObject = JSONObject.parseObject(resp);
 					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
 						//授权失败，token过期
-						mHandler.post(new Runnable() {
-							@Override
-							public void run() {
-								ToastUtils.show("您的登录信息已失效，请重新登录");
-								Intent it=new Intent(callback.getContext(),LoginActivity.class);
-								callback.getContext().startActivity(it);
-							}
-						});
+//						mHandler.post(new Runnable() {
+//							@Override
+//							public void run() {
+//
+//								Map<String,String> par=new HashMap<>();
+//								par.put("refresh_token",User.getInstance().getRefresh_token());
+//								post(ServerInfo.serviceIP + ServerInfo.refreshTokenLogin,par,);
+//
+//								ToastUtils.show("您的登录信息已失效，请重新登录");
+//								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+//								callback.getContext().startActivity(it);
+//							}
+//						});
+						postRefreshTokenLogin(url, textMap, fileMap,callback);
 
 					}else{
 						callback.onResponse(call,resp);
 					}
 				}catch (Exception e){
-
+					callback.onFailure(call,e);
 				}
 
 			}
@@ -218,7 +255,7 @@ public class OkHttpUtils {
 
 
 
-	public static void post(String url, Map<String,String> params, final OkHttpCallback callback){
+	public static void post(final String url, final Map<String,String> params, final OkHttpCallback callback){
 		FormBody.Builder builder = new FormBody.Builder();
 		if(params!=null&&params.size()>0){
 			for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -240,26 +277,41 @@ public class OkHttpUtils {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
+//				try{
+//					int code=response.code();
+//					String resp=response.body().string();
+//					JSONObject jsonObject = JSONObject.parseObject(resp);
+//					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
+//						//授权失败，token过期
+//						mHandler.post(new Runnable() {
+//							@Override
+//							public void run() {
+//								ToastUtils.show("您的登录信息已失效，请重新登录");
+//								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+//								callback.getContext().startActivity(it);
+//							}
+//						});
+//
+//					}else{
+//						callback.onResponse(call,resp);
+//					}
+//				}catch (Exception e){
+//
+//				}
+
 				try{
 					int code=response.code();
 					String resp=response.body().string();
 					JSONObject jsonObject = JSONObject.parseObject(resp);
 					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
-						//授权失败，token过期
-						mHandler.post(new Runnable() {
-							@Override
-							public void run() {
-								ToastUtils.show("您的登录信息已失效，请重新登录");
-								Intent it=new Intent(callback.getContext(),LoginActivity.class);
-								callback.getContext().startActivity(it);
-							}
-						});
+
+						postRefreshTokenLogin(url,params,callback);
 
 					}else{
 						callback.onResponse(call,resp);
 					}
 				}catch (Exception e){
-
+					callback.onFailure(call,e);
 				}
 
 			}
@@ -267,7 +319,7 @@ public class OkHttpUtils {
 	}
 
 
-	public static void put(String url, Map<String,String> params, final OkHttpCallback callback){
+	public static void put(final String url, final Map<String,String> params, final OkHttpCallback callback){
 		FormBody.Builder builder = new FormBody.Builder();
 		if(params!=null&&params.size()>0){
 			for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -289,26 +341,42 @@ public class OkHttpUtils {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
+//				try{
+//					int code=response.code();
+//					String resp=response.body().string();
+//					JSONObject jsonObject = JSONObject.parseObject(resp);
+//					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
+//						//授权失败，token过期
+//						mHandler.post(new Runnable() {
+//							@Override
+//							public void run() {
+//								ToastUtils.show("您的登录信息已失效，请重新登录");
+//								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+//								callback.getContext().startActivity(it);
+//							}
+//						});
+//
+//					}else{
+//						callback.onResponse(call,resp);
+//					}
+//				}catch (Exception e){
+//
+//				}
+
+
 				try{
 					int code=response.code();
 					String resp=response.body().string();
 					JSONObject jsonObject = JSONObject.parseObject(resp);
 					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
-						//授权失败，token过期
-						mHandler.post(new Runnable() {
-							@Override
-							public void run() {
-								ToastUtils.show("您的登录信息已失效，请重新登录");
-								Intent it=new Intent(callback.getContext(),LoginActivity.class);
-								callback.getContext().startActivity(it);
-							}
-						});
+
+						putRefreshTokenLogin(url,params,callback);
 
 					}else{
 						callback.onResponse(call,resp);
 					}
 				}catch (Exception e){
-
+					callback.onFailure(call,e);
 				}
 
 			}
@@ -317,7 +385,7 @@ public class OkHttpUtils {
 
 
 
-	public static void delete(String url, Map<String,String> params, final OkHttpCallback callback){
+	public static void delete(final String url, final Map<String,String> params, final OkHttpCallback callback){
 		FormBody.Builder builder = new FormBody.Builder();
 		if(params!=null&&params.size()>0){
 			for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -339,26 +407,40 @@ public class OkHttpUtils {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
+//				try{
+//					int code=response.code();
+//					String resp=response.body().string();
+//					JSONObject jsonObject = JSONObject.parseObject(resp);
+//					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
+//						//授权失败，token过期
+//						mHandler.post(new Runnable() {
+//							@Override
+//							public void run() {
+//								ToastUtils.show("您的登录信息已失效，请重新登录");
+//								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+//								callback.getContext().startActivity(it);
+//							}
+//						});
+//
+//					}else{
+//						callback.onResponse(call,resp);
+//					}
+//				}catch (Exception e){
+//
+//				}
 				try{
 					int code=response.code();
 					String resp=response.body().string();
 					JSONObject jsonObject = JSONObject.parseObject(resp);
 					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
-						//授权失败，token过期
-						mHandler.post(new Runnable() {
-							@Override
-							public void run() {
-								ToastUtils.show("您的登录信息已失效，请重新登录");
-								Intent it=new Intent(callback.getContext(),LoginActivity.class);
-								callback.getContext().startActivity(it);
-							}
-						});
+
+						deleteRefreshTokenLogin(url,params,callback);
 
 					}else{
 						callback.onResponse(call,resp);
 					}
 				}catch (Exception e){
-
+					callback.onFailure(call,e);
 				}
 
 			}
@@ -367,7 +449,7 @@ public class OkHttpUtils {
 
 
 
-	public static void get(String url, Map<String,String> params, final OkHttpCallback callback){
+	public static void get(final String url, final Map<String,String> params, final OkHttpCallback callback){
 		String newUrl=url;
 		if(params!=null&&params.size()>0){
 			newUrl+="?";
@@ -394,26 +476,41 @@ public class OkHttpUtils {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
+//				try{
+//					int code=response.code();
+//					String resp=response.body().string();
+//					JSONObject jsonObject = JSONObject.parseObject(resp);
+//					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
+//						//授权失败，token过期
+//						mHandler.post(new Runnable() {
+//							@Override
+//							public void run() {
+//								ToastUtils.show("您的登录信息已失效，请重新登录");
+//								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+//								callback.getContext().startActivity(it);
+//							}
+//						});
+//
+//					}else{
+//						callback.onResponse(call,resp);
+//					}
+//				}catch (Exception e){
+//
+//				}
+
 				try{
 					int code=response.code();
 					String resp=response.body().string();
 					JSONObject jsonObject = JSONObject.parseObject(resp);
 					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
-						//授权失败，token过期
-						mHandler.post(new Runnable() {
-							@Override
-							public void run() {
-								ToastUtils.show("您的登录信息已失效，请重新登录");
-								Intent it=new Intent(callback.getContext(),LoginActivity.class);
-								callback.getContext().startActivity(it);
-							}
-						});
+
+						getRefreshTokenLogin(url,params,callback);
 
 					}else{
 						callback.onResponse(call,resp);
 					}
 				}catch (Exception e){
-
+					callback.onFailure(call,e);
 				}
 
 
@@ -446,25 +543,369 @@ public class OkHttpUtils {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
+
 				try{
 					int code=response.code();
 					String resp=response.body().string();
 					JSONObject jsonObject = JSONObject.parseObject(resp);
-
 					callback.onResponse(call,resp);
 
 				}catch (Exception e){
-
+					callback.onFailure(call,e);
 				}
+
 
 
 			}
 		});
 
 	}
-	
 
-	
+
+
+
+
+	public static void postRefreshTokenLogin(final String url, final Map<String,String> params, final List<File> files, final OkHttpCallback callback){
+		String loginUrl = ServerInfo.serviceIP + ServerInfo.refreshTokenLogin;
+		Map<String, String> loginParams = new HashMap<String, String>();
+		loginParams.put("refresh_token", User.getInstance().getRefresh_token());
+
+		FormBody.Builder builder = new FormBody.Builder();
+		if(loginParams!=null&&loginParams.size()>0){
+			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
+				builder.add(entry.getKey(),entry.getValue()) ;
+			}
+		}
+		FormBody body = builder.build();
+		Request request= new Request.Builder().url(loginUrl).addHeader("Content-Type","application/json").post(body).build();
+
+		okHttpClient.newCall(request).enqueue(new Callback() {
+
+			@Override
+			public void onFailure(Call call, IOException e) {
+				callback.onFailure(call,e);
+			}
+
+			@Override
+			public void onResponse(Call call, Response response) throws IOException {
+				try{
+					int code=response.code();
+					String resp=response.body().string();
+					JSONObject jsonObject = JSONObject.parseObject(resp);
+					if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+						User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
+						user.setRefresh_token(User.getInstance().getRefresh_token());
+						User.setInstance(user);
+						SharedPreferencesUtils.saveUser(user);
+						post(url, params, files, callback);
+
+					}else if(jsonObject != null && jsonObject.getIntValue("code") == 303001){
+						mHandler.post(new Runnable() {
+							@Override
+							public void run() {
+								ToastUtils.show("您的登录信息已失效，请重新登录");
+								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+								callback.getContext().startActivity(it);
+							}
+						});
+					}else{
+						callback.onResponse(call,resp);
+					}
+				}catch (Exception e){
+					callback.onFailure(call,e);
+				}
+
+			}
+		});
+
+
+	}
+
+
+
+	public static void postRefreshTokenLogin(final String url, final Map<String, String> textMap, final Map<String, String> fileMap, final OkHttpCallback callback){
+		String loginUrl = ServerInfo.serviceIP + ServerInfo.refreshTokenLogin;
+		Map<String, String> loginParams = new HashMap<String, String>();
+		loginParams.put("refresh_token", User.getInstance().getRefresh_token());
+
+		FormBody.Builder builder = new FormBody.Builder();
+		if(loginParams!=null&&loginParams.size()>0){
+			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
+				builder.add(entry.getKey(),entry.getValue()) ;
+			}
+		}
+		FormBody body = builder.build();
+		Request request= new Request.Builder().url(loginUrl).addHeader("Content-Type","application/json").post(body).build();
+
+		okHttpClient.newCall(request).enqueue(new Callback() {
+
+			@Override
+			public void onFailure(Call call, IOException e) {
+				callback.onFailure(call,e);
+			}
+
+			@Override
+			public void onResponse(Call call, Response response) throws IOException {
+				try{
+					int code=response.code();
+					String resp=response.body().string();
+					JSONObject jsonObject = JSONObject.parseObject(resp);
+					if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+						User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
+						user.setRefresh_token(User.getInstance().getRefresh_token());
+						User.setInstance(user);
+						SharedPreferencesUtils.saveUser(user);
+						postWithFile(url,textMap,fileMap,callback);
+
+					}else if(jsonObject != null && jsonObject.getIntValue("code") == 303001){
+						mHandler.post(new Runnable() {
+							@Override
+							public void run() {
+								ToastUtils.show("您的登录信息已失效，请重新登录");
+								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+								callback.getContext().startActivity(it);
+							}
+						});
+					}else{
+						callback.onResponse(call,resp);
+					}
+				}catch (Exception e){
+					callback.onFailure(call,e);
+				}
+
+			}
+		});
+
+
+	}
+
+	public static void postRefreshTokenLogin(final String url, final Map<String,String> params, final OkHttpCallback callback){
+		String loginUrl = ServerInfo.serviceIP + ServerInfo.refreshTokenLogin;
+		Map<String, String> loginParams = new HashMap<String, String>();
+		loginParams.put("refresh_token", User.getInstance().getRefresh_token());
+
+		FormBody.Builder builder = new FormBody.Builder();
+		if(loginParams!=null&&loginParams.size()>0){
+			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
+				builder.add(entry.getKey(),entry.getValue()) ;
+			}
+		}
+		FormBody body = builder.build();
+		Request request= new Request.Builder().url(loginUrl).addHeader("Content-Type","application/json").post(body).build();
+
+		okHttpClient.newCall(request).enqueue(new Callback() {
+
+			@Override
+			public void onFailure(Call call, IOException e) {
+				callback.onFailure(call,e);
+			}
+
+			@Override
+			public void onResponse(Call call, Response response) throws IOException {
+				try{
+					int code=response.code();
+					String resp=response.body().string();
+					JSONObject jsonObject = JSONObject.parseObject(resp);
+					if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+						User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
+						user.setRefresh_token(User.getInstance().getRefresh_token());
+						User.setInstance(user);
+						SharedPreferencesUtils.saveUser(user);
+						post(url,params,callback);
+
+					}else if(jsonObject != null && jsonObject.getIntValue("code") == 303001){
+						mHandler.post(new Runnable() {
+							@Override
+							public void run() {
+								ToastUtils.show("您的登录信息已失效，请重新登录");
+								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+								callback.getContext().startActivity(it);
+							}
+						});
+					}else{
+						callback.onResponse(call,resp);
+					}
+				}catch (Exception e){
+					callback.onFailure(call,e);
+				}
+
+			}
+		});
+
+
+	}
+
+	public static void putRefreshTokenLogin(final String url, final Map<String,String> params, final OkHttpCallback callback){
+		String loginUrl = ServerInfo.serviceIP + ServerInfo.refreshTokenLogin;
+		Map<String, String> loginParams = new HashMap<String, String>();
+		loginParams.put("refresh_token", User.getInstance().getRefresh_token());
+
+		FormBody.Builder builder = new FormBody.Builder();
+		if(loginParams!=null&&loginParams.size()>0){
+			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
+				builder.add(entry.getKey(),entry.getValue()) ;
+			}
+		}
+		FormBody body = builder.build();
+		Request request= new Request.Builder().url(loginUrl).addHeader("Content-Type","application/json").post(body).build();
+
+		okHttpClient.newCall(request).enqueue(new Callback() {
+
+			@Override
+			public void onFailure(Call call, IOException e) {
+				callback.onFailure(call,e);
+			}
+
+			@Override
+			public void onResponse(Call call, Response response) throws IOException {
+				try{
+					int code=response.code();
+					String resp=response.body().string();
+					JSONObject jsonObject = JSONObject.parseObject(resp);
+					if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+						User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
+						user.setRefresh_token(User.getInstance().getRefresh_token());
+						User.setInstance(user);
+						SharedPreferencesUtils.saveUser(user);
+						put(url,params,callback);
+
+					}else if(jsonObject != null && jsonObject.getIntValue("code") == 303001){
+						mHandler.post(new Runnable() {
+							@Override
+							public void run() {
+								ToastUtils.show("您的登录信息已失效，请重新登录");
+								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+								callback.getContext().startActivity(it);
+							}
+						});
+					}else{
+						callback.onResponse(call,resp);
+					}
+				}catch (Exception e){
+					callback.onFailure(call,e);
+				}
+
+			}
+		});
+
+
+	}
+
+
+
+	public static void deleteRefreshTokenLogin(final String url, final Map<String,String> params, final OkHttpCallback callback){
+		String loginUrl = ServerInfo.serviceIP + ServerInfo.refreshTokenLogin;
+		Map<String, String> loginParams = new HashMap<String, String>();
+		loginParams.put("refresh_token", User.getInstance().getRefresh_token());
+
+		FormBody.Builder builder = new FormBody.Builder();
+		if(loginParams!=null&&loginParams.size()>0){
+			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
+				builder.add(entry.getKey(),entry.getValue()) ;
+			}
+		}
+		FormBody body = builder.build();
+		Request request= new Request.Builder().url(loginUrl).addHeader("Content-Type","application/json").post(body).build();
+
+		okHttpClient.newCall(request).enqueue(new Callback() {
+
+			@Override
+			public void onFailure(Call call, IOException e) {
+				callback.onFailure(call,e);
+			}
+
+			@Override
+			public void onResponse(Call call, Response response) throws IOException {
+				try{
+					int code=response.code();
+					String resp=response.body().string();
+					JSONObject jsonObject = JSONObject.parseObject(resp);
+					if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+						User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
+						user.setRefresh_token(User.getInstance().getRefresh_token());
+						User.setInstance(user);
+						SharedPreferencesUtils.saveUser(user);
+						delete(url,params,callback);
+
+					}else if(jsonObject != null && jsonObject.getIntValue("code") == 303001){
+						mHandler.post(new Runnable() {
+							@Override
+							public void run() {
+								ToastUtils.show("您的登录信息已失效，请重新登录");
+								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+								callback.getContext().startActivity(it);
+							}
+						});
+					}else{
+						callback.onResponse(call,resp);
+					}
+				}catch (Exception e){
+					callback.onFailure(call,e);
+				}
+
+			}
+		});
+
+
+	}
+
+
+
+	public static void getRefreshTokenLogin(final String url, final Map<String,String> params, final OkHttpCallback callback){
+		String loginUrl = ServerInfo.serviceIP + ServerInfo.refreshTokenLogin;
+		Map<String, String> loginParams = new HashMap<String, String>();
+		loginParams.put("refresh_token", User.getInstance().getRefresh_token());
+
+		FormBody.Builder builder = new FormBody.Builder();
+		if(loginParams!=null&&loginParams.size()>0){
+			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
+				builder.add(entry.getKey(),entry.getValue()) ;
+			}
+		}
+		FormBody body = builder.build();
+		Request request= new Request.Builder().url(loginUrl).addHeader("Content-Type","application/json").post(body).build();
+
+		okHttpClient.newCall(request).enqueue(new Callback() {
+
+			@Override
+			public void onFailure(Call call, IOException e) {
+				callback.onFailure(call,e);
+			}
+
+			@Override
+			public void onResponse(Call call, Response response) throws IOException {
+				try{
+					int code=response.code();
+					String resp=response.body().string();
+					JSONObject jsonObject = JSONObject.parseObject(resp);
+					if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+						User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
+						user.setRefresh_token(User.getInstance().getRefresh_token());
+						User.setInstance(user);
+						SharedPreferencesUtils.saveUser(user);
+						get(url,params,callback);
+
+					}else if(jsonObject != null && jsonObject.getIntValue("code") == 303001){
+						mHandler.post(new Runnable() {
+							@Override
+							public void run() {
+								ToastUtils.show("您的登录信息已失效，请重新登录");
+								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+								callback.getContext().startActivity(it);
+							}
+						});
+					}else{
+						callback.onResponse(call,resp);
+					}
+				}catch (Exception e){
+					callback.onFailure(call,e);
+				}
+
+			}
+		});
+
+
+	}
 	
 	
 }

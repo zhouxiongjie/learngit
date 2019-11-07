@@ -133,7 +133,7 @@ public class RadioProgramListFragment extends Fragment implements Handler.Callba
             }
 
             @Override
-            public void onFailure(Call call, IOException exception) {
+            public void onFailure(Call call, Exception exception) {
 
                 if(refreshLayout.isRefreshing()){
                     refreshLayout.finishRefresh();

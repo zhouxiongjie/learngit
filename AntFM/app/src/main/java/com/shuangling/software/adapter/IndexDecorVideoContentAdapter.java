@@ -39,7 +39,7 @@ import butterknife.ButterKnife;
  * Created by 666 on 2017/1/3.
  * 首页分类
  */
-public class ColumnContentAdapter extends RecyclerView.Adapter implements View.OnClickListener {
+public class IndexDecorVideoContentAdapter extends RecyclerView.Adapter implements View.OnClickListener {
 
     //"type": 4,//1 音频 2 专辑 3 文章 4 视频 5专题
 
@@ -90,12 +90,8 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
         void onItemClick(View view, int pos);
     }
 
-    public ColumnContentAdapter(Context context) {
-        this.mContext = context;
-        inflater = LayoutInflater.from(mContext);
 
-    }
-    public ColumnContentAdapter(Context context, List<ColumnContent> columnContent) {
+    public IndexDecorVideoContentAdapter(Context context, List<ColumnContent> columnContent) {
         this.mContext = context;
         this.mColumnContent = columnContent;
         inflater = LayoutInflater.from(mContext);

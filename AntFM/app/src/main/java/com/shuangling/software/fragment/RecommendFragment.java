@@ -1,17 +1,14 @@
 package com.shuangling.software.fragment;
 
+import android.content.Intent;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,19 +16,27 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.activity.CityListActivity;
+import com.shuangling.software.activity.MainActivity;
+import com.shuangling.software.activity.SearchActivity;
 import com.shuangling.software.entity.Column;
-import com.shuangling.software.entity.Station;
+import com.shuangling.software.entity.Weather;
+import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
-import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,14 +46,15 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import okhttp3.Call;
-import okhttp3.Response;
 
 
-public class RecommendFragment extends Fragment implements OnClickListener, Handler.Callback {
+public class RecommendFragment extends Fragment implements Handler.Callback {
 
     public static final int MSG_GET_COLUMN = 0x1;
+    public static final int MSG_GET_CITY_WEATHER = 0x2;
     @BindView(R.id.search)
     TextView search;
     @BindView(R.id.columnContent)
@@ -60,6 +66,16 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
     HorizontalScrollView columnScrollView;
     @BindView(R.id.topBar)
     LinearLayout topBar;
+    @BindView(R.id.city)
+    TextView city;
+    @BindView(R.id.divide)
+    TextView divide;
+    @BindView(R.id.temperature)
+    TextView temperature;
+    @BindView(R.id.weather)
+    TextView weather;
+    @BindView(R.id.weatherLayout)
+    RelativeLayout weatherLayout;
 
     /**
      * 当前选中的栏目
@@ -81,17 +97,18 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
         mScreenWidth = CommonUtils.getScreenWidth();
         Bundle bundle = getArguments();
         if (bundle != null) {
-            mSwitchColumn = (Column)bundle.getSerializable("column");
+            mSwitchColumn = (Column) bundle.getSerializable("column");
         }
         mHandler = new Handler(this);
+        EventBus.getDefault().register(this);
     }
 
 
     public void switchColumn(Column switchColumn) {
 
-        for(int i=0;i<mColumns.size();i++){
-            if(mColumns.get(i).getId()==switchColumn.getId()){
-                mColumnSelectIndex =i;
+        for (int i = 0; i < mColumns.size(); i++) {
+            if (mColumns.get(i).getId() == switchColumn.getId()) {
+                mColumnSelectIndex = i;
                 break;
             }
         }
@@ -104,6 +121,12 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
         View view = inflater.inflate(R.layout.fragment_recommend, container, false);
         getRecommendColumns();
         unbinder = ButterKnife.bind(this, view);
+        if(MyApplication.getInstance().getStation()!=null&&MyApplication.getInstance().getStation().getIs_league()==0){
+            city.setCompoundDrawables(null, null, null, null);
+        }
+        if(MainActivity.sCurrentCity!=null) {
+            city.setText(MainActivity.sCurrentCity.getName());
+        }
         return view;
 
     }
@@ -118,19 +141,17 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
             //viewPager.setCurrentItem(mColumnSelectIndex);
         }
 
-        if(mSwitchColumn!=null){
+        if (mSwitchColumn != null) {
             mHandler.postDelayed(new Runnable() {
 
                 @Override
                 public void run() {
                     switchColumn(mSwitchColumn);
                 }
-            },500);
+            }, 500);
         }
 
     }
-
-
 
 
     public ViewPager.OnPageChangeListener mPageListener = new ViewPager.OnPageChangeListener() {
@@ -146,7 +167,11 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
         @Override
         public void onPageSelected(int position) {
             // TODO Auto-generated method stub
-            //viewPager.setCurrentItem(position);
+            if (position == 0) {
+                weatherLayout.setVisibility(View.VISIBLE);
+            }else{
+                weatherLayout.setVisibility(View.GONE);
+            }
 
             for (int i = 0; i < columnContent.getChildCount(); i++) {
                 View checkView = columnContent.getChildAt(i);
@@ -192,13 +217,20 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
         }
     };
 
-    @Override
-    public void onClick(View v) {
 
-        switch (v.getId()) {
+    @OnClick({R.id.city, R.id.search})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.city:
+                if(MyApplication.getInstance().getStation()!=null&&MyApplication.getInstance().getStation().getIs_league()==1){
+                    //固定
+                    startActivity(new Intent(getContext(), CityListActivity.class));
+                }
 
+                break;
+            case R.id.search:
+                startActivity(new Intent(getContext(), SearchActivity.class));
 
-            default:
                 break;
         }
     }
@@ -234,6 +266,46 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
     }
 
 
+    public void weather() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.weather;
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("location", "" + MainActivity.sCurrentCity.getCode() + "00");
+
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_CITY_WEATHER;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if (event.getEventName().equals("onLocationChanged")) {
+            city.setText(MainActivity.sCurrentCity.getName());
+            weather();
+
+        }
+    }
+
+
     public class MyselfFragmentPagerAdapter extends FragmentStatePagerAdapter {
         private List<Column> mColumns;
         private FragmentManager fm;
@@ -258,12 +330,17 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
         @Override
         public Fragment getItem(int position) {
             Bundle data = new Bundle();
-            data.putSerializable("Column",mColumns.get(position));
-            if(mColumns.get(position).getType()==1){
+            data.putSerializable("Column", mColumns.get(position));
+            if (mColumns.get(position).getType() == -1) {
+                //首页
+                IndexFragment indexFragment = new IndexFragment();
+                indexFragment.setArguments(data);
+                return indexFragment;
+            } else if (mColumns.get(position).getType() == 1) {
                 ContentHotFragment contentFragment = new ContentHotFragment();
                 contentFragment.setArguments(data);
                 return contentFragment;
-            }else{
+            } else {
                 ContentFragment contentFragment = new ContentFragment();
                 contentFragment.setArguments(data);
                 return contentFragment;
@@ -311,6 +388,15 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
                         if (jo.getInteger("total") > 0) {
                             mColumns = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), Column.class);
 
+                            Column col = new Column();
+                            col.setName("首页");
+                            col.setType(-1);
+                            if (mColumns != null) {
+                                mColumns.add(0, col);
+                            } else {
+                                mColumns = new ArrayList<>();
+                                mColumns.add(col);
+                            }
                             for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
                                 Column column = mColumns.get(i);
                                 //LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -326,8 +412,6 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
                                 //columnTextView.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
                                 columnTextView.setText(column.getName());
                                 columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
-
-
 
 
                                 if (mColumnSelectIndex == i) {
@@ -410,6 +494,22 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
 
 
             break;
+            case MSG_GET_CITY_WEATHER:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jo = JSONObject.parseObject(result);
+                    if (jo.getIntValue("code") == 100000 && jo.getJSONObject("data") != null) {
+                        Weather wea = JSONObject.parseObject(jo.getJSONObject("data").toJSONString(), Weather.class);
+                        if (wea.getWeather() != null && wea.getWeather().getHeWeather6() != null && wea.getWeather().getHeWeather6().get(0) != null && wea.getWeather().getHeWeather6().get(0).getNow() != null) {
+                            temperature.setText(wea.getWeather().getHeWeather6().get(0).getNow().getTmp() + "℃");
+                            weather.setText(wea.getWeather().getHeWeather6().get(0).getNow().getCond_txt());
+                        }
+
+                    }
+                } catch (Exception e) {
+
+                }
+                break;
             default:
                 break;
         }
@@ -420,5 +520,11 @@ public class RecommendFragment extends Fragment implements OnClickListener, Hand
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 }

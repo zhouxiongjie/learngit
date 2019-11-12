@@ -21,83 +21,83 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:id="@+id/topBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="10dp">
+        <!--<RelativeLayout-->
+            <!--android:id="@+id/topBar"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="vertical"-->
+            <!--android:padding="10dp">-->
 
-            <TextView
-                android:id="@+id/city"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:drawableRight="@drawable/ic_xia"
-                android:drawablePadding="5dp"
-                android:text="湘西土家族苗族自治州"
-                android:textColor="@color/white"
-                android:textSize="@dimen/font_size_28px"
-                android:singleLine="true"
-                android:ellipsize="end"
-                android:maxLength="4"/>
+            <!--<TextView-->
+                <!--android:id="@+id/city"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:drawableRight="@drawable/ic_xia"-->
+                <!--android:drawablePadding="5dp"-->
+                <!--android:text="湘西土家族苗族自治州"-->
+                <!--android:textColor="@color/white"-->
+                <!--android:textSize="@dimen/font_size_28px"-->
+                <!--android:singleLine="true"-->
+                <!--android:ellipsize="end"-->
+                <!--android:maxLength="4"/>-->
 
-            <TextView
-                android:id="@+id/divide"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@+id/city"
-                android:text="|"
-                android:textColor="@color/white"
-                android:textSize="@dimen/font_size_28px" />
+            <!--<TextView-->
+                <!--android:id="@+id/divide"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:layout_marginLeft="10dp"-->
+                <!--android:layout_toRightOf="@+id/city"-->
+                <!--android:text="|"-->
+                <!--android:textColor="@color/white"-->
+                <!--android:textSize="@dimen/font_size_28px" />-->
 
-            <TextView
-                android:id="@+id/temperature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@+id/divide"
-                tools:text="16℃"
-                android:textColor="@color/white"
-                android:textSize="@dimen/font_size_28px" />
+            <!--<TextView-->
+                <!--android:id="@+id/temperature"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:layout_marginLeft="10dp"-->
+                <!--android:layout_toRightOf="@+id/divide"-->
+                <!--tools:text="16℃"-->
+                <!--android:textColor="@color/white"-->
+                <!--android:textSize="@dimen/font_size_28px" />-->
 
-            <TextView
-                android:id="@+id/weather"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@+id/temperature"
-                tools:text="晴"
-                android:textColor="@color/white"
-                android:textSize="@dimen/font_size_28px" />
-
-
-            <TextView
-                android:id="@+id/search"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="5dp"
-                android:background="@drawable/search_box_bg"
-                android:drawableLeft="@drawable/ic_search"
-                android:drawablePadding="10dp"
-                android:paddingLeft="20dp"
-                android:paddingTop="8dp"
-                android:paddingRight="40dp"
-                android:paddingBottom="8dp"
-                android:text="请输入搜索内容"
-                android:textColor="#FFFFFF"
-                android:textSize="@dimen/font_size_26px" />
+            <!--<TextView-->
+                <!--android:id="@+id/weather"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:layout_marginLeft="10dp"-->
+                <!--android:layout_toRightOf="@+id/temperature"-->
+                <!--tools:text="晴"-->
+                <!--android:textColor="@color/white"-->
+                <!--android:textSize="@dimen/font_size_28px" />-->
 
 
-        </RelativeLayout>
+            <!--<TextView-->
+                <!--android:id="@+id/search"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_marginLeft="10dp"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_marginRight="10dp"-->
+                <!--android:layout_marginBottom="5dp"-->
+                <!--android:background="@drawable/search_box_bg"-->
+                <!--android:drawableLeft="@drawable/ic_search"-->
+                <!--android:drawablePadding="10dp"-->
+                <!--android:paddingLeft="20dp"-->
+                <!--android:paddingTop="8dp"-->
+                <!--android:paddingRight="40dp"-->
+                <!--android:paddingBottom="8dp"-->
+                <!--android:text="请输入搜索内容"-->
+                <!--android:textColor="#FFFFFF"-->
+                <!--android:textSize="@dimen/font_size_26px" />-->
+
+
+        <!--</RelativeLayout>-->
 
         <HorizontalScrollView
             android:id="@+id/columnScrollView"

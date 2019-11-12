@@ -33,6 +33,20 @@
     <string name="float_icon_pause">&#xe618;</string>
     <string name="float_icon_play">&#xe610;</string>
 
+    <!--底部菜单图标-->
+    <string name="menus_index">&#xe614;</string>
+    <string name="menus_personal_center">&#xe61e;</string>
+    <string name="menus_media_matrix">&#xe66f;</string>
+    <string name="menus_suggest_consult">&#xe66e;</string>
+    <string name="menus_affairs_guide">&#xe60b;</string>
+    <string name="menus_facilitate_people">&#xe66c;</string>
+    <string name="menus_activity_center">&#xe60e;</string>
+    <string name="menus_tv">&#xe66d;</string>
+    <string name="menus_radio">&#xe61f;</string>
+    <string name="menus_news">&#xe670;</string>
+
+
+
     <string name="radio">电台</string>
     <string name="tv">电视台</string>
     <string name="album">专辑</string>

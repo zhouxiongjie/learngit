@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -107,20 +108,20 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     public static final int MSG_GET_SERVICE = 0x2;
     public static final int MSG_GET_ORGANIZATION = 0x3;
     public static final int MSG_GET_CITY_CONTNET = 0x4;
-    public static final int MSG_GET_CITY_WEATHER = 0x5;
+    public static final int MSG_GET_CITY_TYPE_CONTENT = 0x5;
     public static final int MSG_GET_INDEX_DECOR = 0x6;
     public static final int MSG_ATTENTION_CALLBACK = 0x7;
     public static final int MSG_GET_COLUMN = 0x8;
     public static final int REQUEST_LOGIN = 0x9;
 
-    @BindView(R.id.city)
-    TextView city;
-    @BindView(R.id.temperature)
-    TextView temperature;
-    @BindView(R.id.weather)
-    TextView weather;
-    @BindView(R.id.search)
-    TextView search;
+//    @BindView(R.id.city)
+//    TextView city;
+//    @BindView(R.id.temperature)
+//    TextView temperature;
+//    @BindView(R.id.weather)
+//    TextView weather;
+//    @BindView(R.id.search)
+//    TextView search;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
     @BindView(R.id.contentLayout)
@@ -177,14 +178,14 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
             }
         });
-        if(MyApplication.getInstance().getStation()!=null&&MyApplication.getInstance().getStation().getIs_league()==0){
-           city.setCompoundDrawables(null, null, null, null);
-        }
-        getRecommendColumns();
+//        if(MyApplication.getInstance().getStation()!=null&&MyApplication.getInstance().getStation().getIs_league()==0){
+//           city.setCompoundDrawables(null, null, null, null);
+//        }
+        //getRecommendColumns();
         if(MainActivity.sCurrentCity!=null){
-            city.setText(MainActivity.sCurrentCity.getName());
+            //city.setText(MainActivity.sCurrentCity.getName());
             //getCityAnchors();
-            weather();
+            //weather();
             //getCityColumns("");
             indexDecorate();
         }
@@ -199,22 +200,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.city, R.id.search})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.city:
-                if(MyApplication.getInstance().getStation()!=null&&MyApplication.getInstance().getStation().getIs_league()==1){
-                    //固定
-                    startActivity(new Intent(getContext(), CityListActivity.class));
-                }
 
-                break;
-            case R.id.search:
-                startActivity(new Intent(getContext(), SearchActivity.class));
-
-                break;
-        }
-    }
 
 
 
@@ -378,7 +364,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
 
                 Message msg = Message.obtain();
-                msg.what = MSG_GET_CITY_WEATHER;
+                msg.what = MSG_GET_CITY_TYPE_CONTENT;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
 
@@ -504,14 +490,51 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     }
 
 
-    public void getContent(String typeId, String contentNumber, final int position) {
+
+    public void getDecorateContent(final int animated,final int orderBy,String type,String columnId, String contentNumber, final int position) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.indexDecorateContent ;
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("id", columnId);
+        params.put("type", type);
+        params.put("limit", contentNumber);
+        params.put("sorce_type", "1");
+        params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
+        params.put("order_by", ""+orderBy);
+
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_CITY_TYPE_CONTENT;
+                msg.arg1 = position;
+                msg.arg2=animated;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+
+    }
+
+    public void getContent(final int orderBy,String typeId, String contentNumber, final int position) {
 
         String url = ServerInfo.serviceIP + ServerInfo.getColumnContent + typeId;
         Map<String, String> params = new HashMap<String, String>();
         params.put("limit", contentNumber);
         params.put("sorce_type", "1");
         params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
-        params.put("order_by", "1");
+        params.put("order_by", ""+orderBy);
 
 
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
@@ -826,6 +849,169 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                 }
 
                 break;
+            case MSG_GET_CITY_TYPE_CONTENT:{
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jo = JSONObject.parseObject(result);
+                    int position = msg.arg1;
+                    int animated=msg.arg2;
+                    if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
+
+                        List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
+
+                        if(animated==3){
+                            RecyclerView recyclerView = mContentRecyclerView.get(position);
+                            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+                            DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                            divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                            recyclerView.addItemDecoration(divider);
+
+                            ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), columnContents);
+                            recyclerView.setAdapter(adapter);
+                        }else if(animated==4){
+                            RecyclerView recyclerView = mContentRecyclerView.get(position);
+                            GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
+                            recyclerView.setLayoutManager(manager);
+                            DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                            divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                            recyclerView.addItemDecoration(divider);
+                            final ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), columnContents);
+                            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                                @Override
+                                public int getSpanSize(int position) {
+                                    int size = adapter.getItemCount();
+                                    if ((position+1) %2== 0) {
+                                        return 1;
+                                    } else if((position+1)==size){
+                                        return 2;
+                                    }else {
+                                        return 1;
+                                    }
+                                }
+                            });
+
+                            recyclerView.setAdapter(adapter);
+
+                        }else if(animated==7){
+                            //1+4
+                            RecyclerView recyclerView = mContentRecyclerView.get(position);
+                            GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
+                            recyclerView.setLayoutManager(manager);
+                            DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                            divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                            recyclerView.addItemDecoration(divider);
+                            final ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), columnContents);
+                            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                                @Override
+                                public int getSpanSize(int position) {
+                                    int size = adapter.getItemCount();
+                                    int page=size/5;
+                                    if (page>0&&(position+1)<=5*page) {
+                                        if((position+1)%5==1){
+                                            return 2;
+                                        }else{
+                                            return 1;
+                                        }
+                                    } else{
+                                        if(size%5==1){
+                                            if((position+1)%5==1){
+                                                return 2;
+                                            }
+                                        }else if(size%5==2){
+                                            if((position+1)%5==1){
+                                                return 2;
+                                            }else if((position+1)%5==2){
+                                                return 2;
+                                            }
+                                        }else if(size%5==3){
+                                            if((position+1)%5==1){
+                                                return 2;
+                                            }else if((position+1)%5==2){
+                                                return 1;
+                                            }else if((position+1)%5==3){
+                                                return 1;
+                                            }
+                                        }else if(size%5==4){
+                                            if((position+1)%5==1){
+                                                return 2;
+                                            }else if((position+1)%5==2){
+                                                return 1;
+                                            }else if((position+1)%5==3){
+                                                return 1;
+                                            }else if((position+1)%5==4){
+                                                return 2;
+                                            }
+                                        }
+                                        return 2;
+                                    }
+                                }
+                            });
+
+                            recyclerView.setAdapter(adapter);
+                        }else if(animated==8){
+                            //单行
+                            LayoutInflater inflater = LayoutInflater.from(getContext());
+                            View anchorLayout = inflater.inflate(R.layout.index_scrollview_column_layout, contentLayout, false);
+                            LinearLayout videoLayout= anchorLayout.findViewById(R.id.contentLayout);
+
+                            for (int i = 0; i < columnContents.size(); i++) {
+                                final ColumnContent content = columnContents.get(i);
+
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((CommonUtils.getScreenWidth()-CommonUtils.dip2px(10))*2/5, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+//                                int margin = CommonUtils.dip2px(10);
+//                                params.setMargins(margin, margin, margin, margin);
+                                View anchorView = LayoutInflater.from(getContext()).inflate(R.layout.scrollview_video_item_layout, videoLayout, false);
+                                TextView videoTitle = anchorView.findViewById(R.id.title);
+                                SimpleDraweeView logo = anchorView.findViewById(R.id.logo);
+                                TextView duration = anchorView.findViewById(R.id.duration);
+
+                                videoTitle.setText(content.getTitle());
+                                if(content.getVideo()!=null){
+                                    duration.setText(content.getVideo().getDuration());
+                                }
+                                if (!TextUtils.isEmpty(content.getCover())) {
+                                    Uri uri = Uri.parse(content.getCover());
+                                    int width = (CommonUtils.getScreenWidth()-CommonUtils.dip2px(10))*2/5;
+                                    int height = (int) (2f * width / 3f);
+                                    ImageLoader.showThumb(uri, logo, width, height);
+                                }
+
+                                anchorView.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent it = new Intent(getContext(), VideoDetailActivity.class);
+                                        it.putExtra("videoId", content.getId());
+                                        startActivity(it);
+                                    }
+                                });
+
+
+                                videoLayout.addView(anchorView,  params);
+                            }
+
+
+                            RecyclerView recyclerView = mContentRecyclerView.get(position);
+                            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+                            DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                            divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                            recyclerView.addItemDecoration(divider);
+
+                            ColumnContentAdapter adapter = new ColumnContentAdapter(getContext());
+                            adapter.addHeaderView(anchorLayout);
+                            recyclerView.setAdapter(adapter);
+
+                        }
+
+
+                    }
+
+
+                } catch (Exception e) {
+
+                }
+            }
+            break;
             case MSG_ATTENTION_CALLBACK:
                 try {
                     String result = msg.getData().getString("response");
@@ -868,22 +1054,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
                 }
                 break;
-            case MSG_GET_CITY_WEATHER:
-                try {
-                    String result = (String) msg.obj;
-                    JSONObject jo = JSONObject.parseObject(result);
-                    if (jo.getIntValue("code") == 100000 && jo.getJSONObject("data") != null) {
-                        Weather wea = JSONObject.parseObject(jo.getJSONObject("data").toJSONString(), Weather.class);
-                        if (wea.getWeather() != null && wea.getWeather().getHeWeather6() != null && wea.getWeather().getHeWeather6().get(0) != null && wea.getWeather().getHeWeather6().get(0).getNow() != null) {
-                            temperature.setText(wea.getWeather().getHeWeather6().get(0).getNow().getTmp() + "℃");
-                            weather.setText(wea.getWeather().getHeWeather6().get(0).getNow().getCond_txt());
-                        }
 
-                    }
-                } catch (Exception e) {
-
-                }
-                break;
             case MSG_GET_INDEX_DECOR:
                 try {
                     String result = (String) msg.obj;
@@ -1401,7 +1572,77 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                 recyclerView.addItemDecoration(divider);
                                 mContentRecyclerView.add(recyclerView);
                                 contentLayout.addView(clolumnLayout);
-                                getContent(columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
+                                getContent(module.getOrder_by(),columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
+
+                            }else if (module.getType() == 15){
+                                //视频
+                                LayoutInflater inflater = LayoutInflater.from(getContext());
+                                View clolumnLayout = inflater.inflate(R.layout.index_column_item, contentLayout, false);
+                                SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
+                                TextView column = clolumnLayout.findViewById(R.id.column);
+                                TextView more= clolumnLayout.findViewById(R.id.more);
+                                more.setVisibility(View.GONE);
+                                column.setText(module.getTitle());
+
+                                Station station=MyApplication.getInstance().getStation();
+                                if(station!=null&&!TextUtils.isEmpty(station.getIcon3())){
+                                    Uri uri = Uri.parse(station.getIcon3());
+                                    int width=CommonUtils.dip2px(9);
+                                    int height=width*2;
+                                    ImageLoader.showThumb(uri,logo,width,height);
+                                }else{
+                                    logo.setVisibility(View.GONE);
+                                }
+
+
+                                String[] ids= module.getData_source_id().split(",");
+                                final String columnId=ids[ids.length-1];
+                                more.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+
+                                    }
+                                });
+                                RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);
+
+                                mContentRecyclerView.add(recyclerView);
+                                contentLayout.addView(clolumnLayout);
+                                getDecorateContent(module.getAnimated(),module.getOrder_by(),"4",columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
+
+                            }else if (module.getType() == 16){
+                                //音频
+                                LayoutInflater inflater = LayoutInflater.from(getContext());
+                                View clolumnLayout = inflater.inflate(R.layout.index_column_item, contentLayout, false);
+                                SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
+                                TextView column = clolumnLayout.findViewById(R.id.column);
+                                TextView more= clolumnLayout.findViewById(R.id.more);
+                                more.setVisibility(View.GONE);
+                                column.setText(module.getTitle());
+
+                                Station station=MyApplication.getInstance().getStation();
+                                if(station!=null&&!TextUtils.isEmpty(station.getIcon3())){
+                                    Uri uri = Uri.parse(station.getIcon3());
+                                    int width=CommonUtils.dip2px(9);
+                                    int height=width*2;
+                                    ImageLoader.showThumb(uri,logo,width,height);
+                                }else{
+                                    logo.setVisibility(View.GONE);
+                                }
+
+
+                                String[] ids= module.getData_source_id().split(",");
+                                final String columnId=ids[ids.length-1];
+                                more.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+
+                                    }
+                                });
+                                RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);
+
+                                mContentRecyclerView.add(recyclerView);
+                                contentLayout.addView(clolumnLayout);
+                                getDecorateContent(module.getAnimated(),module.getOrder_by(),"1",columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
 
                             }
 
@@ -1466,8 +1707,8 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
             }
 
-
             break;
+
         }
         return false;
     }
@@ -1476,9 +1717,9 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getEventBus(CommonEvent event) {
         if (event.getEventName().equals("onLocationChanged")) {
-            city.setText(MainActivity.sCurrentCity.getName());
+            //city.setText(MainActivity.sCurrentCity.getName());
             //getCityAnchors();
-            weather();
+            //weather();
             //getCityColumns("");
             indexDecorate();
         }

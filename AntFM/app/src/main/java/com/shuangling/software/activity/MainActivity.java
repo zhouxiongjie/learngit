@@ -3,16 +3,13 @@ package com.shuangling.software.activity;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,15 +18,14 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -47,12 +43,11 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.dialog.UpdateDialog;
+import com.shuangling.software.entity.BottomMenu;
 import com.shuangling.software.entity.City;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.UpdateInfo;
 import com.shuangling.software.event.CommonEvent;
-import com.shuangling.software.fragment.DiscoverFragment;
-import com.shuangling.software.fragment.IndexFragment;
 import com.shuangling.software.fragment.PersonalCenterFragment;
 import com.shuangling.software.fragment.RecommendFragment;
 import com.shuangling.software.network.OkHttpCallback;
@@ -61,15 +56,12 @@ import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ServerInfo;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-import com.youngfeng.snake.Snake;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,12 +69,10 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import cn.jake.share.frdialog.dialog.FRDialog;
 import cn.jake.share.frdialog.interfaces.FRDialogClickListener;
 import io.reactivex.functions.Consumer;
 import okhttp3.Call;
-import okhttp3.Response;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
@@ -93,30 +83,34 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     public static final int REQUEST_PERMISSION_CODE = 0x0110;
     public static final int MSG_GET_CITY_LIST = 0x1;
     public static final int MSG_GET_UPDATE_INFO = 0x2;
-    @BindView(R.id.indexIcon)
-    FontIconView indexIcon;
-    @BindView(R.id.index)
-    TextView index;
-    @BindView(R.id.indexLayout)
-    LinearLayout indexLayout;
-    @BindView(R.id.recommendIcon)
-    FontIconView recommendIcon;
-    @BindView(R.id.recommend)
-    TextView recommend;
-    @BindView(R.id.recommendLayout)
-    LinearLayout recommendLayout;
-    @BindView(R.id.discoverIcon)
-    FontIconView discoverIcon;
-    @BindView(R.id.discover)
-    TextView discover;
-    @BindView(R.id.discoverLayout)
-    LinearLayout discoverLayout;
-    @BindView(R.id.personalCenterIcon)
-    FontIconView personalCenterIcon;
-    @BindView(R.id.personalCenter)
-    TextView personalCenter;
-    @BindView(R.id.personalCenterLayout)
-    LinearLayout personalCenterLayout;
+    public static final int MSG_GET_BOTTOM_MENUS = 0x3;
+
+    //    @BindView(R.id.indexIcon)
+//    FontIconView indexIcon;
+//    @BindView(R.id.index)
+//    TextView index;
+//    @BindView(R.id.indexLayout)
+//    LinearLayout indexLayout;
+//    @BindView(R.id.recommendIcon)
+//    FontIconView recommendIcon;
+//    @BindView(R.id.recommend)
+//    TextView recommend;
+//    @BindView(R.id.recommendLayout)
+//    LinearLayout recommendLayout;
+//    @BindView(R.id.discoverIcon)
+//    FontIconView discoverIcon;
+//    @BindView(R.id.discover)
+//    TextView discover;
+//    @BindView(R.id.discoverLayout)
+//    LinearLayout discoverLayout;
+//    @BindView(R.id.personalCenterIcon)
+//    FontIconView personalCenterIcon;
+//    @BindView(R.id.personalCenter)
+//    TextView personalCenter;
+//    @BindView(R.id.personalCenterLayout)
+//    LinearLayout personalCenterLayout;
+    @BindView(R.id.menuContainer)
+    LinearLayout menuContainer;
 
 
     private Fragment indexFragment;
@@ -142,20 +136,25 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
     private static long lastClickTime;
     private static final int MIN_CLICK_DELAY_TIME = 2000;
+
+
+    ArrayList<BottomMenuHolder> mMenus=new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        getBottomMenus();
         mHandler = new Handler(this);
-        showFragment(0);
+        //showFragment(0);
         showFloatWindowPermission();
         //getCityList();
-        if(MyApplication.getInstance().getStation()!=null&&MyApplication.getInstance().getStation().getIs_league()==0){
+        if (MyApplication.getInstance().getStation() != null && MyApplication.getInstance().getStation().getIs_league() == 0) {
             sCurrentCity = new City(Integer.parseInt(MyApplication.getInstance().getStation().getCity_info().getCode()), MyApplication.getInstance().getStation().getCity_info().getName(), "#");
             EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
-        }else{
+        } else {
             initLocation();
             startLocation();
         }
@@ -165,22 +164,22 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
 
     public void switchRecommend(Column column) {
-        settingBackgound(recommend);
-        settingBackgound(recommendIcon);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (recommendFragment == null) {
-            recommendFragment = new RecommendFragment();
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("column",column);
-            recommendFragment.setArguments(bundle);
-            transaction.add(R.id.content, recommendFragment);
-        } else {
-
-            transaction.show(recommendFragment);
-            ((RecommendFragment)recommendFragment).switchColumn(column);
-        }
-        hideFragments(transaction);
-        transaction.commit();
+//        settingBackgound(recommend);
+//        settingBackgound(recommendIcon);
+//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//        if (recommendFragment == null) {
+//            recommendFragment = new RecommendFragment();
+//            Bundle bundle = new Bundle();
+//            bundle.putSerializable("column", column);
+//            recommendFragment.setArguments(bundle);
+//            transaction.add(R.id.content, recommendFragment);
+//        } else {
+//
+//            transaction.show(recommendFragment);
+//            ((RecommendFragment) recommendFragment).switchColumn(column);
+//        }
+//        hideFragments(transaction);
+//        transaction.commit();
     }
 
 
@@ -202,13 +201,13 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     @Override
                     public void accept(Boolean granted) throws Exception {
                         if (granted) {
-                            if(isLocServiceEnable(MainActivity.this)){
+                            if (isLocServiceEnable(MainActivity.this)) {
                                 //checkWifiSetting();
                                 //设置定位参数
                                 mLocationClient.setLocationOption(getOption());
                                 // 启动定位
                                 mLocationClient.startLocation();
-                            }else {
+                            } else {
                                 ToastUtils.show("定位失败,和位置相关的功能可能无法使用");
                                 sCurrentCity = new City(4301, "长沙市", "C");
                                 EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
@@ -304,140 +303,139 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     }
 
 
-
-
-    @OnClick({R.id.indexLayout, R.id.recommendLayout, R.id.discoverLayout, R.id.personalCenterLayout})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.indexLayout:
-                showFragment(0);
-                break;
-            case R.id.recommendLayout:
-                showFragment(1);
-                break;
-            case R.id.discoverLayout:
-                showFragment(2);
-                break;
-            case R.id.personalCenterLayout:
-                showFragment(3);
-                break;
-        }
-    }
+//    @OnClick({R.id.indexLayout, R.id.recommendLayout, R.id.discoverLayout, R.id.personalCenterLayout})
+//    public void onViewClicked(View view) {
+//        switch (view.getId()) {
+//            case R.id.indexLayout:
+//                showFragment(0);
+//                break;
+//            case R.id.recommendLayout:
+//                showFragment(1);
+//                break;
+//            case R.id.discoverLayout:
+//                showFragment(2);
+//                break;
+//            case R.id.personalCenterLayout:
+//                showFragment(3);
+//                break;
+//        }
+//    }
 
 
     private void settingBackgound(TextView table) {
-        table.setSelected(true);
-        if (table != index) {
-            index.setSelected(false);
-        }
-        if (table != recommend) {
-            recommend.setSelected(false);
-        }
-        if (table != discover) {
-            discover.setSelected(false);
-        }
-        if (table != personalCenter) {
-            personalCenter.setSelected(false);
-        }
+//        table.setSelected(true);
+//        if (table != index) {
+//            index.setSelected(false);
+//        }
+//        if (table != recommend) {
+//            recommend.setSelected(false);
+//        }
+//        if (table != discover) {
+//            discover.setSelected(false);
+//        }
+//        if (table != personalCenter) {
+//            personalCenter.setSelected(false);
+//        }
 
     }
 
     private void settingBackgound(FontIconView table) {
-        table.setSelected(true);
-        if (table != indexIcon) {
-            indexIcon.setSelected(false);
-        }
-        if (table != recommendIcon) {
-            recommendIcon.setSelected(false);
-        }
-        if (table != discoverIcon) {
-            discoverIcon.setSelected(false);
-        }
-        if (table != personalCenterIcon) {
-            personalCenterIcon.setSelected(false);
-        }
+//        table.setSelected(true);
+//        if (table != indexIcon) {
+//            indexIcon.setSelected(false);
+//        }
+//        if (table != recommendIcon) {
+//            recommendIcon.setSelected(false);
+//        }
+//        if (table != discoverIcon) {
+//            discoverIcon.setSelected(false);
+//        }
+//        if (table != personalCenterIcon) {
+//            personalCenterIcon.setSelected(false);
+//        }
 
     }
 
 
     private void hideFragments(FragmentTransaction transaction) {
 
-        if (!index.isSelected()) {
-            if (indexFragment != null) {
-                transaction.hide(indexFragment);
-            }
-        }
-        if (!recommend.isSelected()) {
-            if (recommendFragment != null) {
-                transaction.hide(recommendFragment);
-            }
 
-        }
-        if (!discover.isSelected()) {
-            if (discoverFragment != null) {
-                transaction.hide(discoverFragment);
-            }
-
-        }
-        if (!personalCenter.isSelected()) {
-            if (personalCenterFragment != null) {
-                transaction.hide(personalCenterFragment);
-            }
-        }
+//        if (!index.isSelected()) {
+//            if (indexFragment != null) {
+//                transaction.hide(indexFragment);
+//            }
+//        }
+//        if (!recommend.isSelected()) {
+//            if (recommendFragment != null) {
+//                transaction.hide(recommendFragment);
+//            }
+//
+//        }
+//        if (!discover.isSelected()) {
+//            if (discoverFragment != null) {
+//                transaction.hide(discoverFragment);
+//            }
+//
+//        }
+//        if (!personalCenter.isSelected()) {
+//            if (personalCenterFragment != null) {
+//                transaction.hide(personalCenterFragment);
+//            }
+//        }
 
     }
 
 
     private void showFragment(int order) {
-        if (order == 0) {
-            settingBackgound(index);
-            settingBackgound(indexIcon);
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            if (indexFragment == null) {
-                indexFragment = new IndexFragment();
-                transaction.add(R.id.content, indexFragment);
-            } else {
-                transaction.show(indexFragment);
-            }
-            hideFragments(transaction);
-            transaction.commit();
-        } else if (order == 1) {
-            settingBackgound(recommend);
-            settingBackgound(recommendIcon);
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            if (recommendFragment == null) {
-                recommendFragment = new RecommendFragment();
-                transaction.add(R.id.content, recommendFragment);
-            } else {
-                transaction.show(recommendFragment);
-            }
-            hideFragments(transaction);
-            transaction.commit();
-        } else if (order == 2) {
-            settingBackgound(discover);
-            settingBackgound(discoverIcon);
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            if (discoverFragment == null) {
-                discoverFragment = new DiscoverFragment();
-                transaction.add(R.id.content, discoverFragment);
-            } else {
-                transaction.show(discoverFragment);
-            }
-            hideFragments(transaction);
-            transaction.commit();
-        } else if (order == 3) {
-            settingBackgound(personalCenter);
-            settingBackgound(personalCenterIcon);
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            if (personalCenterFragment == null) {
-                personalCenterFragment = new PersonalCenterFragment();
-                transaction.add(R.id.content, personalCenterFragment);
-            } else {
-                transaction.show(personalCenterFragment);
-            }
-            hideFragments(transaction);
-            transaction.commit();
-        }
+//        if (order == 0) {
+//            settingBackgound(index);
+//            settingBackgound(indexIcon);
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            if (indexFragment == null) {
+//                indexFragment = new IndexFragment();
+//                transaction.add(R.id.content, indexFragment);
+//            } else {
+//                transaction.show(indexFragment);
+//            }
+//            hideFragments(transaction);
+//            transaction.commit();
+//        } else if (order == 1) {
+//            settingBackgound(recommend);
+//            settingBackgound(recommendIcon);
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            if (recommendFragment == null) {
+//                recommendFragment = new RecommendFragment();
+//                transaction.add(R.id.content, recommendFragment);
+//            } else {
+//                transaction.show(recommendFragment);
+//            }
+//            hideFragments(transaction);
+//            transaction.commit();
+//        } else if (order == 2) {
+//            settingBackgound(discover);
+//            settingBackgound(discoverIcon);
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            if (discoverFragment == null) {
+//                discoverFragment = new DiscoverFragment();
+//                transaction.add(R.id.content, discoverFragment);
+//            } else {
+//                transaction.show(discoverFragment);
+//            }
+//            hideFragments(transaction);
+//            transaction.commit();
+//        } else if (order == 3) {
+//            settingBackgound(personalCenter);
+//            settingBackgound(personalCenterIcon);
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            if (personalCenterFragment == null) {
+//                personalCenterFragment = new PersonalCenterFragment();
+//                transaction.add(R.id.content, personalCenterFragment);
+//            } else {
+//                transaction.show(personalCenterFragment);
+//            }
+//            hideFragments(transaction);
+//            transaction.commit();
+//        }
     }
 
     @Override
@@ -477,7 +475,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         if (aMapLocation != null && aMapLocation.getErrorCode() == 0) {
 
             String cityCode = aMapLocation.getAdCode();
-            cityCode=cityCode.substring(0,4);
+            cityCode = cityCode.substring(0, 4);
 
 //            for (int i = 0; i < sCityList.size(); i++) {
 //                if (cityCode.equals(sCityList.get(i).getCode())) {
@@ -546,12 +544,42 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     }
 
 
+    public void getBottomMenus() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.bottomMenus;
+        Map<String, String> params = new HashMap<>();
+        params.put("version", "v" + getVersionName());
+        params.put("type", "android");
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_BOTTOM_MENUS;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+
+
+    }
+
+
     public void getUpdateInfo() {
 
         String url = ServerInfo.serviceIP + ServerInfo.updateInfo;
-        Map<String,String> params =new HashMap<>();
-        params.put("version","v"+getVersionName());
-        params.put("type","android");
+        Map<String, String> params = new HashMap<>();
+        params.put("version", "v" + getVersionName());
+        params.put("type", "android");
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
 
             @Override
@@ -608,9 +636,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        UpdateInfo updateInfo=JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), UpdateInfo.class);
-                        if(updateInfo.isSupport()){
-                            UpdateDialog dialog=UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(),updateInfo.getNew_version().getContent());
+                        UpdateInfo updateInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), UpdateInfo.class);
+                        if (updateInfo.isSupport()) {
+                            UpdateDialog dialog = UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(), updateInfo.getNew_version().getContent());
                             dialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
                                 @Override
                                 public void download() {
@@ -629,10 +657,198 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
 
                 break;
+            case MSG_GET_BOTTOM_MENUS:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        List<BottomMenu> menus = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), BottomMenu.class);
+                        if(menus!=null&&menus.size()>0){
+                           mMenus.clear();
+                        }
+                        for (int i = 0; menus != null && i < menus.size(); i++) {
+                            final BottomMenu bottomMenu = menus.get(i);
+                            LayoutInflater inflater = LayoutInflater.from(this);
+                            View root = inflater.inflate(R.layout.bottom_menu, menuContainer, false);
+                            final FontIconView iconView = root.findViewById(R.id.icon);
+                            final TextView name = root.findViewById(R.id.name);
+                            name.setText(bottomMenu.getName());
+                            final BottomMenuHolder bottomMenuHolder=new BottomMenuHolder(root);
+                            mMenus.add(bottomMenuHolder);
+                            if (bottomMenu.getType() == 1) {
+                                //首页
+                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_index));
+                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //
+                                        bottomMenuHolder.name.setSelected(true);
+                                        bottomMenuHolder.icon.setSelected(true);
+                                        for(int i=0;i<mMenus.size();i++){
+                                            BottomMenuHolder holder=mMenus.get(i);
+                                            if(holder!=bottomMenuHolder){
+                                                holder.name.setSelected(false);
+                                                holder.icon.setSelected(false);
+                                            }
+                                        }
+
+                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                        if (recommendFragment == null) {
+                                            recommendFragment = new RecommendFragment();
+                                            transaction.add(R.id.content, recommendFragment);
+                                        } else {
+                                            transaction.show(recommendFragment);
+                                        }
+                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                            transaction.hide(personalCenterFragment);
+                                        }
+                                        transaction.commit();
+                                    }
+                                });
+                            } else if (bottomMenu.getType() == 2) {
+                                //个人中心
+                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_personal_center));
+                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //
+                                        bottomMenuHolder.name.setSelected(true);
+                                        bottomMenuHolder.icon.setSelected(true);
+                                        for(int i=0;i<mMenus.size();i++){
+                                            BottomMenuHolder holder=mMenus.get(i);
+                                            if(holder!=bottomMenuHolder){
+                                                holder.name.setSelected(false);
+                                                holder.icon.setSelected(false);
+                                            }
+                                        }
+
+                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                        if (personalCenterFragment == null) {
+                                            personalCenterFragment = new PersonalCenterFragment();
+                                            transaction.add(R.id.content, personalCenterFragment);
+                                        } else {
+                                            transaction.show(personalCenterFragment);
+                                        }
+                                        if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                            transaction.hide(recommendFragment);
+                                        }
+                                        transaction.commit();
+                                    }
+                                });
+                            } else if (bottomMenu.getType() == 3) {
+                                //媒体矩阵
+                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_media_matrix));
+                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //
+//                                        bottomMenuHolder.name.setSelected(true);
+//                                        bottomMenuHolder.icon.setSelected(true);
+//                                        for(int i=0;i<mMenus.size();i++){
+//                                            BottomMenuHolder holder=mMenus.get(i);
+//                                            if(holder!=bottomMenuHolder){
+//                                                holder.name.setSelected(false);
+//                                                holder.icon.setSelected(false);
+//                                            }
+//                                        }
+
+                                        //跳到媒体矩阵
+                                    }
+                                });
+                            } else if (bottomMenu.getType() == 4) {
+                                //建言咨政
+                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_suggest_consult));
+                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //跳到建言咨政
+                                    }
+                                });
+                            } else if (bottomMenu.getType() == 5) {
+                                //办事指南
+                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_affairs_guide));
+                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //跳到建言咨政
+                                    }
+                                });
+                            } else if (bottomMenu.getType() == 6) {
+                                //便民服务
+                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_facilitate_people));
+                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //跳到建言咨政
+                                    }
+                                });
+                            } else if (bottomMenu.getType() == 7) {
+                                //活动中心
+                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_activity_center));
+                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //跳到建言咨政
+                                    }
+                                });
+                            } else if (bottomMenu.getType() == 8) {
+                                //电视
+                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_tv));
+                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent it=new Intent(MainActivity.this,RadioListActivity.class);
+                                        it.putExtra("type","2");
+                                        startActivity(it);
+                                    }
+                                });
+                            } else if (bottomMenu.getType() == 9) {
+                                //电台
+                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_radio));
+                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent it=new Intent(MainActivity.this,RadioListActivity.class);
+                                        it.putExtra("type","1");
+                                        startActivity(it);
+                                    }
+                                });
+                            } else if (bottomMenu.getType() == 10) {
+                                //资讯分类
+                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_news));
+                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Column column=new Column();
+                                        column.setId(Integer.parseInt(bottomMenu.getSource_id()));
+                                        column.setName(bottomMenu.getName());
+                                        Intent it = new Intent(MainActivity.this, ContentActivity.class);
+                                        it.putExtra("column", column);
+                                        startActivity(it);
+                                    }
+                                });
+                            }
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                            params.weight = 1;
+                            menuContainer.addView(root, params);
+
+                        }
+
+                        if(mMenus.size()>0){
+                            mMenus.get(0).root.performClick();
+                        }
+
+
+                    }
+
+
+                } catch (Exception e) {
+
+                }
+                break;
         }
         return false;
     }
-
 
 
     @Override
@@ -649,17 +865,17 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     }
 
 
-    public String getVersionName(){
-        try{
-            return  getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-        }catch(Exception e){
+    public String getVersionName() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
 
-    public void downloadApk(){
+    public void downloadApk() {
 
 
         RxPermissions rxPermissions = new RxPermissions(this);
@@ -669,13 +885,13 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     public void accept(Boolean granted) throws Exception {
                         if (granted) {
 
-                            File file=new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator +   "ltsj.apk");
-                            if(file.exists()){
+                            File file = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk");
+                            if (file.exists()) {
                                 file.delete();
                             }
 
-                            final CircleDialog.Builder builder=new CircleDialog.Builder();
-                            DialogFragment dialogFragment =builder
+                            final CircleDialog.Builder builder = new CircleDialog.Builder();
+                            DialogFragment dialogFragment = builder
                                     .setCancelable(false)
                                     .setCanceledOnTouchOutside(false)
 //                                    .configDialog(params -> params.backgroundColor = Color.CYAN)
@@ -707,12 +923,12 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                             final FileDownloadListener downloadListener = new FileDownloadListener() {
                                 @Override
                                 protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                                    Log.i("test","pending");
+                                    Log.i("test", "pending");
                                 }
 
                                 @Override
                                 protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
-                                    Log.i("test","connected");
+                                    Log.i("test", "connected");
                                 }
 
                                 @Override
@@ -723,17 +939,17 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
                                 @Override
                                 protected void blockComplete(BaseDownloadTask task) {
-                                    try{
+                                    try {
                                         Intent intent = new Intent();
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        intent.setAction(android.content.Intent.ACTION_VIEW);
-                                        File file=new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator +   "ltsj.apk");
-                                        boolean exist=file.exists();
+                                        intent.setAction(Intent.ACTION_VIEW);
+                                        File file = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk");
+                                        boolean exist = file.exists();
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                                             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                             String packageName = getPackageName();
                                             Uri contentUri = FileProvider.getUriForFile(MainActivity.this
-                                                    , packageName+".fileprovider"
+                                                    , packageName + ".fileprovider"
                                                     , file);
 
 
@@ -742,7 +958,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
                                         }
                                         startActivity(intent);
-                                    }catch (Exception e){
+                                    } catch (Exception e) {
                                         e.printStackTrace();
                                     }
 
@@ -750,7 +966,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
                                 @Override
                                 protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
-                                    Log.i("test",ex.toString());
+                                    Log.i("test", ex.toString());
 
                                 }
 
@@ -765,7 +981,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
                                 @Override
                                 protected void error(BaseDownloadTask task, Throwable e) {
-                                    Log.i("test",e.toString());
+                                    Log.i("test", e.toString());
                                 }
 
                                 @Override
@@ -777,7 +993,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
                             final List<BaseDownloadTask> tasks = new ArrayList<>();
 
-                            tasks.add(FileDownloader.getImpl().create(ServerInfo.apkDownloadAddr).setPath(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator +   "ltsj.apk"));
+                            tasks.add(FileDownloader.getImpl().create(ServerInfo.apkDownloadAddr).setPath(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk"));
                             //queueSet.setCallbackProgressMinInterval(200);
                             //queueSet.disableCallbackProgressTimes();
                             // 由于是队列任务, 这里是我们假设了现在不需要每个任务都回调`FileDownloadListener#progress`, 我们只关系每个任务是否完成, 所以这里这样设置可以很有效的减少ipc.
@@ -819,5 +1035,18 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
             cursor.close();
         }
         return path;
+    }
+
+    static class BottomMenuHolder {
+        @BindView(R.id.icon)
+        FontIconView icon;
+        @BindView(R.id.name)
+        TextView name;
+        @BindView(R.id.root)
+        LinearLayout root;
+
+        BottomMenuHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
     }
 }

@@ -180,4 +180,8 @@ public class ServerInfo {
 	public static String shareStatistics="/v2/share";							//分享添加来记录
 
     public static String bottomMenus="/v2/consumer/menus";					    //C端获取底部菜单
+
+	public static String indexDecorateContent="/v2/cassify_posts";			    //首页装修内容（c端）
+
+
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -34,7 +35,6 @@ import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
-import com.shuangling.software.event.PlayerEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
     private static final int MSG_LOGIN_CALLBACK = 3;
     private static final int MSG_GET_VERIFY_CODE = 4;
     private static final int LOGIN_VERIFY_REQUEST = 5;
-
+    private static final int MSG_VERIFY_CODE_LOGIN_CALLBACK = 6;
 
     @BindView(R.id.verifyCodeLogin)
     Button verifyCodeLogin;
@@ -98,7 +98,8 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
 
     private String mPhoneNumber;
     private DialogFragment mDialogFragment;
-
+    private VerifyCodeViewHolder verifyCodeViewHolder;
+    private CountDownTimer mCountDownTimer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
@@ -115,7 +116,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
 
     private void init() {
 
-        if(MyApplication.getInstance().getStation()!=null&&!TextUtils.isEmpty(MyApplication.getInstance().getStation().getH5_logo())){
+        if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getH5_logo())) {
             Uri uri = Uri.parse(MyApplication.getInstance().getStation().getH5_logo());
             ImageLoader.showThumb(uri, head, CommonUtils.dip2px(70), CommonUtils.dip2px(70));
         }
@@ -128,7 +129,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
         });
 
         View verifyCodeLoginView = LayoutInflater.from(this).inflate(R.layout.veritfy_code_login, null);
-        final VerifyCodeViewHolder verifyCodeViewHolder = new VerifyCodeViewHolder(verifyCodeLoginView);
+        verifyCodeViewHolder = new VerifyCodeViewHolder(verifyCodeLoginView);
         verifyCodeViewHolder.phoneNum.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -142,10 +143,64 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (CommonUtils.isMobileNO(s.toString())) {
-                    verifyCodeViewHolder.login.setEnabled(true);
+//                if (CommonUtils.isMobileNO(s.toString())) {
+//                    verifyCodeViewHolder.login.setEnabled(true);
+//                } else {
+//                    verifyCodeViewHolder.login.setEnabled(false);
+//                }
+
+                String phone = s.toString();
+                if (CommonUtils.isMobileNO(phone)) {
+                    if (!TextUtils.isEmpty(verifyCodeViewHolder.verifyCode.getText().toString())) {
+                        verifyCodeViewHolder.login.setEnabled(true);
+                    } else {
+                        verifyCodeViewHolder.login.setEnabled(false);
+                    }
+                }
+
+            }
+        });
+
+        verifyCodeViewHolder.verifyCode.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+//                if (CommonUtils.isMobileNO(s.toString())) {
+//                    verifyCodeViewHolder.login.setEnabled(true);
+//                } else {
+//                    verifyCodeViewHolder.login.setEnabled(false);
+//                }
+
+                String phone=verifyCodeViewHolder.phoneNum.getText().toString();
+                String verifyCode = s.toString();
+                if (CommonUtils.isMobileNO(phone)) {
+                    if (!TextUtils.isEmpty(verifyCode)) {
+                        verifyCodeViewHolder.login.setEnabled(true);
+                    } else {
+                        verifyCodeViewHolder.login.setEnabled(false);
+                    }
+                }
+
+            }
+        });
+
+        verifyCodeViewHolder.timer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPhoneNumber = verifyCodeViewHolder.phoneNum.getText().toString();
+                if (CommonUtils.isMobileNO(mPhoneNumber)) {
+                    getVerifyCode(mPhoneNumber);
                 } else {
-                    verifyCodeViewHolder.login.setEnabled(false);
+                    ToastUtils.show("请输入正确的手机号码");
                 }
 
             }
@@ -154,8 +209,10 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
         verifyCodeViewHolder.login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPhoneNumber = verifyCodeViewHolder.phoneNum.getText().toString();
-                getVerifyCode(mPhoneNumber);
+                String phone=verifyCodeViewHolder.phoneNum.getText().toString();
+                String verifyCode=verifyCodeViewHolder.verifyCode.getText().toString();
+                verifyCodeLogin(phone,verifyCode);
+
             }
         });
 
@@ -424,15 +481,74 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
                 }
             }
             break;
+            case MSG_VERIFY_CODE_LOGIN_CALLBACK:{
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
+                        User.setInstance(user);
+                        SharedPreferencesUtils.saveUser(user);
+
+                        final CloudPushService pushService = PushServiceFactory.getCloudPushService();
+                        pushService.bindAccount(user.getUsername(), new CommonCallback() {
+                            @Override
+                            public void onSuccess(String s) {
+                                Log.i("bindAccount-onSuccess",s);
+                            }
+
+                            @Override
+                            public void onFailed(String s, String s1) {
+                                Log.i("bindAccount-onFailed",s);
+                                Log.i("bindAccount-onFailed",s1);
+                            }
+                        });
+                        ToastUtils.show("登录成功");
+                        setResult(RESULT_OK);
+                        EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
+                        finish();
+                    }else{
+                        ToastUtils.show(jsonObject.getString("msg"));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            break;
+
             case MSG_GET_VERIFY_CODE: {
                 try {
                     mDialogFragment.dismiss();
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
+//                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+//                        Intent it = new Intent(this, VerifyCodeLoginActivity.class);
+//                        it.putExtra("PhoneNumber", mPhoneNumber);
+//                        startActivityForResult(it, LOGIN_VERIFY_REQUEST);
+//                    } else if (jsonObject != null) {
+//                        ToastUtils.show(jsonObject.getString("msg"));
+//                    }
+
+
+
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        Intent it = new Intent(this, VerifyCodeLoginActivity.class);
-                        it.putExtra("PhoneNumber", mPhoneNumber);
-                        startActivityForResult(it, LOGIN_VERIFY_REQUEST);
+
+
+                        mCountDownTimer = new CountDownTimer(60 * 1000, 500) {
+                            @Override
+                            public void onTick(long millisUntilFinished) {
+                                verifyCodeViewHolder.timer.setText("(" + millisUntilFinished / 1000 + ")重新发送");
+                                verifyCodeViewHolder.timer.setEnabled(false);
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                verifyCodeViewHolder.timer.setText("重新发送");
+                                verifyCodeViewHolder.timer.setEnabled(true);
+                            }
+                        };
+                        mCountDownTimer.start();
+
                     } else if (jsonObject != null) {
                         ToastUtils.show(jsonObject.getString("msg"));
                     }
@@ -466,16 +582,51 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
 
 
     static class VerifyCodeViewHolder {
+
         @BindView(R.id.countryCode)
         TextView countryCode;
         @BindView(R.id.phoneNum)
         EditText phoneNum;
+        @BindView(R.id.verifyCode)
+        EditText verifyCode;
+        @BindView(R.id.timer)
+        TextView timer;
         @BindView(R.id.login)
         Button login;
 
         VerifyCodeViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
+    }
+
+
+    private void verifyCodeLogin(String phone, String verifyCode) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.login;
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("type", "1");
+        params.put("phone", phone);
+        params.put("verification_code", verifyCode);
+
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = mHandler.obtainMessage(MSG_VERIFY_CODE_LOGIN_CALLBACK);
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                ToastUtils.show("登陆异常");
+
+
+            }
+        });
     }
 
 
@@ -554,6 +705,9 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
     @Override
     public void onBackPressed() {
         User.setInstance(null);
+        if (mCountDownTimer != null) {
+            mCountDownTimer.cancel();
+        }
         super.onBackPressed();
     }
 
@@ -565,4 +719,6 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
         }
         //super.onActivityResult(requestCode, resultCode, data);
     }
+
+
 }

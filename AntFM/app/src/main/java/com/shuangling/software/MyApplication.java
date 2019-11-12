@@ -76,6 +76,8 @@ public class MyApplication extends MultiDexApplication {
     private String backgroundImage;
     private boolean needResume=false;
 
+    public boolean remindPermission=true;
+
     public Station getStation() {
         return station;
     }

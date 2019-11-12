@@ -33,6 +33,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AudioDetailActivity;
+import com.shuangling.software.activity.MainActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.customview.FloatView;
 import com.shuangling.software.customview.ProgressCircleImageView;
@@ -47,6 +48,9 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cn.jake.share.frdialog.dialog.FRDialog;
+import cn.jake.share.frdialog.interfaces.FRDialogClickListener;
+
 import static android.content.Context.WINDOW_SERVICE;
 
 /**
@@ -56,6 +60,7 @@ import static android.content.Context.WINDOW_SERVICE;
  */
 public class FloatWindowUtil {
 
+    public static final int REQUEST_PERMISSION_CODE = 0x0110;
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mLayoutParams;
     private FloatView mView;
@@ -121,8 +126,13 @@ public class FloatWindowUtil {
 
         if (checkFloatWindowPermission()) {
             showWindow();
+        }else{
+
         }
     }
+
+
+
 
 
     public boolean checkFloatWindowPermission() {

@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         getBottomMenus();
         mHandler = new Handler(this);
         //showFragment(0);
-        showFloatWindowPermission();
+        //showFloatWindowPermission();
         //getCityList();
         if (MyApplication.getInstance().getStation() != null && MyApplication.getInstance().getStation().getIs_league() == 0) {
             sCurrentCity = new City(Integer.parseInt(MyApplication.getInstance().getStation().getCity_info().getCode()), MyApplication.getInstance().getStation().getCity_info().getName(), "#");

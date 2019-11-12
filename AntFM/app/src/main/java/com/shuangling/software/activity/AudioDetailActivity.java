@@ -2,19 +2,23 @@ package com.shuangling.software.activity;
 
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.provider.Settings;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -24,6 +28,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -87,6 +92,8 @@ import java.util.TimerTask;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.jake.share.frdialog.dialog.FRDialog;
+import cn.jake.share.frdialog.interfaces.FRDialogClickListener;
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.framework.ShareSDK;
@@ -126,6 +133,8 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 
     public static final int MSG_DELETE_COMMENT = 0xb;
 
+
+    public static final int REQUEST_PERMISSION_CODE = 0x0110;
 
     @BindView(R.id.activity_title)
     TopTitleBar activityTitle;
@@ -1139,7 +1148,15 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
         try{
             if(mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Paused.ordinal()||
                     mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Started.ordinal()){
-                FloatWindowUtil.getInstance().showFloatWindow();
+
+                if(FloatWindowUtil.getInstance().checkFloatWindowPermission()){
+                    FloatWindowUtil.getInstance().showFloatWindow();
+                }else{
+                    //showFloatWindowPermission();
+
+                }
+
+
             }
         }catch (RemoteException e){
 
@@ -1148,8 +1165,46 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     }
 
 
+    private void showFloatWindowPermission() {
+        FloatWindowUtil.getInstance().addOnPermissionListener(new FloatWindowUtil.OnPermissionListener() {
+            @Override
+            public void showPermissionDialog() {
+                FRDialog dialog = new FRDialog.MDBuilder(AudioDetailActivity.this)
+                        .setTitle("是否显示悬浮播放器")
+                        .setMessage("要显示悬浮播放器，需要开启悬浮窗权限")
+                        .setPositiveContentAndListener("现在去开启", new FRDialogClickListener() {
+                            @Override
+                            public boolean onDialogClick(View view) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                                    intent.setData(Uri.parse("package:" + getPackageName()));
+                                    startActivityForResult(intent, REQUEST_PERMISSION_CODE);
+                                }
+                                return true;
+                            }
+                        }).setNegativeContentAndListener("暂不开启", new FRDialogClickListener() {
+                            @Override
+                            public boolean onDialogClick(View view) {
+                                return true;
+                            }
+                        }).create();
+                dialog.show();
+            }
+        });
+        FloatWindowUtil.getInstance().setPermission();
+    }
+
+
     @Override
     protected void onResume() {
+
+        if(!FloatWindowUtil.getInstance().checkFloatWindowPermission()){
+           if(MyApplication.getInstance().remindPermission) {
+               MyApplication.getInstance().remindPermission=false;
+               showFloatWindowPermission();
+
+           }
+        }
         FloatWindowUtil.getInstance().hideWindow();
         super.onResume();
     }
@@ -1160,9 +1215,21 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
         if (requestCode == REQUEST_LOGIN && resultCode == Activity.RESULT_OK) {
             getAudioDetail(true);
             getComments();
+        }else if (requestCode == REQUEST_PERMISSION_CODE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                if (FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
+                    //FloatWindowUtil.getInstance().showFloatWindow();
+                } else {
+                    //不显示悬浮窗 并提示
+                }
+
+
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
+
 
 
     private void showShare(final String title, final String desc, final String logo, final String url) {

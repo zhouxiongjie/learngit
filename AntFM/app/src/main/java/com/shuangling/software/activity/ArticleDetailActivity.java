@@ -27,7 +27,9 @@ import com.shuangling.software.entity.Article;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
+import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.IOException;
@@ -51,6 +53,7 @@ import okhttp3.Call;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.shuangling.software.utils.CommonUtils.NETWORKTYPE_WIFI;
 
 @EnableDragToClose()
 public class ArticleDetailActivity extends AppCompatActivity implements Handler.Callback {
@@ -117,10 +120,16 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
         mArticleId = getIntent().getIntExtra("articleId", 0);
         getArticleDetail();
         String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
+        int size=1;
+        int netLoad=SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD,0);
+        if(netLoad==0||CommonUtils.getNetWorkType(this)==NETWORKTYPE_WIFI){
+           size=2;
+        }
+
         if (User.getInstance() == null) {
-            url = url + "?app=android";
+            url = url + "?app=android&size="+size;
         } else {
-            url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+            url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size="+size;
         }
         WebSettings s = webView.getSettings();
         s.setJavaScriptEnabled(true);       //js
@@ -367,10 +376,15 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
 
         if (requestCode == LOGIN_RESULT && resultCode == Activity.RESULT_OK) {
             String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
+            int size=1;
+            int netLoad=SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD,0);
+            if(netLoad==0||CommonUtils.getNetWorkType(this)==NETWORKTYPE_WIFI){
+                size=2;
+            }
             if (User.getInstance() == null) {
-                url = url + "?app=android";
+                url = url + "?app=android&size="+size;
             } else {
-                url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size="+size;
             }
             webView.loadUrl(url);
 

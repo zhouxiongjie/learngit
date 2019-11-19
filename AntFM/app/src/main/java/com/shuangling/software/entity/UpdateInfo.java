@@ -50,6 +50,7 @@ public class UpdateInfo implements Serializable {
         private String created_at;
         private String updated_at;
         private int created_by;
+        private String url;
 
         public int getId() {
             return id;
@@ -113,6 +114,14 @@ public class UpdateInfo implements Serializable {
 
         public void setCreated_by(int created_by) {
             this.created_by = created_by;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
         }
     }
 }

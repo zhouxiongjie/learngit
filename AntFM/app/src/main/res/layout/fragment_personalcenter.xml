@@ -287,12 +287,47 @@
                 android:layout_centerVertical="true"
                 android:background="@drawable/ic_right" />
         </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/checkUpdate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/setting"
+            android:padding="15dp">
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/updateIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="&#xe677;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_36px" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/updateIcon"
+                android:layout_marginStart="10dp"
+                android:text="检查更新"
+                android:textColor="@color/textColorTwo"
+                android:textSize="@dimen/font_size_28px" />
+
+            <TextView
+                android:id="@+id/update"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:drawableRight="@drawable/ic_right"
+                />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/support"
             android:layout_width="wrap_content"
             android:layout_height="14dp"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="10dp"
             android:text="湖南双菱电子科技有限公司提供技术支持"
             android:textColor="#DCDCDC"
             android:textSize="@dimen/font_size_22px"

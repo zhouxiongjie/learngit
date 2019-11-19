@@ -21,6 +21,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,6 +56,7 @@ import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ServerInfo;
+import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
@@ -636,16 +638,41 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        UpdateInfo updateInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), UpdateInfo.class);
+                        final UpdateInfo updateInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), UpdateInfo.class);
+                        if(updateInfo.getNew_version()!=null){
+                            MyApplication.getInstance().findNewVerison=true;
+                        }
                         if (updateInfo.isSupport()) {
                             UpdateDialog dialog = UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(), updateInfo.getNew_version().getContent());
                             dialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
                                 @Override
                                 public void download() {
-                                    downloadApk();
+                                    if(!TextUtils.isEmpty(updateInfo.getNew_version().getUrl())){
+                                        downloadApk(updateInfo.getNew_version().getUrl());
+                                    }else {
+                                        ToastUtils.show("下载地址有误");
+                                    }
                                 }
                             });
                             dialog.show(getSupportFragmentManager(), "UpdateDialog");
+                        }else{
+                            String version=SharedPreferencesUtils.getStringValue("version",null);
+                            if(TextUtils.isEmpty(version)||(updateInfo.getNew_version()!=null&&!updateInfo.getNew_version().getVersion().equals(version))){
+                                UpdateDialog dialog = UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(), updateInfo.getNew_version().getContent());
+                                dialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
+                                    @Override
+                                    public void download() {
+                                        if(!TextUtils.isEmpty(updateInfo.getNew_version().getUrl())){
+                                            downloadApk(updateInfo.getNew_version().getUrl());
+                                        }else {
+                                            ToastUtils.show("下载地址有误");
+                                        }
+
+                                    }
+                                });
+                                dialog.showNoUpdate(true);
+                                dialog.show(getSupportFragmentManager(), "UpdateDialog");
+                            }
                         }
 
                     }
@@ -875,7 +902,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     }
 
 
-    public void downloadApk() {
+    public void downloadApk(final String downloadUrl) {
 
 
         RxPermissions rxPermissions = new RxPermissions(this);
@@ -891,7 +918,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                             }
 
                             final CircleDialog.Builder builder = new CircleDialog.Builder();
-                            DialogFragment dialogFragment = builder
+                            final DialogFragment dialogFragment = builder
                                     .setCancelable(false)
                                     .setCanceledOnTouchOutside(false)
 //                                    .configDialog(params -> params.backgroundColor = Color.CYAN)
@@ -940,6 +967,8 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                 @Override
                                 protected void blockComplete(BaseDownloadTask task) {
                                     try {
+                                        dialogFragment.dismiss();
+
                                         Intent intent = new Intent();
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         intent.setAction(Intent.ACTION_VIEW);
@@ -993,7 +1022,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
                             final List<BaseDownloadTask> tasks = new ArrayList<>();
 
-                            tasks.add(FileDownloader.getImpl().create(ServerInfo.apkDownloadAddr).setPath(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk"));
+                            tasks.add(FileDownloader.getImpl().create(downloadUrl).setPath(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk"));
                             //queueSet.setCallbackProgressMinInterval(200);
                             //queueSet.disableCallbackProgressTimes();
                             // 由于是队列任务, 这里是我们假设了现在不需要每个任务都回调`FileDownloadListener#progress`, 我们只关系每个任务是否完成, 所以这里这样设置可以很有效的减少ipc.

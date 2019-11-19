@@ -61,6 +61,7 @@ import com.shuangling.software.activity.TvDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.activity.WebViewBackActivity;
+import com.shuangling.software.adapter.ColumnAlbumContentAdapter;
 import com.shuangling.software.adapter.ColumnContentAdapter;
 import com.shuangling.software.adapter.MoudleGridViewAdapter;
 import com.shuangling.software.customview.BannerView;
@@ -491,12 +492,12 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
 
 
-    public void getDecorateContent(final int animated,final int orderBy,String type,String columnId, String contentNumber, final int position) {
+    public void getDecorateContent(final int animated, final int orderBy, final int type, String columnId, String contentNumber, final int position) {
 
         String url = ServerInfo.serviceIP + ServerInfo.indexDecorateContent ;
         Map<String, String> params = new HashMap<String, String>();
         params.put("id", columnId);
-        params.put("type", type);
+        params.put("type", ""+type);
         params.put("limit", contentNumber);
         params.put("sorce_type", "1");
         params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
@@ -511,8 +512,11 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_CITY_TYPE_CONTENT;
-                msg.arg1 = position;
-                msg.arg2=animated;
+                Bundle bundle=new Bundle();
+                bundle.putInt("type",type);
+                bundle.putInt("position",position);
+                bundle.putInt("animated",animated);
+                msg.setData(bundle);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
 
@@ -837,7 +841,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                     if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
                         List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
                         RecyclerView recyclerView = mContentRecyclerView.get(position);
-                        ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), columnContents);
+                        ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView, columnContents);
                         recyclerView.setAdapter(adapter);
 
 
@@ -853,158 +857,315 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                 try {
                     String result = (String) msg.obj;
                     JSONObject jo = JSONObject.parseObject(result);
-                    int position = msg.arg1;
-                    int animated=msg.arg2;
-                    if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
+                    int position = msg.getData().getInt("position");
+                    int animated=msg.getData().getInt("animated");
+                    int type=msg.getData().getInt("type");
 
-                        List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
-
-                        if(animated==3){
-                            RecyclerView recyclerView = mContentRecyclerView.get(position);
-                            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                            DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                            divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
-                            recyclerView.addItemDecoration(divider);
-
-                            ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), columnContents);
-                            recyclerView.setAdapter(adapter);
-                        }else if(animated==4){
-                            RecyclerView recyclerView = mContentRecyclerView.get(position);
-                            GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
-                            recyclerView.setLayoutManager(manager);
-                            DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                            divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
-                            recyclerView.addItemDecoration(divider);
-                            final ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), columnContents);
-                            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                                @Override
-                                public int getSpanSize(int position) {
-                                    int size = adapter.getItemCount();
-                                    if ((position+1) %2== 0) {
-                                        return 1;
-                                    } else if((position+1)==size){
-                                        return 2;
-                                    }else {
-                                        return 1;
-                                    }
-                                }
-                            });
-
-                            recyclerView.setAdapter(adapter);
-
-                        }else if(animated==7){
-                            //1+4
-                            RecyclerView recyclerView = mContentRecyclerView.get(position);
-                            GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
-                            recyclerView.setLayoutManager(manager);
-                            DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                            divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
-                            recyclerView.addItemDecoration(divider);
-                            final ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), columnContents);
-                            manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                                @Override
-                                public int getSpanSize(int position) {
-                                    int size = adapter.getItemCount();
-                                    int page=size/5;
-                                    if (page>0&&(position+1)<=5*page) {
-                                        if((position+1)%5==1){
+                    if(type==4){
+                        if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
+                            List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
+                            if(animated==3){
+                                RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                recyclerView.addItemDecoration(divider);
+                                ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), recyclerView,columnContents);
+                                recyclerView.setAdapter(adapter);
+                            }else if(animated==4){
+                                RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
+                                recyclerView.setLayoutManager(manager);
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                recyclerView.addItemDecoration(divider);
+                                final ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView, columnContents);
+                                manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                                    @Override
+                                    public int getSpanSize(int position) {
+                                        int size = adapter.getItemCount();
+                                        if ((position+1) %2== 0) {
+                                            return 1;
+                                        } else if((position+1)==size){
                                             return 2;
-                                        }else{
+                                        }else {
                                             return 1;
                                         }
-                                    } else{
-                                        if(size%5==1){
-                                            if((position+1)%5==1){
-                                                return 2;
-                                            }
-                                        }else if(size%5==2){
-                                            if((position+1)%5==1){
-                                                return 2;
-                                            }else if((position+1)%5==2){
-                                                return 2;
-                                            }
-                                        }else if(size%5==3){
-                                            if((position+1)%5==1){
-                                                return 2;
-                                            }else if((position+1)%5==2){
-                                                return 1;
-                                            }else if((position+1)%5==3){
-                                                return 1;
-                                            }
-                                        }else if(size%5==4){
-                                            if((position+1)%5==1){
-                                                return 2;
-                                            }else if((position+1)%5==2){
-                                                return 1;
-                                            }else if((position+1)%5==3){
-                                                return 1;
-                                            }else if((position+1)%5==4){
-                                                return 2;
-                                            }
-                                        }
-                                        return 2;
-                                    }
-                                }
-                            });
-
-                            recyclerView.setAdapter(adapter);
-                        }else if(animated==8){
-                            //单行
-                            LayoutInflater inflater = LayoutInflater.from(getContext());
-                            View anchorLayout = inflater.inflate(R.layout.index_scrollview_column_layout, contentLayout, false);
-                            LinearLayout videoLayout= anchorLayout.findViewById(R.id.contentLayout);
-
-                            for (int i = 0; i < columnContents.size(); i++) {
-                                final ColumnContent content = columnContents.get(i);
-
-                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((CommonUtils.getScreenWidth()-CommonUtils.dip2px(10))*2/5, LinearLayout.LayoutParams.WRAP_CONTENT);
-
-//                                int margin = CommonUtils.dip2px(10);
-//                                params.setMargins(margin, margin, margin, margin);
-                                View anchorView = LayoutInflater.from(getContext()).inflate(R.layout.scrollview_video_item_layout, videoLayout, false);
-                                TextView videoTitle = anchorView.findViewById(R.id.title);
-                                SimpleDraweeView logo = anchorView.findViewById(R.id.logo);
-                                TextView duration = anchorView.findViewById(R.id.duration);
-
-                                videoTitle.setText(content.getTitle());
-                                if(content.getVideo()!=null){
-                                    duration.setText(content.getVideo().getDuration());
-                                }
-                                if (!TextUtils.isEmpty(content.getCover())) {
-                                    Uri uri = Uri.parse(content.getCover());
-                                    int width = (CommonUtils.getScreenWidth()-CommonUtils.dip2px(10))*2/5;
-                                    int height = (int) (2f * width / 3f);
-                                    ImageLoader.showThumb(uri, logo, width, height);
-                                }
-
-                                anchorView.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Intent it = new Intent(getContext(), VideoDetailActivity.class);
-                                        it.putExtra("videoId", content.getId());
-                                        startActivity(it);
                                     }
                                 });
 
+                                recyclerView.setAdapter(adapter);
 
-                                videoLayout.addView(anchorView,  params);
+                            }else if(animated==7){
+                                //1+4
+                                RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
+                                recyclerView.setLayoutManager(manager);
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                recyclerView.addItemDecoration(divider);
+                                final ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView, columnContents);
+                                manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                                    @Override
+                                    public int getSpanSize(int position) {
+                                        int size = adapter.getItemCount();
+                                        int page=size/5;
+                                        if (page>0&&(position+1)<=5*page) {
+                                            if((position+1)%5==1){
+                                                return 2;
+                                            }else{
+                                                return 1;
+                                            }
+                                        } else{
+                                            if(size%5==1){
+                                                if((position+1)%5==1){
+                                                    return 2;
+                                                }
+                                            }else if(size%5==2){
+                                                if((position+1)%5==1){
+                                                    return 2;
+                                                }else if((position+1)%5==2){
+                                                    return 2;
+                                                }
+                                            }else if(size%5==3){
+                                                if((position+1)%5==1){
+                                                    return 2;
+                                                }else if((position+1)%5==2){
+                                                    return 1;
+                                                }else if((position+1)%5==3){
+                                                    return 1;
+                                                }
+                                            }else if(size%5==4){
+                                                if((position+1)%5==1){
+                                                    return 2;
+                                                }else if((position+1)%5==2){
+                                                    return 1;
+                                                }else if((position+1)%5==3){
+                                                    return 1;
+                                                }else if((position+1)%5==4){
+                                                    return 2;
+                                                }
+                                            }
+                                            return 2;
+                                        }
+                                    }
+                                });
+
+                                recyclerView.setAdapter(adapter);
+                            }else if(animated==8){
+                                //单行
+                                RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                LayoutInflater inflater = LayoutInflater.from(getContext());
+                                View anchorLayout = inflater.inflate(R.layout.index_scrollview_column_layout, null, false);
+                                LinearLayout videoLayout= anchorLayout.findViewById(R.id.contentLayout);
+
+                                for (int i = 0; i < columnContents.size(); i++) {
+                                    final ColumnContent content = columnContents.get(i);
+
+                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((CommonUtils.getScreenWidth()-CommonUtils.dip2px(10))*2/5, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+//                                int margin = CommonUtils.dip2px(10);
+//                                params.setMargins(margin, margin, margin, margin);
+                                    View anchorView = LayoutInflater.from(getContext()).inflate(R.layout.scrollview_video_item_layout, videoLayout, false);
+                                    TextView videoTitle = anchorView.findViewById(R.id.title);
+                                    SimpleDraweeView logo = anchorView.findViewById(R.id.logo);
+                                    TextView duration = anchorView.findViewById(R.id.duration);
+
+                                    videoTitle.setText(content.getTitle());
+                                    if(content.getVideo()!=null){
+                                        duration.setText(content.getVideo().getDuration());
+                                    }
+                                    if (!TextUtils.isEmpty(content.getCover())) {
+                                        Uri uri = Uri.parse(content.getCover());
+                                        int width = (CommonUtils.getScreenWidth()-CommonUtils.dip2px(10))*2/5;
+                                        int height = (int) (2f * width / 3f);
+                                        ImageLoader.showThumb(uri, logo, width, height);
+                                    }
+
+                                    anchorView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Intent it = new Intent(getContext(), VideoDetailActivity.class);
+                                            it.putExtra("videoId", content.getId());
+                                            startActivity(it);
+                                        }
+                                    });
+
+
+                                    videoLayout.addView(anchorView,  params);
+                                }
+
+
+
+                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                recyclerView.addItemDecoration(divider);
+
+                                ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView);
+                                adapter.addHeaderView(anchorLayout);
+                                recyclerView.setAdapter(adapter);
+
                             }
 
 
+                        }
+                    }else if(type==3){
+                        //文章
+                        if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
+                            List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
                             RecyclerView recyclerView = mContentRecyclerView.get(position);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                            DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                            divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                            DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+                            divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                             recyclerView.addItemDecoration(divider);
-
-                            ColumnContentAdapter adapter = new ColumnContentAdapter(getContext());
-                            adapter.addHeaderView(anchorLayout);
+                            ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView, columnContents);
                             recyclerView.setAdapter(adapter);
+                        }
+
+                    }else if(type==7){
+                        //图集
+                        if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
+                            List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
+                            RecyclerView recyclerView = mContentRecyclerView.get(position);
+                            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+                            DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+                            divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
+                            recyclerView.addItemDecoration(divider);
+                            ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView, columnContents);
+                            recyclerView.setAdapter(adapter);
+                        }
+
+                    }else if(type==2){
+                        //音频
+                        if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
+                            List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
+
+                            if(animated==8){
+                                //单行
+                                RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                LayoutInflater inflater = LayoutInflater.from(getContext());
+                                View anchorLayout = inflater.inflate(R.layout.index_scrollview_column_layout, null, false);
+                                LinearLayout albumLayout= anchorLayout.findViewById(R.id.contentLayout);
+
+                                for (int i = 0; i < columnContents.size(); i++) {
+                                    final ColumnContent content = columnContents.get(i);
+
+                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((CommonUtils.getScreenWidth()-CommonUtils.dip2px(10))*2/7, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+//                                int margin = CommonUtils.dip2px(10);
+//                                params.setMargins(margin, margin, margin, margin);
+                                    View anchorView = LayoutInflater.from(getContext()).inflate(R.layout.scrollview_album_item_layout, albumLayout, false);
+                                    TextView videoTitle = anchorView.findViewById(R.id.title);
+                                    SimpleDraweeView logo = anchorView.findViewById(R.id.logo);
+
+
+                                    videoTitle.setText(content.getTitle());
+
+                                    if (!TextUtils.isEmpty(content.getCover())) {
+                                        Uri uri = Uri.parse(content.getCover());
+                                        int width = (CommonUtils.getScreenWidth()-CommonUtils.dip2px(10))*2/7;
+                                        int height = width;
+                                        ImageLoader.showThumb(uri, logo, width, height);
+                                    }
+
+                                    anchorView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+                                            Intent it = new Intent(getContext(), AlbumDetailActivity.class);
+                                            it.putExtra("albumId", content.getId());
+                                            startActivity(it);
+                                        }
+                                    });
+
+
+                                    albumLayout.addView(anchorView,  params);
+                                }
+
+
+
+                                recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                recyclerView.addItemDecoration(divider);
+
+                                ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView);
+                                adapter.addHeaderView(anchorLayout);
+                                recyclerView.setAdapter(adapter);
+
+                            }else if(animated==5){
+                                //三图
+                                RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
+                                recyclerView.setLayoutManager(manager);
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                recyclerView.addItemDecoration(divider);
+                                final ColumnAlbumContentAdapter adapter = new ColumnAlbumContentAdapter(getContext(), columnContents);
+                                manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                                    @Override
+                                    public int getSpanSize(int position) {
+                                        int size = adapter.getItemCount();
+                                        int page = size / 3;
+                                        if (page > 0 && (position + 1) <= 3 * page) {
+                                            return 1;
+                                        } else {
+                                            return 3;
+                                        }
+                                    }
+                                });
+                                adapter.setMode(1);
+
+                                recyclerView.setAdapter(adapter);
+
+
+
+                            }else if(animated==9){
+                                //三图+5图
+                                RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
+                                recyclerView.setLayoutManager(manager);
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                recyclerView.addItemDecoration(divider);
+                                final ColumnAlbumContentAdapter adapter = new ColumnAlbumContentAdapter(getContext(), columnContents);
+                                manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                                    @Override
+                                    public int getSpanSize(int position) {
+
+                                        int size = adapter.getItemCount();
+                                        int page=size/8;
+                                        if (page>0&&(position+1)<=8*page) {
+                                            if((position+1)%8>0&&(position+1)%8<=3){
+                                                return 1;
+                                            }else{
+                                                return 3;
+                                            }
+                                        }else{
+                                            if(size%8==1||size%8==2){
+                                                return 3;
+                                            }else if(size%8==3){
+                                                return 1;
+                                            }else{
+                                                if((position+1)%8<=3&&(position+1)%8>0){
+                                                    return 1;
+                                                }else {
+                                                    return 3;
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                                adapter.setMode(2);
+
+                                recyclerView.setAdapter(adapter);
+                            }
 
                         }
 
-
                     }
+
 
 
                 } catch (Exception e) {
@@ -1095,9 +1256,121 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                         public void onClick(View view) {
                                             BannerInfo banner=(BannerInfo)view.getTag();
 
-                                            Intent it=new Intent(getContext(),WebViewBackActivity.class);
-                                            it.putExtra("url",banner.getUrl());
-                                            startActivity(it);
+
+
+//                                            Intent it=new Intent(getContext(),WebViewBackActivity.class);
+//                                            it.putExtra("url",banner.getUrl());
+//                                            startActivity(it);
+
+                                            if(banner.getUrl().startsWith(ServerInfo.h5IP+"/tv")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/tv")){
+                                                Intent it=new Intent(getContext(),RadioListActivity.class);
+                                                it.putExtra("type","2");
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/radios/")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/radios/")){
+                                                String radioId=banner.getUrl().substring(banner.getUrl().lastIndexOf("/")+1);
+                                                Intent it=new Intent(getContext(),TvDetailActivity.class);
+                                                it.putExtra("radioId",Integer.parseInt(radioId));
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/radios")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/radios")){
+                                                Intent it=new Intent(getContext(),RadioListActivity.class);
+                                                it.putExtra("type","1");
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/radios/")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/radios/")){
+                                                String radioId=banner.getUrl().substring(banner.getUrl().lastIndexOf("/")+1);
+                                                Intent it=new Intent(getContext(),RadioDetailActivity.class);
+                                                it.putExtra("radioId",Integer.parseInt(radioId));
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/gover")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/gover")){
+                                                Intent it=new Intent(getContext(),WebViewActivity.class);
+                                                it.putExtra("url",banner.getUrl());
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/dj")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/dj")){
+                                                Intent it=new Intent(getContext(),WebViewActivity.class);
+                                                it.putExtra("url",banner.getUrl());
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/interact")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/interact")){
+                                                Intent it=new Intent(getContext(),WebViewActivity.class);
+                                                it.putExtra("url",banner.getUrl());
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/guide")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/guide")){
+                                                Intent it=new Intent(getContext(),WebViewActivity.class);
+                                                it.putExtra("url",banner.getUrl());
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/cates/")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/cates/")){
+                                                //跳转栏目
+                                                String columnid=banner.getUrl().substring(banner.getUrl().lastIndexOf("/")+1);
+                                                Column column=new Column();
+                                                column.setId(Integer.parseInt(columnid));
+                                                ((MainActivity)getActivity()).switchRecommend(column);
+
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/specials/")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/specials/")){
+                                                //跳转栏目
+                                                int columnid=0;
+                                                for(int i=0;i<mColumns.size();i++){
+                                                    if(mColumns.get(i).getType()==1){
+                                                        columnid=mColumns.get(i).getId();
+                                                        break;
+                                                    }
+                                                }
+                                                Column column=new Column();
+                                                column.setId(columnid);
+                                                ((MainActivity)getActivity()).switchRecommend(column);
+
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/orgs/")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/orgs/")){
+                                                String organizationId=banner.getUrl().substring(banner.getUrl().lastIndexOf("/")+1);
+                                                Intent it = new Intent(getContext(), OrganizationDetailActivity.class);
+                                                it.putExtra("organizationId", Integer.parseInt(organizationId));
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/anchors/")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/anchors/")){
+                                                String anchorId=banner.getUrl().substring(banner.getUrl().lastIndexOf("/")+1);
+                                                Intent it = new Intent(getContext(), AnchorDetailActivity.class);
+                                                it.putExtra("anchorId", Integer.parseInt(anchorId));
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/atlas/")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/atlas/")){
+                                                String galleriaId=banner.getUrl().substring(banner.getUrl().lastIndexOf("/")+1);
+                                                Intent it = new Intent(getContext(), GalleriaActivity.class);
+                                                it.putExtra("galleriaId", Integer.parseInt(galleriaId));
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/albums/")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/albums/")){
+                                                String albumId=banner.getUrl().substring(banner.getUrl().lastIndexOf("/")+1);
+                                                Intent it = new Intent(getContext(), AlbumDetailActivity.class);
+                                                it.putExtra("albumId", Integer.parseInt(albumId));
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/audios/")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/audios/")){
+                                                String audioId=banner.getUrl().substring(banner.getUrl().lastIndexOf("/")+1);
+                                                Intent it = new Intent(getContext(), AudioDetailActivity.class);
+                                                it.putExtra("audioId", Integer.parseInt(audioId));
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/posts/")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/posts/")){
+                                                String articleId=banner.getUrl().substring(banner.getUrl().lastIndexOf("/")+1);
+                                                Intent it = new Intent(getContext(), ArticleDetailActivity.class);
+                                                it.putExtra("articleId", Integer.parseInt(articleId));
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/specials/")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/specials/")){
+                                                String specialId=banner.getUrl().substring(banner.getUrl().lastIndexOf("/")+1);
+                                                Intent it = new Intent(getContext(), SpecialDetailActivity.class);
+                                                it.putExtra("specialId", Integer.parseInt(specialId));
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/videos/")||banner.getUrl().startsWith(ServerInfo.h5HttpsIP+"/videos/")){
+                                                String videoId=banner.getUrl().substring(banner.getUrl().lastIndexOf("/")+1);
+                                                Intent it = new Intent(getContext(), VideoDetailActivity.class);
+                                                it.putExtra("videoId",Integer.parseInt(videoId));
+                                                startActivity(it);
+                                            }else if(banner.getUrl().startsWith(ServerInfo.h5IP+"/subcates/")||banner.getUrl().startsWith(ServerInfo.h5IP+"/subcates/")){
+                                                String url=banner.getUrl();
+                                                String columnid=url.substring(url.lastIndexOf("/")+1,url.lastIndexOf("?"));
+                                                Column column=new Column();
+                                                column.setId(Integer.parseInt(columnid));
+                                                column.setName(url.substring(url.lastIndexOf("=")+1));
+                                                Intent it = new Intent(getContext(), ContentActivity.class);
+                                                it.putExtra("column", column);
+                                                startActivity(it);
+                                            }else {
+                                                Intent it=new Intent(getContext(),WebViewBackActivity.class);
+                                                it.putExtra("url",banner.getUrl());
+                                                it.putExtra("title",banner.getTitle());
+                                                startActivity(it);
+                                            }
                                         }
                                     });
 
@@ -1173,6 +1446,14 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                                             it.putExtra("url",cb.getSource_url());
                                                             startActivity(it);
                                                         }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/dj")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/dj")){
+                                                            Intent it=new Intent(getContext(),WebViewActivity.class);
+                                                            it.putExtra("url",cb.getSource_url());
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/interact")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/interact")){
+                                                            Intent it=new Intent(getContext(),WebViewActivity.class);
+                                                            it.putExtra("url",cb.getSource_url());
+                                                            startActivity(it);
+                                                        }else if(cb.getSource_url().startsWith(ServerInfo.h5IP+"/guide")||cb.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/guide")){
                                                             Intent it=new Intent(getContext(),WebViewActivity.class);
                                                             it.putExtra("url",cb.getSource_url());
                                                             startActivity(it);
@@ -1359,6 +1640,14 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                                         it.putExtra("url",content.getSource_url());
                                                         startActivity(it);
                                                     }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/dj")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/dj")){
+                                                        Intent it=new Intent(getContext(),WebViewActivity.class);
+                                                        it.putExtra("url",content.getSource_url());
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/interact")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/interact")){
+                                                        Intent it=new Intent(getContext(),WebViewActivity.class);
+                                                        it.putExtra("url",content.getSource_url());
+                                                        startActivity(it);
+                                                    }else if(content.getSource_url().startsWith(ServerInfo.h5IP+"/guide")||content.getSource_url().startsWith(ServerInfo.h5HttpsIP+"/guide")){
                                                         Intent it=new Intent(getContext(),WebViewActivity.class);
                                                         it.putExtra("url",content.getSource_url());
                                                         startActivity(it);
@@ -1607,7 +1896,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
                                 mContentRecyclerView.add(recyclerView);
                                 contentLayout.addView(clolumnLayout);
-                                getDecorateContent(module.getAnimated(),module.getOrder_by(),"4",columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
+                                getDecorateContent(module.getAnimated(),module.getOrder_by(),4,columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
 
                             }else if (module.getType() == 16){
                                 //音频
@@ -1642,7 +1931,77 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
                                 mContentRecyclerView.add(recyclerView);
                                 contentLayout.addView(clolumnLayout);
-                                getDecorateContent(module.getAnimated(),module.getOrder_by(),"1",columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
+                                getDecorateContent(module.getAnimated(),module.getOrder_by(),2,columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
+
+                            }else if (module.getType() == 17){
+                                //文章
+                                LayoutInflater inflater = LayoutInflater.from(getContext());
+                                View clolumnLayout = inflater.inflate(R.layout.index_column_item, contentLayout, false);
+                                SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
+                                TextView column = clolumnLayout.findViewById(R.id.column);
+                                TextView more= clolumnLayout.findViewById(R.id.more);
+                                more.setVisibility(View.GONE);
+                                column.setText(module.getTitle());
+
+                                Station station=MyApplication.getInstance().getStation();
+                                if(station!=null&&!TextUtils.isEmpty(station.getIcon3())){
+                                    Uri uri = Uri.parse(station.getIcon3());
+                                    int width=CommonUtils.dip2px(9);
+                                    int height=width*2;
+                                    ImageLoader.showThumb(uri,logo,width,height);
+                                }else{
+                                    logo.setVisibility(View.GONE);
+                                }
+
+
+                                String[] ids= module.getData_source_id().split(",");
+                                final String columnId=ids[ids.length-1];
+                                more.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+
+                                    }
+                                });
+                                RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);
+
+                                mContentRecyclerView.add(recyclerView);
+                                contentLayout.addView(clolumnLayout);
+                                getDecorateContent(module.getAnimated(),module.getOrder_by(),3,columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
+
+                            }else if (module.getType() == 18){
+                                //图集
+                                LayoutInflater inflater = LayoutInflater.from(getContext());
+                                View clolumnLayout = inflater.inflate(R.layout.index_column_item, contentLayout, false);
+                                SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
+                                TextView column = clolumnLayout.findViewById(R.id.column);
+                                TextView more= clolumnLayout.findViewById(R.id.more);
+                                more.setVisibility(View.GONE);
+                                column.setText(module.getTitle());
+
+                                Station station=MyApplication.getInstance().getStation();
+                                if(station!=null&&!TextUtils.isEmpty(station.getIcon3())){
+                                    Uri uri = Uri.parse(station.getIcon3());
+                                    int width=CommonUtils.dip2px(9);
+                                    int height=width*2;
+                                    ImageLoader.showThumb(uri,logo,width,height);
+                                }else{
+                                    logo.setVisibility(View.GONE);
+                                }
+
+
+                                String[] ids= module.getData_source_id().split(",");
+                                final String columnId=ids[ids.length-1];
+                                more.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+
+                                    }
+                                });
+                                RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);
+
+                                mContentRecyclerView.add(recyclerView);
+                                contentLayout.addView(clolumnLayout);
+                                getDecorateContent(module.getAnimated(),module.getOrder_by(),7,columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
 
                             }
 

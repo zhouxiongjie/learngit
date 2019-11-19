@@ -3,7 +3,6 @@ package com.shuangling.software.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -11,13 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
@@ -25,12 +22,15 @@ import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
+import com.shuangling.software.customview.BannerView;
+import com.shuangling.software.entity.BannerInfo;
 import com.shuangling.software.entity.ColumnContent;
-import com.shuangling.software.entity.Station;
+import com.shuangling.software.entity.DecorModule;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.TimeUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -41,7 +41,7 @@ import butterknife.ButterKnife;
  * Created by 666 on 2017/1/3.
  * 首页分类
  */
-public class ColumnContentAdapter extends RecyclerView.Adapter implements View.OnClickListener {
+public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implements View.OnClickListener {
 
     //"type": 4,//1 音频 2 专辑 3 文章 4 视频 5专题
 
@@ -54,13 +54,14 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
     public static final int TYPE_GALLERIE_ONE = 6;      //一图集
     public static final int TYPE_GALLERIE_THREE = 7;    //三图集
     public static final int TYPE_HEAD = 8;              //头
+    public static final int TYPE_DECORATE = 9;          //装修头
 
     private Context mContext;
+
     private List<ColumnContent> mColumnContent;
     private LayoutInflater inflater;
     private View mHeaderView;
-    private RecyclerView mRecyclerView;
-
+    private LinearLayout mDecorateLayout;
     private boolean mIsHot = false;
 
     private boolean mIsVideo = false;
@@ -94,19 +95,20 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
         void onItemClick(View view, int pos);
     }
 
-    public ColumnContentAdapter(Context context,RecyclerView recyclerView) {
+    public ColumnDecorateContentAdapter(Context context) {
         this.mContext = context;
-        mRecyclerView=recyclerView;
         inflater = LayoutInflater.from(mContext);
 
     }
-    public ColumnContentAdapter(Context context, RecyclerView recyclerView,List<ColumnContent> columnContent) {
+
+    public ColumnDecorateContentAdapter(Context context, List<ColumnContent> columnContent) {
         this.mContext = context;
-        mRecyclerView=recyclerView;
         this.mColumnContent = columnContent;
         inflater = LayoutInflater.from(mContext);
 
     }
+
+
 
     public void setData(List<ColumnContent> columnContent) {
         this.mColumnContent = columnContent;
@@ -119,6 +121,11 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
         notifyItemInserted(0);
     }
 
+    public void addDecorateLayout(LinearLayout decorateLayout) {
+        mDecorateLayout = decorateLayout;
+        notifyDataSetChanged();
+    }
+
     public List<ColumnContent> getData() {
         return this.mColumnContent;
     }
@@ -129,13 +136,15 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
 
         if (viewType == TYPE_HEAD) {
             return new HeadViewHolder(mHeaderView);
+        } else if (viewType == TYPE_DECORATE) {
+            return new DecorateViewHolder(mDecorateLayout);
         } else if (viewType == TYPE_AUDIO) {
             return new AudioViewHolder(inflater.inflate(R.layout.content_audio_item, parent, false));
         } else if (viewType == TYPE_ALBUM) {
             return new AlbumViewHolder(inflater.inflate(R.layout.content_album_item, parent, false));
         } else if (viewType == TYPE_ARTICLE) {
             return new ArticleViewHolder(inflater.inflate(R.layout.content_article_item, parent, false));
-        }  else if (viewType == TYPE_ARTICLE_THREE) {
+        } else if (viewType == TYPE_ARTICLE_THREE) {
             return new ArticleViewThreeHolder(inflater.inflate(R.layout.content_article_three_item, parent, false));
         } else if (viewType == TYPE_VIDEO) {
             if (isVideo()) {
@@ -156,56 +165,48 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final ColumnContent content;
-        boolean showExcellent = false;
         if (mHeaderView != null) {
             if (position == 0) {
                 content = null;
-            } else {
+            } else if(mDecorateLayout!=null){
+                if(position==1){
+                    content=null;
+                }else{
+                    content = mColumnContent.get(position - 2);
+                }
+
+            }else{
                 content = mColumnContent.get(position - 1);
-//                if (isIsHot()) {
-//                    if (position - 2 > 0) {
-//                        if (mColumnContent.get(position - 2).getTop() != null) {
-//                            showExcellent = true;
-//                        }
-//                    }
-//                }
             }
 
         } else {
-            content = mColumnContent.get(position);
-//            if (isIsHot()) {
-//                if (position - 1 > 0) {
-//                    if (mColumnContent.get(position - 1).getTop() != null) {
-//                        showExcellent = true;
-//                    }
-//                }
-//            }
-        }
-
-        int itemViewType=getItemViewType(position);
-        if ( itemViewType== TYPE_HEAD) {
-
-        } else if (itemViewType == TYPE_AUDIO) {
-            AudioViewHolder audioViewHolder = (AudioViewHolder) holder;
-            if (showExcellent) {
-                audioViewHolder.excellent.setVisibility(View.VISIBLE);
-                Station station=MyApplication.getInstance().getStation();
-                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
-                    Uri uri = Uri.parse(station.getIcon2());
-                    int width=CommonUtils.dip2px(15);
-                    int height=width;
-                    ImageLoader.showThumb(uri,audioViewHolder.excellentLogo,width,height);
+            if(mDecorateLayout!=null){
+                if(position==0){
+                    content=null;
                 }else{
-                    audioViewHolder.excellentLogo.setVisibility(View.GONE);
+                    content = mColumnContent.get(position-1);
                 }
 
-            } else {
-                audioViewHolder.excellent.setVisibility(View.GONE);
+            }else{
+                content = mColumnContent.get(position);
             }
 
-            if(content.getTop()!=null){
+        }
+
+
+        int itemViewType = getItemViewType(position);
+        if (itemViewType == TYPE_HEAD) {
+
+        }else if(itemViewType == TYPE_DECORATE){
+
+
+        }else if (itemViewType == TYPE_AUDIO) {
+            AudioViewHolder audioViewHolder = (AudioViewHolder) holder;
+
+            audioViewHolder.excellent.setVisibility(View.GONE);
+            if (content.getTop() != null) {
                 audioViewHolder.top.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 audioViewHolder.top.setVisibility(View.GONE);
             }
             if (!TextUtils.isEmpty(content.getCover())) {
@@ -213,7 +214,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 int width = CommonUtils.dip2px(100);
                 int height = width;
                 ImageLoader.showThumb(uri, audioViewHolder.logo, width, height);
-            }else{
+            } else {
                 ImageLoader.showThumb(audioViewHolder.logo, R.drawable.article_placeholder);
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
@@ -234,24 +235,13 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
 
         } else if (itemViewType == TYPE_ALBUM) {
             final AlbumViewHolder albumViewHolder = (AlbumViewHolder) holder;
-            if (showExcellent) {
-                albumViewHolder.excellent.setVisibility(View.VISIBLE);
-                Station station=MyApplication.getInstance().getStation();
-                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
-                    Uri uri = Uri.parse(station.getIcon2());
-                    int width=CommonUtils.dip2px(15);
-                    int height=width;
-                    ImageLoader.showThumb(uri,albumViewHolder.excellentLogo,width,height);
-                }else{
-                    albumViewHolder.excellentLogo.setVisibility(View.GONE);
-                }
-            } else {
-                albumViewHolder.excellent.setVisibility(View.GONE);
-            }
 
-            if(content.getTop()!=null){
+            albumViewHolder.excellent.setVisibility(View.GONE);
+
+
+            if (content.getTop() != null) {
                 albumViewHolder.top.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 albumViewHolder.top.setVisibility(View.GONE);
             }
 
@@ -265,16 +255,16 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 albumViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
 
-            if(albumViewHolder.title.getTag()!=null){
-                ViewTreeObserver.OnPreDrawListener listener =(ViewTreeObserver.OnPreDrawListener)albumViewHolder.title.getTag();
+            if (albumViewHolder.title.getTag() != null) {
+                ViewTreeObserver.OnPreDrawListener listener = (ViewTreeObserver.OnPreDrawListener) albumViewHolder.title.getTag();
                 albumViewHolder.title.getViewTreeObserver().removeOnPreDrawListener(listener);
             }
 
-            ViewTreeObserver.OnPreDrawListener listener=new ViewTreeObserver.OnPreDrawListener() {
+            ViewTreeObserver.OnPreDrawListener listener = new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
-                    Log.i("test","albumViewHolder onPreDraw");
-                    Log.i("test",content.getTitle());
+                    Log.i("test", "albumViewHolder onPreDraw");
+                    Log.i("test", content.getTitle());
                     ViewTreeObserver obs = albumViewHolder.title.getViewTreeObserver();
                     obs.removeOnPreDrawListener(this);
                     albumViewHolder.title.setTag(null);
@@ -282,27 +272,27 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
 //                    Log.i("test_title",""+content.getTitle());
 //                    Log.i("test_title_width",""+albumViewHolder.title.getWidth());
 
-                    if(albumViewHolder.title.getLineCount()>2){
+                    if (albumViewHolder.title.getLineCount() > 2) {
 //                        Log.i("test","getLineCount>2");
                         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                         layoutParams.topMargin = CommonUtils.dip2px(5);
-                        layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
+                        layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                         albumViewHolder.layout.setLayoutParams(layoutParams);
-                    } else{
+                    } else {
 
 
-                        if(albumViewHolder.layout.getWidth()>albumViewHolder.title.getWidth()){
+                        if (albumViewHolder.layout.getWidth() > albumViewHolder.title.getWidth()) {
 //                            Log.i("test","layout.getWidth()>title.getWidth()");
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
-                            layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
+                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                             albumViewHolder.layout.setLayoutParams(layoutParams);
 
-                        }else{
+                        } else {
 //                            Log.i("test","layout.getWidth()<title.getWidth()");
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
-                            layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM,R.id.logo);
+                            layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
                             albumViewHolder.layout.setLayoutParams(layoutParams);
                         }
 
@@ -313,15 +303,15 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             albumViewHolder.title.setTag(listener);
             albumViewHolder.title.getViewTreeObserver().addOnPreDrawListener(listener);
             albumViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            if(content.getAlbums().getStatus()==1){
+            if (content.getAlbums().getStatus() == 1) {
                 //已完结
-                albumViewHolder.title.setText(CommonUtils.tagKeyword("完~"+content.getTitle(),"完~",CommonUtils.getThemeColor(mContext)));
-            }else{
+                albumViewHolder.title.setText(CommonUtils.tagKeyword("完~" + content.getTitle(), "完~", CommonUtils.getThemeColor(mContext)));
+            } else {
                 albumViewHolder.title.setText(content.getTitle());
             }
 
             albumViewHolder.count.setText("" + content.getAlbums().getCount() + "集");
-            albumViewHolder.commentNum.setText(content.getComment()+"评论");
+            albumViewHolder.commentNum.setText(content.getComment() + "评论");
             albumViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -335,21 +325,10 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
         } else if (itemViewType == TYPE_ARTICLE) {
             final ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
 
-            if (showExcellent) {
-                articleViewHolder.excellent.setVisibility(View.VISIBLE);
-                Station station=MyApplication.getInstance().getStation();
-                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
-                    Uri uri = Uri.parse(station.getIcon2());
-                    int width=CommonUtils.dip2px(15);
-                    int height=width;
-                    ImageLoader.showThumb(uri,articleViewHolder.excellentLogo,width,height);
-                }else{
-                    articleViewHolder.excellentLogo.setVisibility(View.GONE);
-                }
-            } else {
-                articleViewHolder.excellent.setVisibility(View.GONE);
-            }
-            if(content.getTop()!=null){
+
+            articleViewHolder.excellent.setVisibility(View.GONE);
+
+            if (content.getTop() != null) {
                 articleViewHolder.top.setVisibility(View.VISIBLE);
                 if (!TextUtils.isEmpty(content.getCover())) {
                     articleViewHolder.logo.setVisibility(View.VISIBLE);
@@ -357,18 +336,18 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                     int height = (int) (2f * width / 3f);
                     ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
-                }else{
+                } else {
                     articleViewHolder.logo.setVisibility(View.GONE);
                 }
-            }else{
+            } else {
                 articleViewHolder.top.setVisibility(View.GONE);
-                if (content.getArticle().getCovers().size()>0&&!TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
+                if (content.getArticle().getCovers().size() > 0 && !TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
                     articleViewHolder.logo.setVisibility(View.VISIBLE);
                     Uri uri = Uri.parse(content.getArticle().getCovers().get(0));
                     int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                     int height = (int) (2f * width / 3f);
                     ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
-                }else{
+                } else {
                     articleViewHolder.logo.setVisibility(View.GONE);
                 }
             }
@@ -377,39 +356,39 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             articleViewHolder.title.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
-                    Log.i("test","articleViewHolder onPreDraw");
-                    Log.i("test",content.getTitle());
+                    Log.i("test", "articleViewHolder onPreDraw");
+                    Log.i("test", content.getTitle());
                     ViewTreeObserver obs = articleViewHolder.title.getViewTreeObserver();
                     obs.removeOnPreDrawListener(this);
 
-                    if(articleViewHolder.logo.getVisibility()==View.GONE){
+                    if (articleViewHolder.logo.getVisibility() == View.GONE) {
 //                            Log.i("test","articleViewHolder.logo=GONE");
-                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                            layoutParams.topMargin = CommonUtils.dip2px(10);
-                            layoutParams.addRule(RelativeLayout.BELOW,R.id.title);
-                            articleViewHolder.layout.setLayoutParams(layoutParams);
+                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                        layoutParams.topMargin = CommonUtils.dip2px(10);
+                        layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
+                        articleViewHolder.layout.setLayoutParams(layoutParams);
 
-                    }else{
-                        if(articleViewHolder.title.getLineCount()>2){
+                    } else {
+                        if (articleViewHolder.title.getLineCount() > 2) {
 //                            Log.i("test","getLineCount>2");
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
-                            layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
+                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                             articleViewHolder.layout.setLayoutParams(layoutParams);
-                        } else{
+                        } else {
 
-                            if(articleViewHolder.layout.getWidth()>articleViewHolder.title.getWidth()){
+                            if (articleViewHolder.layout.getWidth() > articleViewHolder.title.getWidth()) {
 //                                Log.i("test","layout.getWidth()>title.getWidth()");
                                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                                 layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
+                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                                 articleViewHolder.layout.setLayoutParams(layoutParams);
 
-                            }else{
+                            } else {
 //                                Log.i("test","layout.getWidth()<title.getWidth()");
                                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                                 layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM,R.id.logo);
+                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
                                 articleViewHolder.layout.setLayoutParams(layoutParams);
                             }
 
@@ -439,26 +418,15 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     mContext.startActivity(it);
                 }
             });
-        }  else if (itemViewType == TYPE_ARTICLE_THREE) {
+        } else if (itemViewType == TYPE_ARTICLE_THREE) {
             final ArticleViewThreeHolder articleViewHolder = (ArticleViewThreeHolder) holder;
 
-            if (showExcellent) {
-                articleViewHolder.excellent.setVisibility(View.VISIBLE);
-                Station station=MyApplication.getInstance().getStation();
-                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
-                    Uri uri = Uri.parse(station.getIcon2());
-                    int width=CommonUtils.dip2px(15);
-                    int height=width;
-                    ImageLoader.showThumb(uri,articleViewHolder.excellentLogo,width,height);
-                }else{
-                    articleViewHolder.excellentLogo.setVisibility(View.GONE);
-                }
-            } else {
-                articleViewHolder.excellent.setVisibility(View.GONE);
-            }
-            if(content.getTop()!=null){
+
+            articleViewHolder.excellent.setVisibility(View.GONE);
+
+            if (content.getTop() != null) {
                 articleViewHolder.top.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 articleViewHolder.top.setVisibility(View.GONE);
             }
 
@@ -467,7 +435,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
                 ImageLoader.showThumb(uri, articleViewHolder.pic1, width, height);
-            }else{
+            } else {
                 ImageLoader.showThumb(articleViewHolder.pic1, R.drawable.video_placeholder);
             }
             if (!TextUtils.isEmpty(content.getArticle().getCovers().get(1))) {
@@ -475,7 +443,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
                 ImageLoader.showThumb(uri, articleViewHolder.pic2, width, height);
-            }else{
+            } else {
                 ImageLoader.showThumb(articleViewHolder.pic2, R.drawable.video_placeholder);
             }
             if (!TextUtils.isEmpty(content.getArticle().getCovers().get(2))) {
@@ -483,10 +451,9 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
                 ImageLoader.showThumb(uri, articleViewHolder.pic3, width, height);
-            }else{
+            } else {
                 ImageLoader.showThumb(articleViewHolder.pic3, R.drawable.video_placeholder);
             }
-
 
 
             articleViewHolder.title.setText(content.getTitle());
@@ -506,26 +473,15 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     mContext.startActivity(it);
                 }
             });
-        }else if (itemViewType == TYPE_VIDEO) {
+        } else if (itemViewType == TYPE_VIDEO) {
             VideoViewHolder videoViewHolder = (VideoViewHolder) holder;
 
-            if (showExcellent) {
-                videoViewHolder.excellent.setVisibility(View.VISIBLE);
-                Station station=MyApplication.getInstance().getStation();
-                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
-                    Uri uri = Uri.parse(station.getIcon2());
-                    int width=CommonUtils.dip2px(15);
-                    int height=width;
-                    ImageLoader.showThumb(uri,videoViewHolder.excellentLogo,width,height);
-                }else{
-                    videoViewHolder.excellentLogo.setVisibility(View.GONE);
-                }
-            } else {
-                videoViewHolder.excellent.setVisibility(View.GONE);
-            }
-            if(content.getTop()!=null){
+
+            videoViewHolder.excellent.setVisibility(View.GONE);
+
+            if (content.getTop() != null) {
                 videoViewHolder.top.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 videoViewHolder.top.setVisibility(View.GONE);
             }
             if (!TextUtils.isEmpty(content.getCover())) {
@@ -533,7 +489,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 int width = CommonUtils.getScreenWidth() - CommonUtils.dip2px(20);
                 int height = (int) (9f * width / 16f);
                 ImageLoader.showThumb(uri, videoViewHolder.logo, width, height);
-            }else{
+            } else {
                 ImageLoader.showThumb(videoViewHolder.logo, R.drawable.video_placeholder);
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
@@ -547,27 +503,14 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     }
                 }
             }
-            if(!TextUtils.isEmpty(content.getVideo().getDuration())){
+            if (content.getVideo()!=null&&!TextUtils.isEmpty(content.getVideo().getDuration())) {
                 videoViewHolder.duration.setText(CommonUtils.getShowTime((long) Float.parseFloat(content.getVideo().getDuration()) * 1000));
-            }else{
+            } else {
                 videoViewHolder.duration.setText("00:00");
             }
-
-            RecyclerView.LayoutManager lm=mRecyclerView.getLayoutManager();
-            if(lm instanceof GridLayoutManager){
-                GridLayoutManager manager =(GridLayoutManager)lm;
-                int maxSpanCount=manager.getSpanCount();
-                int spanSize=manager.getSpanSizeLookup().getSpanSize(position);
-                if(maxSpanCount==2&&spanSize==1){
-                    videoViewHolder.playIcon.setVisibility(View.GONE);
-                } else{
-                    videoViewHolder.playIcon.setVisibility(View.VISIBLE);
-                }
-            }
-
             videoViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             videoViewHolder.title.setText(content.getTitle());
-            videoViewHolder.commentNum.setText( content.getComment()+"评论" );
+            videoViewHolder.commentNum.setText(content.getComment() + "评论");
             videoViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -576,26 +519,15 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     mContext.startActivity(it);
                 }
             });
-        } else if (itemViewType== TYPE_GALLERIE_ONE) {
+        } else if (itemViewType == TYPE_GALLERIE_ONE) {
             GallerieOneViewHolder gallerieOneViewHolder = (GallerieOneViewHolder) holder;
 
-            if (showExcellent) {
-                gallerieOneViewHolder.excellent.setVisibility(View.VISIBLE);
-                Station station=MyApplication.getInstance().getStation();
-                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
-                    Uri uri = Uri.parse(station.getIcon2());
-                    int width=CommonUtils.dip2px(15);
-                    int height=width;
-                    ImageLoader.showThumb(uri,gallerieOneViewHolder.excellentLogo,width,height);
-                }else{
-                    gallerieOneViewHolder.excellentLogo.setVisibility(View.GONE);
-                }
-            } else {
-                gallerieOneViewHolder.excellent.setVisibility(View.GONE);
-            }
-            if(content.getTop()!=null){
+
+            gallerieOneViewHolder.excellent.setVisibility(View.GONE);
+
+            if (content.getTop() != null) {
                 gallerieOneViewHolder.top.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 gallerieOneViewHolder.top.setVisibility(View.GONE);
             }
             if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(0))) {
@@ -603,7 +535,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 int width = CommonUtils.getScreenWidth();
                 int height = (int) (9f * width / 16f);
                 ImageLoader.showThumb(uri, gallerieOneViewHolder.logo, width, height);
-            }else{
+            } else {
                 ImageLoader.showThumb(gallerieOneViewHolder.logo, R.drawable.video_placeholder);
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
@@ -625,23 +557,12 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
         } else if (itemViewType == TYPE_GALLERIE_THREE) {
             GallerieViewThreeHolder gallerieViewThreeHolder = (GallerieViewThreeHolder) holder;
 
-            if (showExcellent) {
-                gallerieViewThreeHolder.excellent.setVisibility(View.VISIBLE);
-                Station station=MyApplication.getInstance().getStation();
-                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
-                    Uri uri = Uri.parse(station.getIcon2());
-                    int width=CommonUtils.dip2px(15);
-                    int height=width;
-                    ImageLoader.showThumb(uri,gallerieViewThreeHolder.excellentLogo,width,height);
-                }else{
-                    gallerieViewThreeHolder.excellentLogo.setVisibility(View.GONE);
-                }
-            } else {
-                gallerieViewThreeHolder.excellent.setVisibility(View.GONE);
-            }
-            if(content.getTop()!=null){
+
+            gallerieViewThreeHolder.excellent.setVisibility(View.GONE);
+
+            if (content.getTop() != null) {
                 gallerieViewThreeHolder.top.setVisibility(View.VISIBLE);
-            }else{
+            } else {
                 gallerieViewThreeHolder.top.setVisibility(View.GONE);
             }
             if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(0))) {
@@ -649,7 +570,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
                 ImageLoader.showThumb(uri, gallerieViewThreeHolder.pic1, width, height);
-            }else{
+            } else {
                 ImageLoader.showThumb(gallerieViewThreeHolder.pic1, R.drawable.video_placeholder);
             }
             if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(1))) {
@@ -657,7 +578,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
                 ImageLoader.showThumb(uri, gallerieViewThreeHolder.pic2, width, height);
-            }else{
+            } else {
                 ImageLoader.showThumb(gallerieViewThreeHolder.pic2, R.drawable.video_placeholder);
             }
             if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(2))) {
@@ -665,7 +586,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
                 ImageLoader.showThumb(uri, gallerieViewThreeHolder.pic3, width, height);
-            }else{
+            } else {
                 ImageLoader.showThumb(gallerieViewThreeHolder.pic3, R.drawable.video_placeholder);
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
@@ -686,25 +607,14 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
 
         } else {
             final SpecialViewHolder specialViewHolder = (SpecialViewHolder) holder;
-            if (showExcellent) {
-                specialViewHolder.excellent.setVisibility(View.VISIBLE);
-                Station station=MyApplication.getInstance().getStation();
-                if(station!=null&&!TextUtils.isEmpty(station.getIcon2())){
-                    Uri uri = Uri.parse(station.getIcon2());
-                    int width=CommonUtils.dip2px(15);
-                    int height=width;
-                    ImageLoader.showThumb(uri,specialViewHolder.excellentLogo,width,height);
-                }else{
-                    specialViewHolder.excellentLogo.setVisibility(View.GONE);
-                }
-            } else {
-                specialViewHolder.excellent.setVisibility(View.GONE);
-            }
 
-            if(content.getTop()!=null){
+            specialViewHolder.excellent.setVisibility(View.GONE);
+
+
+            if (content.getTop() != null) {
                 specialViewHolder.top.setVisibility(View.VISIBLE);
                 specialViewHolder.specialIcon.setVisibility(View.GONE);
-            }else{
+            } else {
                 specialViewHolder.top.setVisibility(View.GONE);
                 specialViewHolder.specialIcon.setVisibility(View.VISIBLE);
             }
@@ -713,46 +623,46 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                 int height = (int) (2f * width / 3f);
                 ImageLoader.showThumb(uri, specialViewHolder.logo, width, height);
-            }else{
+            } else {
                 ImageLoader.showThumb(specialViewHolder.logo, R.drawable.article_placeholder);
             }
 
             specialViewHolder.title.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                 @Override
                 public boolean onPreDraw() {
-                    Log.i("test","specialViewHolder onPreDraw");
-                    Log.i("test",content.getTitle());
+                    Log.i("test", "specialViewHolder onPreDraw");
+                    Log.i("test", content.getTitle());
                     ViewTreeObserver obs = specialViewHolder.title.getViewTreeObserver();
                     obs.removeOnPreDrawListener(this);
 
-                    if(specialViewHolder.logo.getVisibility()==View.GONE){
+                    if (specialViewHolder.logo.getVisibility() == View.GONE) {
 
                         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                         layoutParams.topMargin = CommonUtils.dip2px(10);
-                        layoutParams.addRule(RelativeLayout.BELOW,R.id.title);
+                        layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
                         specialViewHolder.layout.setLayoutParams(layoutParams);
 
-                    }else{
-                        if(specialViewHolder.title.getLineCount()>2){
-                            Log.i("test","getLineCount>2");
+                    } else {
+                        if (specialViewHolder.title.getLineCount() > 2) {
+                            Log.i("test", "getLineCount>2");
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
-                            layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
+                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                             specialViewHolder.layout.setLayoutParams(layoutParams);
-                        } else{
+                        } else {
 
-                            if(specialViewHolder.layout.getWidth()>specialViewHolder.title.getWidth()){
-                                Log.i("test","layout.getWidth()>title.getWidth()");
+                            if (specialViewHolder.layout.getWidth() > specialViewHolder.title.getWidth()) {
+                                Log.i("test", "layout.getWidth()>title.getWidth()");
                                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                                 layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
+                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                                 specialViewHolder.layout.setLayoutParams(layoutParams);
 
-                            }else{
-                                Log.i("test","layout.getWidth()<title.getWidth()");
+                            } else {
+                                Log.i("test", "layout.getWidth()<title.getWidth()");
                                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                                 layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM,R.id.logo);
+                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
                                 specialViewHolder.layout.setLayoutParams(layoutParams);
                             }
 
@@ -795,6 +705,28 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
 
         public HeadViewHolder(View view) {
             super(view);
+
+        }
+    }
+
+    public class DecorateViewHolder extends RecyclerView.ViewHolder {
+
+
+        public DecorateViewHolder(View view) {
+            super(view);
+
+        }
+    }
+
+    public class BannerViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.banner)
+        BannerView banner;
+        @BindView(R.id.root)
+        RelativeLayout root;
+
+        public BannerViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
 
         }
     }
@@ -852,6 +784,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
         TextView commentNum;
         @BindView(R.id.layout)
         LinearLayout layout;
+
         public AlbumViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
@@ -915,8 +848,6 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
         TextView organization;
         @BindView(R.id.organizationLogo)
         SimpleDraweeView organizationLogo;
-        @BindView(R.id.playIcon)
-        ImageView playIcon;
 
 
         public VideoViewHolder(View view) {
@@ -947,8 +878,6 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
         RelativeLayout excellent;
         @BindView(R.id.excellentLogo)
         SimpleDraweeView excellentLogo;
-
-
 
         public GallerieOneViewHolder(View view) {
             super(view);
@@ -1020,7 +949,6 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
     }
 
 
-
     public class ArticleViewThreeHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.title)
         TextView title;
@@ -1056,19 +984,17 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
 
     @Override
     public int getItemCount() {
-        if (mHeaderView != null) {
-            if (mColumnContent != null) {
-                return mColumnContent.size() + 1;
-            } else {
-                return 1;
-            }
-        } else {
-            if (mColumnContent != null) {
-                return mColumnContent.size();
-            } else {
-                return 0;
-            }
+        int count=0;
+        if(mHeaderView!=null){
+            count++;
         }
+        if(mDecorateLayout!=null){
+            count++;
+        }
+        if(mColumnContent!=null){
+            count+=mColumnContent.size();
+        }
+        return count;
 
     }
 
@@ -1077,7 +1003,46 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
         if (mHeaderView != null) {
             if (position == 0) {
                 return TYPE_HEAD;
-            } else {
+            } else if(mDecorateLayout!=null) {
+                if(position==1) {
+                    return TYPE_DECORATE;
+                }else {
+                    if (mColumnContent.get(position - 2).getType() == 1) {
+                        return TYPE_AUDIO;
+                    } else if (mColumnContent.get(position - 2).getType() == 2) {
+                        return TYPE_ALBUM;
+                    } else if (mColumnContent.get(position - 2).getType() == 3) {
+                        if (mColumnContent.get(position - 2).getArticle().getType() == 1) {
+                            return TYPE_ARTICLE;
+                        } else if (mColumnContent.get(position - 2).getArticle().getType() == 2) {
+                            return TYPE_ARTICLE_THREE;
+                        } else {
+                            if (mColumnContent.get(position - 2).getArticle().getCovers().size() >2) {
+                                return TYPE_ARTICLE_THREE;
+                            } else {
+                                return TYPE_ARTICLE;
+                            }
+                        }
+                    } else if (mColumnContent.get(position - 2).getType() == 4) {
+                        return TYPE_VIDEO;
+                    } else if (mColumnContent.get(position - 2).getType() == 5) {
+                        return TYPE_SPECIAL;
+                    } else {
+                        if (mColumnContent.get(position - 2).getGallerie().getType() == 1) {
+                            return TYPE_GALLERIE_ONE;
+                        } else if (mColumnContent.get(position - 2).getGallerie().getType() == 2) {
+                            return TYPE_GALLERIE_THREE;
+                        } else {
+                            if (mColumnContent.get(position - 2).getGallerie().getCovers().size() < 3) {
+                                return TYPE_GALLERIE_ONE;
+                            } else {
+                                return TYPE_GALLERIE_THREE;
+                            }
+                        }
+
+                    }
+                }
+            }else {
                 if (mColumnContent.get(position - 1).getType() == 1) {
                     return TYPE_AUDIO;
                 } else if (mColumnContent.get(position - 1).getType() == 2) {
@@ -1113,51 +1078,95 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
 
                 }
             }
-
-
         } else {
-            if (mColumnContent.get(position).getType() == 1) {
-                return TYPE_AUDIO;
-            } else if (mColumnContent.get(position).getType() == 2) {
-                return TYPE_ALBUM;
-            } else if (mColumnContent.get(position).getType() == 3) {
-                if(mColumnContent.get(position).getTop()!=null){
-                    return TYPE_ARTICLE;
-                }else{
-                    if (mColumnContent.get(position).getArticle().getType() == 1) {
-                        return TYPE_ARTICLE;
-                    } else if (mColumnContent.get(position).getArticle().getType() == 2) {
-                        return TYPE_ARTICLE_THREE;
+            if(mDecorateLayout!=null){
+                if(position==0){
+                    return TYPE_DECORATE;
+                }else {
+                    if (mColumnContent.get(position-1).getType() == 1) {
+                        return TYPE_AUDIO;
+                    } else if (mColumnContent.get(position-1).getType() == 2) {
+                        return TYPE_ALBUM;
+                    } else if (mColumnContent.get(position-1).getType() == 3) {
+                        if(mColumnContent.get(position-1).getTop()!=null){
+                            return TYPE_ARTICLE;
+                        }else{
+                            if (mColumnContent.get(position-1).getArticle().getType() == 1) {
+                                return TYPE_ARTICLE;
+                            } else if (mColumnContent.get(position-1).getArticle().getType() == 2) {
+                                return TYPE_ARTICLE_THREE;
+                            } else {
+                                if (mColumnContent.get(position-1).getArticle().getCovers().size() >2) {
+                                    return TYPE_ARTICLE_THREE;
+                                } else {
+                                    return TYPE_ARTICLE;
+                                }
+                            }
+                        }
+
+                    } else if (mColumnContent.get(position-1).getType() == 4) {
+                        return TYPE_VIDEO;
+                    } else if (mColumnContent.get(position-1).getType() == 5) {
+                        return TYPE_SPECIAL;
                     } else {
-                        if (mColumnContent.get(position).getArticle().getCovers().size() >2) {
+                        if (mColumnContent.get(position-1).getGallerie().getType() == 1) {
+                            return TYPE_GALLERIE_ONE;
+                        } else if (mColumnContent.get(position-1).getGallerie().getType() == 2) {
+                            return TYPE_GALLERIE_THREE;
+                        } else {
+                            if (mColumnContent.get(position-1).getGallerie().getCovers().size() < 3) {
+                                return TYPE_GALLERIE_ONE;
+                            } else {
+                                return TYPE_GALLERIE_THREE;
+                            }
+                        }
+
+                    }
+                }
+
+            }else{
+                if (mColumnContent.get(position).getType() == 1) {
+                    return TYPE_AUDIO;
+                } else if (mColumnContent.get(position).getType() == 2) {
+                    return TYPE_ALBUM;
+                } else if (mColumnContent.get(position).getType() == 3) {
+                    if(mColumnContent.get(position).getTop()!=null){
+                        return TYPE_ARTICLE;
+                    }else{
+                        if (mColumnContent.get(position).getArticle().getType() == 1) {
+                            return TYPE_ARTICLE;
+                        } else if (mColumnContent.get(position).getArticle().getType() == 2) {
                             return TYPE_ARTICLE_THREE;
                         } else {
-                            return TYPE_ARTICLE;
+                            if (mColumnContent.get(position).getArticle().getCovers().size() >2) {
+                                return TYPE_ARTICLE_THREE;
+                            } else {
+                                return TYPE_ARTICLE;
+                            }
                         }
                     }
-                }
 
-            } else if (mColumnContent.get(position).getType() == 4) {
-                return TYPE_VIDEO;
-            } else if (mColumnContent.get(position).getType() == 5) {
-                return TYPE_SPECIAL;
-            } else {
-                if (mColumnContent.get(position).getGallerie().getType() == 1) {
-                    return TYPE_GALLERIE_ONE;
-                } else if (mColumnContent.get(position).getGallerie().getType() == 2) {
-                    return TYPE_GALLERIE_THREE;
+                } else if (mColumnContent.get(position).getType() == 4) {
+                    return TYPE_VIDEO;
+                } else if (mColumnContent.get(position).getType() == 5) {
+                    return TYPE_SPECIAL;
                 } else {
-                    if (mColumnContent.get(position).getGallerie().getCovers().size() < 3) {
+                    if (mColumnContent.get(position).getGallerie().getType() == 1) {
                         return TYPE_GALLERIE_ONE;
-                    } else {
+                    } else if (mColumnContent.get(position).getGallerie().getType() == 2) {
                         return TYPE_GALLERIE_THREE;
+                    } else {
+                        if (mColumnContent.get(position).getGallerie().getCovers().size() < 3) {
+                            return TYPE_GALLERIE_ONE;
+                        } else {
+                            return TYPE_GALLERIE_THREE;
+                        }
                     }
+
                 }
-
             }
+
         }
-
-
     }
 
 

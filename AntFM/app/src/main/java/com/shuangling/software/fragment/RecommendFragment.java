@@ -2,6 +2,7 @@ package com.shuangling.software.fragment;
 
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -9,12 +10,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -32,6 +35,7 @@ import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 
 import org.greenrobot.eventbus.EventBus;
@@ -76,12 +80,14 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
     TextView weather;
     @BindView(R.id.weatherLayout)
     RelativeLayout weatherLayout;
+    @BindView(R.id.logo1)
+    SimpleDraweeView logo1;
 
     /**
      * 当前选中的栏目
      */
     private int mColumnSelectIndex = 0;
-    private List<Column> mColumns;
+    public List<Column> mColumns;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
     /**
      * 屏幕宽度
@@ -121,10 +127,16 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
         View view = inflater.inflate(R.layout.fragment_recommend, container, false);
         getRecommendColumns();
         unbinder = ButterKnife.bind(this, view);
-        if(MyApplication.getInstance().getStation()!=null&&MyApplication.getInstance().getStation().getIs_league()==0){
-            city.setCompoundDrawables(null, null, null, null);
+        if (MyApplication.getInstance().getStation() != null && MyApplication.getInstance().getStation().getIs_league() == 0) {
+            //city.setCompoundDrawables(null, null, null, null);
+            weatherLayout.setVisibility(View.GONE);
+            logo1.setVisibility(View.VISIBLE);
+            if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getLogo1())){
+                Uri uri = Uri.parse(MyApplication.getInstance().getStation().getLogo1());
+                ImageLoader.showThumb(uri,logo1,CommonUtils.dip2px(110),CommonUtils.dip2px(18));
+            }
         }
-        if(MainActivity.sCurrentCity!=null) {
+        if (MainActivity.sCurrentCity != null) {
             city.setText(MainActivity.sCurrentCity.getName());
         }
         return view;
@@ -168,9 +180,16 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
         public void onPageSelected(int position) {
             // TODO Auto-generated method stub
             if (position == 0) {
-                weatherLayout.setVisibility(View.VISIBLE);
-            }else{
+                if (MyApplication.getInstance().getStation() != null && MyApplication.getInstance().getStation().getIs_league() == 0) {
+                    weatherLayout.setVisibility(View.GONE);
+                    logo1.setVisibility(View.VISIBLE);
+                }else{
+                    weatherLayout.setVisibility(View.VISIBLE);
+                    logo1.setVisibility(View.GONE);
+                }
+            } else {
                 weatherLayout.setVisibility(View.GONE);
+                logo1.setVisibility(View.GONE);
             }
 
             for (int i = 0; i < columnContent.getChildCount(); i++) {
@@ -222,7 +241,7 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.city:
-                if(MyApplication.getInstance().getStation()!=null&&MyApplication.getInstance().getStation().getIs_league()==1){
+                if (MyApplication.getInstance().getStation() != null && MyApplication.getInstance().getStation().getIs_league() == 1) {
                     //固定
                     startActivity(new Intent(getContext(), CityListActivity.class));
                 }

@@ -1,10 +1,12 @@
 package com.shuangling.software.activity;
 
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -26,6 +28,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.Column;
@@ -33,7 +36,12 @@ import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ServerInfo;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+import com.zhihu.matisse.engine.impl.GlideEngine;
+import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -51,6 +59,7 @@ import cn.sharesdk.tencent.qq.QQ;
 import cn.sharesdk.wechat.favorite.WechatFavorite;
 import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
+import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
 import static android.view.View.GONE;
@@ -224,23 +233,40 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
 
             // For Lollipop 5.0+ Devices
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-            public boolean onShowFileChooser(WebView mWebView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
+            public boolean onShowFileChooser(WebView mWebView, final ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
                 if (uploadMessage != null) {
                     uploadMessage.onReceiveValue(null);
                     uploadMessage = null;
                 }
 
                 uploadMessage = filePathCallback;
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                //startActivityForResult(intent, REQUEST_SELECT_FILE);
-                //Intent intent = fileChooserParams.createIntent();
-                try {
-                    startActivityForResult(intent, REQUEST_SELECT_FILE);
-                } catch (ActivityNotFoundException e) {
-                    uploadMessage = null;
-                    Toast.makeText(getBaseContext(), "Cannot Open File Chooser", Toast.LENGTH_LONG).show();
-                    return false;
-                }
+
+
+                RxPermissions rxPermissions = new RxPermissions(WebViewActivity.this);
+                rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .subscribe(new Consumer<Boolean>() {
+                            @Override
+                            public void accept(Boolean granted) throws Exception {
+                                if(granted){
+                                    String packageName = getPackageName();
+                                    Matisse.from(WebViewActivity.this)
+                                            .choose(MimeType.of(MimeType.JPEG,MimeType.PNG)) // 选择 mime 的类型
+                                            .countable(false)
+                                            .maxSelectable(9) // 图片选择的最多数量
+                                            .spanCount(4)
+                                            .capture(true)
+                                            .captureStrategy(new CaptureStrategy(true,packageName+".fileprovider"))
+                                            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                                            .thumbnailScale(1.0f) // 缩略图的比例
+                                            .theme(R.style.Matisse_Zhihu)
+                                            .imageEngine(new GlideEngine()) // 使用的图片加载引擎
+                                            .forResult(REQUEST_SELECT_FILE); // 设置作为标记的请求码
+                                }else{
+                                    ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
+                                }
+                            }
+                        });
+
                 return true;
             }
 

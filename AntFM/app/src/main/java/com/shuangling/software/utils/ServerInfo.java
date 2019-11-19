@@ -183,5 +183,8 @@ public class ServerInfo {
 
 	public static String indexDecorateContent="/v2/cassify_posts";			    //首页装修内容（c端）
 
+	public static String columnDecorateContent="/v2/consumer/category_layouts/";//C端分类装修详情
+
+	public static String startAdvert="/v2/consumer/app_advertisings";			//启动广告
 
 }

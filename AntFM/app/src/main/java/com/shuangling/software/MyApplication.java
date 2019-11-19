@@ -77,6 +77,7 @@ public class MyApplication extends MultiDexApplication {
     private boolean needResume=false;
 
     public boolean remindPermission=true;
+    public boolean findNewVerison=false;
 
     public Station getStation() {
         return station;

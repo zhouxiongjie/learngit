@@ -85,7 +85,9 @@ public class RadioRecommendAdapter extends BaseAdapter {
             viewHolder.program.setVisibility(View.GONE);
         }
         viewHolder.title.setText(radioRecommend.getName());
-
+        if(radioRecommend.getMerchant_id()!=null){
+            viewHolder.organization.setText(radioRecommend.getMerchant_id().getName());
+        }
         return view;
 
     }

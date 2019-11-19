@@ -25,7 +25,7 @@
             fresco:placeholderImage="@drawable/article_placeholder"
             fresco:placeholderImageScaleType="centerCrop"
             fresco:roundedCornerRadius="2dp"
-            fresco:viewAspectRatio="1.5" />
+            fresco:viewAspectRatio="1" />
 
 
         <LinearLayout
@@ -36,7 +36,8 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/video_duration_text_bg"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <com.shuangling.software.customview.FontIconView
                 android:layout_width="wrap_content"

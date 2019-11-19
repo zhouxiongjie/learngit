@@ -67,6 +67,7 @@
             tools:text="资讯文章内容中只有2张图片以下的，按左图右文的方式显示（左图为封面图）" />
 
         <ImageView
+            android:id="@+id/playIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"

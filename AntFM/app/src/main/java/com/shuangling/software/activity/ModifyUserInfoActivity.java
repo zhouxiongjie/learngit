@@ -456,13 +456,14 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
                             @Override
                             public void accept(Boolean granted) throws Exception {
                                 if(granted){
+                                    String packageName = getPackageName();
                                     Matisse.from(ModifyUserInfoActivity.this)
                                             .choose(MimeType.of(MimeType.JPEG,MimeType.PNG)) // 选择 mime 的类型
                                             .countable(false)
                                             .maxSelectable(1) // 图片选择的最多数量
                                             .spanCount(4)
                                             .capture(true)
-                                            .captureStrategy(new CaptureStrategy(true,"com.shuangling.software.fileprovider"))
+                                            .captureStrategy(new CaptureStrategy(true,packageName+".fileprovider"))
                                             .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                                             .thumbnailScale(1.0f) // 缩略图的比例
                                             .theme(R.style.Matisse_Zhihu)

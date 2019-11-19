@@ -53,6 +53,7 @@
             fresco:viewAspectRatio="1.778" />
 
         <ImageView
+            android:id="@+id/playIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"

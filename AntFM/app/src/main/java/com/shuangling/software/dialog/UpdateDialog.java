@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.mylhyl.circledialog.BaseCircleDialog;
 import com.shuangling.software.R;
+import com.shuangling.software.utils.SharedPreferencesUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,9 +36,12 @@ public class UpdateDialog extends BaseCircleDialog {
     String mDesc;
     @BindView(R.id.desc)
     TextView desc;
+    @BindView(R.id.noUpdate)
+    TextView noUpdate;
 
 
     private OnUpdateClickListener mOnUpdateClickListener;
+    private boolean showNoUpdate=false;
 
     public void setOnUpdateClickListener(OnUpdateClickListener onUpdateClickListener) {
         this.mOnUpdateClickListener = onUpdateClickListener;
@@ -46,6 +50,7 @@ public class UpdateDialog extends BaseCircleDialog {
 
     public interface OnUpdateClickListener {
         void download();
+
     }
 
 
@@ -58,6 +63,11 @@ public class UpdateDialog extends BaseCircleDialog {
         dialogFragment.mVersion = ver;
         dialogFragment.mDesc = des;
         return dialogFragment;
+    }
+
+
+    public void showNoUpdate(boolean show){
+        showNoUpdate=show;
     }
 
     @Override
@@ -76,6 +86,11 @@ public class UpdateDialog extends BaseCircleDialog {
         // TODO: inflate a fragment view
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
         unbinder = ButterKnife.bind(this, rootView);
+        if(showNoUpdate){
+            noUpdate.setVisibility(View.VISIBLE);
+        }else{
+            noUpdate.setVisibility(View.GONE);
+        }
         version.setText(mVersion);
         desc.setText(mDesc);
 
@@ -88,12 +103,22 @@ public class UpdateDialog extends BaseCircleDialog {
         unbinder.unbind();
     }
 
-    @OnClick(R.id.update)
-    public void onViewClicked() {
-        dismiss();
-        if (mOnUpdateClickListener != null) {
-            mOnUpdateClickListener.download();
+    @OnClick({R.id.update,R.id.noUpdate})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.update:
+                dismiss();
+                if (mOnUpdateClickListener != null) {
+                    mOnUpdateClickListener.download();
+                }
+            break;
+            case R.id.noUpdate:
+                SharedPreferencesUtils.putPreferenceTypeValue("version", SharedPreferencesUtils.PreferenceType.String,mVersion);
+                dismiss();
+                break;
+
         }
+
     }
 
 }

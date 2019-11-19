@@ -4,35 +4,38 @@ public class Station {
 
 
     /**
-     * id : 1
-     * name : 菱听视界
-     * domain : http://slradio.cn
-     * logo : https://sl-cms.static.slradio.cn/platform/imges/0CT6Gy7aSHeYn1MXscWWQHCTFQtnfNAs1562316720134.png
-     * logo_gray : https://sl-cms.static.slradio.cn/platform/imges/neh3W18wrP1xwaY4hzaThnxG0NPhS59D1562316794615.png
-     * image : https://sl-cms.static.slradio.cn/platform/imges/5fkwAJXEB63MySz6RjGkfE8SeexAmbAz1562804763774.png
-     * title : 早稻田
-     * keywords : radio
-     * des : 这里的生活很好
-     * app_ios :
-     * app_android :
-     * icon1 : http://sl-cdn.slradio.cn/cms/icon/imges/XWJmsaB7kFmMHrpsZYWHZXfjFnxtTPAE1563348607213.png
-     * icon2 : https://sl-cms.static.slradio.cn/platform/imges/pshyhGdP0MjE3xmir5FE1XRszwMyhfYQ1562317752848.png
-     * icon3 : https://sl-cms.static.slradio.cn/platform/imges/wMHxzbsRdcMDEEJExtP0MmaPTJnipH931562314158773.png
-     * record : 湘ICP备XXXXX号-X
-     * record_url : http://www.shuangln.com/
-     * created_at : 2019-07-03 09:12:11
-     * updated_at : 2019-09-17 18:28:44
-     * h5_logo : https://sl-cms.static.slradio.cn/platform/imges/8xzrfkxR3ps8XF4kwKwXp44M4bhpERnk1562804725968.png
-     * tv_show : 1
-     * tv_name : 看电视
+     * id : 2
+     * name : 飞雪连天射白鹿
+     * domain : http://www-cms-pc.review.slradio.cn
+     * logo : https://sl-cms.static.slradio.cn/platform/imges/Zi8iSBYzFNbafFmZB320a6BDhT353R2a1562029126270.jpg
+     * logo_gray : https://sl-cms.static.slradio.cn/platform/imges/W3f6JtBhfzRyRdbNStPzTWXBNk8P6m6X1562029336800.png
+     * image : https://sl-cms.static.slradio.cn/platform/imges/XPcxWF66baaznTriQkZ6iWTe8hQWea4z1562029248895.png
+     * title : 我是seo哟
+     * keywords : 我是关键字哟
+     * des : 我是描述哟
+     * app_ios : http://www.baidu.com
+     * app_android : http://www.baidu.com
+     * icon1 :
+     * icon2 :
+     * icon3 :
+     * record : 湘ICP5363546546号
+     * record_url : http://www.baidu.com
+     * created_at : 2019-06-28 17:18:40
+     * updated_at : 2019-11-14 16:37:12
+     * h5_logo : https://sl-cms.static.slradio.cn/platform/imges/FGYAnDRMa55RPssXwbGp2CMTJw2z1PSH1562723499051.jpg
+     * tv_show : 0
+     * tv_name : 看电视sd
      * radio_show : 1
-     * radio_name : 听广播
-     * is_league : 1
-     * province :
-     * city :
+     * radio_name : 听广播ss
+     * is_league : 0
+     * province : 43
+     * city : 4301
      * county :
-     * city_info : null
-     * province_info : null
+     * category : 2
+     * logo1 : https://sl-cdn.slradio.cn/cms/icon/imges/p9RPMkhJkpY2bi91Rsk2cWpF6piTFr2T1573720624722.png
+     * logo2 : https://sl-cdn.slradio.cn/cms/icon/imges/e8B6hrMN78d2J5nkJ06cnjSaTDQxwxDz1573699736193.png
+     * city_info : {"code":"4301","name":"长沙市"}
+     * province_info : {"code":"43","name":"湖南省"}
      */
 
     private int id;
@@ -62,8 +65,11 @@ public class Station {
     private String province;
     private String city;
     private String county;
-    private City city_info;
-    private Province province_info;
+    private int category;
+    private String logo1;
+    private String logo2;
+    private CityInfoBean city_info;
+    private ProvinceInfoBean province_info;
 
     public int getId() {
         return id;
@@ -281,37 +287,54 @@ public class Station {
         this.county = county;
     }
 
-    public City getCity_info() {
+    public int getCategory() {
+        return category;
+    }
+
+    public void setCategory(int category) {
+        this.category = category;
+    }
+
+    public String getLogo1() {
+        return logo1;
+    }
+
+    public void setLogo1(String logo1) {
+        this.logo1 = logo1;
+    }
+
+    public String getLogo2() {
+        return logo2;
+    }
+
+    public void setLogo2(String logo2) {
+        this.logo2 = logo2;
+    }
+
+    public CityInfoBean getCity_info() {
         return city_info;
     }
 
-    public void setCity_info(City city_info) {
+    public void setCity_info(CityInfoBean city_info) {
         this.city_info = city_info;
     }
 
-    public Object getProvince_info() {
+    public ProvinceInfoBean getProvince_info() {
         return province_info;
     }
 
-    public void setProvince_info(Province province_info) {
+    public void setProvince_info(ProvinceInfoBean province_info) {
         this.province_info = province_info;
     }
 
+    public static class CityInfoBean {
+        /**
+         * code : 4301
+         * name : 长沙市
+         */
 
-    public static class Province {
-
-
-
-        private String name;
         private String code;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
+        private String name;
 
         public String getCode() {
             return code;
@@ -319,23 +342,25 @@ public class Station {
 
         public void setCode(String code) {
             this.code = code;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
     }
 
-    public static class City {
+    public static class ProvinceInfoBean {
+        /**
+         * code : 43
+         * name : 湖南省
+         */
 
-
-
-        private String name;
         private String code;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
+        private String name;
 
         public String getCode() {
             return code;
@@ -343,6 +368,14 @@ public class Station {
 
         public void setCode(String code) {
             this.code = code;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
     }
 }

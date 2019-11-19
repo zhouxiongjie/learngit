@@ -74,6 +74,11 @@ public class SharedPreferencesUtils {
         return sp.getBoolean(key, defValue);
     }
 
+    public static String getStringValue(String key,String defValue){
+        SharedPreferences sp = MyApplication.getInstance().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+        return sp.getString(key, defValue);
+    }
+
     public static boolean putIntValue(String key,int value){
         SharedPreferences sp = MyApplication.getInstance().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();

@@ -15,68 +15,96 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">
-            <RelativeLayout
-                android:id="@+id/weatherLayout"
+
+            <FrameLayout
+                android:id="@+id/frameLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/city"
+                android:layout_marginRight="10dp">
+                <RelativeLayout
+                    android:id="@+id/weatherLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:drawableRight="@drawable/ic_xia"
-                    android:drawablePadding="5dp"
-                    android:text="湘西土家族苗族自治州"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/font_size_28px"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    android:maxLength="4"/>
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/divide"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@+id/city"
-                    android:text="|"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/font_size_28px" />
+                    <TextView
+                        android:id="@+id/city"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:drawableRight="@drawable/ic_xia"
+                        android:drawablePadding="5dp"
+                        android:text="湘西土家族苗族自治州"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/font_size_28px"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:maxLength="4"/>
 
-                <TextView
-                    android:id="@+id/temperature"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@+id/divide"
-                    tools:text="16℃"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/font_size_28px" />
+                    <TextView
+                        android:id="@+id/divide"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@+id/city"
+                        android:text="|"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/font_size_28px" />
 
-                <TextView
-                    android:id="@+id/weather"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="10dp"
-                    android:layout_toRightOf="@+id/temperature"
-                    tools:text="晴"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/font_size_28px" />
+                    <TextView
+                        android:id="@+id/temperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@+id/divide"
+                        tools:text="16℃"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/font_size_28px" />
 
-            </RelativeLayout>
+                    <TextView
+                        android:id="@+id/weather"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@+id/temperature"
+                        tools:text="晴"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/font_size_28px" />
+
+                </RelativeLayout>
+
+
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/logo1"
+                    android:layout_width="110dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentLeft="true"
+                    app:actualImageScaleType="fitXY"
+                    app:placeholderImage="@drawable/special_placeholder"
+                    app:placeholderImageScaleType="fitXY"
+                    app:failureImage="@drawable/special_placeholder"
+                    app:failureImageScaleType="fitXY"
+                    app:roundingBorderWidth="0dp"
+                    app:roundingBorderColor="@color/white"
+                    android:visibility="visible"/>
+            </FrameLayout>
+
+
+
+
+
+
 
             <TextView
                 android:id="@+id/search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/weatherLayout"
+                android:layout_toRightOf="@+id/frameLayout"
                 android:background="@drawable/search_box_bg"
                 android:drawableLeft="@drawable/ic_search"
                 android:drawablePadding="10dp"

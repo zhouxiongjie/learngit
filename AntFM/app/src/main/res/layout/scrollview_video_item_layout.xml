@@ -44,7 +44,8 @@
                 android:layout_gravity="center_vertical"
                 android:text="&#xe638;"
                 android:textColor="@color/white"
-                android:textSize="@dimen/font_size_20px" />
+                android:textSize="@dimen/font_size_20px"
+                android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/duration"

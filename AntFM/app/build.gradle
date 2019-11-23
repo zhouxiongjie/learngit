@@ -2,6 +2,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 apply from: '../MobSDK.gradle'
 apply plugin: 'com.aliyun.ams.emas-services'
+
+
+static def releaseTime() {
+    return new Date().format("yyyy-MM-dd-HH.mm", TimeZone.getTimeZone("GMT+8"))
+}
+
 android {
     compileSdkVersion externalCompileSdkVersion
     defaultConfig {
@@ -14,9 +20,26 @@ android {
         multiDexEnabled true
     }
 
-
-
     signingConfigs {
+
+        ltsj{
+            storeFile file("../keystore/ltsj.jks")
+            storePassword "123456"
+            keyAlias "xiongjie"
+            keyPassword "123456"
+        }
+
+        jx {
+            storeFile file("../keystore/jx.jks")
+            storePassword "123456"
+            keyAlias "xiongjie"
+            keyPassword "123456"
+        }
+
+
+
+
+
         debug {
             storeFile file("release_lingting.keystore")
             storePassword "123456"
@@ -30,16 +53,55 @@ android {
             keyPassword "123456"
         }
     }
+    flavorDimensions "default"
+    productFlavors {
+
+        ltsj {
+            applicationId "com.shuangling.software"
+            signingConfig signingConfigs.ltsj
+
+            //            buildConfigField "String",           "QQ_ID", qq_id
+//            buildConfigField "String",           "WX_ID", '"wxxxxxxxxxxxxxxxxx"' // 配置微信appid
+            manifestPlaceholders = [
+                    GD_KEY: "a2fdac9774a1380d6479f72d020cb92b"
+            ]
+
+        }
+
+        jx {
+            applicationId "com.shuangling.software.jx"
+            signingConfig signingConfigs.jx         //配置签名
+            manifestPlaceholders = [
+                    GD_KEY: "6d951523e28be6cb3fa6cffcb125a21b"
+            ]
+
+
+        }
+
+
+
+    }
+
+
+    applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                outputFileName = "${variant.productFlavors[0].name}-v${variant.productFlavors[0].versionName}-${releaseTime()}.apk"
+            }
+    }
+
+
+
 
     buildTypes {
 
         debug {
-            signingConfig signingConfigs.debug
+            signingConfig null
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            signingConfig signingConfigs.release
+            signingConfig null
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -128,5 +190,9 @@ dependencies {
     implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'com.liulishuo.filedownloader:library:1.7.4'
     implementation "com.facebook.fresco:imagepipeline-okhttp3:0.12.0+"
+    // 基础依赖包，必须要依赖
+    implementation 'com.gyf.immersionbar:immersionbar:3.0.0'
+    // fragment快速实现（可选）
+    implementation 'com.gyf.immersionbar:immersionbar-components:3.0.0'
     implementation externalGlide
 }

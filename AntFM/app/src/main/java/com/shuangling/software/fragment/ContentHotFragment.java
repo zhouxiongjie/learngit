@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -551,8 +552,8 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height);
                                         params.leftMargin = CommonUtils.dip2px(20);
                                         params.rightMargin = CommonUtils.dip2px(20);
-                                        params.bottomMargin = CommonUtils.dip2px(5);
-                                        //params.topMargin = CommonUtils.dip2px(20);
+                                        params.bottomMargin = CommonUtils.dip2px(10);
+                                        params.topMargin = CommonUtils.dip2px(10);
                                         mDecorateLayout.addView(bannerView, params);
                                         List<BannerView.Banner> banners = new ArrayList<>();
                                         for (int j = 0; module.getContents() != null && j < module.getContents().size(); j++) {
@@ -1051,6 +1052,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
                                         TextView column = clolumnLayout.findViewById(R.id.column);
                                         TextView more= clolumnLayout.findViewById(R.id.more);
+                                        ImageView divider=clolumnLayout.findViewById(R.id.divider);
                                         more.setVisibility(View.GONE);
                                         column.setText(module.getTitle());
 
@@ -1076,6 +1078,9 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);
 
                                         mContentRecyclerView.add(recyclerView);
+                                        if(mDecorateLayout.getChildCount()==0){
+                                            divider.setVisibility(View.GONE);
+                                        }
                                         mDecorateLayout.addView(clolumnLayout);
                                         getDecorateContent(module.getAnimated(),module.getOrder_by(),4,columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
 
@@ -1087,6 +1092,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
                                         TextView column = clolumnLayout.findViewById(R.id.column);
                                         TextView more= clolumnLayout.findViewById(R.id.more);
+                                        ImageView divider=clolumnLayout.findViewById(R.id.divider);
                                         more.setVisibility(View.GONE);
                                         column.setText(module.getTitle());
 
@@ -1112,6 +1118,9 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);
 
                                         mContentRecyclerView.add(recyclerView);
+                                        if(mDecorateLayout.getChildCount()==0){
+                                            divider.setVisibility(View.GONE);
+                                        }
                                         mDecorateLayout.addView(clolumnLayout);
                                         getDecorateContent(module.getAnimated(),module.getOrder_by(),2,columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
 
@@ -1123,6 +1132,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
                                         TextView column = clolumnLayout.findViewById(R.id.column);
                                         TextView more= clolumnLayout.findViewById(R.id.more);
+                                        ImageView divider=clolumnLayout.findViewById(R.id.divider);
                                         more.setVisibility(View.GONE);
                                         column.setText(module.getTitle());
 
@@ -1148,6 +1158,10 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);
 
                                         mContentRecyclerView.add(recyclerView);
+
+                                        if(mDecorateLayout.getChildCount()==0){
+                                            divider.setVisibility(View.GONE);
+                                        }
                                         mDecorateLayout.addView(clolumnLayout);
                                         getDecorateContent(module.getAnimated(),module.getOrder_by(),3,columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
 
@@ -1159,6 +1173,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
                                         TextView column = clolumnLayout.findViewById(R.id.column);
                                         TextView more= clolumnLayout.findViewById(R.id.more);
+                                        ImageView divider=clolumnLayout.findViewById(R.id.divider);
                                         more.setVisibility(View.GONE);
                                         column.setText(module.getTitle());
 
@@ -1184,19 +1199,14 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);
 
                                         mContentRecyclerView.add(recyclerView);
+                                        if(mDecorateLayout.getChildCount()==0){
+                                            divider.setVisibility(View.GONE);
+                                        }
                                         mDecorateLayout.addView(clolumnLayout);
                                         getDecorateContent(module.getAnimated(),module.getOrder_by(),7,columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
-
                                     }
 
-
-
-
-
-
                                 }
-
-
 
                                 mAdapter.addDecorateLayout(mDecorateLayout);
 
@@ -1349,8 +1359,10 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                     TextView duration = anchorView.findViewById(R.id.duration);
 
                                     videoTitle.setText(content.getTitle());
-                                    if(content.getVideo()!=null){
-                                        duration.setText(content.getVideo().getDuration());
+                                    if(content.getVideo()!=null&&!TextUtils.isEmpty(content.getVideo().getDuration())){
+                                        duration.setText(CommonUtils.getShowTime((long) Float.parseFloat(content.getVideo().getDuration()) * 1000));
+                                    }else{
+                                        duration.setText("00:00");
                                     }
                                     if (!TextUtils.isEmpty(content.getCover())) {
                                         Uri uri = Uri.parse(content.getCover());

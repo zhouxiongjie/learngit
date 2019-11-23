@@ -27,6 +27,7 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.Anchor;
+import com.shuangling.software.entity.AnchorOrganizationColumn;
 import com.shuangling.software.entity.Station;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.fragment.ProgramContentFragment;
@@ -39,6 +40,7 @@ import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +65,9 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
 
     public static final int REQUEST_LOGIN = 0x5;
 
-    private static final int[] category = new int[]{R.string.album, R.string.article, R.string.video, R.string.special, R.string.photo};
+    public static final int MSG_GET_ANCHOR_COLUMN = 0x6;
+
+    //private static final int[] category = new int[]{ R.string.article, R.string.video,R.string.album, R.string.photo, R.string.special};
 
     @BindView(R.id.activity_title)
     TopTitleBar activityTitle;
@@ -97,6 +101,8 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
     LinearLayout anchors;
     @BindView(R.id.authentication)
     TextView authentication;
+    @BindView(R.id.noData)
+    LinearLayout noData;
 
 
     private int mAnchorId;
@@ -104,7 +110,8 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
     private Anchor mAnchor;
     private List<Anchor> mAnchors;
     private Handler mHandler;
-
+    public List<AnchorOrganizationColumn> mColumns;
+    private ArrayList<Fragment> mFragments = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,14 +129,54 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
     }
 
     private void init() {
-        mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(mFragmentPagerAdapter);
-        tabPageIndicator.setupWithViewPager(viewPager);
+        mAnchorId = getIntent().getIntExtra("anchorId", 0);
+        getColumn();
+
+//        mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager());
+//        viewPager.setAdapter(mFragmentPagerAdapter);
+//        tabPageIndicator.setupWithViewPager(viewPager);
 
     }
 
+    private void initFragment() {
+        mFragments.clear();
+        if (mColumns != null && mColumns.size() > 0) {
+
+            mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager(), mColumns);
+            viewPager.setAdapter(mFragmentPagerAdapter);
+            tabPageIndicator.setupWithViewPager(viewPager);
+        }
+
+    }
+
+
+    private void getColumn() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.getAnchorOrOrganizationColumn + mAnchorId;
+        Map<String, String> params = new HashMap<>();
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_ANCHOR_COLUMN;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+    }
+
     private void getAnchorDetail() {
-        mAnchorId = getIntent().getIntExtra("anchorId", 0);
+
 
         String url = ServerInfo.serviceIP + ServerInfo.anchorDetail + mAnchorId;
         Map<String, String> params = new HashMap<>();
@@ -271,7 +318,7 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
                             int height = width;
                             ImageLoader.showThumb(uri, logo, width, height);
                         }
-                        authentication.setText(mAnchor.getMerchant().getName()+"官方主播");
+                        authentication.setText(mAnchor.getMerchant().getName() + "官方主播");
                         activityTitle.setTitleText(mAnchor.getName());
                         if (mAnchor.getOthers() != null) {
                             count.setText("" + mAnchor.getOthers().getCount());
@@ -509,6 +556,27 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
 
                 }
                 break;
+            case MSG_GET_ANCHOR_COLUMN:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        mColumns = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), AnchorOrganizationColumn.class);
+                        if(mColumns==null||mColumns.size()==0){
+                            noData.setVisibility(View.VISIBLE);
+                        }else{
+                            noData.setVisibility(View.GONE);
+                            initFragment();
+                        }
+
+                    }
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
         }
         return false;
     }
@@ -538,16 +606,23 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
     public class FragmentAdapter extends FragmentStatePagerAdapter {
 
         private FragmentManager fm;
+        private List<AnchorOrganizationColumn> mColumns;
 
         public FragmentAdapter(FragmentManager fm) {
             super(fm);
             this.fm = fm;
         }
 
+        public FragmentAdapter(FragmentManager fm, List<AnchorOrganizationColumn> columns) {
+            super(fm);
+            this.fm = fm;
+            this.mColumns = columns;
+
+        }
 
         @Override
         public int getCount() {
-            return category.length;
+            return mColumns.size();
         }
 
         @Override
@@ -557,14 +632,14 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
             ProgramContentFragment fragment = new ProgramContentFragment();
             Bundle bundle = new Bundle();
             bundle.putString("anchorId", "" + mAnchorId);
-            bundle.putString("category", getResources().getString(category[position]));
+            bundle.putSerializable("columns", mColumns.get(position));
             fragment.setArguments(bundle);
             return fragment;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return getResources().getString(category[position]);
+            return mColumns.get(position).getName();
         }
 
 

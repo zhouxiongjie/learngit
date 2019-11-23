@@ -691,7 +691,6 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     @Override
     protected void onStop() {
         super.onStop();
-
         if (aliyunVodPlayerView != null) {
             aliyunVodPlayerView.onStop();
         }
@@ -1328,6 +1327,10 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 //
 //            }
 
+        }
+        if (aliyunVodPlayerView != null) {
+            aliyunVodPlayerView.onDestroy();
+            aliyunVodPlayerView = null;
         }
         super.onDestroy();
     }

@@ -187,4 +187,8 @@ public class ServerInfo {
 
 	public static String startAdvert="/v2/consumer/app_advertisings";			//启动广告
 
+	public static String clickAdvert="/v2/consumer/app_advertisings/";			//C端点击广告
+
+	public static String getAnchorOrOrganizationColumn="/v2/merchant_columns/";	//机构或者主播栏目
+
 }

@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.StrictMode;
 import android.support.multidex.MultiDexApplication;
+import android.text.TextUtils;
 import android.util.Log;
 
 //import com.alibaba.sdk.android.push.CloudPushService;
@@ -313,11 +314,9 @@ public class MyApplication extends MultiDexApplication {
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         JSONObject jo=jsonObject.getJSONObject("data");
                         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        Date startTime = format.parse(jo.getString("start_time"));
-                        Date endTime = format.parse(jo.getString("end_time"));
-                        Date today = new Date();
-
-                        if(today.after(startTime)&&today.before(endTime)){
+                        String start=jo.getString("start_time");
+                        String end=jo.getString("end_time");
+                        if(TextUtils.isEmpty(start)&&TextUtils.isEmpty(end)){
                             if(Color.parseColor(jo.getString("background_color"))==getResources().getColor(R.color.themeBlue)){
                                 MyApplication.getInstance().setCurrentTheme(R.style.AppThemeBlue);
                                 MyApplication.getInstance().setTheme(R.style.AppThemeBlue);
@@ -335,8 +334,33 @@ public class MyApplication extends MultiDexApplication {
                                 MyApplication.getInstance().setTheme(R.style.AppThemeOrange);
                             }
                             MyApplication.getInstance().setBackgroundImage(jo.getString("background_image"));
+                        }else{
+                            Date startTime = format.parse(start);
+                            Date endTime = format.parse(end);
+                            Date today = new Date();
 
+                            if(today.after(startTime)&&today.before(endTime)){
+                                if(Color.parseColor(jo.getString("background_color"))==getResources().getColor(R.color.themeBlue)){
+                                    MyApplication.getInstance().setCurrentTheme(R.style.AppThemeBlue);
+                                    MyApplication.getInstance().setTheme(R.style.AppThemeBlue);
+                                }else if(Color.parseColor(jo.getString("background_color"))==getResources().getColor(R.color.themePurple)){
+                                    MyApplication.getInstance().setCurrentTheme(R.style.AppThemePurple);
+                                    MyApplication.getInstance().setTheme(R.style.AppThemePurple);
+                                }else if(Color.parseColor(jo.getString("background_color"))==getResources().getColor(R.color.themeRed)){
+                                    MyApplication.getInstance().setCurrentTheme(R.style.AppThemeRed);
+                                    MyApplication.getInstance().setTheme(R.style.AppThemeRed);
+                                }else if(Color.parseColor(jo.getString("background_color"))==getResources().getColor(R.color.themeGreen)){
+                                    MyApplication.getInstance().setCurrentTheme(R.style.AppThemeGreen);
+                                    MyApplication.getInstance().setTheme(R.style.AppThemeGreen);
+                                }else if(Color.parseColor(jo.getString("background_color"))==getResources().getColor(R.color.themeOrange)){
+                                    MyApplication.getInstance().setCurrentTheme(R.style.AppThemeOrange);
+                                    MyApplication.getInstance().setTheme(R.style.AppThemeOrange);
+                                }
+                                MyApplication.getInstance().setBackgroundImage(jo.getString("background_image"));
+
+                            }
                         }
+
 
                     }
 

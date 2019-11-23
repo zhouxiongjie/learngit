@@ -6,11 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -66,6 +68,8 @@ import java.util.TimerTask;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.jake.share.frdialog.dialog.FRDialog;
+import cn.jake.share.frdialog.interfaces.FRDialogClickListener;
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.framework.ShareSDK;
@@ -98,6 +102,8 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
     private static final int SHARE_SUCCESS = 0x5;
 
     private static final int SHARE_FAILED = 0x6;
+
+    public static final int REQUEST_PERMISSION_CODE = 0x0110;
 
     @BindView(R.id.activity_title)
     TopTitleBar activityTitle;
@@ -381,10 +387,46 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
         super.onPause();
     }
 
-
+    private void showFloatWindowPermission() {
+        FloatWindowUtil.getInstance().addOnPermissionListener(new FloatWindowUtil.OnPermissionListener() {
+            @Override
+            public void showPermissionDialog() {
+                FRDialog dialog = new FRDialog.MDBuilder(RadioDetailActivity.this)
+                        .setTitle("是否显示悬浮播放器")
+                        .setMessage("要显示悬浮播放器，需要开启悬浮窗权限")
+                        .setPositiveContentAndListener("现在去开启", new FRDialogClickListener() {
+                            @Override
+                            public boolean onDialogClick(View view) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                                    intent.setData(Uri.parse("package:" + getPackageName()));
+                                    startActivityForResult(intent, REQUEST_PERMISSION_CODE);
+                                }
+                                return true;
+                            }
+                        }).setNegativeContentAndListener("暂不开启", new FRDialogClickListener() {
+                            @Override
+                            public boolean onDialogClick(View view) {
+                                return true;
+                            }
+                        }).create();
+                dialog.show();
+            }
+        });
+        FloatWindowUtil.getInstance().setPermission();
+    }
 
     @Override
     protected void onResume() {
+//        FloatWindowUtil.getInstance().hideWindow();
+//        super.onResume();
+        if(!FloatWindowUtil.getInstance().checkFloatWindowPermission()){
+            if(MyApplication.getInstance().remindPermission) {
+                MyApplication.getInstance().remindPermission=false;
+                showFloatWindowPermission();
+
+            }
+        }
         FloatWindowUtil.getInstance().hideWindow();
         super.onResume();
     }

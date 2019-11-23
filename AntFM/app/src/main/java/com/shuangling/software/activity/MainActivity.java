@@ -34,6 +34,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
@@ -49,6 +50,7 @@ import com.shuangling.software.entity.City;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.UpdateInfo;
 import com.shuangling.software.event.CommonEvent;
+import com.shuangling.software.fragment.DiscoverFragment;
 import com.shuangling.software.fragment.PersonalCenterFragment;
 import com.shuangling.software.fragment.RecommendFragment;
 import com.shuangling.software.network.OkHttpCallback;
@@ -147,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //ImmersionBar.with(this).transparentStatusBar().statusBarDarkFont(true).fitsSystemWindows(true).init();
         ButterKnife.bind(this);
         getBottomMenus();
         mHandler = new Handler(this);
@@ -729,6 +732,10 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                         if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
                                             transaction.hide(personalCenterFragment);
                                         }
+                                        if(discoverFragment!=null&&!discoverFragment.isHidden()){
+                                            transaction.hide(discoverFragment);
+                                        }
+
                                         transaction.commit();
                                     }
                                 });
@@ -768,16 +775,36 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                 bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        //
-//                                        bottomMenuHolder.name.setSelected(true);
-//                                        bottomMenuHolder.icon.setSelected(true);
-//                                        for(int i=0;i<mMenus.size();i++){
-//                                            BottomMenuHolder holder=mMenus.get(i);
-//                                            if(holder!=bottomMenuHolder){
-//                                                holder.name.setSelected(false);
-//                                                holder.icon.setSelected(false);
-//                                            }
-//                                        }
+
+                                        bottomMenuHolder.name.setSelected(true);
+                                        bottomMenuHolder.icon.setSelected(true);
+                                        for(int i=0;i<mMenus.size();i++){
+                                            BottomMenuHolder holder=mMenus.get(i);
+                                            if(holder!=bottomMenuHolder){
+                                                holder.name.setSelected(false);
+                                                holder.icon.setSelected(false);
+                                            }
+                                        }
+
+                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                        if (discoverFragment == null) {
+                                            discoverFragment = new DiscoverFragment();
+                                            Bundle bundle = new Bundle();
+                                            bundle.putString("url", ServerInfo.h5IP + "/gover");
+                                            discoverFragment.setArguments(bundle);
+                                            transaction.add(R.id.content, discoverFragment);
+                                        } else {
+                                            transaction.show(discoverFragment);
+                                            ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5IP + "/gover");
+                                        }
+                                        if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                            transaction.hide(recommendFragment);
+                                        }
+                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                            transaction.hide(personalCenterFragment);
+                                        }
+                                        transaction.commit();
+
 
                                         //跳到媒体矩阵
                                     }
@@ -789,6 +816,34 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                     @Override
                                     public void onClick(View v) {
                                         //跳到建言咨政
+                                        bottomMenuHolder.name.setSelected(true);
+                                        bottomMenuHolder.icon.setSelected(true);
+                                        for(int i=0;i<mMenus.size();i++){
+                                            BottomMenuHolder holder=mMenus.get(i);
+                                            if(holder!=bottomMenuHolder){
+                                                holder.name.setSelected(false);
+                                                holder.icon.setSelected(false);
+                                            }
+                                        }
+
+                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                        if (discoverFragment == null) {
+                                            discoverFragment = new DiscoverFragment();
+                                            Bundle bundle = new Bundle();
+                                            bundle.putString("url", ServerInfo.h5IP + "/interact");
+                                            discoverFragment.setArguments(bundle);
+                                            transaction.add(R.id.content, discoverFragment);
+                                        } else {
+                                            transaction.show(discoverFragment);
+                                            ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5IP + "/interact");
+                                        }
+                                        if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                            transaction.hide(recommendFragment);
+                                        }
+                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                            transaction.hide(personalCenterFragment);
+                                        }
+                                        transaction.commit();
                                     }
                                 });
                             } else if (bottomMenu.getType() == 5) {
@@ -797,7 +852,34 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                 bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        //跳到建言咨政
+                                        bottomMenuHolder.name.setSelected(true);
+                                        bottomMenuHolder.icon.setSelected(true);
+                                        for(int i=0;i<mMenus.size();i++){
+                                            BottomMenuHolder holder=mMenus.get(i);
+                                            if(holder!=bottomMenuHolder){
+                                                holder.name.setSelected(false);
+                                                holder.icon.setSelected(false);
+                                            }
+                                        }
+
+                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                        if (discoverFragment == null) {
+                                            discoverFragment = new DiscoverFragment();
+                                            Bundle bundle = new Bundle();
+                                            bundle.putString("url", ServerInfo.h5IP + "/guide");
+                                            discoverFragment.setArguments(bundle);
+                                            transaction.add(R.id.content, discoverFragment);
+                                        } else {
+                                            transaction.show(discoverFragment);
+                                            ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5IP + "/guide");
+                                        }
+                                        if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                            transaction.hide(recommendFragment);
+                                        }
+                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                            transaction.hide(personalCenterFragment);
+                                        }
+                                        transaction.commit();
                                     }
                                 });
                             } else if (bottomMenu.getType() == 6) {
@@ -806,7 +888,34 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                 bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        //跳到建言咨政
+                                        bottomMenuHolder.name.setSelected(true);
+                                        bottomMenuHolder.icon.setSelected(true);
+                                        for(int i=0;i<mMenus.size();i++){
+                                            BottomMenuHolder holder=mMenus.get(i);
+                                            if(holder!=bottomMenuHolder){
+                                                holder.name.setSelected(false);
+                                                holder.icon.setSelected(false);
+                                            }
+                                        }
+
+                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                        if (discoverFragment == null) {
+                                            discoverFragment = new DiscoverFragment();
+                                            Bundle bundle = new Bundle();
+                                            bundle.putString("url", ServerInfo.h5IP + "/services");
+                                            discoverFragment.setArguments(bundle);
+                                            transaction.add(R.id.content, discoverFragment);
+                                        } else {
+                                            transaction.show(discoverFragment);
+                                            ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5IP + "/services");
+                                        }
+                                        if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                            transaction.hide(recommendFragment);
+                                        }
+                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                            transaction.hide(personalCenterFragment);
+                                        }
+                                        transaction.commit();
                                     }
                                 });
                             } else if (bottomMenu.getType() == 7) {
@@ -815,7 +924,34 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                 bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        //跳到建言咨政
+                                        bottomMenuHolder.name.setSelected(true);
+                                        bottomMenuHolder.icon.setSelected(true);
+                                        for(int i=0;i<mMenus.size();i++){
+                                            BottomMenuHolder holder=mMenus.get(i);
+                                            if(holder!=bottomMenuHolder){
+                                                holder.name.setSelected(false);
+                                                holder.icon.setSelected(false);
+                                            }
+                                        }
+
+                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                        if (discoverFragment == null) {
+                                            discoverFragment = new DiscoverFragment();
+                                            Bundle bundle = new Bundle();
+                                            bundle.putString("url", ServerInfo.activity + "activity");
+                                            discoverFragment.setArguments(bundle);
+                                            transaction.add(R.id.content, discoverFragment);
+                                        } else {
+                                            transaction.show(discoverFragment);
+                                            ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.activity + "activity");
+                                        }
+                                        if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                            transaction.hide(recommendFragment);
+                                        }
+                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                            transaction.hide(personalCenterFragment);
+                                        }
+                                        transaction.commit();
                                     }
                                 });
                             } else if (bottomMenu.getType() == 8) {
@@ -842,16 +978,59 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                 });
                             } else if (bottomMenu.getType() == 10) {
                                 //资讯分类
+
+
+
                                 bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_news));
                                 bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
+
+                                        bottomMenuHolder.name.setSelected(true);
+                                        bottomMenuHolder.icon.setSelected(true);
+                                        for(int i=0;i<mMenus.size();i++){
+                                            BottomMenuHolder holder=mMenus.get(i);
+                                            if(holder!=bottomMenuHolder){
+                                                holder.name.setSelected(false);
+                                                holder.icon.setSelected(false);
+                                            }
+                                        }
+
+
+                                        bottomMenuHolder.name.setSelected(true);
+                                        bottomMenuHolder.icon.setSelected(true);
+                                        for(int i=0;i<mMenus.size();i++){
+                                            BottomMenuHolder holder=mMenus.get(i);
+                                            if(holder!=bottomMenuHolder){
+                                                holder.name.setSelected(false);
+                                                holder.icon.setSelected(false);
+                                            }
+                                        }
+
+                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                        if (recommendFragment == null) {
+                                            recommendFragment = new RecommendFragment();
+                                            transaction.add(R.id.content, recommendFragment);
+                                        } else {
+                                            transaction.show(recommendFragment);
+                                        }
+                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                            transaction.hide(personalCenterFragment);
+                                        }
+                                        if(discoverFragment!=null&&!discoverFragment.isHidden()){
+                                            transaction.hide(discoverFragment);
+                                        }
+
+                                        transaction.commit();
+
+
+
+
+
                                         Column column=new Column();
                                         column.setId(Integer.parseInt(bottomMenu.getSource_id()));
                                         column.setName(bottomMenu.getName());
-                                        Intent it = new Intent(MainActivity.this, ContentActivity.class);
-                                        it.putExtra("column", column);
-                                        startActivity(it);
+                                        ((RecommendFragment)recommendFragment).switchColumn(column);
                                     }
                                 });
                             }

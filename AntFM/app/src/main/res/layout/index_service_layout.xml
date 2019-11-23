@@ -7,6 +7,7 @@
     android:orientation="vertical">
 
     <ImageView
+        android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="6dp"
         android:background="@color/divideColorTwo" />

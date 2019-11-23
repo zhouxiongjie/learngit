@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,11 +25,28 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.gyf.immersionbar.ImmersionBar;
+import com.gyf.immersionbar.components.SimpleImmersionFragment;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.activity.AlbumDetailActivity;
+import com.shuangling.software.activity.AnchorDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.CityListActivity;
+import com.shuangling.software.activity.ContentActivity;
+import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.MainActivity;
+import com.shuangling.software.activity.OrganizationDetailActivity;
+import com.shuangling.software.activity.RadioDetailActivity;
+import com.shuangling.software.activity.RadioListActivity;
 import com.shuangling.software.activity.SearchActivity;
+import com.shuangling.software.activity.SpecialDetailActivity;
+import com.shuangling.software.activity.TvDetailActivity;
+import com.shuangling.software.activity.VideoDetailActivity;
+import com.shuangling.software.activity.WebViewActivity;
+import com.shuangling.software.activity.WebViewBackActivity;
+import com.shuangling.software.dialog.CustomColumnDialog;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.Weather;
 import com.shuangling.software.event.CommonEvent;
@@ -37,6 +55,7 @@ import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
+import com.shuangling.software.utils.SharedPreferencesUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -55,7 +74,7 @@ import butterknife.Unbinder;
 import okhttp3.Call;
 
 
-public class RecommendFragment extends Fragment implements Handler.Callback {
+public class RecommendFragment extends SimpleImmersionFragment implements Handler.Callback {
 
     public static final int MSG_GET_COLUMN = 0x1;
     public static final int MSG_GET_CITY_WEATHER = 0x2;
@@ -68,8 +87,6 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
     Unbinder unbinder;
     @BindView(R.id.columnScrollView)
     HorizontalScrollView columnScrollView;
-    @BindView(R.id.topBar)
-    LinearLayout topBar;
     @BindView(R.id.city)
     TextView city;
     @BindView(R.id.divide)
@@ -82,12 +99,23 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
     RelativeLayout weatherLayout;
     @BindView(R.id.logo1)
     SimpleDraweeView logo1;
+    @BindView(R.id.customColumn)
+    ImageView customColumn;
+    @BindView(R.id.topBackground)
+    SimpleDraweeView topBackground;
+    @BindView(R.id.topBar)
+    RelativeLayout topBar;
+    @BindView(R.id.statusBar)
+    View statusBar;
+
 
     /**
      * 当前选中的栏目
      */
     private int mColumnSelectIndex = 0;
     public List<Column> mColumns;
+    public List<Column> mRemoteColumns;
+
     private ArrayList<Fragment> mFragments = new ArrayList<>();
     /**
      * 屏幕宽度
@@ -96,6 +124,7 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
     private Handler mHandler;
 
     private Column mSwitchColumn;
+    private MyselfFragmentPagerAdapter mMyselfFragmentPagerAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -124,22 +153,99 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_recommend, container, false);
-        getRecommendColumns();
-        unbinder = ButterKnife.bind(this, view);
+        View rootView = inflater.inflate(R.layout.fragment_recommend, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
+        if (!TextUtils.isEmpty(MyApplication.getInstance().getBackgroundImage())) {
+            Uri uri = Uri.parse(MyApplication.getInstance().getBackgroundImage());
+            topBackground.setImageURI(uri);
+        }
+        if (TextUtils.isEmpty(SharedPreferencesUtils.getStringValue("custom_column", null))) {
+            getRecommendColumns(0);
+        } else {
+            mColumns = JSONObject.parseArray(SharedPreferencesUtils.getStringValue("custom_column", null), Column.class);
+            for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
+                Column column = mColumns.get(i);
+                View view = inflater.inflate(R.layout.column_txt_layout, columnContent, false);
+                TextView columnTextView = view.findViewById(R.id.text);
+                SimpleDraweeView indicator = view.findViewById(R.id.indicator);
+                columnTextView.setText(column.getName());
+                columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
+
+
+                if (mColumnSelectIndex == i) {
+                    columnTextView.setSelected(true);
+                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+                    indicator.setVisibility(View.VISIBLE);
+
+                } else {
+                    columnTextView.setSelected(false);
+                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                    indicator.setVisibility(View.INVISIBLE);
+                }
+                view.setOnClickListener(new OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        for (int i = 0; i < columnContent.getChildCount(); i++) {
+                            View localView = columnContent.getChildAt(i);
+                            TextView columnTextView = localView.findViewById(R.id.text);
+                            SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
+                            if (localView != v) {
+                                columnTextView.setSelected(false);
+                                indicator.setVisibility(View.INVISIBLE);
+
+                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                                columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                            } else {
+                                mColumnSelectIndex = i;
+                                columnTextView.setSelected(true);
+                                indicator.setVisibility(View.VISIBLE);
+                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+
+                                viewPager.setCurrentItem(mColumnSelectIndex);
+                            }
+                        }
+                    }
+                });
+                columnContent.addView(view, i);
+            }
+            initFragment();
+            getRecommendColumns(1);
+
+
+        }
+
+
+//        if (!TextUtils.isEmpty(MyApplication.getInstance().getBackgroundImage())) {
+//            Uri uri = Uri.parse(MyApplication.getInstance().getBackgroundImage());
+//        }
         if (MyApplication.getInstance().getStation() != null && MyApplication.getInstance().getStation().getIs_league() == 0) {
             //city.setCompoundDrawables(null, null, null, null);
             weatherLayout.setVisibility(View.GONE);
             logo1.setVisibility(View.VISIBLE);
-            if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getLogo1())){
+            if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getLogo1())) {
                 Uri uri = Uri.parse(MyApplication.getInstance().getStation().getLogo1());
-                ImageLoader.showThumb(uri,logo1,CommonUtils.dip2px(110),CommonUtils.dip2px(18));
+                ImageLoader.showThumb(uri, logo1, CommonUtils.dip2px(110), CommonUtils.dip2px(18));
             }
         }
         if (MainActivity.sCurrentCity != null) {
             city.setText(MainActivity.sCurrentCity.getName());
         }
-        return view;
+
+        topBar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                topBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int height = topBar.getHeight();
+                ViewGroup.LayoutParams lp = topBackground.getLayoutParams();
+                lp.height = height;
+                topBackground.setLayoutParams(lp);
+            }
+        });
+        return rootView;
 
     }
 
@@ -147,8 +253,8 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
     private void initFragment() {
         mFragments.clear();
         if (mColumns != null && mColumns.size() > 0) {
-            MyselfFragmentPagerAdapter mAdapetr = new MyselfFragmentPagerAdapter(getChildFragmentManager(), mColumns);
-            viewPager.setAdapter(mAdapetr);
+            mMyselfFragmentPagerAdapter = new MyselfFragmentPagerAdapter(getChildFragmentManager(), mColumns);
+            viewPager.setAdapter(mMyselfFragmentPagerAdapter);
             viewPager.addOnPageChangeListener(mPageListener);
             //viewPager.setCurrentItem(mColumnSelectIndex);
         }
@@ -161,6 +267,18 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
                     switchColumn(mSwitchColumn);
                 }
             }, 500);
+        } else {
+            if (MyApplication.getInstance().getStation() != null && MyApplication.getInstance().getStation().getCategory() == 2) {
+//                mHandler.postDelayed(new Runnable() {
+//
+//                    @Override
+//                    public void run() {
+//
+//                    }
+//                }, 500);
+                mColumnSelectIndex = 1;
+                viewPager.setCurrentItem(mColumnSelectIndex);
+            }
         }
 
     }
@@ -183,7 +301,7 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
                 if (MyApplication.getInstance().getStation() != null && MyApplication.getInstance().getStation().getIs_league() == 0) {
                     weatherLayout.setVisibility(View.GONE);
                     logo1.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     weatherLayout.setVisibility(View.VISIBLE);
                     logo1.setVisibility(View.GONE);
                 }
@@ -237,7 +355,7 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
     };
 
 
-    @OnClick({R.id.city, R.id.search})
+    @OnClick({R.id.city, R.id.search, R.id.customColumn})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.city:
@@ -251,11 +369,83 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
                 startActivity(new Intent(getContext(), SearchActivity.class));
 
                 break;
+            case R.id.customColumn:
+                if (mRemoteColumns != null) {
+                    List<Column> columns = new ArrayList<>();
+                    columns.addAll(mRemoteColumns);
+                    CustomColumnDialog dialog = CustomColumnDialog.getInstance(columns, mColumns.get(mColumnSelectIndex));
+                    dialog.setOnCloseClickListener(new CustomColumnDialog.OnCloseClickListener() {
+                        @Override
+                        public void close() {
+                            mColumns = JSONObject.parseArray(SharedPreferencesUtils.getStringValue("custom_column", null), Column.class);
+                            columnContent.removeAllViews();
+                            LayoutInflater inflater = getLayoutInflater();
+                            for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
+                                Column column = mColumns.get(i);
+                                View view = inflater.inflate(R.layout.column_txt_layout, columnContent, false);
+                                TextView columnTextView = view.findViewById(R.id.text);
+                                SimpleDraweeView indicator = view.findViewById(R.id.indicator);
+                                columnTextView.setText(column.getName());
+                                columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
+
+
+                                if (mColumnSelectIndex == i) {
+                                    columnTextView.setSelected(true);
+                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+                                    indicator.setVisibility(View.VISIBLE);
+
+                                } else {
+                                    columnTextView.setSelected(false);
+                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                                    indicator.setVisibility(View.INVISIBLE);
+                                }
+                                view.setOnClickListener(new OnClickListener() {
+
+                                    @Override
+                                    public void onClick(View v) {
+                                        for (int i = 0; i < columnContent.getChildCount(); i++) {
+                                            View localView = columnContent.getChildAt(i);
+                                            TextView columnTextView = localView.findViewById(R.id.text);
+                                            SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
+                                            if (localView != v) {
+                                                columnTextView.setSelected(false);
+                                                indicator.setVisibility(View.INVISIBLE);
+
+                                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                                                columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                                            } else {
+                                                mColumnSelectIndex = i;
+                                                columnTextView.setSelected(true);
+                                                indicator.setVisibility(View.VISIBLE);
+                                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                                columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+
+                                                viewPager.setCurrentItem(mColumnSelectIndex);
+                                            }
+                                        }
+                                    }
+                                });
+                                columnContent.addView(view, i);
+                            }
+
+                            mMyselfFragmentPagerAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void switchClo(Column column) {
+                            switchColumn(column);
+                        }
+                    });
+                    dialog.show(getFragmentManager(), "AudioListDialog");
+                }
+                break;
         }
     }
 
 
-    public void getRecommendColumns() {
+    public void getRecommendColumns(final int useLocal) {
 
         String url = ServerInfo.serviceIP + ServerInfo.getRecommendColumns;
         Map<String, String> params = new HashMap<>();
@@ -269,6 +459,7 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_COLUMN;
                 msg.obj = response;
+                msg.arg1 = useLocal;
                 mHandler.sendMessage(msg);
 
 
@@ -322,6 +513,11 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
             weather();
 
         }
+    }
+
+    @Override
+    public void initImmersionBar() {
+        ImmersionBar.with(this).keyboardEnable(true).statusBarView(statusBar).init();
     }
 
 
@@ -398,15 +594,15 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_GET_COLUMN: {
-                String result = (String) msg.obj;
-                try {
-                    JSONObject jsonObject = JSONObject.parseObject(result);
-                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    int useLocal = msg.arg1;
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         JSONObject jo = jsonObject.getJSONObject("data");
                         if (jo.getInteger("total") > 0) {
                             mColumns = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), Column.class);
-
                             Column col = new Column();
                             col.setName("首页");
                             col.setType(-1);
@@ -416,28 +612,36 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
                                 mColumns = new ArrayList<>();
                                 mColumns.add(col);
                             }
-                            for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
-                                Column column = mColumns.get(i);
-                                //LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                                //params.leftMargin = 20;
-                                //params.rightMargin = 20;
-                                LayoutInflater inflater = getLayoutInflater();
-                                View view = inflater.inflate(R.layout.column_txt_layout, columnContent, false);
-                                TextView columnTextView = view.findViewById(R.id.text);
-                                SimpleDraweeView indicator = view.findViewById(R.id.indicator);
-                                //columnTextView.setGravity(Gravity.CENTER);
-                                //columnTextView.setPadding(40, 20, 40, 20);
+                            mRemoteColumns = mColumns;
+                            if (useLocal == 1) {
+                                return true;
+                            } else {
 
-                                //columnTextView.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
-                                columnTextView.setText(column.getName());
-                                columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
+                                if (mColumns != null && mColumns.size() > 8) {
+                                    mColumns = mColumns.subList(0, 8);
+                                }
+                                for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
+                                    Column column = mColumns.get(i);
+                                    //LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                    //params.leftMargin = 20;
+                                    //params.rightMargin = 20;
+                                    LayoutInflater inflater = getLayoutInflater();
+                                    View view = inflater.inflate(R.layout.column_txt_layout, columnContent, false);
+                                    TextView columnTextView = view.findViewById(R.id.text);
+                                    SimpleDraweeView indicator = view.findViewById(R.id.indicator);
+                                    //columnTextView.setGravity(Gravity.CENTER);
+                                    //columnTextView.setPadding(40, 20, 40, 20);
+
+                                    //columnTextView.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
+                                    columnTextView.setText(column.getName());
+                                    columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
 
 
-                                if (mColumnSelectIndex == i) {
-                                    columnTextView.setSelected(true);
-                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-                                    indicator.setVisibility(View.VISIBLE);
+                                    if (mColumnSelectIndex == i) {
+                                        columnTextView.setSelected(true);
+                                        columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                        columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+                                        indicator.setVisibility(View.VISIBLE);
 //                                    Station station=MyApplication.getInstance().getStation();
 //                                    if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
 //                                        ViewGroup.LayoutParams lp=indicator.getLayoutParams();
@@ -457,30 +661,30 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
 //                                        ImageLoader.showThumb(indicator,R.drawable.indicator_line_bg);
 //                                    }
 
-                                } else {
-                                    columnTextView.setSelected(false);
-                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-                                    indicator.setVisibility(View.INVISIBLE);
-                                }
-                                view.setOnClickListener(new OnClickListener() {
+                                    } else {
+                                        columnTextView.setSelected(false);
+                                        columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                                        columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                                        indicator.setVisibility(View.INVISIBLE);
+                                    }
+                                    view.setOnClickListener(new OnClickListener() {
 
-                                    @Override
-                                    public void onClick(View v) {
-                                        for (int i = 0; i < columnContent.getChildCount(); i++) {
-                                            View localView = columnContent.getChildAt(i);
-                                            TextView columnTextView = localView.findViewById(R.id.text);
-                                            SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
-                                            if (localView != v) {
-                                                columnTextView.setSelected(false);
-                                                indicator.setVisibility(View.INVISIBLE);
+                                        @Override
+                                        public void onClick(View v) {
+                                            for (int i = 0; i < columnContent.getChildCount(); i++) {
+                                                View localView = columnContent.getChildAt(i);
+                                                TextView columnTextView = localView.findViewById(R.id.text);
+                                                SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
+                                                if (localView != v) {
+                                                    columnTextView.setSelected(false);
+                                                    indicator.setVisibility(View.INVISIBLE);
 
-                                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-                                                columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-                                            } else {
-                                                mColumnSelectIndex = i;
-                                                columnTextView.setSelected(true);
-                                                indicator.setVisibility(View.VISIBLE);
+                                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                                                } else {
+                                                    mColumnSelectIndex = i;
+                                                    columnTextView.setSelected(true);
+                                                    indicator.setVisibility(View.VISIBLE);
 //                                                Station station=MyApplication.getInstance().getStation();
 //                                                if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
 //                                                    Uri uri = Uri.parse(station.getIcon1());
@@ -488,17 +692,20 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
 //                                                    int height=width;
 //                                                    ImageLoader.showThumb(uri,indicator,width,height);
 //                                                }
-                                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-                                                columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-                                                viewPager.setCurrentItem(mColumnSelectIndex);
+                                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+
+                                                    viewPager.setCurrentItem(mColumnSelectIndex);
+                                                }
                                             }
                                         }
-                                    }
-                                });
-                                columnContent.addView(view, i);
+                                    });
+                                    columnContent.addView(view, i);
+                                }
+
+                                initFragment();
                             }
 
-                            initFragment();
                         }
                     } else {
 
@@ -545,5 +752,118 @@ public class RecommendFragment extends Fragment implements Handler.Callback {
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+    }
+
+
+    public void jumpTo(String url, String title) {
+        if (url.startsWith(ServerInfo.h5IP + "/tv") || url.startsWith(ServerInfo.h5HttpsIP + "/tv")) {
+            Intent it = new Intent(getContext(), RadioListActivity.class);
+            it.putExtra("type", "2");
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/radios/") || url.startsWith(ServerInfo.h5HttpsIP + "/radios/")) {
+            String radioId = url.substring(url.lastIndexOf("/") + 1);
+            Intent it = new Intent(getContext(), TvDetailActivity.class);
+            it.putExtra("radioId", Integer.parseInt(radioId));
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/radios") || url.startsWith(ServerInfo.h5HttpsIP + "/radios")) {
+            Intent it = new Intent(getContext(), RadioListActivity.class);
+            it.putExtra("type", "1");
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/radios/") || url.startsWith(ServerInfo.h5HttpsIP + "/radios/")) {
+            String radioId = url.substring(url.lastIndexOf("/") + 1);
+            Intent it = new Intent(getContext(), RadioDetailActivity.class);
+            it.putExtra("radioId", Integer.parseInt(radioId));
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/gover") || url.startsWith(ServerInfo.h5HttpsIP + "/gover")) {
+            Intent it = new Intent(getContext(), WebViewActivity.class);
+            it.putExtra("url", url);
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/dj") || url.startsWith(ServerInfo.h5HttpsIP + "/dj")) {
+            Intent it = new Intent(getContext(), WebViewActivity.class);
+            it.putExtra("url", url);
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/interact") || url.startsWith(ServerInfo.h5HttpsIP + "/interact")) {
+            Intent it = new Intent(getContext(), WebViewActivity.class);
+            it.putExtra("url", url);
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/guide") || url.startsWith(ServerInfo.h5HttpsIP + "/guide")) {
+            Intent it = new Intent(getContext(), WebViewActivity.class);
+            it.putExtra("url", url);
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/cates/") || url.startsWith(ServerInfo.h5HttpsIP + "/cates/")) {
+            //跳转栏目
+            String columnid = url.substring(url.lastIndexOf("/") + 1);
+            Column column = new Column();
+            column.setId(Integer.parseInt(columnid));
+            switchColumn(column);
+
+        } else if (url.startsWith(ServerInfo.h5IP + "/specials") || url.startsWith(ServerInfo.h5HttpsIP + "/specials")) {
+            //跳转热门
+            int columnid = 0;
+
+            for (int i = 0; i < mColumns.size(); i++) {
+                if (mColumns.get(i).getType() == 1) {
+                    columnid = mColumns.get(i).getId();
+                    break;
+                }
+            }
+            Column column = new Column();
+            column.setId(columnid);
+            switchColumn(column);
+
+        } else if (url.startsWith(ServerInfo.h5IP + "/orgs/") || url.startsWith(ServerInfo.h5HttpsIP + "/orgs/")) {
+            String organizationId = url.substring(url.lastIndexOf("/") + 1);
+            Intent it = new Intent(getContext(), OrganizationDetailActivity.class);
+            it.putExtra("organizationId", Integer.parseInt(organizationId));
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/anchors/") || url.startsWith(ServerInfo.h5HttpsIP + "/anchors/")) {
+            String anchorId = url.substring(url.lastIndexOf("/") + 1);
+            Intent it = new Intent(getContext(), AnchorDetailActivity.class);
+            it.putExtra("anchorId", Integer.parseInt(anchorId));
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/atlas/") || url.startsWith(ServerInfo.h5HttpsIP + "/atlas/")) {
+            String galleriaId = url.substring(url.lastIndexOf("/") + 1);
+            Intent it = new Intent(getContext(), GalleriaActivity.class);
+            it.putExtra("galleriaId", Integer.parseInt(galleriaId));
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/albums/") || url.startsWith(ServerInfo.h5HttpsIP + "/albums/")) {
+            String albumId = url.substring(url.lastIndexOf("/") + 1);
+            Intent it = new Intent(getContext(), AlbumDetailActivity.class);
+            it.putExtra("albumId", Integer.parseInt(albumId));
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/audios/") || url.startsWith(ServerInfo.h5HttpsIP + "/audios/")) {
+            String audioId = url.substring(url.lastIndexOf("/") + 1);
+            Intent it = new Intent(getContext(), AudioDetailActivity.class);
+            it.putExtra("audioId", Integer.parseInt(audioId));
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/posts/") || url.startsWith(ServerInfo.h5HttpsIP + "/posts/")) {
+            String articleId = url.substring(url.lastIndexOf("/") + 1);
+            Intent it = new Intent(getContext(), ArticleDetailActivity.class);
+            it.putExtra("articleId", Integer.parseInt(articleId));
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/specials/") || url.startsWith(ServerInfo.h5HttpsIP + "/specials/")) {
+            String specialId = url.substring(url.lastIndexOf("/") + 1);
+            Intent it = new Intent(getContext(), SpecialDetailActivity.class);
+            it.putExtra("specialId", Integer.parseInt(specialId));
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/videos/") || url.startsWith(ServerInfo.h5HttpsIP + "/videos/")) {
+            String videoId = url.substring(url.lastIndexOf("/") + 1);
+            Intent it = new Intent(getContext(), VideoDetailActivity.class);
+            it.putExtra("videoId", Integer.parseInt(videoId));
+            startActivity(it);
+        } else if (url.startsWith(ServerInfo.h5IP + "/subcates/") || url.startsWith(ServerInfo.h5IP + "/subcates/")) {
+            String columnid = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("?"));
+            Column column = new Column();
+            column.setId(Integer.parseInt(columnid));
+            column.setName(url.substring(url.lastIndexOf("=") + 1));
+            Intent it = new Intent(getContext(), ContentActivity.class);
+            it.putExtra("column", column);
+            startActivity(it);
+        } else {
+            Intent it = new Intent(getContext(), WebViewBackActivity.class);
+            it.putExtra("url", url);
+            it.putExtra("title", title);
+            startActivity(it);
+        }
     }
 }

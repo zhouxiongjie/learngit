@@ -25,6 +25,7 @@ import com.shuangling.software.R;
 import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.activity.TvDetailActivity;
 import com.shuangling.software.adapter.ProgramRadioAdapter;
+import com.shuangling.software.entity.AnchorOrganizationColumn;
 import com.shuangling.software.entity.RadioSet;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
@@ -56,7 +57,7 @@ public class ProgramRadioFragment extends Fragment implements Handler.Callback {
     @BindView(R.id.noData)
     LinearLayout noData;
 
-    private String mCategory;
+    private AnchorOrganizationColumn mColumn;
     private String mOrganizationId;
     private List<RadioSet.Radio> mRadios = new ArrayList<>();
     private ProgramRadioAdapter mAdapter;
@@ -76,7 +77,7 @@ public class ProgramRadioFragment extends Fragment implements Handler.Callback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Bundle args = getArguments();
-        mCategory = args.getString("category");
+        mColumn = (AnchorOrganizationColumn)args.getSerializable("columns");
         mOrganizationId = args.getString("organizationId");
         mHandler = new Handler(this);
         super.onCreate(savedInstanceState);
@@ -147,6 +148,11 @@ public class ProgramRadioFragment extends Fragment implements Handler.Callback {
         Map<String, String> params = new HashMap<String, String>();
         params.put("page", "" + mCurrentPage);
         params.put("merchant_id", "" + mOrganizationId);
+        if(mColumn.getType()==2){
+            params.put("type", "1");
+        }else{
+            params.put("type", "2");
+        }
 
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
 

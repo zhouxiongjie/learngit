@@ -25,6 +25,7 @@ import com.shuangling.software.R;
 import com.shuangling.software.activity.AnchorDetailActivity;
 import com.shuangling.software.adapter.ProgramAnchorAdapter;
 import com.shuangling.software.entity.Anchor;
+import com.shuangling.software.entity.AnchorOrganizationColumn;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.Constant;
@@ -56,7 +57,7 @@ public class ProgramAnchorFragment extends Fragment implements Handler.Callback 
     @BindView(R.id.noData)
     LinearLayout noData;
 
-    private String mCategory;
+    private AnchorOrganizationColumn mColumn;
     private String mOrganizationId;
     private List<Anchor> mAnchors = new ArrayList<>();
     private ProgramAnchorAdapter mAdapter;
@@ -76,7 +77,7 @@ public class ProgramAnchorFragment extends Fragment implements Handler.Callback 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Bundle args = getArguments();
-        mCategory = args.getString("category");
+        mColumn = (AnchorOrganizationColumn)args.getSerializable("columns");
         mOrganizationId = args.getString("organizationId");
         mHandler = new Handler(this);
         super.onCreate(savedInstanceState);

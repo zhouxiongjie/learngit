@@ -29,6 +29,7 @@ import com.shuangling.software.customview.ArrowRectangleView;
 import com.shuangling.software.customview.PopupMenu;
 import com.shuangling.software.customview.ReadMoreTextViewWithIcon;
 import com.shuangling.software.customview.TopTitleBar;
+import com.shuangling.software.entity.AnchorOrganizationColumn;
 import com.shuangling.software.entity.Organization;
 import com.shuangling.software.entity.OrganizationMenus;
 import com.shuangling.software.entity.Station;
@@ -45,6 +46,7 @@ import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +72,8 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
     public static final int MSG_GET_ORGANIZATION_MENUS = 0x5;
 
     public static final int REQUEST_LOGIN = 0x6;
+
+    public static final int MSG_GET_ANCHOR_COLUMN = 0x7;
 
     private static final int[] category = new int[]{R.string.radio, R.string.anchor, R.string.article, R.string.album, R.string.video, R.string.special, R.string.photo};
     //private static final int[] category = new int[]{ R.string.article,R.string.album, R.string.video, R.string.special, R.string.photo};
@@ -104,6 +108,8 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
     LinearLayout menus;
     @BindView(R.id.authentication)
     TextView authentication;
+    @BindView(R.id.noData)
+    LinearLayout noData;
 
     private FragmentAdapter mFragmentPagerAdapter;
 
@@ -112,7 +118,8 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
 
     private List<Organization> mOrganizations;
     private List<OrganizationMenus> mOrganizationMenus;
-
+    public List<AnchorOrganizationColumn> mColumns;
+    private ArrayList<Fragment> mFragments = new ArrayList<>();
 
     private Handler mHandler;
 
@@ -135,13 +142,59 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
 
 
     private void init() {
-        mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(mFragmentPagerAdapter);
-        tabPageIndicator.setupWithViewPager(viewPager);
+        mOrganizationId = getIntent().getIntExtra("organizationId", 0);
+        getColumn();
+//        mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager());
+//        viewPager.setAdapter(mFragmentPagerAdapter);
+//        tabPageIndicator.setupWithViewPager(viewPager);
+    }
+
+
+    private void initFragment() {
+        mFragments.clear();
+        if (mColumns != null && mColumns.size() > 0) {
+
+            mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager(), mColumns);
+            viewPager.setAdapter(mFragmentPagerAdapter);
+            tabPageIndicator.setupWithViewPager(viewPager);
+
+            if (mColumns.size() > 5) {
+                tabPageIndicator.setTabMode(TabLayout.MODE_SCROLLABLE);
+            } else {
+                tabPageIndicator.setTabMode(TabLayout.MODE_FIXED);
+            }
+        }
+
+    }
+
+
+    private void getColumn() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.getAnchorOrOrganizationColumn + mOrganizationId;
+        Map<String, String> params = new HashMap<>();
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_ANCHOR_COLUMN;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
     }
 
     private void getOrganizationDetail() {
-        mOrganizationId = getIntent().getIntExtra("organizationId", 0);
+
 
         String url = ServerInfo.serviceIP + ServerInfo.anchorDetail + mOrganizationId;
         Map<String, String> params = new HashMap<>();
@@ -311,7 +364,7 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
                             int height = width;
                             ImageLoader.showThumb(uri, logo, width, height);
                         }
-                        authentication.setText(mOrganization.getName()+"官方账号");
+                        authentication.setText(mOrganization.getName() + "官方账号");
                         activityTitle.setTitleText(mOrganization.getName());
                         if (mOrganization.getOthers() != null) {
                             count.setText("" + mOrganization.getOthers().getCount());
@@ -660,6 +713,28 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
 
                 }
                 break;
+            case MSG_GET_ANCHOR_COLUMN:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        mColumns = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), AnchorOrganizationColumn.class);
+
+
+                        if (mColumns == null || mColumns.size() == 0) {
+                            noData.setVisibility(View.VISIBLE);
+                        } else {
+                            noData.setVisibility(View.GONE);
+                            initFragment();
+                        }
+                    }
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
         }
         return false;
     }
@@ -685,42 +760,49 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
     public class FragmentAdapter extends FragmentStatePagerAdapter {
 
         private FragmentManager fm;
+        private List<AnchorOrganizationColumn> mColumns;
 
         public FragmentAdapter(FragmentManager fm) {
             super(fm);
             this.fm = fm;
         }
 
+        public FragmentAdapter(FragmentManager fm, List<AnchorOrganizationColumn> columns) {
+            super(fm);
+            this.fm = fm;
+            mColumns = columns;
+
+        }
 
         @Override
         public int getCount() {
-            return category.length;
+            return mColumns.size();
         }
 
         @Override
         public Fragment getItem(int position) {
 
-            if (category[position] == R.string.radio) {
+            if (mColumns.get(position).getType() == 2 || mColumns.get(position).getType() == 6) {
                 //电台
                 ProgramRadioFragment fragment = new ProgramRadioFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("organizationId", "" + mOrganizationId);
-                bundle.putString("category", getResources().getString(category[position]));
+                bundle.putSerializable("columns", mColumns.get(position));
                 fragment.setArguments(bundle);
                 return fragment;
-            } else if (category[position] == R.string.anchor) {
+            } else if (mColumns.get(position).getType() == 3) {
                 //主播
                 ProgramAnchorFragment fragment = new ProgramAnchorFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("organizationId", "" + mOrganizationId);
-                bundle.putString("category", getResources().getString(category[position]));
+                bundle.putSerializable("columns", mColumns.get(position));
                 fragment.setArguments(bundle);
                 return fragment;
             } else {
                 ProgramContentFragment fragment = new ProgramContentFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString("organizationId", "" + mOrganizationId);
-                bundle.putString("category", getResources().getString(category[position]));
+                bundle.putSerializable("columns", mColumns.get(position));
                 fragment.setArguments(bundle);
                 return fragment;
             }
@@ -730,7 +812,7 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return getResources().getString(category[position]);
+            return mColumns.get(position).getName();
         }
 
 

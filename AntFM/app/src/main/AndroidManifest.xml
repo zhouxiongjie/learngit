@@ -29,7 +29,7 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
 
     <application
-        android:name=".MyApplication"
+        android:name="com.shuangling.software.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/application_name"
@@ -40,7 +40,7 @@
 
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.shuangling.software.fileprovider"
+            android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <!--<meta-data-->
@@ -57,7 +57,7 @@
 
 
         <activity
-            android:name=".activity.MainActivity"
+            android:name="com.shuangling.software.activity.MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan|stateHidden"
@@ -66,12 +66,12 @@
         </activity>
 
         <activity
-            android:name=".activity.StartupActivity"
+            android:name="com.shuangling.software.activity.StartupActivity"
             android:screenOrientation="portrait" >
         </activity>
 
         <activity
-            android:name=".activity.GuidePageActivity"
+            android:name="com.shuangling.software.activity.GuidePageActivity"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -82,186 +82,190 @@
 
 
         <activity
-            android:name=".activity.AlbumDetailActivity"
+            android:name="com.shuangling.software.activity.AlbumDetailActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.CityListActivity"
+            android:name="com.shuangling.software.activity.CityListActivity"
             android:screenOrientation="portrait" >
         </activity>
 
         <activity
-            android:name=".activity.ArticleDetailActivity"
+            android:name="com.shuangling.software.activity.ArticleDetailActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.AudioDetailActivity"
+            android:name="com.shuangling.software.activity.AudioDetailActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.SingleAudioDetailActivity"
+            android:name="com.shuangling.software.activity.SingleAudioDetailActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" >
         </activity>
 
 
         <activity
-            android:name=".activity.LoginActivity"
+            android:name="com.shuangling.software.activity.LoginActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" >
         </activity>
 
         <activity
-            android:name=".activity.ModifyUserInfoActivity"
+            android:name="com.shuangling.software.activity.ModifyUserInfoActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.SearchActivity"
+            android:name="com.shuangling.software.activity.SearchActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.ForgetPasswordActivity"
+            android:name="com.shuangling.software.activity.ForgetPasswordActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.VerifyCodeLoginActivity"
+            android:name="com.shuangling.software.activity.VerifyCodeLoginActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.AnchorDetailActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-
-        <activity
-            android:name=".activity.OrganizationDetailActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".activity.GalleriaActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".activity.SpecialDetailActivity"
+            android:name="com.shuangling.software.activity.AnchorDetailActivity"
             android:screenOrientation="portrait" >
         </activity>
 
         <activity
-            android:name=".activity.RadioListActivity"
+            android:name="com.shuangling.software.activity.OrganizationDetailActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.shuangling.software.activity.GalleriaActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.shuangling.software.activity.SpecialDetailActivity"
             android:screenOrientation="portrait" >
         </activity>
 
         <activity
-            android:name=".activity.RadioDetailActivity"
+            android:name="com.shuangling.software.activity.RadioListActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name="com.shuangling.software.activity.RadioDetailActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.TvDetailActivity"
+            android:name="com.shuangling.software.activity.TvDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" >
         </activity>
 
         <activity
-            android:name=".activity.AccountAndSecurityActivity"
+            android:name="com.shuangling.software.activity.AccountAndSecurityActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.ModifyPasswordActivity"
+            android:name="com.shuangling.software.activity.ModifyPasswordActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.PhoneBindActivity"
+            android:name="com.shuangling.software.activity.PhoneBindActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.NewPhoneBindActivity"
+            android:name="com.shuangling.software.activity.NewPhoneBindActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.CommentDetailActivity"
+            android:name="com.shuangling.software.activity.CommentDetailActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.VideoDetailActivity"
+            android:name="com.shuangling.software.activity.VideoDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.FeedbackActivity"
+            android:name="com.shuangling.software.activity.FeedbackActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.CluesActivity"
+            android:name="com.shuangling.software.activity.CluesActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.HistoryActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-
-        <activity
-            android:name=".activity.CollectActivity"
+            android:name="com.shuangling.software.activity.HistoryActivity"
             android:screenOrientation="portrait" >
         </activity>
 
         <activity
-            android:name=".activity.SubscribeActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".activity.MessageListActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".activity.ServiceDetailActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".activity.MoreServiceActivity"
+            android:name="com.shuangling.software.activity.CollectActivity"
             android:screenOrientation="portrait" >
         </activity>
 
         <activity
-            android:name=".activity.ContentActivity"
+            android:name="com.shuangling.software.activity.SubscribeActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.shuangling.software.activity.MessageListActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.shuangling.software.activity.ServiceDetailActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.shuangling.software.activity.MoreServiceActivity"
             android:screenOrientation="portrait" >
         </activity>
 
         <activity
-            android:name=".activity.WebViewActivity"
-            android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name=".activity.WebViewBackActivity"
+            android:name="com.shuangling.software.activity.ContentActivity"
             android:screenOrientation="portrait" >
         </activity>
 
         <activity
-            android:name=".activity.SettingActivity"
+            android:name="com.shuangling.software.activity.WebViewActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.shuangling.software.activity.WebViewBackActivity"
             android:screenOrientation="portrait" >
         </activity>
 
         <activity
-            android:name=".activity.AttentionActivity"
+            android:name="com.shuangling.software.activity.SettingActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name="com.shuangling.software.activity.AttentionActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.ModifyNicknameActivity"
+            android:name="com.shuangling.software.activity.ModifyNicknameActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.shuangling.software.activity.AdvertActivity"
             android:screenOrientation="portrait" >
         </activity>
 
 
         <activity
-            android:name=".activity.MoreAnchorOrOrganizationActivity"
+            android:name="com.shuangling.software.activity.MoreAnchorOrOrganizationActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" >
         </activity>
 
 
-        <service android:name=".service.AudioPlayerService" />
+        <service android:name="com.shuangling.software.service.AudioPlayerService" />
         <service android:name="com.amap.api.location.APSService"/>
 
         <receiver
-            android:name=".push.MyAliPushMessageReceiver"
+            android:name="com.shuangling.software.push.MyAliPushMessageReceiver"
             android:exported="false"> <!-- 为保证receiver安全，建议设置不可导出，如需对其他应用开放可通过android：permission进行限制 -->
             <intent-filter>
                 <action android:name="com.alibaba.push2.action.NOTIFICATION_OPENED" />
@@ -277,7 +281,7 @@
 
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="a2fdac9774a1380d6479f72d020cb92b" />
+            android:value="${GD_KEY}" />
 
     </application>
 </manifest>

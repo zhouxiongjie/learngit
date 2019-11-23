@@ -1,8 +1,13 @@
 package com.shuangling.software.fragment;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,11 +21,14 @@ import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+
+import com.hjq.toast.ToastUtils;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.AudioDetailActivity;
@@ -41,6 +49,11 @@ import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+import com.zhihu.matisse.engine.impl.GlideEngine;
+import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -48,6 +61,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -63,7 +77,11 @@ import cn.sharesdk.tencent.qq.QQ;
 import cn.sharesdk.wechat.favorite.WechatFavorite;
 import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
+import io.reactivex.functions.Consumer;
 import okhttp3.Call;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 
 public class DiscoverFragment extends Fragment implements Handler.Callback {
@@ -73,6 +91,12 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
     private static final int SHARE_SUCCESS = 0x3;
     private static final int SHARE_FAILED = 0x4;
 
+
+    private ValueCallback<Uri> mUploadMessage;
+    public ValueCallback<Uri[]> uploadMessage;
+    public static final int REQUEST_SELECT_FILE = 100;
+    private final static int FILECHOOSER_RESULTCODE = 2;
+
     @BindView(R.id.webView)
     WebView webView;
     @BindView(R.id.activtyTitle)
@@ -80,18 +104,18 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
 
+    private String mUrl;
 
     Unbinder unbinder;
     private Handler mHandler;
 
-    private int level=0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         mHandler = new Handler(this);
-
+        mUrl=getArguments().getString("url");
     }
 
 
@@ -107,6 +131,25 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
 
 
 
+    public void jumpTo(String url){
+        mUrl=url;
+
+        if (User.getInstance() == null) {
+            if (MainActivity.sCurrentCity != null) {
+                url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
+            } else {
+                url = url + "?app=android";
+            }
+
+        } else {
+            if (MainActivity.sCurrentCity != null) {
+                url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+            } else {
+                url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+            }
+        }
+        webView.loadUrl(url);
+    }
 
 
     private void init() {
@@ -119,7 +162,7 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
                 }
             }
         });
-        String url = ServerInfo.h5IP + "/find";
+        String url = mUrl;
 
         if (User.getInstance() == null) {
             if (MainActivity.sCurrentCity != null) {
@@ -166,7 +209,7 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
                 //progressBar.setVisibility(View.GONE);
                 super.onPageFinished(view, url);
 
-                if(url.startsWith(ServerInfo.h5IP + "/find")){
+                if(url.startsWith(mUrl)){
                     activtyTitle.setCanBack(false);
                 }else{
                     activtyTitle.setCanBack(true);
@@ -227,15 +270,15 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
             // 设置网页加载的进度条
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-//                long id=Thread.currentThread().getId();
-//                Log.i("onProgressChanged",""+newProgress);
-//                if (newProgress == 100) {
-//                    progressBar.setVisibility(GONE);
-//                } else {
-//                    if (progressBar.getVisibility() == GONE)
-//                        progressBar.setVisibility(VISIBLE);
-//                    progressBar.setProgress(newProgress);
-//                }
+                long id=Thread.currentThread().getId();
+                Log.i("onProgressChanged",""+newProgress);
+                if (newProgress == 100) {
+                    progressBar.setVisibility(GONE);
+                } else {
+                    if (progressBar.getVisibility() == GONE)
+                        progressBar.setVisibility(VISIBLE);
+                    progressBar.setProgress(newProgress);
+                }
                 super.onProgressChanged(view, newProgress);
             }
 
@@ -243,6 +286,76 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
             @Override
             public void onReceivedTitle(WebView view, String title) {
                 super.onReceivedTitle(view, title);
+            }
+
+
+            // For 3.0+ Devices (Start)
+            // onActivityResult attached before constructor
+
+            protected void openFileChooser(ValueCallback uploadMsg, String acceptType) {
+                mUploadMessage = uploadMsg;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("image/*");
+                startActivityForResult(Intent.createChooser(i, "File Browser"), FILECHOOSER_RESULTCODE);
+            }
+
+
+            // For Lollipop 5.0+ Devices
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+            public boolean onShowFileChooser(WebView mWebView, final ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
+                if (uploadMessage != null) {
+                    uploadMessage.onReceiveValue(null);
+                    uploadMessage = null;
+                }
+
+                uploadMessage = filePathCallback;
+
+
+                RxPermissions rxPermissions = new RxPermissions(getActivity());
+                rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .subscribe(new Consumer<Boolean>() {
+                            @Override
+                            public void accept(Boolean granted) throws Exception {
+                                if(granted){
+                                    String packageName = getContext().getPackageName();
+                                    Matisse.from(DiscoverFragment.this)
+                                            .choose(MimeType.of(MimeType.JPEG,MimeType.PNG)) // 选择 mime 的类型
+                                            .countable(false)
+                                            .maxSelectable(9) // 图片选择的最多数量
+                                            .spanCount(4)
+                                            .capture(true)
+                                            .captureStrategy(new CaptureStrategy(true,packageName+".fileprovider"))
+                                            .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                                            .thumbnailScale(1.0f) // 缩略图的比例
+                                            .theme(R.style.Matisse_Zhihu)
+                                            .imageEngine(new GlideEngine()) // 使用的图片加载引擎
+                                            .forResult(REQUEST_SELECT_FILE); // 设置作为标记的请求码
+                                }else{
+                                    ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
+                                }
+                            }
+                        });
+
+                return true;
+            }
+
+            //For Android 4.1 only
+            protected void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+                mUploadMessage = uploadMsg;
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("image/*");
+                startActivityForResult(Intent.createChooser(intent, "File Browser"), FILECHOOSER_RESULTCODE);
+            }
+
+
+            protected void openFileChooser(ValueCallback<Uri> uploadMsg) {
+                mUploadMessage = uploadMsg;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("image/*");
+                startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
             }
         });
         webView.addJavascriptInterface(new JsToAndroid(), "clientJS");
@@ -367,7 +480,7 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
 //            webView.loadUrl(url);
 
 
-            String url = ServerInfo.h5IP + "/find";
+            String url = mUrl;
 
             if (User.getInstance() == null) {
                 if (MainActivity.sCurrentCity != null) {
@@ -474,6 +587,25 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
             }
             webView.loadUrl(url);
 
+        }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (requestCode == REQUEST_SELECT_FILE&&resultCode == Activity.RESULT_OK && data != null) {
+                if (uploadMessage == null)
+                    return;
+
+                //List<String> paths=Matisse.obtainPathResult(data);
+                List<Uri> selects = Matisse.obtainResult(data);
+                //File file = new File(CommonUtils.getRealFilePath(this, selects.get(0)));
+                Uri[] urls = selects.toArray(new Uri[selects.size()]);
+                uploadMessage.onReceiveValue(urls);
+                //uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                uploadMessage = null;
+            }
+        } else if (requestCode == FILECHOOSER_RESULTCODE) {
+            if (null == mUploadMessage)
+                return;
+            Uri result = data == null || resultCode != Activity.RESULT_OK ? null : data.getData();
+            mUploadMessage.onReceiveValue(result);
+            mUploadMessage = null;
         }
     }
 

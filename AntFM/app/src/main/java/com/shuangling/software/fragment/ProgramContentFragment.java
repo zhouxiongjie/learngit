@@ -23,6 +23,7 @@ import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.ProgramContentAdapter;
+import com.shuangling.software.entity.AnchorOrganizationColumn;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
@@ -55,7 +56,7 @@ public class ProgramContentFragment extends Fragment implements Handler.Callback
     @BindView(R.id.noData)
     LinearLayout noData;
 
-    private String mCategory;
+    private AnchorOrganizationColumn mColumn;
     private String mAnchorId;
     private String mOrganizationId;
     private List<ColumnContent> mColumnContents = new ArrayList<>();
@@ -76,7 +77,7 @@ public class ProgramContentFragment extends Fragment implements Handler.Callback
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Bundle args = getArguments();
-        mCategory = args.getString("category");
+        mColumn = (AnchorOrganizationColumn)args.getSerializable("columns");
         mOrganizationId = args.getString("organizationId");
         mAnchorId = args.getString("anchorId");
         mHandler = new Handler(this);
@@ -136,18 +137,18 @@ public class ProgramContentFragment extends Fragment implements Handler.Callback
         } else {
             params.put("type", "1");
         }
-
-        if (mCategory.equals(getResources().getString(R.string.album))) {
-            params.put("post_type", "2");
-        } else if (mCategory.equals(getResources().getString(R.string.article))) {
-            params.put("post_type", "3");
-        } else if (mCategory.equals(getResources().getString(R.string.video))) {
-            params.put("post_type", "4");
-        } else if (mCategory.equals(getResources().getString(R.string.special))) {
-            params.put("post_type", "5");
-        } else {
-            params.put("post_type", "7");
-        }
+        params.put("post_type", ""+mColumn.getPost_type());
+//        if (mCategory.equals(getResources().getString(R.string.album))) {
+//            params.put("post_type", "2");
+//        } else if (mCategory.equals(getResources().getString(R.string.article))) {
+//            params.put("post_type", "3");
+//        } else if (mCategory.equals(getResources().getString(R.string.video))) {
+//            params.put("post_type", "4");
+//        } else if (mCategory.equals(getResources().getString(R.string.special))) {
+//            params.put("post_type", "5");
+//        } else {
+//            params.put("post_type", "7");
+//        }
 
 
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {

@@ -14,7 +14,7 @@
         ptr:failureImage="@color/white"
         ptr:failureImageScaleType="fitXY"
         android:src="@drawable/index_top_bg"
-        />
+        android:visibility="gone"/>
 
     <LinearLayout
         android:layout_width="match_parent"

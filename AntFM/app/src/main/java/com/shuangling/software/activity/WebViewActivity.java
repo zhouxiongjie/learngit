@@ -35,6 +35,7 @@ import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.youngfeng.snake.annotations.EnableDragToClose;
@@ -43,8 +44,10 @@ import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -234,6 +237,7 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
             // For Lollipop 5.0+ Devices
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             public boolean onShowFileChooser(WebView mWebView, final ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
+
                 if (uploadMessage != null) {
                     uploadMessage.onReceiveValue(null);
                     uploadMessage = null;
@@ -267,6 +271,18 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
                             }
                         });
 
+
+
+//                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                //startActivityForResult(intent, REQUEST_SELECT_FILE);
+//                //Intent intent = fileChooserParams.createIntent();
+//                try {
+//                    startActivityForResult(intent, REQUEST_SELECT_FILE);
+//                } catch (ActivityNotFoundException e) {
+//                    uploadMessage = null;
+//                    Toast.makeText(getBaseContext(), "Cannot Open File Chooser", Toast.LENGTH_LONG).show();
+//                    return false;
+//                }
                 return true;
             }
 
@@ -451,6 +467,25 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
             }
             webView.loadUrl(url);
 
+        }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (requestCode == REQUEST_SELECT_FILE&&resultCode == RESULT_OK && data != null) {
+                if (uploadMessage == null)
+                    return;
+
+                //List<String> paths=Matisse.obtainPathResult(data);
+                List<Uri> selects = Matisse.obtainResult(data);
+                //File file = new File(CommonUtils.getRealFilePath(this, selects.get(0)));
+                Uri[] urls = selects.toArray(new Uri[selects.size()]);
+                uploadMessage.onReceiveValue(urls);
+                //uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                uploadMessage = null;
+            }
+        } else if (requestCode == FILECHOOSER_RESULTCODE) {
+            if (null == mUploadMessage)
+                return;
+            Uri result = data == null || resultCode != MainActivity.RESULT_OK ? null : data.getData();
+            mUploadMessage.onReceiveValue(result);
+            mUploadMessage = null;
         }
     }
 

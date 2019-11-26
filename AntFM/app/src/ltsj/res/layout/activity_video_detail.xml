@@ -1,0 +1,382 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <com.shuangling.software.customview.TopTitleBar
+        android:id="@+id/activity_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        fresco:moreImg="@drawable/ic_more"
+        fresco:canBack="true" />
+
+    <com.aliyun.vodplayerview.widget.AliyunVodPlayerView
+        android:id="@+id/aliyunVodPlayerView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@+id/activity_title"
+        />
+
+
+    <!--<FrameLayout-->
+        <!--android:id="@+id/frameLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="200dp"-->
+        <!--android:layout_below="@+id/activity_title">-->
+        <!--<com.aliyun.vodplayerview.widget.AliyunVodPlayerView-->
+            <!--android:id="@+id/aliyunVodPlayerView"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+             <!--/>-->
+        <!--<RelativeLayout-->
+            <!--android:id="@+id/flowLayout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:visibility="gone">-->
+            <!--<LinearLayout-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_centerInParent="true"-->
+                <!--android:orientation="vertical">-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/flow"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:textSize="@dimen/font_size_30px"-->
+                    <!--android:textColor="#CCCCCC"-->
+                    <!--android:layout_gravity="center_horizontal"-->
+                    <!--android:text="播放将消耗7.85M流量,请注意流量使用"/>-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/goOn"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="center_horizontal"-->
+                    <!--android:layout_marginTop="10dp"-->
+                    <!--android:textSize="@dimen/font_size_26px"-->
+                    <!--android:textColor="@color/white"-->
+                    <!--android:text="继续播放"-->
+                    <!--android:background="@drawable/go_on_bg"/>-->
+
+            <!--</LinearLayout>-->
+
+        <!--</RelativeLayout>-->
+    <!--</FrameLayout>-->
+
+    <RelativeLayout
+        android:id="@+id/organizationLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/aliyunVodPlayerView"
+        android:padding="10dp">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/organizationLogo"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            fresco:actualImageScaleType="centerCrop"
+            fresco:failureImage="@drawable/head_placeholder"
+            fresco:failureImageScaleType="centerCrop"
+            fresco:placeholderImage="@drawable/head_placeholder"
+            fresco:placeholderImageScaleType="centerCrop"
+            fresco:roundAsCircle="true"
+            fresco:roundingBorderColor="@color/white"
+            fresco:roundingBorderWidth="0dp"
+            fresco:viewAspectRatio="1" />
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/organizationLogo"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/organization"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxWidth="200dp"
+                android:maxLines="1"
+                android:textColor="#282828"
+                android:textSize="@dimen/font_size_28px"
+                android:textStyle="bold"
+                tools:text="浏阳电台" />
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:ellipsize="end"
+                android:maxWidth="200dp"
+                android:maxLines="1"
+                android:textColor="#BCBCBC"
+                android:textSize="@dimen/font_size_28px"
+                tools:text="2小时前" />
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/attention"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="60dp"
+            android:minHeight="29dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/subscribe_text_bg"
+            android:gravity="center"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="关注"
+            android:textColor="@color/subscribe_text_selector"
+            android:textSize="@dimen/font_size_24px" />
+
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/organizationLayout"
+        android:layout_above="@+id/bottom"
+        />
+
+   <!-- <android.support.v4.widget.NestedScrollView-->
+        <!--android:id="@+id/scrollView"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_below="@+id/organizationLayout"-->
+        <!--android:layout_above="@+id/bottom">-->
+
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:descendantFocusability="blocksDescendants"-->
+            <!--android:orientation="vertical">-->
+
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="vertical"-->
+
+                <!--android:padding="10dp">-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/videoTitle"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="视频名称视频名称视频名称视频名称"-->
+                    <!--android:textColor="@color/textColorTwo"-->
+                    <!--android:textSize="@dimen/font_size_34px"-->
+                    <!--android:textStyle="bold"/>-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/playTimes"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="25万次播放"-->
+                    <!--android:textColor="@color/textColorSeven"-->
+                    <!--android:textSize="@dimen/font_size_22px" />-->
+
+            <!--</LinearLayout>-->
+
+            <!--<LinearLayout-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_horizontal"-->
+                <!--android:orientation="horizontal">-->
+
+                <!--<LinearLayout-->
+                    <!--android:id="@+id/praiseLayout"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="@drawable/praise_and_collect_bg"-->
+                    <!--android:orientation="horizontal">-->
+
+                    <!--<com.shuangling.software.customview.FontIconView-->
+                        <!--android:id="@+id/praiseIcon"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_gravity="center_vertical"-->
+                        <!--android:text="&#xe617;"-->
+                        <!--android:textColor="@color/main_bottom_text_selector"-->
+                        <!--android:textSize="@dimen/font_size_50px" />-->
+
+                    <!--<TextView-->
+                        <!--android:id="@+id/praise"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_gravity="center_vertical"-->
+                        <!--android:layout_marginStart="15dp"-->
+                        <!--android:text="666" />-->
+                <!--</LinearLayout>-->
+
+                <!--<LinearLayout-->
+                    <!--android:id="@+id/collectLayout"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginStart="40dp"-->
+                    <!--android:background="@drawable/praise_and_collect_bg"-->
+                    <!--android:orientation="horizontal">-->
+
+                    <!--<com.shuangling.software.customview.FontIconView-->
+                        <!--android:id="@+id/collectIcon"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_gravity="center_vertical"-->
+                        <!--android:text="&#xe62e;"-->
+                        <!--android:textColor="@color/main_bottom_text_selector"-->
+                        <!--android:textSize="@dimen/font_size_50px" />-->
+
+                    <!--<TextView-->
+                        <!--android:id="@+id/collectText"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_gravity="center_vertical"-->
+                        <!--android:layout_marginStart="15dp"-->
+                        <!--android:text="666" />-->
+                <!--</LinearLayout>-->
+
+            <!--</LinearLayout>-->
+
+            <!--<com.shuangling.software.customview.MyRecyclerView-->
+                <!--android:id="@+id/recommend"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginTop="20dp"-->
+                <!--android:nestedScrollingEnabled="false" />-->
+
+            <!--<ImageView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="6dp"-->
+                <!--android:background="@color/divideColorTwo" />-->
+
+
+            <!--<LinearLayout-->
+                <!--android:id="@+id/commentLayout"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="horizontal"-->
+                <!--android:padding="10dp">-->
+
+
+                <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:text="全部评论"-->
+                    <!--android:textColor="@color/black"-->
+                    <!--android:textSize="@dimen/font_size_36px"-->
+                    <!--android:textStyle="bold" />-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/commentNum"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:text="(12)"-->
+                    <!--android:textColor="@color/black"-->
+                    <!--android:textSize="@dimen/font_size_36px"-->
+                    <!--android:textStyle="bold" />-->
+
+            <!--</LinearLayout>-->
+
+
+            <!--<com.shuangling.software.customview.MyListView-->
+                <!--android:id="@+id/listView"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:divider="@drawable/recycleview_divider_drawable"-->
+                <!--android:nestedScrollingEnabled="false">-->
+
+            <!--</com.shuangling.software.customview.MyListView>-->
+
+        <!--</LinearLayout>-->
+    <!--</android.support.v4.widget.NestedScrollView>-->
+
+
+    <LinearLayout
+        android:id="@+id/bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/divideColorTwo" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/writeComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@+id/commentNumLayout"
+                android:background="@drawable/write_comment_bg"
+                android:drawableLeft="@drawable/ic_comments"
+                android:drawablePadding="5dp"
+                android:text="写评论..."
+                android:textColor="#BCBCBC"
+                android:textSize="@dimen/font_size_30px" />
+
+            <FrameLayout
+                android:id="@+id/commentNumLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true">
+
+                <ImageView
+                    android:id="@+id/commentsIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/ic_checkcomments" />
+
+                <TextView
+                    android:id="@+id/commentNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="15dp"
+                    android:layout_gravity="right|top"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/red_circle_bg"
+                    android:gravity="center"
+                    android:padding="2dp"
+                    android:text="0"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/font_size_16px"
+                    android:visibility="visible" />
+            </FrameLayout>
+
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+</RelativeLayout>
+
+

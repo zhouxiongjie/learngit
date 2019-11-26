@@ -1129,6 +1129,10 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                             }else if(animated==9){
                                 //三图+5图
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)recyclerView.getLayoutParams();
+                                lp.leftMargin=CommonUtils.dip2px(5);
+                                lp.rightMargin=CommonUtils.dip2px(5);
+                                recyclerView.setLayoutParams(lp);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
                                 recyclerView.setLayoutManager(manager);
                                 DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);

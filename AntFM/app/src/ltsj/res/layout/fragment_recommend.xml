@@ -1,0 +1,183 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/topBackground"
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            app:actualImageScaleType="fitXY"
+            app:placeholderImageScaleType="fitXY"
+            app:placeholderImage="@drawable/index_top_bg"
+            />
+
+        <View
+            android:id="@+id/statusBar"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
+        <RelativeLayout
+            android:id="@+id/a"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/statusBar"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="15dp"
+            android:paddingBottom="5dp">
+
+            <FrameLayout
+                android:id="@+id/frameLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="10dp">
+                <RelativeLayout
+                    android:id="@+id/weatherLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/city"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:drawableRight="@drawable/ic_xia"
+                        android:drawablePadding="5dp"
+                        android:text="湘西土家族苗族自治州"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/font_size_28px"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:maxLength="4"/>
+
+                    <TextView
+                        android:id="@+id/divide"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@+id/city"
+                        android:text="|"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/font_size_28px" />
+
+                    <TextView
+                        android:id="@+id/temperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@+id/divide"
+                        tools:text="16℃"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/font_size_28px" />
+
+                    <TextView
+                        android:id="@+id/weather"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@+id/temperature"
+                        tools:text="晴"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/font_size_28px" />
+
+                </RelativeLayout>
+
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/logo1"
+                    android:layout_width="160dp"
+                    android:layout_height="25dp"
+                    android:layout_below="@+id/frameLayout"
+                    android:layout_alignStart="@+id/frameLayout"
+                    android:layout_alignParentLeft="true"
+                    android:visibility="visible"
+                    app:actualImageScaleType="fitXY"
+                    app:failureImageScaleType="fitXY"
+                    app:placeholderImageScaleType="fitXY"
+                    app:roundingBorderColor="@color/white"
+                    app:roundingBorderWidth="0dp" />
+            </FrameLayout>
+
+
+
+
+
+
+
+            <TextView
+                android:id="@+id/search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/frameLayout"
+                android:background="@drawable/search_box_bg"
+                android:drawableLeft="@drawable/ic_search"
+                android:drawablePadding="5dp"
+                android:paddingLeft="10dp"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:paddingRight="12dp"
+                android:text="请输入搜索内容"
+                android:textColor="#FFFFFF"
+                android:textSize="@dimen/font_size_24px" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/a">
+
+            <HorizontalScrollView
+                android:id="@+id/columnScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/customColumn"
+                android:scrollbars="none">
+
+
+                <LinearLayout
+                    android:id="@+id/columnContent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
+
+            <ImageView
+                android:id="@+id/customColumn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/custom_column"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+
+
+
+
+
+
+    </RelativeLayout>
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/topBar" />
+
+
+</RelativeLayout>

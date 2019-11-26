@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <RelativeLayout
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingRight="10dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="倍速播放"
+            android:textColor="@color/textColorEight"
+            android:textSize="@dimen/font_size_34px"
+            android:textStyle="bold" />
+
+
+        <com.shuangling.software.customview.FontIconView
+            android:id="@+id/close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="&#xe62a;"
+            android:textColor="@color/main_bottom_text_selector"
+            android:textSize="@dimen/font_size_30px" />
+
+
+
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/divideColorTwo" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/speed050RL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:padding="20dp">
+
+
+            <TextView
+                android:id="@+id/speed050Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="0.5倍速"
+                android:textStyle="bold"
+                android:textColor="@color/audio_speed_text_selector"
+                android:textSize="@dimen/font_size_30px" />
+
+            <ImageView
+                android:id="@+id/speed050"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/checked"
+                android:visibility="gone"/>
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recycleview_divider_drawable"/>
+
+        <RelativeLayout
+            android:id="@+id/speed075RL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:padding="20dp">
+
+
+            <TextView
+                android:id="@+id/speed075Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="0.75倍速"
+                android:textStyle="bold"
+                android:textColor="@color/audio_speed_text_selector"
+                android:textSize="@dimen/font_size_30px" />
+
+            <ImageView
+                android:id="@+id/speed075"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/checked"
+                android:visibility="gone"
+                />
+
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recycleview_divider_drawable"/>
+
+        <RelativeLayout
+            android:id="@+id/speed100RL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/speed100Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="正常倍速"
+                android:textStyle="bold"
+                android:textColor="@color/audio_speed_text_selector"
+                android:textSize="@dimen/font_size_30px" />
+
+            <ImageView
+                android:id="@+id/speed100"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/checked"
+                android:visibility="gone"
+                />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recycleview_divider_drawable"/>
+
+        <RelativeLayout
+            android:id="@+id/speed125RL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/speed125Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:text="1.25倍速"
+                android:textStyle="bold"
+                android:textColor="@color/audio_speed_text_selector"
+                android:textSize="@dimen/font_size_30px" />
+
+            <ImageView
+                android:id="@+id/speed125"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/checked"
+                android:visibility="gone"
+                />
+
+
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/recycleview_divider_drawable"/>
+
+        <RelativeLayout
+            android:id="@+id/speed150RL"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/speed150Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="1.5倍速"
+                android:textStyle="bold"
+                android:textColor="@color/audio_speed_text_selector"
+                android:textSize="@dimen/font_size_30px" />
+
+            <ImageView
+                android:id="@+id/speed150"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/checked"
+                android:visibility="gone"
+                />
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+
+    <!--<ImageView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@drawable/recycleview_divider_drawable"/>-->
+
+    <!--<RelativeLayout-->
+        <!--android:id="@+id/bottom"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:background="@color/white">-->
+        <!--<TextView-->
+            <!--android:id="@+id/close"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:gravity="center"-->
+            <!--android:padding="20dp"-->
+            <!--android:text="关闭"-->
+            <!--android:textColor="@color/textColorTwo"-->
+            <!--android:textSize="@dimen/font_size_32px" />-->
+
+    <!--</RelativeLayout>-->
+
+
+</LinearLayout>

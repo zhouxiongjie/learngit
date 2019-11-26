@@ -15,10 +15,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+
+import com.gyf.immersionbar.ImmersionBar;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,6 +50,7 @@ public class AdvertActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         // 保持Activity处于唤醒状态
         setContentView(R.layout.activity_webview_back);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         initData();
 

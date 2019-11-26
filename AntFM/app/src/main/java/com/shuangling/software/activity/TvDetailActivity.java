@@ -38,6 +38,7 @@ import com.aliyun.vodplayer.media.IAliyunVodPlayer;
 import com.aliyun.vodplayerview.constants.PlayParameter;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -173,6 +174,7 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_tv_detail);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
 

@@ -285,6 +285,8 @@ public class PersonalCenterFragment extends Fragment {
                                    ToastUtils.show("当前已是最新版本");
                                }
 
+                           }else if(jsonObject != null &&!TextUtils.isEmpty(jsonObject.getString("msg"))){
+                               ToastUtils.show(jsonObject.getString("msg"));
                            }
 
 

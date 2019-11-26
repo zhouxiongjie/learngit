@@ -23,6 +23,7 @@ import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.gyf.immersionbar.ImmersionBar;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.GuidePage;
@@ -63,6 +64,7 @@ public class GuidePageActivity extends AppCompatActivity implements Handler.Call
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
+        CommonUtils.transparentStatusBar(this);
         boolean firstRun = SharedPreferencesUtils.getBooleanValue(FIRST_RUN, true);
         if (firstRun) {
             setContentView(R.layout.activity_guidepage);

@@ -165,7 +165,13 @@ public class ColumnAlbumContentAdapter extends RecyclerView.Adapter implements V
             }
 
             albumViewHolder.count.setText("" + content.getAlbums().getCount() + "集");
-            albumViewHolder.commentNum.setText(content.getComment() + "评论");
+            if(content.getComment()>1){
+                albumViewHolder.commentNum.setText(content.getComment()+"评论");
+            }else if(content.getView()>10&&content.getComment()<1){
+                albumViewHolder.commentNum.setText(content.getView()+"阅读");
+            }else{
+                albumViewHolder.commentNum.setText("");
+            }
             albumViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

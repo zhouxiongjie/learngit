@@ -30,6 +30,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
 import com.ethanhua.skeleton.Skeleton;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.gyf.immersionbar.ImmersionBar;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
@@ -116,6 +117,7 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_content);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
 

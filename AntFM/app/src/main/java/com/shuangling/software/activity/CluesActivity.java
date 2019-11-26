@@ -28,6 +28,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -35,6 +36,7 @@ import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.youngfeng.snake.annotations.EnableDragToClose;
@@ -95,6 +97,7 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_webview);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
     }

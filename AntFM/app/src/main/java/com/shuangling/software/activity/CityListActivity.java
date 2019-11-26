@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.gyf.immersionbar.ImmersionBar;
 import com.jaeger.library.StatusBarUtil;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.shuangling.software.MyApplication;
@@ -23,6 +24,7 @@ import com.shuangling.software.entity.City;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.StatusBarManager;
 import com.youngfeng.snake.annotations.EnableDragToClose;
@@ -71,8 +73,7 @@ public class CityListActivity extends AppCompatActivity implements Handler.Callb
 
         setContentView(R.layout.activity_city_list);
         ButterKnife.bind(this);
-        StatusBarUtil.setTransparent(this);
-        StatusBarManager.setImmersiveStatusBar(this, true);
+        CommonUtils.transparentStatusBar(this);
         mHandler = new Handler(this);
         init();
         getCityList();

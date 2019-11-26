@@ -12,12 +12,14 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.gyf.immersionbar.ImmersionBar;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.fragment.AttentionFragment;
 import com.shuangling.software.fragment.CollectFragment;
 import com.shuangling.software.fragment.CollectRadioFragment;
+import com.shuangling.software.utils.CommonUtils;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
@@ -64,6 +66,7 @@ public class AttentionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_attention);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
     }

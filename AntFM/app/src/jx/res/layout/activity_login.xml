@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <com.shuangling.software.customview.TopTitleBar
+        android:id="@+id/activtyTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:canBack="true" />
+
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/head"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="10dp"
+        app:actualImageScaleType="centerCrop"
+        app:failureImage="@mipmap/ic_launcher"
+        app:failureImageScaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/activtyTitle"
+        app:placeholderImage="@mipmap/ic_launcher"
+        app:placeholderImageScaleType="centerCrop"
+        app:roundAsCircle="false"
+        app:roundingBorderColor="@color/white"
+        app:roundingBorderWidth="0dp"
+        app:viewAspectRatio="1" />
+
+
+
+    <LinearLayout
+        android:id="@+id/loginLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginTop="15dp"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/head">
+
+
+        <Button
+            android:id="@+id/verifyCodeLogin"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_horizontal"
+            android:text="验证码登录"
+            android:textColor="@color/login_text_color_selector"
+            android:textSize="@dimen/font_size_30px"
+            android:background="@drawable/login_btn_bottom_line_selector"/>
+
+
+        <Button
+            android:id="@+id/accountLogin"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="50dp"
+            android:text="密码登录"
+            android:textColor="@color/login_text_color_selector"
+            android:textSize="@dimen/font_size_30px"
+            android:background="@drawable/login_btn_bottom_line_selector"/>
+
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/divide"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/divideColorOne"
+        app:layout_constraintStart_toStartOf="@id/loginLayout"
+        app:layout_constraintEnd_toEndOf="@id/loginLayout"
+        app:layout_constraintTop_toBottomOf="@id/loginLayout"/>
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/divide1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/divide" />
+
+
+    <RelativeLayout
+        android:id="@+id/divide1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        app:layout_constraintBottom_toTopOf="@+id/layout"
+        android:layout_marginBottom="30dp"
+        android:visibility="invisible"
+        >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_centerVertical="true"
+            android:background="@color/divideColorOne" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@color/white"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="其他登录方式"
+            android:textColor="@color/textColorSeven" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/company"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:padding="20dp"
+        android:visibility="invisible">
+
+        <ImageView
+            android:id="@+id/weiXin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/login_weixin" />
+
+        <ImageView
+            android:id="@+id/qq"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="40dp"
+            android:background="@drawable/login_qq" />
+
+        <ImageView
+            android:id="@+id/weiBo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="40dp"
+            android:background="@drawable/login_weibo" />
+
+
+    </LinearLayout>
+
+
+
+    <TextView
+        android:id="@+id/company"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:text="SHUANGLN"
+        android:textColor="#DCDCDC"
+        android:textSize="@dimen/font_size_22px"
+        app:layout_constraintBottom_toTopOf="@+id/support"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <TextView
+        android:id="@+id/support"
+        android:layout_width="wrap_content"
+        android:layout_height="14dp"
+        android:layout_marginBottom="10dp"
+        android:text="湖南双菱电子科技有限公司提供技术支持"
+        android:textColor="#DCDCDC"
+        android:textSize="@dimen/font_size_22px"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</android.support.constraint.ConstraintLayout>

@@ -11,8 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.RemoteException;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,7 +25,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.gyf.immersionbar.ImmersionBar;
+import com.gyf.immersionbar.components.SimpleImmersionFragment;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
@@ -35,18 +36,14 @@ import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.LoginActivity;
 import com.shuangling.software.activity.MainActivity;
-import com.shuangling.software.activity.SingleAudioDetailActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.customview.TopTitleBar;
-import com.shuangling.software.entity.AudioInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
-import com.shuangling.software.event.PlayerEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
-import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -84,12 +81,13 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 
-public class DiscoverFragment extends Fragment implements Handler.Callback {
+public class DiscoverFragment extends SimpleImmersionFragment implements Handler.Callback {
 
     private static final int LOGIN_RESULT = 0x1;
     public static final int MSG_GET_DETAIL = 0x2;
     private static final int SHARE_SUCCESS = 0x3;
     private static final int SHARE_FAILED = 0x4;
+
 
 
     private ValueCallback<Uri> mUploadMessage;
@@ -99,12 +97,15 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
 
     @BindView(R.id.webView)
     WebView webView;
+    @BindView(R.id.statusBar)
+    View statusBar;
     @BindView(R.id.activtyTitle)
     TopTitleBar activtyTitle;
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
 
     private String mUrl;
+    private String mTitle;
 
     Unbinder unbinder;
     private Handler mHandler;
@@ -115,7 +116,8 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
         mHandler = new Handler(this);
-        mUrl=getArguments().getString("url");
+        mUrl = getArguments().getString("url");
+        mTitle=getArguments().getString("title");
     }
 
 
@@ -129,10 +131,8 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
     }
 
 
-
-
-    public void jumpTo(String url){
-        mUrl=url;
+    public void jumpTo(String url,String title) {
+        mUrl = url;
 
         if (User.getInstance() == null) {
             if (MainActivity.sCurrentCity != null) {
@@ -148,16 +148,21 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
                 url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
             }
         }
+        activtyTitle.setTitleText(title);
         webView.loadUrl(url);
     }
 
 
     private void init() {
         EventBus.getDefault().register(this);
+        activtyTitle.setTitleText(mTitle);
+        TextView tv=activtyTitle.getTitleTextView();
+        tv.setTextColor(getResources().getColor(R.color.white));
+        activtyTitle.setCanBack(false);
         activtyTitle.setBackListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(webView.canGoBack()){
+                if (webView.canGoBack()) {
                     webView.goBack();
                 }
             }
@@ -185,7 +190,7 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
 //        webView.setWebViewClient(new WebViewClient());
 
 
-        webView.setWebViewClient(new WebViewClient(){
+        webView.setWebViewClient(new WebViewClient() {
             // url拦截
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -209,9 +214,9 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
                 //progressBar.setVisibility(View.GONE);
                 super.onPageFinished(view, url);
 
-                if(url.startsWith(mUrl)){
+                if (url.startsWith(mUrl)) {
                     activtyTitle.setCanBack(false);
-                }else{
+                } else {
                     activtyTitle.setCanBack(true);
                 }
 //                if(!webView.canGoBack()){
@@ -248,30 +253,36 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
         });
 
 
-        webView.setWebChromeClient(new WebChromeClient(){
+        webView.setWebChromeClient(new WebChromeClient() {
             @Override
             // 处理javascript中的alert
             public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
                 return super.onJsAlert(view, url, message, result);
-            };
+            }
+
+            ;
 
             @Override
             // 处理javascript中的confirm
             public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
                 return super.onJsConfirm(view, url, message, result);
-            };
+            }
+
+            ;
 
             @Override
             // 处理javascript中的prompt
             public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, final JsPromptResult result) {
                 return super.onJsPrompt(view, url, message, defaultValue, result);
-            };
+            }
+
+            ;
 
             // 设置网页加载的进度条
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-                long id=Thread.currentThread().getId();
-                Log.i("onProgressChanged",""+newProgress);
+                long id = Thread.currentThread().getId();
+                Log.i("onProgressChanged", "" + newProgress);
                 if (newProgress == 100) {
                     progressBar.setVisibility(GONE);
                 } else {
@@ -303,7 +314,7 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
 
             // For Lollipop 5.0+ Devices
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-            public boolean onShowFileChooser(WebView mWebView, final ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
+            public boolean onShowFileChooser(WebView mWebView, final ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
                 if (uploadMessage != null) {
                     uploadMessage.onReceiveValue(null);
                     uploadMessage = null;
@@ -313,25 +324,25 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
 
 
                 RxPermissions rxPermissions = new RxPermissions(getActivity());
-                rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                rxPermissions.request(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .subscribe(new Consumer<Boolean>() {
                             @Override
                             public void accept(Boolean granted) throws Exception {
-                                if(granted){
+                                if (granted) {
                                     String packageName = getContext().getPackageName();
                                     Matisse.from(DiscoverFragment.this)
-                                            .choose(MimeType.of(MimeType.JPEG,MimeType.PNG)) // 选择 mime 的类型
+                                            .choose(MimeType.of(MimeType.JPEG, MimeType.PNG)) // 选择 mime 的类型
                                             .countable(false)
                                             .maxSelectable(9) // 图片选择的最多数量
                                             .spanCount(4)
                                             .capture(true)
-                                            .captureStrategy(new CaptureStrategy(true,packageName+".fileprovider"))
+                                            .captureStrategy(new CaptureStrategy(true, packageName + ".fileprovider"))
                                             .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                                             .thumbnailScale(1.0f) // 缩略图的比例
                                             .theme(R.style.Matisse_Zhihu)
                                             .imageEngine(new GlideEngine()) // 使用的图片加载引擎
                                             .forResult(REQUEST_SELECT_FILE); // 设置作为标记的请求码
-                                }else{
+                                } else {
                                     ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
                                 }
                             }
@@ -381,6 +392,11 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
                 break;
         }
         return false;
+    }
+
+    @Override
+    public void initImmersionBar() {
+        ImmersionBar.with(this).statusBarView(statusBar).init();
     }
 
     private final class JsToAndroid {
@@ -498,7 +514,7 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
             }
             webView.loadUrl(url);
 
-        }else if(event.getEventName().equals("OnQuitLogin")){
+        } else if (event.getEventName().equals("OnQuitLogin")) {
 //            String url = webView.getUrl();
 //            if(url.indexOf("?")>0){
 //                url = url.substring(0, url.indexOf("?"));
@@ -552,7 +568,7 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
             }
             webView.loadUrl(url);
             webView.clearHistory();
-            activtyTitle.setCanBack(false);
+//            activtyTitle.setCanBack(false);
         }
         super.onHiddenChanged(hidden);
     }
@@ -576,7 +592,7 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOGIN_RESULT && resultCode == Activity.RESULT_OK) {
             String url = webView.getUrl();
-            if(url.indexOf("?")>0){
+            if (url.indexOf("?") > 0) {
                 url = url.substring(0, url.indexOf("?"));
                 if (User.getInstance() == null) {
                     url = url + "?app=android";
@@ -587,8 +603,8 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
             }
             webView.loadUrl(url);
 
-        }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (requestCode == REQUEST_SELECT_FILE&&resultCode == Activity.RESULT_OK && data != null) {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (requestCode == REQUEST_SELECT_FILE && resultCode == Activity.RESULT_OK && data != null) {
                 if (uploadMessage == null)
                     return;
 
@@ -631,14 +647,14 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
             //自定义分享的回调想要函数
             @Override
             public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
-                String chanel="1";
+                String chanel = "1";
                 //点击新浪微博
                 if (SinaWeibo.NAME.equals(platform.getName())) {
                     //限制微博分享的文字不能超过20
-                    chanel="2";
+                    chanel = "2";
                     paramsToShare.setText(title + ServerInfo.activity + "qaa/game-result/" + id);
                 } else if (QQ.NAME.equals(platform.getName())) {
-                    chanel="3";
+                    chanel = "3";
                     paramsToShare.setTitle(title);
                     if (!TextUtils.isEmpty(logo)) {
                         paramsToShare.setImageUrl(logo);
@@ -669,7 +685,7 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
                         paramsToShare.setImageUrl(logo);
                     }
                 }
-                shareStatistics(chanel,""+id,ServerInfo.activity + "qaa/game-result/" + id);
+                shareStatistics(chanel, "" + id, ServerInfo.activity + "qaa/game-result/" + id);
 
             }
         });
@@ -703,13 +719,12 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
     }
 
 
-
-    public void shareStatistics(String channel,String postId,String shardUrl) {
+    public void shareStatistics(String channel, String postId, String shardUrl) {
 
         String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
         Map<String, String> params = new HashMap<>();
-        if(User.getInstance()!=null){
-            params.put("user_id", ""+User.getInstance().getId());
+        if (User.getInstance() != null) {
+            params.put("user_id", "" + User.getInstance().getId());
         }
         params.put("channel", channel);
         params.put("post_id", postId);
@@ -720,12 +735,12 @@ public class DiscoverFragment extends Fragment implements Handler.Callback {
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Log.i("test",response);
+                Log.i("test", response);
             }
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                Log.i("test",exception.toString());
+                Log.i("test", exception.toString());
 
             }
         });

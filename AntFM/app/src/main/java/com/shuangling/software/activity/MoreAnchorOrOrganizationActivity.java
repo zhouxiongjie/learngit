@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.gyf.immersionbar.ImmersionBar;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
@@ -28,6 +29,7 @@ import com.shuangling.software.entity.Anchor;
 import com.shuangling.software.entity.Subscribe;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
@@ -74,6 +76,7 @@ public class MoreAnchorOrOrganizationActivity extends AppCompatActivity implemen
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_subscribe);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
     }

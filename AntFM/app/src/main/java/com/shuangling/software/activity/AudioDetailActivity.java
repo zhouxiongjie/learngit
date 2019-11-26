@@ -42,6 +42,7 @@ import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigInput;
@@ -217,6 +218,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_single_audio_detail);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
 

@@ -22,6 +22,7 @@ import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -88,6 +89,7 @@ public class VerifyCodeLoginActivity extends AppCompatActivity implements Handle
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_verify_code_login);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         mHandler = new Handler(this);
         init();

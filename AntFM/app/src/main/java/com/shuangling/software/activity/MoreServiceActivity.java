@@ -15,10 +15,12 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.gyf.immersionbar.ImmersionBar;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.Service;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
@@ -55,6 +57,7 @@ public class MoreServiceActivity extends AppCompatActivity implements Handler.Ca
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_service_details);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
     }

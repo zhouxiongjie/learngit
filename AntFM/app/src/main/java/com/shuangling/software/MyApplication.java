@@ -45,15 +45,12 @@ import com.shuangling.software.entity.Station;
 import com.shuangling.software.network.ElnImageDownloaderFetcher;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
-import com.shuangling.software.oss.OSSAKSKCredentialProvider;
-import com.shuangling.software.oss.OssService;
+
 import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.MyToastStyle;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.Snake;
-
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -61,9 +58,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.Call;
-import okhttp3.OkHttpClient;
 
-import static com.taobao.accs.client.AccsConfig.build;
 
 public class MyApplication extends MultiDexApplication {
 

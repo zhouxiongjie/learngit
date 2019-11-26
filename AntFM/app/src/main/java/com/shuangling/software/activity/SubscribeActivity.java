@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.alibaba.fastjson.JSONObject;
+import com.gyf.immersionbar.ImmersionBar;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
@@ -25,6 +26,7 @@ import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.Subscribe;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
@@ -71,6 +73,7 @@ public class SubscribeActivity extends AppCompatActivity implements Handler.Call
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_subscribe);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
     }

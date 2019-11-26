@@ -1,0 +1,24 @@
+<resources>
+
+
+    <dimen name="font_size_100px">50sp</dimen>
+    <dimen name="font_size_60px">30sp</dimen>
+    <dimen name="font_size_50px">25sp</dimen>
+    <dimen name="font_size_40px">20sp</dimen>
+    <dimen name="font_size_38px">19sp</dimen>
+    <dimen name="font_size_36px">18sp</dimen>
+    <dimen name="font_size_34px">17sp</dimen>
+    <dimen name="font_size_32px">16sp</dimen>
+    <dimen name="font_size_30px">15sp</dimen>
+    <dimen name="font_size_28px">14sp</dimen>
+    <dimen name="font_size_26px">13sp</dimen>
+    <dimen name="font_size_24px">12sp</dimen>
+    <dimen name="font_size_22px">11sp</dimen>
+    <dimen name="font_size_20px">10sp</dimen>
+    <dimen name="font_size_18px">9sp</dimen>
+    <dimen name="font_size_16px">8sp</dimen>
+
+
+
+    <dimen name="article_right_image_width">113dp</dimen>
+</resources>

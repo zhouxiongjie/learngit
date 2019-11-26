@@ -61,7 +61,7 @@ android {
             signingConfig signingConfigs.ltsj
 
             //            buildConfigField "String",           "QQ_ID", qq_id
-//            buildConfigField "String",           "WX_ID", '"wxxxxxxxxxxxxxxxxx"' // 配置微信appid
+            //            buildConfigField "String",           "WX_ID", '"wxxxxxxxxxxxxxxxxx"' // 配置微信appid
             manifestPlaceholders = [
                     GD_KEY: "a2fdac9774a1380d6479f72d020cb92b"
             ]
@@ -94,17 +94,18 @@ android {
 
 
     buildTypes {
-
         debug {
             signingConfig null
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable true
         }
         release {
             signingConfig null
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable true
         }
     }
 
@@ -153,9 +154,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     //阿里音视频播放器
-//    implementation(name: 'AlivcPlayer-3.4.6', ext: 'aar')
-//    implementation(name: 'AlivcReporter-1.2', ext: 'aar')
-//    implementation(name: 'AliyunVodPlayer-3.4.6', ext: 'aar')
+    //    implementation(name: 'AlivcPlayer-3.4.6', ext: 'aar')
+    //    implementation(name: 'AlivcReporter-1.2', ext: 'aar')
+    //    implementation(name: 'AliyunVodPlayer-3.4.6', ext: 'aar')
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
@@ -189,7 +190,7 @@ dependencies {
     implementation 'com.ethanhua:skeleton:1.1.2'
     implementation 'io.supercharge:shimmerlayout:2.1.0'
     implementation 'com.liulishuo.filedownloader:library:1.7.4'
-    implementation "com.facebook.fresco:imagepipeline-okhttp3:0.12.0+"
+    implementation 'com.facebook.fresco:imagepipeline-okhttp3:0.12.0+'
     // 基础依赖包，必须要依赖
     implementation 'com.gyf.immersionbar:immersionbar:3.0.0'
     // fragment快速实现（可选）

@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigInput;
@@ -33,6 +34,7 @@ import com.shuangling.software.entity.Comment;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
@@ -82,6 +84,7 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_comment_detail);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
 

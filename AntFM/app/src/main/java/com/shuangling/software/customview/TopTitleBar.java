@@ -94,6 +94,12 @@ public class TopTitleBar extends RelativeLayout {
         tvTitle.setText(titleText);
     }
 
+
+    public TextView getTitleTextView(){
+        TextView tvTitle =  findViewById(R.id.title);
+        return tvTitle;
+    }
+
     /**
      * 标题更多按钮
      *

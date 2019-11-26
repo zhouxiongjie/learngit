@@ -25,6 +25,7 @@ import com.shuangling.software.entity.Galleria;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
@@ -73,6 +74,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_galleria);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
     }

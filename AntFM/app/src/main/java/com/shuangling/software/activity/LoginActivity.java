@@ -29,6 +29,7 @@ import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -106,6 +107,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_login);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         mHandler = new Handler(this);
 

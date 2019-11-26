@@ -29,6 +29,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.vodplayer.media.IAliyunVodPlayer;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -180,6 +181,7 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_radio_detail);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
 //        StatusBarUtil.setTransparent(this);
 //        StatusBarManager.setImmersiveStatusBar(this, true);

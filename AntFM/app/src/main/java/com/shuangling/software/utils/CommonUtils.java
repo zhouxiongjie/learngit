@@ -39,6 +39,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
+import com.gyf.immersionbar.ImmersionBar;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigDialog;
 import com.mylhyl.circledialog.params.DialogParams;
@@ -1007,5 +1008,10 @@ public class CommonUtils {
                 }
             }
         });
+    }
+
+
+    static public void transparentStatusBar(Activity activity){
+        ImmersionBar.with(activity).transparentStatusBar().statusBarDarkFont(true).fitsSystemWindows(true).init();
     }
 }

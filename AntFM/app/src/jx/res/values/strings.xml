@@ -1,0 +1,67 @@
+<resources>
+    <string name="application_name">智慧嘉祥</string>
+
+    <string name="index">首页</string>
+    <string name="recommend">推荐</string>
+    <string name="discover">发现</string>
+    <string name="service">服务</string>
+    <string name="personal_center">我的</string>
+    <string name="divideLine">下划线</string>
+
+    <string name="city">同城</string>
+    <string name="subscribe">订阅</string>
+    <string name="has_subscribe">已订阅</string>
+
+    <string name="excellent_recommend">精彩推荐</string>
+
+
+    <string name="play_circle">单曲循环</string>
+    <string name="play_order">顺序播放</string>
+    <string name="play_random">随机播放</string>
+    <string name="play_loop">循环播放</string>
+    <string name="play_list">播放列表</string>
+    <string name="play_timer">定时关闭</string>
+
+    <string name="order_positive">正序</string>
+    <string name="order_inverted">倒序</string>
+
+    <string name="play_icon_pause">&#xe618;</string>
+    <string name="play_icon_play">&#xe607;</string>
+    <string name="arrow_up">&#xe634;</string>
+    <string name="arrow_down">&#xe633;</string>
+
+    <string name="float_icon_pause">&#xe618;</string>
+    <string name="float_icon_play">&#xe610;</string>
+
+    <string name="radio">电台</string>
+    <string name="tv">电视台</string>
+    <string name="album">专辑</string>
+    <string name="audio">音频</string>
+    <string name="article">资讯</string>
+    <string name="video">视频</string>
+    <string name="special">专题</string>
+    <string name="photo">图集</string>
+
+    <string name="top">置顶</string>
+
+    <string name="organization">机构</string>
+    <string name="anchor">主播</string>
+
+    <string name="auth_cancel">授权操作已取消</string>
+    <string name="auth_error">授权操作遇到错误，请阅读Logcat输出; \n 如微信登录，需要微信客户端</string>
+    <string name="auth_complete">授权成功，正在跳转登录操作…</string>
+    <string name="default_city_code">4301</string>
+
+    <string name="to_expand_hint">全文</string>
+    <string name="to_shrink_hint">收起</string>
+
+    <string name="read_more">全文</string>
+    <string name="read_less">收起</string>
+    <string name="test_text">哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看哎呀，好精彩的视频哈 太好看了，我今天要通宵看</string>
+
+    <plurals name="error_over_count">
+        <item quantity="one">You can only select one media file</item>
+        <item quantity="many">You can only select up to %1$d media files</item>
+    </plurals>
+
+</resources>

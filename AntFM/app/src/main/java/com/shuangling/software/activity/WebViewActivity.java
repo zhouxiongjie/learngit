@@ -28,6 +28,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -96,6 +97,7 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_webview);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
     }

@@ -14,6 +14,7 @@ import android.widget.ListView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.gyf.immersionbar.ImmersionBar;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.RadioGroupAdapter;
@@ -22,6 +23,7 @@ import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.RadioSet;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
@@ -65,8 +67,7 @@ public class RadioListActivity extends AppCompatActivity implements Handler.Call
 
         setContentView(R.layout.activity_radio_list);
         ButterKnife.bind(this);
-//        StatusBarUtil.setTransparent(this);
-//        StatusBarManager.setImmersiveStatusBar(this, true);
+        CommonUtils.transparentStatusBar(this);
         mHandler = new Handler(this);
         init();
         getRadioList();

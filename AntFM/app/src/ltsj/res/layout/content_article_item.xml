@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <RelativeLayout
+        android:id="@+id/excellent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/excellentLogo"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="5dp"/>
+
+        <TextView
+            android:layout_marginBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/excellentLogo"
+            android:text="@string/excellent_recommend"
+            android:textColor="@color/textColorTwo"
+            android:textSize="@dimen/font_size_36px"
+            android:textStyle="bold"
+            android:visibility="visible"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/logo"
+        android:layout_width="@dimen/article_right_image_width"
+        fresco:viewAspectRatio="1.5"
+        android:layout_height="wrap_content"
+        fresco:placeholderImage="@drawable/article_placeholder"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="5dp"
+        fresco:roundedCornerRadius="2dp"
+        fresco:placeholderImageScaleType="centerCrop"
+        fresco:actualImageScaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/logo"
+        android:lineSpacingExtra="5dp"
+        android:lineSpacingMultiplier="1.0"
+        android:textColor="@color/textColorTwo"
+        android:textSize="@dimen/font_size_34px"
+        android:maxLines="3"
+        android:ellipsize="end"
+        android:layout_alignParentTop="true"
+        tools:text="资讯文章内容中只有2张图片以下的，按左图右文的方式显示（左图为封面图）"/>
+
+
+    <LinearLayout
+        android:id="@+id/layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_alignBottom="@+id/logo"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/top"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/top_text_bg"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/top"
+            android:textColor="@color/textColorFour"
+            android:textSize="@dimen/font_size_18px"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/merchant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginEnd="10dp"
+            android:textColor="@color/textColorThree"
+            android:textSize="@dimen/font_size_24px"
+            tools:text="浏阳电台浏阳电台浏阳电台浏阳电台" />
+
+        <TextView
+            android:id="@+id/commentNum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginEnd="10dp"
+            android:textColor="@color/textColorThree"
+            android:textSize="@dimen/font_size_24px"
+            tools:text="52评论" />
+
+        <TextView
+            android:id="@+id/publishTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginEnd="10dp"
+            android:textColor="@color/textColorThree"
+            android:textSize="@dimen/font_size_24px"
+            tools:text="5小时前" />
+
+
+    </LinearLayout>
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_alignParentStart="true"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_toStartOf="@+id/logo"-->
+
+    <!--android:layout_centerVertical="true"-->
+    <!--android:orientation="vertical">-->
+
+
+    </RelativeLayout>
+
+</LinearLayout>
+
+
+
+
+
+
+
+
+

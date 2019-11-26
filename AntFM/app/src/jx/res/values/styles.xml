@@ -1,0 +1,89 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+
+    </style>
+
+    <!--主题蓝-->
+    <style name="AppThemeBlue" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/themeBlue</item>
+        <item name="colorPrimaryDark">@color/themeBlue</item>
+        <item name="colorAccent">@color/themeBlue</item>
+        <item name="android:navigationBarColor">@color/themeBlue</item>
+        <item name="themeColor">@color/themeBlue</item>
+    </style>
+    <!--主题紫-->
+    <style name="AppThemePurple" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/themePurple</item>
+        <item name="colorPrimaryDark">@color/themePurple</item>
+        <item name="colorAccent">@color/themePurple</item>
+        <item name="android:navigationBarColor">@color/themePurple</item>
+        <item name="themeColor">@color/themePurple</item>
+    </style>
+    <!--主题红-->
+    <style name="AppThemeRed" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/themeRed</item>
+        <item name="colorPrimaryDark">@color/themeRed</item>
+        <item name="colorAccent">@color/themeRed</item>
+        <item name="android:navigationBarColor">@color/themeRed</item>
+        <item name="themeColor">@color/themeRed</item>
+    </style>
+    <!--主题绿-->
+    <style name="AppThemeGreen" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/themeGreen</item>
+        <item name="colorPrimaryDark">@color/themeGreen</item>
+        <item name="colorAccent">@color/themeGreen</item>
+        <item name="android:navigationBarColor">@color/themeGreen</item>
+        <item name="themeColor">@color/themeGreen</item>
+    </style>
+    <!--主题橙-->
+    <style name="AppThemeOrange" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/themeOrange</item>
+        <item name="colorPrimaryDark">@color/themeOrange</item>
+        <item name="colorAccent">@color/themeOrange</item>
+        <item name="android:navigationBarColor">@color/themeOrange</item>
+        <item name="themeColor">@color/themeOrange</item>
+    </style>
+
+
+
+    <style name="dialogWindowAnim" parent="android:Animation" mce_bogus="1">
+        <item name="android:windowEnterAnimation">@anim/dialog_enter_anim</item>
+        <item name="android:windowExitAnimation">@anim/dialog_exit_anim</item>
+    </style>
+
+
+    <style name="TabTextStyle" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="tabIndicatorColor">?attr/themeColor</item>
+        <item name="tabTextColor">@color/black</item>
+        <item name="tabIndicatorHeight">4dp</item>
+        <item name="tabSelectedTextColor">?attr/themeColor</item>
+        <item name="tabIndicatorFullWidth">false</item>
+    </style>
+
+
+    <style name="CheckboxStyle" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/check_box_selector</item>
+    </style>
+
+    <style name="WebViewProgressBar" parent="android:Widget.ProgressBar.Horizontal">
+        <item name="android:indeterminateDrawable">@null</item>
+        <item name="android:minHeight">4dp</item>
+        <item name="android:maxHeight">4dp</item>
+    </style>
+
+
+
+</resources>

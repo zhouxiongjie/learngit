@@ -21,6 +21,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.alibaba.fastjson.JSONObject;
+import com.gyf.immersionbar.ImmersionBar;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.Article;
@@ -79,6 +80,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_article_details);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
 //        StatusBarUtil.setTransparent(this);
 //        StatusBarManager.setImmersiveStatusBar(this, true);
@@ -121,7 +123,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
         getArticleDetail();
         String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
         int size=1;
-        int netLoad=SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD,0);
+        int netLoad=SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD,1);
         if(netLoad==0||CommonUtils.getNetWorkType(this)==NETWORKTYPE_WIFI){
            size=2;
         }
@@ -377,7 +379,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
         if (requestCode == LOGIN_RESULT && resultCode == Activity.RESULT_OK) {
             String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
             int size=1;
-            int netLoad=SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD,0);
+            int netLoad=SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD,1);
             if(netLoad==0||CommonUtils.getNetWorkType(this)==NETWORKTYPE_WIFI){
                 size=2;
             }

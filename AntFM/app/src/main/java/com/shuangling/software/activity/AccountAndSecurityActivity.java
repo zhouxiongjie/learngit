@@ -7,10 +7,12 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.gyf.immersionbar.ImmersionBar;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.utils.CommonUtils;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import butterknife.BindView;
@@ -36,6 +38,7 @@ public class AccountAndSecurityActivity extends AppCompatActivity {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_and_security);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
     }
 

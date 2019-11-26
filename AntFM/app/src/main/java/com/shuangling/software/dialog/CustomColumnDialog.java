@@ -67,7 +67,8 @@ public class CustomColumnDialog extends BaseCircleDialog {
 
     public interface OnCloseClickListener {
         void close();
-        void switchClo(Column column);
+        void switchClo(Column column,boolean initial);
+
 
     }
 
@@ -172,8 +173,20 @@ public class CustomColumnDialog extends BaseCircleDialog {
                 }else{
                     if(mOnCloseClickListener!=null){
                         Column column=mCustomColumns.get(position);
-                        mOnCloseClickListener.switchClo(column);
-                        dismiss();
+
+                        String customColumn=SharedPreferencesUtils.getStringValue("custom_column","");
+                        String custom_column=JSON.toJSONString(mCustomColumns);
+                        if(!custom_column.equals(customColumn)){
+                            SharedPreferencesUtils.putPreferenceTypeValue("custom_column", SharedPreferencesUtils.PreferenceType.String,JSON.toJSONString(mCustomColumns));
+                            mOnCloseClickListener.switchClo(column,true);
+                            dismiss();
+                        }else{
+                            mOnCloseClickListener.switchClo(column,false);
+                            dismiss();
+                        }
+
+
+
                     }
                 }
 
@@ -210,9 +223,13 @@ public class CustomColumnDialog extends BaseCircleDialog {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.close:
-                SharedPreferencesUtils.putPreferenceTypeValue("custom_column", SharedPreferencesUtils.PreferenceType.String,JSON.toJSONString(mCustomColumns));
-                if(mOnCloseClickListener!=null){
-                    mOnCloseClickListener.close();
+                String customColumn=SharedPreferencesUtils.getStringValue("custom_column","");
+                String custom_column=JSON.toJSONString(mCustomColumns);
+                if(!custom_column.equals(customColumn)){
+                    SharedPreferencesUtils.putPreferenceTypeValue("custom_column", SharedPreferencesUtils.PreferenceType.String,JSON.toJSONString(mCustomColumns));
+                    if(mOnCloseClickListener!=null){
+                        mOnCloseClickListener.close();
+                    }
                 }
                 dismiss();
                 break;

@@ -1,0 +1,6 @@
+<selector
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_up_white" android:state_activated="true"/>
+    <item android:drawable="@drawable/ic_up_gray" android:state_activated="false"/>
+    <item android:drawable="@drawable/ic_up_gray"/>
+</selector>

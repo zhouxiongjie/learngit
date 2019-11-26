@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.jaeger.library.StatusBarUtil;
 import com.shuangling.software.MyApplication;
@@ -108,8 +109,7 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
         super.onCreate(savedInstanceState);
 
         ButterKnife.bind(this);
-        StatusBarUtil.setTransparent(this);
-        StatusBarManager.setImmersiveStatusBar(this, true);
+        CommonUtils.transparentStatusBar(this);
         mHandler = new Handler(this);
 
         getAlbumDetail();

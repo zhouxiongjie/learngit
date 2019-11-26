@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -69,6 +70,7 @@ public class NewPhoneBindActivity extends AppCompatActivity implements Handler.C
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_new_phone_bind);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
 
         init();

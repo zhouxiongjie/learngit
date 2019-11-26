@@ -35,6 +35,7 @@ import com.aliyun.vodplayer.media.IAliyunVodPlayer;
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigInput;
@@ -255,6 +256,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_audio_detail);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
 

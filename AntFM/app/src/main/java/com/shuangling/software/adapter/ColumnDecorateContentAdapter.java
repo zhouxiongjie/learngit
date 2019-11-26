@@ -311,7 +311,14 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             }
 
             albumViewHolder.count.setText("" + content.getAlbums().getCount() + "集");
-            albumViewHolder.commentNum.setText(content.getComment() + "评论");
+
+            if(content.getComment()>1){
+                albumViewHolder.commentNum.setText(content.getComment()+"评论");
+            }else if(content.getView()>10&&content.getComment()<1){
+                albumViewHolder.commentNum.setText(content.getView()+"阅读");
+            }else{
+                albumViewHolder.commentNum.setText("");
+            }
             albumViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -404,7 +411,13 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             articleViewHolder.title.setText(content.getTitle());
 
             articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            articleViewHolder.commentNum.setText("" + content.getComment() + "评论");
+            if(content.getComment()>1){
+                articleViewHolder.commentNum.setText(content.getComment()+"评论");
+            }else if(content.getView()>10&&content.getComment()<1){
+                articleViewHolder.commentNum.setText(content.getView()+"阅读");
+            }else{
+                articleViewHolder.commentNum.setText("");
+            }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
@@ -459,7 +472,13 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             articleViewHolder.title.setText(content.getTitle());
 
             articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            articleViewHolder.commentNum.setText("" + content.getComment() + "评论");
+            if(content.getComment()>1){
+                articleViewHolder.commentNum.setText(content.getComment()+"评论");
+            }else if(content.getView()>10&&content.getComment()<1){
+                articleViewHolder.commentNum.setText(content.getView()+"阅读");
+            }else{
+                articleViewHolder.commentNum.setText("");
+            }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
@@ -510,7 +529,13 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             }
             videoViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             videoViewHolder.title.setText(content.getTitle());
-            videoViewHolder.commentNum.setText(content.getComment() + "评论");
+            if(content.getComment()>1){
+                videoViewHolder.commentNum.setText(content.getComment()+"评论");
+            }else if(content.getView()>10&&content.getComment()<1){
+                videoViewHolder.commentNum.setText(content.getView()+"阅读");
+            }else{
+                videoViewHolder.commentNum.setText("");
+            }
             videoViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -543,7 +568,13 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             }
             gallerieOneViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieOneViewHolder.title.setText(content.getTitle());
-            gallerieOneViewHolder.commentNum.setText("" + content.getComment() + "评论");
+            if(content.getComment()>1){
+                gallerieOneViewHolder.commentNum.setText(content.getComment()+"评论");
+            }else if(content.getView()>10&&content.getComment()<1){
+                gallerieOneViewHolder.commentNum.setText(content.getView()+"阅读");
+            }else{
+                gallerieOneViewHolder.commentNum.setText("");
+            }
             gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
             gallerieOneViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -594,7 +625,13 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             }
             gallerieViewThreeHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieViewThreeHolder.title.setText(content.getTitle());
-            gallerieViewThreeHolder.commentNum.setText("" + content.getComment() + "评论");
+            if(content.getComment()>1){
+                gallerieViewThreeHolder.commentNum.setText(content.getComment()+"评论");
+            }else if(content.getView()>10&&content.getComment()<1){
+                gallerieViewThreeHolder.commentNum.setText(content.getView()+"阅读");
+            }else{
+                gallerieViewThreeHolder.commentNum.setText("");
+            }
             gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
             gallerieViewThreeHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -678,8 +715,13 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                 specialViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
             specialViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-
-            specialViewHolder.commentNum.setText("" + content.getComment() + "评论");
+            if(content.getComment()>1){
+                specialViewHolder.commentNum.setText(content.getComment()+"评论");
+            }else if(content.getView()>10&&content.getComment()<1){
+                specialViewHolder.commentNum.setText(content.getView()+"阅读");
+            }else{
+                specialViewHolder.commentNum.setText("");
+            }
             specialViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

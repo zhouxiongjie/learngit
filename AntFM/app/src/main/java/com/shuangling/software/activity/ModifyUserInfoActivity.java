@@ -42,6 +42,7 @@ import com.bigkoo.pickerview.view.TimePickerView;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.core.ImagePipeline;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigDialog;
@@ -146,6 +147,7 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_modify_userinfo);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
         initCity();

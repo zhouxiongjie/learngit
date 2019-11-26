@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipeline;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigDialog;
@@ -70,6 +71,7 @@ public class SettingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_setting);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
     }
@@ -79,14 +81,15 @@ public class SettingActivity extends AppCompatActivity {
 
         version.setText("V"+getVersionName());
 
-        int netLoad=SharedPreferencesUtils.getIntValue(NET_LOAD,0);
+        int netLoad=SharedPreferencesUtils.getIntValue(NET_LOAD,1);
         if (netLoad ==0) {
             netLoadDesc.setText("最佳效果(下载大图)");
-        } else if (netLoad ==1) {
+        } else {
             netLoadDesc.setText("较省流量(智能下载)");
-        }else {
-            netLoadDesc.setText("极省流量(不下载图)");
         }
+//        else {
+//            netLoadDesc.setText("极省流量(不下载图)");
+//        }
 
         int netPlay=SharedPreferencesUtils.getIntValue(NET_PLAY,0);
         if (netPlay ==0) {
@@ -135,7 +138,7 @@ public class SettingActivity extends AppCompatActivity {
                         .show(getSupportFragmentManager());
                 break;
             case R.id.netLoad: {
-                final String[] items = {"最佳效果(下载大图)", "较省流量(智能下图)", "极省流量(不下载图)"};
+                final String[] items = {"最佳效果(下载大图)", "较省流量(智能下图)"};
                 new CircleDialog.Builder()
                         .configDialog(new ConfigDialog() {
                             @Override

@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -121,6 +122,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
      * 屏幕宽度
      */
     private int mScreenWidth = 0;
+
     private Handler mHandler;
 
     private Column mSwitchColumn;
@@ -235,16 +237,29 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             city.setText(MainActivity.sCurrentCity.getName());
         }
 
-        topBar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                topBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                int height = topBar.getHeight();
-                ViewGroup.LayoutParams lp = topBackground.getLayoutParams();
-                lp.height = height;
-                topBackground.setLayoutParams(lp);
-            }
-        });
+//        topBar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//
+//                int height = topBar.getHeight();
+//                Log.i("topBarHeight",""+height);
+//                if(height==mTopBarHeight){
+//                    topBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//                    ViewGroup.LayoutParams lp = topBackground.getLayoutParams();
+//                    lp.height = height;
+//                    topBackground.setLayoutParams(lp);
+//                }
+//                mTopBarHeight=height;
+//
+//            }
+//        });
+//        topBar.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+//            @Override
+//            public boolean onPreDraw() {
+//                int height = topBar.getHeight();
+//                return false;
+//            }
+//        });
         return rootView;
 
     }
@@ -378,6 +393,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                         @Override
                         public void close() {
                             mColumns = JSONObject.parseArray(SharedPreferencesUtils.getStringValue("custom_column", null), Column.class);
+                            mColumnSelectIndex=0;
                             columnContent.removeAllViews();
                             LayoutInflater inflater = getLayoutInflater();
                             for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
@@ -387,14 +403,11 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                 SimpleDraweeView indicator = view.findViewById(R.id.indicator);
                                 columnTextView.setText(column.getName());
                                 columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
-
-
                                 if (mColumnSelectIndex == i) {
                                     columnTextView.setSelected(true);
                                     columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
                                     columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
                                     indicator.setVisibility(View.VISIBLE);
-
                                 } else {
                                     columnTextView.setSelected(false);
                                     columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
@@ -429,13 +442,69 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                 });
                                 columnContent.addView(view, i);
                             }
-
-                            mMyselfFragmentPagerAdapter.notifyDataSetChanged();
+                            initFragment();
+                            //mMyselfFragmentPagerAdapter.notifyDataSetChanged();
                         }
 
                         @Override
-                        public void switchClo(Column column) {
-                            switchColumn(column);
+                        public void switchClo(Column col,boolean initial) {
+                            if(initial){
+                                mColumns = JSONObject.parseArray(SharedPreferencesUtils.getStringValue("custom_column", null), Column.class);
+                                mColumnSelectIndex=0;
+                                columnContent.removeAllViews();
+                                LayoutInflater inflater = getLayoutInflater();
+                                for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
+                                    Column column = mColumns.get(i);
+                                    View view = inflater.inflate(R.layout.column_txt_layout, columnContent, false);
+                                    TextView columnTextView = view.findViewById(R.id.text);
+                                    SimpleDraweeView indicator = view.findViewById(R.id.indicator);
+                                    columnTextView.setText(column.getName());
+                                    columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
+                                    if (mColumnSelectIndex == i) {
+                                        columnTextView.setSelected(true);
+                                        columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                        columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+                                        indicator.setVisibility(View.VISIBLE);
+                                    } else {
+                                        columnTextView.setSelected(false);
+                                        columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                                        columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                                        indicator.setVisibility(View.INVISIBLE);
+                                    }
+                                    view.setOnClickListener(new OnClickListener() {
+
+                                        @Override
+                                        public void onClick(View v) {
+                                            for (int i = 0; i < columnContent.getChildCount(); i++) {
+                                                View localView = columnContent.getChildAt(i);
+                                                TextView columnTextView = localView.findViewById(R.id.text);
+                                                SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
+                                                if (localView != v) {
+                                                    columnTextView.setSelected(false);
+                                                    indicator.setVisibility(View.INVISIBLE);
+
+                                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                                                } else {
+                                                    mColumnSelectIndex = i;
+                                                    columnTextView.setSelected(true);
+                                                    indicator.setVisibility(View.VISIBLE);
+                                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+
+                                                    viewPager.setCurrentItem(mColumnSelectIndex);
+                                                }
+                                            }
+                                        }
+                                    });
+                                    columnContent.addView(view, i);
+                                }
+                                mSwitchColumn=col;
+                                initFragment();
+                            }else{
+                                switchColumn(col);
+                            }
+
                         }
                     });
                     dialog.show(getFragmentManager(), "AudioListDialog");

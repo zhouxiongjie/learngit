@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.jaeger.library.StatusBarUtil;
 import com.shuangling.software.MyApplication;
@@ -76,7 +77,7 @@ public class SearchActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_search);
         StatusBarUtil.setTransparent(this);
-        StatusBarManager.setImmersiveStatusBar(this, true);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
 
         init();

@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -119,6 +120,7 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_anchor_detail);
+        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         mHandler = new Handler(this);
 

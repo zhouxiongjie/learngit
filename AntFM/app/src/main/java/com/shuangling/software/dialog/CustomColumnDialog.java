@@ -126,6 +126,20 @@ public class CustomColumnDialog extends BaseCircleDialog {
                     }
                 }
                 mMoreColumns=mColumns;
+                columnIds.clear();
+                for(int i=0;i<tempColumns.size();i++){
+                    columnIds.add(tempColumns.get(i).getId());
+                }
+                tempColumns.clear();
+
+                iterator = mCustomColumns.iterator();
+                while (iterator.hasNext()) {
+                    Column column = iterator.next();
+                    if (columnIds.contains(column.getId())) {
+                        tempColumns.add(column);
+
+                    }
+                }
                 mCustomColumns=tempColumns;
 
             }catch (Exception e){

@@ -799,8 +799,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             discoverFragment.setArguments(bundle);
                                             transaction.add(R.id.content, discoverFragment);
                                         } else {
-                                            transaction.show(discoverFragment);
+
                                             ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/gover",bottomMenu.getName());
+                                            transaction.show(discoverFragment);
                                         }
                                         if(recommendFragment!=null&&!recommendFragment.isHidden()){
                                             transaction.hide(recommendFragment);
@@ -840,8 +841,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             discoverFragment.setArguments(bundle);
                                             transaction.add(R.id.content, discoverFragment);
                                         } else {
-                                            transaction.show(discoverFragment);
+
                                             ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/interact",bottomMenu.getName());
+                                            transaction.show(discoverFragment);
                                         }
                                         if(recommendFragment!=null&&!recommendFragment.isHidden()){
                                             transaction.hide(recommendFragment);
@@ -877,8 +879,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             discoverFragment.setArguments(bundle);
                                             transaction.add(R.id.content, discoverFragment);
                                         } else {
-                                            transaction.show(discoverFragment);
+
                                             ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/guide",bottomMenu.getName());
+                                            transaction.show(discoverFragment);
                                         }
                                         if(recommendFragment!=null&&!recommendFragment.isHidden()){
                                             transaction.hide(recommendFragment);
@@ -914,8 +917,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             discoverFragment.setArguments(bundle);
                                             transaction.add(R.id.content, discoverFragment);
                                         } else {
-                                            transaction.show(discoverFragment);
+
                                             ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/services",bottomMenu.getName());
+                                            transaction.show(discoverFragment);
                                         }
                                         if(recommendFragment!=null&&!recommendFragment.isHidden()){
                                             transaction.hide(recommendFragment);
@@ -951,8 +955,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             discoverFragment.setArguments(bundle);
                                             transaction.add(R.id.content, discoverFragment);
                                         } else {
-                                            transaction.show(discoverFragment);
+
                                             ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.activity + "activity",bottomMenu.getName());
+                                            transaction.show(discoverFragment);
                                         }
                                         if(recommendFragment!=null&&!recommendFragment.isHidden()){
                                             transaction.hide(recommendFragment);

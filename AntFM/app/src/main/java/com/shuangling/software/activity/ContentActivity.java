@@ -41,6 +41,7 @@ import com.shuangling.software.R;
 import com.shuangling.software.adapter.ColumnAlbumContentAdapter;
 import com.shuangling.software.adapter.ColumnContentAdapter;
 import com.shuangling.software.adapter.ColumnDecorateContentAdapter;
+import com.shuangling.software.adapter.ColumnDecorateVideoContentAdapter;
 import com.shuangling.software.adapter.MoudleGridViewAdapter;
 import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.MyGridView;
@@ -50,6 +51,7 @@ import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.DecorModule;
 import com.shuangling.software.entity.Station;
+import com.shuangling.software.entity.User;
 import com.shuangling.software.fragment.ContentFragment;
 import com.shuangling.software.fragment.ContentHotFragment;
 import com.shuangling.software.fragment.RecommendFragment;
@@ -815,20 +817,28 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
                             List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
                             if(animated==3){
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
-                                recyclerView.setLayoutManager(new LinearLayoutManager(ContentActivity.this, LinearLayoutManager.VERTICAL, false));
-                                DividerItemDecoration divider = new DividerItemDecoration(ContentActivity.this,DividerItemDecoration.VERTICAL);
-                                divider.setDrawable(ContextCompat.getDrawable(ContentActivity.this,R.drawable.recycleview_divider_drawable));
+                                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)recyclerView.getLayoutParams();
+                                lp.leftMargin=CommonUtils.dip2px(5);
+                                lp.rightMargin=CommonUtils.dip2px(5);
+                                recyclerView.setLayoutParams(lp);
+                                recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+                                DividerItemDecoration divider = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(this,R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
-                                ColumnContentAdapter adapter = new ColumnContentAdapter(ContentActivity.this, recyclerView,columnContents);
+                                ColumnDecorateVideoContentAdapter adapter = new ColumnDecorateVideoContentAdapter(this, recyclerView,columnContents);
                                 recyclerView.setAdapter(adapter);
                             }else if(animated==4){
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)recyclerView.getLayoutParams();
+                                lp.leftMargin=CommonUtils.dip2px(5);
+                                lp.rightMargin=CommonUtils.dip2px(5);
+                                recyclerView.setLayoutParams(lp);
                                 GridLayoutManager manager = new GridLayoutManager(this, 2);
                                 recyclerView.setLayoutManager(manager);
-                                DividerItemDecoration divider = new DividerItemDecoration(ContentActivity.this,DividerItemDecoration.VERTICAL);
-                                divider.setDrawable(ContextCompat.getDrawable(ContentActivity.this,R.drawable.recycleview_divider_drawable));
+                                DividerItemDecoration divider = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(this,R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
-                                final ColumnContentAdapter adapter = new ColumnContentAdapter(ContentActivity.this,recyclerView, columnContents);
+                                final ColumnDecorateVideoContentAdapter adapter = new ColumnDecorateVideoContentAdapter(this,recyclerView, columnContents);
                                 manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                                     @Override
                                     public int getSpanSize(int position) {
@@ -848,12 +858,16 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
                             }else if(animated==7){
                                 //1+4
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)recyclerView.getLayoutParams();
+                                lp.leftMargin=CommonUtils.dip2px(5);
+                                lp.rightMargin=CommonUtils.dip2px(5);
+                                recyclerView.setLayoutParams(lp);
                                 GridLayoutManager manager = new GridLayoutManager(this, 2);
                                 recyclerView.setLayoutManager(manager);
-                                DividerItemDecoration divider = new DividerItemDecoration(ContentActivity.this,DividerItemDecoration.VERTICAL);
-                                divider.setDrawable(ContextCompat.getDrawable(ContentActivity.this,R.drawable.recycleview_divider_drawable));
+                                DividerItemDecoration divider = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(this,R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
-                                final ColumnContentAdapter adapter = new ColumnContentAdapter(ContentActivity.this,recyclerView, columnContents);
+                                final ColumnDecorateVideoContentAdapter adapter = new ColumnDecorateVideoContentAdapter(this,recyclerView, columnContents);
                                 manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                                     @Override
                                     public int getSpanSize(int position) {
@@ -1226,6 +1240,15 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
             Intent it = new Intent(this, ContentActivity.class);
             it.putExtra("column", column);
             startActivity(it);
+        }else if (url.startsWith(ServerInfo.scs + "/broke-create")) {
+            if (User.getInstance() != null) {
+                Intent it = new Intent(this, CluesActivity.class);
+                it.putExtra("url", ServerInfo.scs + "/broke-create");
+                startActivity(it);
+            } else {
+                Intent it = new Intent(this, LoginActivity.class);
+                startActivity(it);
+            }
         }else {
             Intent it=new Intent(this,WebViewBackActivity.class);
             it.putExtra("url",url);

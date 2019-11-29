@@ -185,6 +185,10 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
         }
         WebSettings s = webView.getSettings();
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+        webView.getSettings().setBlockNetworkImage(false);
         s.setJavaScriptEnabled(true);       //js
         s.setDomStorageEnabled(true);       //localStorage
 //        webView.setWebViewClient(new WebViewClient());
@@ -527,7 +531,7 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 //            }
 
 
-            String url = ServerInfo.h5IP + "/find";
+            String url = mUrl;
 
             if (User.getInstance() == null) {
                 if (MainActivity.sCurrentCity != null) {
@@ -551,22 +555,22 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
     @Override
     public void onHiddenChanged(boolean hidden) {
         if (hidden) {
-            String url = ServerInfo.h5IP + "/find";
-            if (User.getInstance() == null) {
-                if (MainActivity.sCurrentCity != null) {
-                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
-                } else {
-                    url = url + "?app=android";
-                }
-            } else {
-                if (MainActivity.sCurrentCity != null) {
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
-                } else {
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                }
-
-            }
-            webView.loadUrl(url);
+//            String url = mUrl;
+//            if (User.getInstance() == null) {
+//                if (MainActivity.sCurrentCity != null) {
+//                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
+//                } else {
+//                    url = url + "?app=android";
+//                }
+//            } else {
+//                if (MainActivity.sCurrentCity != null) {
+//                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+//                } else {
+//                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+//                }
+//
+//            }
+//            webView.loadUrl(url);
             webView.clearHistory();
 //            activtyTitle.setCanBack(false);
         }

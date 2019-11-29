@@ -13,7 +13,9 @@
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/topBackground"
             android:layout_width="match_parent"
-            android:layout_height="0px"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignBottom="@+id/b"
             app:actualImageScaleType="fitXY"
             app:placeholderImageScaleType="fitXY"
             app:placeholderImage="@drawable/index_top_bg"
@@ -30,15 +32,15 @@
             android:layout_below="@+id/statusBar"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:paddingTop="15dp"
-            android:paddingBottom="5dp">
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
 
             <FrameLayout
                 android:id="@+id/frameLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="10dp">
+                android:layout_centerVertical="true"
+                >
                 <RelativeLayout
                     android:id="@+id/weatherLayout"
                     android:layout_width="wrap_content"
@@ -121,6 +123,8 @@
                 android:id="@+id/search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/frameLayout"
                 android:background="@drawable/search_box_bg"
                 android:drawableLeft="@drawable/ic_search"
@@ -136,6 +140,7 @@
 
 
         <RelativeLayout
+            android:id="@+id/b"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/a">
@@ -145,6 +150,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@+id/customColumn"
+                android:layout_centerVertical="true"
                 android:scrollbars="none">
 
 
@@ -152,7 +158,8 @@
                     android:id="@+id/columnContent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"/>
             </HorizontalScrollView>
 
             <ImageView

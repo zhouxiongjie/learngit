@@ -4,12 +4,14 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
+
+
     <ProgressBar
         android:id="@+id/progressBar"
         style="@style/WebViewProgressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@+id/statusBar"
         android:progressDrawable="@drawable/webview_progress_drawable"
         android:max="100"
         android:progress="10"

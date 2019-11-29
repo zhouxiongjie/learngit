@@ -4,6 +4,7 @@ package com.shuangling.software.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
@@ -80,7 +82,9 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_article_details);
-        CommonUtils.transparentStatusBar(this);
+        //CommonUtils.transparentStatusBar(this);
+        ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).keyboardEnable(true)  //解决软键盘与底部输入框冲突问题，默认为false，还有一个重载方法，可以指定软键盘mode
+                .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE).init();
         ButterKnife.bind(this);
 //        StatusBarUtil.setTransparent(this);
 //        StatusBarManager.setImmersiveStatusBar(this, true);
@@ -134,6 +138,10 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
             url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size="+size;
         }
         WebSettings s = webView.getSettings();
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+        webView.getSettings().setBlockNetworkImage(false);
         s.setJavaScriptEnabled(true);       //js
         s.setDomStorageEnabled(true);       //localStorage
 

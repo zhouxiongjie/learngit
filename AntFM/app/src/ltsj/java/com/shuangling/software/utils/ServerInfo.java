@@ -8,15 +8,15 @@ public class ServerInfo {
 
 
 
-	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
+	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
 
-	public static String h5IP="http://www-cms-c.staging.slradio.cn";
+	public static String h5IP="http://www-cms-c.review.slradio.cn";
 
-	public static String h5HttpsIP="https://www-cms-c.staging.slradio.cn";
+	public static String h5HttpsIP="https://www-cms-c.review.slradio.cn";
 
-	public static String activity="https://www-asc-c.staging.slradio.cn/";
+	public static String activity="https://www-asc-c.review.slradio.cn/";
 
-	public static String scs="http://www-scs-c.staging.slradio.cn";
+	public static String scs="http://www-scs-c.review.slradio.cn";
 
 
 

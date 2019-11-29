@@ -35,8 +35,10 @@ import com.shuangling.software.activity.AnchorDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.CityListActivity;
+import com.shuangling.software.activity.CluesActivity;
 import com.shuangling.software.activity.ContentActivity;
 import com.shuangling.software.activity.GalleriaActivity;
+import com.shuangling.software.activity.LoginActivity;
 import com.shuangling.software.activity.MainActivity;
 import com.shuangling.software.activity.OrganizationDetailActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
@@ -49,6 +51,7 @@ import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.activity.WebViewBackActivity;
 import com.shuangling.software.dialog.CustomColumnDialog;
 import com.shuangling.software.entity.Column;
+import com.shuangling.software.entity.User;
 import com.shuangling.software.entity.Weather;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
@@ -169,22 +172,22 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                 Column column = mColumns.get(i);
                 View view = inflater.inflate(R.layout.column_txt_layout, columnContent, false);
                 TextView columnTextView = view.findViewById(R.id.text);
-                SimpleDraweeView indicator = view.findViewById(R.id.indicator);
+                //SimpleDraweeView indicator = view.findViewById(R.id.indicator);
                 columnTextView.setText(column.getName());
                 columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
 
 
                 if (mColumnSelectIndex == i) {
                     columnTextView.setSelected(true);
-                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
                     columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-                    indicator.setVisibility(View.VISIBLE);
+                    //indicator.setVisibility(View.VISIBLE);
 
                 } else {
                     columnTextView.setSelected(false);
                     columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                     columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-                    indicator.setVisibility(View.INVISIBLE);
+                    //indicator.setVisibility(View.INVISIBLE);
                 }
                 view.setOnClickListener(new OnClickListener() {
 
@@ -193,18 +196,18 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                         for (int i = 0; i < columnContent.getChildCount(); i++) {
                             View localView = columnContent.getChildAt(i);
                             TextView columnTextView = localView.findViewById(R.id.text);
-                            SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
+                            //SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
                             if (localView != v) {
                                 columnTextView.setSelected(false);
-                                indicator.setVisibility(View.INVISIBLE);
+                                //indicator.setVisibility(View.INVISIBLE);
 
                                 columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                                 columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
                             } else {
                                 mColumnSelectIndex = i;
                                 columnTextView.setSelected(true);
-                                indicator.setVisibility(View.VISIBLE);
-                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                //indicator.setVisibility(View.VISIBLE);
+                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
                                 columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
                                 viewPager.setCurrentItem(mColumnSelectIndex);
@@ -312,31 +315,30 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
         @Override
         public void onPageSelected(int position) {
             // TODO Auto-generated method stub
-            if (position == 0) {
-                if (MyApplication.getInstance().getStation() != null && MyApplication.getInstance().getStation().getIs_league() == 0) {
-                    weatherLayout.setVisibility(View.GONE);
-                    logo1.setVisibility(View.VISIBLE);
-                } else {
-                    weatherLayout.setVisibility(View.VISIBLE);
-                    logo1.setVisibility(View.GONE);
-                }
-            } else {
+
+            if (MyApplication.getInstance().getStation() != null && MyApplication.getInstance().getStation().getIs_league() == 0) {
                 weatherLayout.setVisibility(View.GONE);
+                logo1.setVisibility(View.VISIBLE);
+            } else {
+                weatherLayout.setVisibility(View.VISIBLE);
                 logo1.setVisibility(View.GONE);
             }
+
 
             for (int i = 0; i < columnContent.getChildCount(); i++) {
                 View checkView = columnContent.getChildAt(i);
                 TextView columnTextView = checkView.findViewById(R.id.text);
-                SimpleDraweeView indicator = checkView.findViewById(R.id.indicator);
+                //SimpleDraweeView indicator = checkView.findViewById(R.id.indicator);
                 boolean ischeck;
                 if (i == position) {
                     ischeck = true;
-                    indicator.setVisibility(View.VISIBLE);
-                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                    //indicator.setVisibility(View.VISIBLE);
+                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
                     columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
                     if (checkView.getLeft() > mScreenWidth / 2) {
                         columnScrollView.scrollTo((int) checkView.getLeft() - mScreenWidth / 2, 0);
+                    } else {
+                        columnScrollView.scrollTo(0, 0);
                     }
                     mColumnSelectIndex = position;
 //                    Station station=MyApplication.getInstance().getStation();
@@ -360,7 +362,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 
                 } else {
                     ischeck = false;
-                    indicator.setVisibility(View.INVISIBLE);
+                    //indicator.setVisibility(View.INVISIBLE);
                     columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                     columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
                 }
@@ -393,26 +395,26 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                         @Override
                         public void close() {
                             mColumns = JSONObject.parseArray(SharedPreferencesUtils.getStringValue("custom_column", null), Column.class);
-                            mColumnSelectIndex=0;
+                            mColumnSelectIndex = 0;
                             columnContent.removeAllViews();
                             LayoutInflater inflater = getLayoutInflater();
                             for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
                                 Column column = mColumns.get(i);
                                 View view = inflater.inflate(R.layout.column_txt_layout, columnContent, false);
                                 TextView columnTextView = view.findViewById(R.id.text);
-                                SimpleDraweeView indicator = view.findViewById(R.id.indicator);
+                                //SimpleDraweeView indicator = view.findViewById(R.id.indicator);
                                 columnTextView.setText(column.getName());
                                 columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
                                 if (mColumnSelectIndex == i) {
                                     columnTextView.setSelected(true);
-                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
                                     columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-                                    indicator.setVisibility(View.VISIBLE);
+                                    //indicator.setVisibility(View.VISIBLE);
                                 } else {
                                     columnTextView.setSelected(false);
                                     columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                                     columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-                                    indicator.setVisibility(View.INVISIBLE);
+                                    //indicator.setVisibility(View.INVISIBLE);
                                 }
                                 view.setOnClickListener(new OnClickListener() {
 
@@ -421,18 +423,18 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                         for (int i = 0; i < columnContent.getChildCount(); i++) {
                                             View localView = columnContent.getChildAt(i);
                                             TextView columnTextView = localView.findViewById(R.id.text);
-                                            SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
+                                            //SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
                                             if (localView != v) {
                                                 columnTextView.setSelected(false);
-                                                indicator.setVisibility(View.INVISIBLE);
+                                                //indicator.setVisibility(View.INVISIBLE);
 
                                                 columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                                                 columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
                                             } else {
                                                 mColumnSelectIndex = i;
                                                 columnTextView.setSelected(true);
-                                                indicator.setVisibility(View.VISIBLE);
-                                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                                //indicator.setVisibility(View.VISIBLE);
+                                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
                                                 columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
                                                 viewPager.setCurrentItem(mColumnSelectIndex);
@@ -447,29 +449,29 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                         }
 
                         @Override
-                        public void switchClo(Column col,boolean initial) {
-                            if(initial){
+                        public void switchClo(Column col, boolean initial) {
+                            if (initial) {
                                 mColumns = JSONObject.parseArray(SharedPreferencesUtils.getStringValue("custom_column", null), Column.class);
-                                mColumnSelectIndex=0;
+                                mColumnSelectIndex = 0;
                                 columnContent.removeAllViews();
                                 LayoutInflater inflater = getLayoutInflater();
                                 for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
                                     Column column = mColumns.get(i);
                                     View view = inflater.inflate(R.layout.column_txt_layout, columnContent, false);
                                     TextView columnTextView = view.findViewById(R.id.text);
-                                    SimpleDraweeView indicator = view.findViewById(R.id.indicator);
+                                    //SimpleDraweeView indicator = view.findViewById(R.id.indicator);
                                     columnTextView.setText(column.getName());
                                     columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
                                     if (mColumnSelectIndex == i) {
                                         columnTextView.setSelected(true);
-                                        columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                        columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
                                         columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-                                        indicator.setVisibility(View.VISIBLE);
+                                        //indicator.setVisibility(View.VISIBLE);
                                     } else {
                                         columnTextView.setSelected(false);
                                         columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                                         columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-                                        indicator.setVisibility(View.INVISIBLE);
+                                        //indicator.setVisibility(View.INVISIBLE);
                                     }
                                     view.setOnClickListener(new OnClickListener() {
 
@@ -478,18 +480,18 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                             for (int i = 0; i < columnContent.getChildCount(); i++) {
                                                 View localView = columnContent.getChildAt(i);
                                                 TextView columnTextView = localView.findViewById(R.id.text);
-                                                SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
+                                                //SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
                                                 if (localView != v) {
                                                     columnTextView.setSelected(false);
-                                                    indicator.setVisibility(View.INVISIBLE);
+                                                    //indicator.setVisibility(View.INVISIBLE);
 
                                                     columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                                                     columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
                                                 } else {
                                                     mColumnSelectIndex = i;
                                                     columnTextView.setSelected(true);
-                                                    indicator.setVisibility(View.VISIBLE);
-                                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+                                                    //indicator.setVisibility(View.VISIBLE);
+                                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
                                                     columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
                                                     viewPager.setCurrentItem(mColumnSelectIndex);
@@ -499,9 +501,9 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                     });
                                     columnContent.addView(view, i);
                                 }
-                                mSwitchColumn=col;
+                                mSwitchColumn = col;
                                 initFragment();
-                            }else{
+                            } else {
                                 switchColumn(col);
                             }
 
@@ -671,46 +673,48 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         JSONObject jo = jsonObject.getJSONObject("data");
                         if (jo.getInteger("total") > 0) {
-                            mColumns = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), Column.class);
+                            mRemoteColumns = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), Column.class);
+
+
                             Column col = new Column();
                             col.setName("首页");
                             col.setType(-1);
-                            if (mColumns != null) {
-                                mColumns.add(0, col);
+                            if (mRemoteColumns != null) {
+                                mRemoteColumns.add(0, col);
                             } else {
-                                mColumns = new ArrayList<>();
-                                mColumns.add(col);
+                                mRemoteColumns = new ArrayList<>();
+                                mRemoteColumns.add(col);
                             }
-                            mRemoteColumns = mColumns;
+
                             if (useLocal == 1) {
                                 return true;
-                            } else {
+                            }
+                            mColumns = mRemoteColumns;
+                            if (mColumns != null && mColumns.size() > 8) {
+                                mColumns = mColumns.subList(0, 8);
+                            }
+                            for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
+                                Column column = mColumns.get(i);
+                                //LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                //params.leftMargin = 20;
+                                //params.rightMargin = 20;
+                                LayoutInflater inflater = getLayoutInflater();
+                                View view = inflater.inflate(R.layout.column_txt_layout, columnContent, false);
+                                TextView columnTextView = view.findViewById(R.id.text);
+                                //SimpleDraweeView indicator = view.findViewById(R.id.indicator);
+                                //columnTextView.setGravity(Gravity.CENTER);
+                                //columnTextView.setPadding(40, 20, 40, 20);
 
-                                if (mColumns != null && mColumns.size() > 8) {
-                                    mColumns = mColumns.subList(0, 8);
-                                }
-                                for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
-                                    Column column = mColumns.get(i);
-                                    //LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                                    //params.leftMargin = 20;
-                                    //params.rightMargin = 20;
-                                    LayoutInflater inflater = getLayoutInflater();
-                                    View view = inflater.inflate(R.layout.column_txt_layout, columnContent, false);
-                                    TextView columnTextView = view.findViewById(R.id.text);
-                                    SimpleDraweeView indicator = view.findViewById(R.id.indicator);
-                                    //columnTextView.setGravity(Gravity.CENTER);
-                                    //columnTextView.setPadding(40, 20, 40, 20);
-
-                                    //columnTextView.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
-                                    columnTextView.setText(column.getName());
-                                    columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
+                                //columnTextView.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
+                                columnTextView.setText(column.getName());
+                                columnTextView.setTextColor(getActivity().getResources().getColorStateList(R.color.column_item_selector));
 
 
-                                    if (mColumnSelectIndex == i) {
-                                        columnTextView.setSelected(true);
-                                        columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-                                        columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-                                        indicator.setVisibility(View.VISIBLE);
+                                if (mColumnSelectIndex == i) {
+                                    columnTextView.setSelected(true);
+                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+                                    //indicator.setVisibility(View.VISIBLE);
 //                                    Station station=MyApplication.getInstance().getStation();
 //                                    if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
 //                                        ViewGroup.LayoutParams lp=indicator.getLayoutParams();
@@ -730,30 +734,30 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 //                                        ImageLoader.showThumb(indicator,R.drawable.indicator_line_bg);
 //                                    }
 
-                                    } else {
-                                        columnTextView.setSelected(false);
-                                        columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-                                        columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-                                        indicator.setVisibility(View.INVISIBLE);
-                                    }
-                                    view.setOnClickListener(new OnClickListener() {
+                                } else {
+                                    columnTextView.setSelected(false);
+                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                                    //indicator.setVisibility(View.INVISIBLE);
+                                }
+                                view.setOnClickListener(new OnClickListener() {
 
-                                        @Override
-                                        public void onClick(View v) {
-                                            for (int i = 0; i < columnContent.getChildCount(); i++) {
-                                                View localView = columnContent.getChildAt(i);
-                                                TextView columnTextView = localView.findViewById(R.id.text);
-                                                SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
-                                                if (localView != v) {
-                                                    columnTextView.setSelected(false);
-                                                    indicator.setVisibility(View.INVISIBLE);
+                                    @Override
+                                    public void onClick(View v) {
+                                        for (int i = 0; i < columnContent.getChildCount(); i++) {
+                                            View localView = columnContent.getChildAt(i);
+                                            TextView columnTextView = localView.findViewById(R.id.text);
+                                            //SimpleDraweeView indicator = localView.findViewById(R.id.indicator);
+                                            if (localView != v) {
+                                                columnTextView.setSelected(false);
+                                                //indicator.setVisibility(View.INVISIBLE);
 
-                                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-                                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-                                                } else {
-                                                    mColumnSelectIndex = i;
-                                                    columnTextView.setSelected(true);
-                                                    indicator.setVisibility(View.VISIBLE);
+                                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                                                columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                                            } else {
+                                                mColumnSelectIndex = i;
+                                                columnTextView.setSelected(true);
+                                                //indicator.setVisibility(View.VISIBLE);
 //                                                Station station=MyApplication.getInstance().getStation();
 //                                                if(station!=null&&!TextUtils.isEmpty(station.getIcon1())){
 //                                                    Uri uri = Uri.parse(station.getIcon1());
@@ -761,21 +765,21 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 //                                                    int height=width;
 //                                                    ImageLoader.showThumb(uri,indicator,width,height);
 //                                                }
-                                                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-                                                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+                                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+                                                columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
-                                                    viewPager.setCurrentItem(mColumnSelectIndex);
-                                                }
+                                                viewPager.setCurrentItem(mColumnSelectIndex);
                                             }
                                         }
-                                    });
-                                    columnContent.addView(view, i);
-                                }
-
-                                initFragment();
+                                    }
+                                });
+                                columnContent.addView(view, i);
                             }
 
+                            initFragment();
                         }
+
+
                     } else {
 
                     }
@@ -928,6 +932,16 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             Intent it = new Intent(getContext(), ContentActivity.class);
             it.putExtra("column", column);
             startActivity(it);
+        } else if (url.startsWith(ServerInfo.scs + "/broke-create")) {
+            if (User.getInstance() != null) {
+                Intent it = new Intent(getContext(), CluesActivity.class);
+                it.putExtra("url", ServerInfo.scs + "/broke-create");
+                startActivity(it);
+            } else {
+                Intent it = new Intent(getContext(), LoginActivity.class);
+                startActivity(it);
+            }
+
         } else {
             Intent it = new Intent(getContext(), WebViewBackActivity.class);
             it.putExtra("url", url);

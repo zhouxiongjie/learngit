@@ -112,11 +112,43 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
     }
 
     public void getContent() {
-
         String url = ServerInfo.serviceIP + ServerInfo.search;
         Map<String, String> params = new HashMap<String, String>();
-        params.put("search_type", "" + mSearchType);
-
+        switch (mSearchType){
+            case R.string.all:
+                params.put("search_type", "0");
+                break;
+            case R.string.article:
+                params.put("search_type", "2");
+                break;
+            case R.string.video:
+                params.put("search_type", "6");
+                break;
+            case R.string.audio:
+                params.put("search_type", "1");
+                break;
+            case R.string.album:
+                params.put("search_type", "3");
+                break;
+            case R.string.photo:
+                params.put("search_type", "9");
+                break;
+            case R.string.special:
+                params.put("search_type", "8");
+                break;
+            case R.string.organization:
+                params.put("search_type", "10");
+                break;
+            case R.string.anchor:
+                params.put("search_type", "5");
+                break;
+            case R.string.tv:
+                params.put("search_type", "7");
+                break;
+            case R.string.radio:
+                params.put("search_type", "4");
+                break;
+        }
         params.put("query", mKeyword);
         params.put("page", "" + mCurrentPage);
 

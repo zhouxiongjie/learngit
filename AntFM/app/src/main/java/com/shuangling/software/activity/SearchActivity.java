@@ -47,7 +47,7 @@ public class SearchActivity extends AppCompatActivity {
 
     public static final String TAG = "SearchActivity";
 
-    private static final String[] searchCategory = new String[]{"全部", "音频", "资讯", "专辑", "电台","主播","视频","电视台","专题"};
+    private static final int[] searchCategory = new int[]{R.string.all,R.string.article,R.string.video,R.string.audio,R.string.album,R.string.photo,R.string.special,R.string.organization,R.string.anchor,R.string.tv,R.string.radio};
 
     @BindView(R.id.searchCancel)
     TextView searchCancel;
@@ -106,6 +106,8 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String kw=((TextView) view).getText().toString();
+                CommonUtils.hideInput(SearchActivity.this);
+                keyword.clearFocus();
                 //开始搜索
                 keyword.setText(kw);
                 searchResult.setVisibility(View.VISIBLE);
@@ -119,6 +121,8 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH){
+                    CommonUtils.hideInput(SearchActivity.this);
+                    keyword.clearFocus();
                     String str=v.getText().toString();
                     if(str.length()>0){
                         //1.添加历史记录
@@ -169,6 +173,7 @@ public class SearchActivity extends AppCompatActivity {
                 }
             }
         });
+        keyword.requestFocus();
     }
 
 
@@ -176,6 +181,7 @@ public class SearchActivity extends AppCompatActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.searchCancel:
+                CommonUtils.hideInput(this);
                 finish();
                 break;
             case R.id.clean:
@@ -218,7 +224,7 @@ public class SearchActivity extends AppCompatActivity {
 
             SearchListFragment fragment = new SearchListFragment();
             Bundle bundle = new Bundle();
-            bundle.putInt("search_type", position);
+            bundle.putInt("search_type", searchCategory[position]);
             bundle.putString("keyword", keyword.getText().toString());
             fragment.setArguments(bundle);
             return fragment;
@@ -226,7 +232,7 @@ public class SearchActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return searchCategory[position];
+            return getResources().getString(searchCategory[position]);
         }
 
 

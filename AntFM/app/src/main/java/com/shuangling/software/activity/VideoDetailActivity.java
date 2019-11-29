@@ -206,7 +206,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_detail);
-        CommonUtils.transparentStatusBar(this);
+        //ImmersionBar.with(this).transparentBar().titleBar(activityTitle).init();
         ButterKnife.bind(this);
         init();
 

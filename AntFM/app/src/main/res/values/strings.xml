@@ -46,15 +46,18 @@
     <string name="menus_news">&#xe670;</string>
 
 
+    <string name="view_icon">&#xe66a;</string>
+    <string name="comment_icon">&#xe6cb;</string>
 
     <string name="radio">电台</string>
     <string name="tv">电视台</string>
     <string name="album">专辑</string>
     <string name="audio">音频</string>
-    <string name="article">资讯</string>
+    <string name="article">文章</string>
     <string name="video">视频</string>
     <string name="special">专题</string>
     <string name="photo">图集</string>
+    <string name="all">全部</string>
 
     <string name="top">置顶</string>
 

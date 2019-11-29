@@ -33,7 +33,7 @@ public class CollectActivity extends AppCompatActivity {
     public static final String TAG = "HistoryActivity";
 
 
-    public static final int[] category = new int[]{R.string.article,R.string.radio, R.string.tv,  R.string.video, R.string.special, R.string.photo};
+    public static final int[] category = new int[]{R.string.article,R.string.video, R.string.photo,  R.string.special,R.string.tv,R.string.radio };
     @BindView(R.id.activtyTitle)
     TopTitleBar activtyTitle;
     @BindView(R.id.tabPageIndicator)

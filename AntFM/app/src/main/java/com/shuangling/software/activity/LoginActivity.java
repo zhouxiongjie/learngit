@@ -213,6 +213,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
             public void onClick(View v) {
                 String phone=verifyCodeViewHolder.phoneNum.getText().toString();
                 String verifyCode=verifyCodeViewHolder.verifyCode.getText().toString();
+                CommonUtils.hideInput(LoginActivity.this);
                 verifyCodeLogin(phone,verifyCode);
 
             }
@@ -271,6 +272,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
         accountViewHolder.login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                CommonUtils.hideInput(LoginActivity.this);
                 accountLogin(accountViewHolder.phoneNum.getText().toString(), accountViewHolder.password.getText().toString());
 
             }

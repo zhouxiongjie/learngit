@@ -253,12 +253,47 @@
                 android:background="@drawable/ic_right" />
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/myPublish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/brokeNews"
+            android:padding="15dp"
+            android:visibility="visible">
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/myPublishIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="&#xe639;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_36px" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/myPublishIcon"
+                android:layout_marginStart="10dp"
+                android:text="我的发布"
+                android:textColor="@color/textColorTwo"
+                android:textSize="@dimen/font_size_28px" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_right" />
+        </RelativeLayout>
+
 
         <RelativeLayout
             android:id="@+id/setting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/brokeNews"
+            android:layout_below="@+id/myPublish"
             android:padding="15dp">
 
             <com.shuangling.software.customview.FontIconView
@@ -324,6 +359,9 @@
                 android:drawableRight="@drawable/ic_right"
                 />
         </RelativeLayout>
+
+
+
 
         <TextView
             android:id="@+id/support"
@@ -449,18 +487,18 @@
         <TextView
             android:id="@+id/messageNumber"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="10dp"
+            android:layout_height="match_parent"
             android:layout_gravity="right|top"
             android:layout_marginLeft="20dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/red_circle_bg"
             android:gravity="center"
+            android:minWidth="10dp"
             android:padding="2dp"
-            tools:text="10"
             android:textColor="@color/white"
             android:textSize="@dimen/font_size_16px"
-            android:visibility="visible" />
+            android:visibility="gone"
+            tools:text="10" />
     </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

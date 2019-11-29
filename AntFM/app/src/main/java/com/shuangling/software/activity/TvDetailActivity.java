@@ -63,6 +63,7 @@ import com.youngfeng.snake.annotations.EnableDragToClose;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -174,7 +175,7 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_tv_detail);
-        CommonUtils.transparentStatusBar(this);
+        //CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
 
@@ -708,6 +709,14 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
                         mRadioSetList = JSONArray.parseArray(jsonObject.getJSONArray("data").toJSONString(), RadioSet.class);
+
+                        Iterator<RadioSet> iterator = mRadioSetList.iterator();
+                        while (iterator.hasNext()) {
+                            RadioSet radioSet = iterator.next();
+                            if (radioSet.getList()==null||radioSet.getList().size()==0) {
+                                iterator.remove();
+                            }
+                        }
 
                         if (mRadioGroupAdapter == null) {
                             mRadioGroupAdapter = new RadioGroupAdapter(this, mRadioSetList);

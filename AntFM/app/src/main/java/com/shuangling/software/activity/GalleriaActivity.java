@@ -3,12 +3,14 @@ package com.shuangling.software.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
@@ -19,6 +21,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.alibaba.fastjson.JSONObject;
+import com.gyf.immersionbar.ImmersionBar;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.Galleria;
@@ -74,8 +77,10 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_galleria);
-        CommonUtils.transparentStatusBar(this);
+        //CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).keyboardEnable(true)  //解决软键盘与底部输入框冲突问题，默认为false，还有一个重载方法，可以指定软键盘mode
+                .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE).init();
         init();
     }
 
@@ -118,6 +123,10 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
             url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
         }
         WebSettings s = webView.getSettings();
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+        webView.getSettings().setBlockNetworkImage(false);
         s.setJavaScriptEnabled(true);       //js
         s.setDomStorageEnabled(true);       //localStorage
 
@@ -134,7 +143,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
 //		  webView.setScrollBarStyle(0);
 
 
-        webView.setWebViewClient(new WebViewClient(){
+        webView.setWebViewClient(new WebViewClient() {
             // url拦截
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -174,24 +183,30 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
         });
 
 
-        webView.setWebChromeClient(new WebChromeClient(){
+        webView.setWebChromeClient(new WebChromeClient() {
             @Override
             // 处理javascript中的alert
             public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
                 return super.onJsAlert(view, url, message, result);
-            };
+            }
+
+            ;
 
             @Override
             // 处理javascript中的confirm
             public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
                 return super.onJsConfirm(view, url, message, result);
-            };
+            }
+
+            ;
 
             @Override
             // 处理javascript中的prompt
             public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, final JsPromptResult result) {
                 return super.onJsPrompt(view, url, message, defaultValue, result);
-            };
+            }
+
+            ;
 
             // 设置网页加载的进度条
             @Override
@@ -389,17 +404,17 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
                 //自定义分享的回调想要函数
                 @Override
                 public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
-                    String chanel="1";
+                    String chanel = "1";
                     //点击新浪微博
                     if (SinaWeibo.NAME.equals(platform.getName())) {
-                        chanel="2";
+                        chanel = "2";
                         //限制微博分享的文字不能超过20
                         if (mGalleria.getGallerie().getCovers().size() > 0) {
                             paramsToShare.setImageUrl(mGalleria.getGallerie().getCovers().get(0));
                         }
                         paramsToShare.setText(mGalleria.getTitle() + ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId + "?app=android");
                     } else if (QQ.NAME.equals(platform.getName())) {
-                        chanel="3";
+                        chanel = "3";
                         paramsToShare.setTitle(mGalleria.getTitle());
                         if (mGalleria.getGallerie().getCovers().size() > 0) {
                             paramsToShare.setImageUrl(mGalleria.getGallerie().getCovers().get(0));
@@ -430,7 +445,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
                             paramsToShare.setImageUrl(mGalleria.getGallerie().getCovers().get(0));
                         }
                     }
-                    shareStatistics(chanel,""+mGalleria.getId(),ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId + "?app=android");
+                    shareStatistics(chanel, "" + mGalleria.getId(), ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId + "?app=android");
 
                 }
             });
@@ -466,13 +481,12 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
     }
 
 
-
-    public void shareStatistics(String channel,String postId,String shardUrl) {
+    public void shareStatistics(String channel, String postId, String shardUrl) {
 
         String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
         Map<String, String> params = new HashMap<>();
-        if(User.getInstance()!=null){
-            params.put("user_id", ""+User.getInstance().getId());
+        if (User.getInstance() != null) {
+            params.put("user_id", "" + User.getInstance().getId());
         }
         params.put("channel", channel);
         params.put("post_id", postId);
@@ -483,12 +497,12 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Log.i("test",response);
+                Log.i("test", response);
             }
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                Log.i("test",exception.toString());
+                Log.i("test", exception.toString());
 
             }
         });

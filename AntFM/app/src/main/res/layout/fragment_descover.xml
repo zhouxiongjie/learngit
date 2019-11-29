@@ -4,11 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
+    <View
+        android:id="@+id/statusBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="?attr/themeColor"/>
     <com.shuangling.software.customview.TopTitleBar
         android:id="@+id/activtyTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/themeColor"
+        android:layout_below="@+id/statusBar"
         app:canBack="false"
         android:visibility="visible"/>
 

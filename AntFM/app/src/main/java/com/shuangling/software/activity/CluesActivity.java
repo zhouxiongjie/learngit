@@ -113,6 +113,10 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
 
         mHandler = new Handler(this);
         WebSettings s = webView.getSettings();
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+        webView.getSettings().setBlockNetworkImage(false);
         s.setJavaScriptEnabled(true);       //js
         s.setDomStorageEnabled(true);       //localStorage
 

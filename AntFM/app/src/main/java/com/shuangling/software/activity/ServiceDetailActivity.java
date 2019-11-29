@@ -4,6 +4,7 @@ package com.shuangling.software.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -83,6 +84,10 @@ public class ServiceDetailActivity extends AppCompatActivity implements Handler.
         String url = mService.getLink_url();
 
         WebSettings s = webView.getSettings();
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+        webView.getSettings().setBlockNetworkImage(false);
         s.setJavaScriptEnabled(true);       //js
         s.setDomStorageEnabled(true);       //localStorage
 

@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.FileProvider;
@@ -39,11 +38,12 @@ import com.shuangling.software.activity.CollectActivity;
 import com.shuangling.software.activity.FeedbackActivity;
 import com.shuangling.software.activity.HistoryActivity;
 import com.shuangling.software.activity.LoginActivity;
-import com.shuangling.software.activity.MainActivity;
 import com.shuangling.software.activity.MessageListActivity;
 import com.shuangling.software.activity.ModifyUserInfoActivity;
 import com.shuangling.software.activity.SettingActivity;
 import com.shuangling.software.activity.SubscribeActivity;
+import com.shuangling.software.activity.WebViewActivity;
+import com.shuangling.software.activity.WebViewBackActivity;
 import com.shuangling.software.dialog.UpdateDialog;
 import com.shuangling.software.entity.UpdateInfo;
 import com.shuangling.software.entity.User;
@@ -118,6 +118,8 @@ public class PersonalCenterFragment extends Fragment {
     TextView update;
     @BindView(R.id.checkUpdate)
     RelativeLayout checkUpdate;
+    @BindView(R.id.myPublish)
+    RelativeLayout myPublish;
 
     private Handler mHandler;
     private DialogFragment mDialogFragment;
@@ -136,10 +138,10 @@ public class PersonalCenterFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_personalcenter, container, false);
 
         unbinder = ButterKnife.bind(this, view);
-        if(MyApplication.getInstance().findNewVerison){
+        if (MyApplication.getInstance().findNewVerison) {
             update.setText("发现新版本");
             Drawable drawableRight = getResources().getDrawable(R.drawable.update_red_circle);
-            update.setCompoundDrawablesWithIntrinsicBounds(null,null, drawableRight, null);
+            update.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableRight, null);
         }
         return view;
 
@@ -152,7 +154,7 @@ public class PersonalCenterFragment extends Fragment {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.history, R.id.collect, R.id.subscribe, R.id.accountAndSecurity, R.id.headBg, R.id.login, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.messageLayout, R.id.setting, R.id.attentionNumber,R.id.checkUpdate})
+    @OnClick({R.id.history, R.id.collect, R.id.subscribe, R.id.accountAndSecurity, R.id.headBg, R.id.login, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.messageLayout, R.id.setting, R.id.attentionNumber, R.id.checkUpdate,R.id.myPublish})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.history:
@@ -222,6 +224,17 @@ public class PersonalCenterFragment extends Fragment {
                     startActivity(it);
                 }
                 break;
+            case R.id.myPublish:
+                if (User.getInstance() != null) {
+                    Intent it=new Intent(getContext(),WebViewActivity.class);
+                    it.putExtra("url",ServerInfo.h5HttpsIP+"/publish");
+                    it.putExtra("title","我的发布");
+                    startActivity(it);
+                } else {
+                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    startActivity(it);
+                }
+                break;
             case R.id.messageLayout:
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), MessageListActivity.class));
@@ -258,43 +271,43 @@ public class PersonalCenterFragment extends Fragment {
             @Override
             public void onResponse(Call call, final String response) throws IOException {
 
-               mHandler.post(new Runnable() {
-                   @Override
-                   public void run() {
-                       try {
-                           mDialogFragment.dismiss();
-                           JSONObject jsonObject = JSONObject.parseObject(response);
-                           if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                               final UpdateInfo updateInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), UpdateInfo.class);
-                               if (updateInfo.getNew_version()!=null) {
-                                   UpdateDialog dialog = UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(), updateInfo.getNew_version().getContent());
-                                   dialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
-                                       @Override
-                                       public void download() {
-                                           if(!TextUtils.isEmpty(updateInfo.getNew_version().getUrl())){
-                                               downloadApk(updateInfo.getNew_version().getUrl());
-                                           }else {
-                                               ToastUtils.show("下载地址有误");
-                                           }
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            mDialogFragment.dismiss();
+                            JSONObject jsonObject = JSONObject.parseObject(response);
+                            if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                                final UpdateInfo updateInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), UpdateInfo.class);
+                                if (updateInfo.getNew_version() != null) {
+                                    UpdateDialog dialog = UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(), updateInfo.getNew_version().getContent());
+                                    dialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
+                                        @Override
+                                        public void download() {
+                                            if (!TextUtils.isEmpty(updateInfo.getNew_version().getUrl())) {
+                                                downloadApk(updateInfo.getNew_version().getUrl());
+                                            } else {
+                                                ToastUtils.show("下载地址有误");
+                                            }
 
-                                       }
-                                   });
-                                   dialog.showNoUpdate(true);
-                                   dialog.show(getFragmentManager(), "UpdateDialog");
-                               }else{
-                                   ToastUtils.show("当前已是最新版本");
-                               }
+                                        }
+                                    });
+                                    dialog.showNoUpdate(true);
+                                    dialog.show(getFragmentManager(), "UpdateDialog");
+                                } else {
+                                    ToastUtils.show("当前已是最新版本");
+                                }
 
-                           }else if(jsonObject != null &&!TextUtils.isEmpty(jsonObject.getString("msg"))){
-                               ToastUtils.show(jsonObject.getString("msg"));
-                           }
+                            } else if (jsonObject != null && !TextUtils.isEmpty(jsonObject.getString("msg"))) {
+                                ToastUtils.show(jsonObject.getString("msg"));
+                            }
 
 
-                       } catch (Exception e) {
+                        } catch (Exception e) {
 
-                       }
-                   }
-               });
+                        }
+                    }
+                });
 
 
             }
@@ -410,7 +423,6 @@ public class PersonalCenterFragment extends Fragment {
         });
 
     }
-
 
 
     public void downloadApk(final String downloadUrl) {

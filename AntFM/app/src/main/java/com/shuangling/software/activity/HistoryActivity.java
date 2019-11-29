@@ -34,7 +34,7 @@ public class HistoryActivity extends AppCompatActivity {
 
     public static final int MSG_FEED_BACK = 0x1;
 
-    public static final int[] category = new int[]{R.string.radio, R.string.tv, R.string.article, R.string.audio, R.string.video, R.string.special, R.string.photo};
+    public static final int[] category = new int[]{R.string.article,R.string.video,R.string.audio,R.string.photo,R.string.special,R.string.tv, R.string.radio};
     @BindView(R.id.activtyTitle)
     TopTitleBar activtyTitle;
     @BindView(R.id.tabPageIndicator)

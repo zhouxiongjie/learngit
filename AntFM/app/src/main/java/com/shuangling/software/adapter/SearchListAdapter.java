@@ -8,6 +8,8 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -17,6 +19,8 @@ import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.AnchorDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
 import com.shuangling.software.activity.AudioDetailActivity;
+import com.shuangling.software.activity.GalleriaActivity;
+import com.shuangling.software.activity.OrganizationDetailActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.TvDetailActivity;
@@ -24,7 +28,9 @@ import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.entity.SearchResult;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
+
 import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -45,8 +51,8 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
     public static final int TYPE_RADIO = 5;             //电台
     public static final int TYPE_ANCHOR = 6;            //主播
     public static final int TYPE_TV = 7;                //电视台
-
-
+    public static final int TYPE_GALLERIE = 8;          //图集
+    public static final int TYPE_ORGANIZATION = 9;       //机构
     private Context mContext;
     private List<SearchResult> mSearchResults;
     private LayoutInflater inflater;
@@ -101,15 +107,20 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             return new RadioViewHolder(inflater.inflate(R.layout.search_radio_item, parent, false));
         } else if (viewType == TYPE_ANCHOR) {
             return new AnchorViewHolder(inflater.inflate(R.layout.search_anchor_item, parent, false));
-        } else {
+        } else if (viewType == TYPE_TV) {
             return new TvViewHolder(inflater.inflate(R.layout.search_radio_item, parent, false));
+        } else if (viewType == TYPE_GALLERIE) {
+            return new GallerieViewHolder(inflater.inflate(R.layout.history_gallerie_item, parent, false));
+        } else {
+            return new OrganizationViewHolder(inflater.inflate(R.layout.search_anchor_item, parent, false));
         }
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final SearchResult content = mSearchResults.get(position);
-        if (getItemViewType(position) == TYPE_AUDIO) {
+        int itemViewType = getItemViewType(position);
+        if (itemViewType == TYPE_AUDIO) {
             AudioViewHolder audioViewHolder = (AudioViewHolder) holder;
             if (!TextUtils.isEmpty(content.getCover())) {
                 Uri uri = Uri.parse(content.getCover());
@@ -123,13 +134,13 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             audioViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext,AudioDetailActivity.class);
+                    Intent it = new Intent(mContext, AudioDetailActivity.class);
                     it.putExtra("audioId", content.getId());
                     mContext.startActivity(it);
                 }
             });
 
-        } else if (getItemViewType(position) == TYPE_ALBUM) {
+        } else if (itemViewType == TYPE_ALBUM) {
             AlbumViewHolder albumViewHolder = (AlbumViewHolder) holder;
             if (!TextUtils.isEmpty(content.getCover())) {
                 Uri uri = Uri.parse(content.getCover());
@@ -148,7 +159,7 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                 }
             });
 
-        } else if (getItemViewType(position) == TYPE_ARTICLE) {
+        } else if (itemViewType == TYPE_ARTICLE) {
             ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
@@ -166,7 +177,7 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                     mContext.startActivity(it);
                 }
             });
-        } else if (getItemViewType(position) == TYPE_VIDEO) {
+        } else if (itemViewType == TYPE_VIDEO) {
             VideoViewHolder videoViewHolder = (VideoViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
@@ -176,9 +187,9 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                 ImageLoader.showThumb(uri, videoViewHolder.logo, width, height);
             }
             videoViewHolder.title.setText(content.getTitle());
-            if(!TextUtils.isEmpty(content.getDuration())){
+            if (!TextUtils.isEmpty(content.getDuration())) {
                 videoViewHolder.duration.setText(CommonUtils.getShowTime((long) Float.parseFloat(content.getDuration())));
-            }else{
+            } else {
                 videoViewHolder.duration.setText("00:00");
             }
             videoViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -190,7 +201,7 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                 }
             });
 
-        } else if (getItemViewType(position) == TYPE_SPECIAL) {
+        } else if (itemViewType == TYPE_SPECIAL) {
             SpecialViewHolder specialViewHolder = (SpecialViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
@@ -211,7 +222,7 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             });
 
 
-        } else if (getItemViewType(position) == TYPE_RADIO) {
+        } else if (itemViewType == TYPE_RADIO) {
             RadioViewHolder radioViewHolder = (RadioViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
@@ -221,19 +232,19 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                 ImageLoader.showThumb(uri, radioViewHolder.logo, width, height);
             }
             radioViewHolder.title.setText(content.getName());
-            radioViewHolder.name.setText("正在直播:"+content.getDes());
+            radioViewHolder.name.setText("正在直播:" + content.getDes());
             radioViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    Intent it=new Intent(mContext,RadioDetailActivity.class);
-                    it.putExtra("radioId",content.getId());
+                    Intent it = new Intent(mContext, RadioDetailActivity.class);
+                    it.putExtra("radioId", content.getId());
                     mContext.startActivity(it);
                 }
             });
 
 
-        } else if (getItemViewType(position) == TYPE_ANCHOR) {
+        } else if (itemViewType == TYPE_ANCHOR) {
             AnchorViewHolder anchorViewHolder = (AnchorViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
@@ -244,16 +255,47 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             }
 
             anchorViewHolder.title.setText(content.getName());
+            anchorViewHolder.fanNum.setText(content.getFollows()+"粉丝");
+            if (content.getIs_follow() == 0) {
+                anchorViewHolder.attention.setActivated(true);
+                anchorViewHolder.attention.setText("关注");
+            } else {
+                anchorViewHolder.attention.setActivated(false);
+                anchorViewHolder.attention.setText("已关注");
+            }
             anchorViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it=new Intent(mContext,AnchorDetailActivity.class);
-                    it.putExtra("anchorId",content.getId());
+                    Intent it = new Intent(mContext, AnchorDetailActivity.class);
+                    it.putExtra("anchorId", content.getId());
                     mContext.startActivity(it);
                 }
             });
 
-        } else {
+        } else if (itemViewType == TYPE_GALLERIE) {
+            final GallerieViewHolder gallerieViewHolder = (GallerieViewHolder) holder;
+
+            if (!TextUtils.isEmpty(content.getCover())) {
+                Uri uri = Uri.parse(content.getCover());
+                int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
+                int height = (int) (2f * width / 3f);
+                ImageLoader.showThumb(uri, gallerieViewHolder.logo, width, height);
+            }
+
+
+            gallerieViewHolder.title.setText(content.getTitle());
+            gallerieViewHolder.timePrefix.setVisibility(View.INVISIBLE);
+            gallerieViewHolder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Intent it = new Intent(mContext, GalleriaActivity.class);
+                    it.putExtra("galleriaId", content.getId());
+                    mContext.startActivity(it);
+                }
+            });
+
+        } else if (itemViewType == TYPE_TV) {
             TvViewHolder tvViewHolder = (TvViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
@@ -264,12 +306,40 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             }
 
             tvViewHolder.title.setText(content.getName());
-            tvViewHolder.name.setText("正在直播:"+content.getDes());
+            tvViewHolder.name.setText("正在直播:" + content.getDes());
             tvViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it=new Intent(mContext,TvDetailActivity.class);
-                    it.putExtra("radioId",content.getId());
+                    Intent it = new Intent(mContext, TvDetailActivity.class);
+                    it.putExtra("radioId", content.getId());
+                    mContext.startActivity(it);
+                }
+            });
+
+        } else {
+            OrganizationViewHolder organizationViewHolder = (OrganizationViewHolder) holder;
+
+            if (!TextUtils.isEmpty(content.getCover())) {
+                Uri uri = Uri.parse(content.getCover());
+                int width = CommonUtils.dip2px(70);
+                int height = width;
+                ImageLoader.showThumb(uri, organizationViewHolder.logo, width, height);
+            }
+
+            organizationViewHolder.title.setText(content.getName());
+            organizationViewHolder.fanNum.setText(content.getFollows()+"粉丝");
+            if (content.getIs_follow() == 0) {
+                organizationViewHolder.attention.setActivated(true);
+                organizationViewHolder.attention.setText("关注");
+            } else {
+                organizationViewHolder.attention.setActivated(false);
+                organizationViewHolder.attention.setText("已关注");
+            }
+            organizationViewHolder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent it = new Intent(mContext, OrganizationDetailActivity.class);
+                    it.putExtra("organizationId", content.getId());
                     mContext.startActivity(it);
                 }
             });
@@ -428,16 +498,67 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
     }
 
 
+    public class GallerieViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.checkBox)
+        CheckBox checkBox;
+        @BindView(R.id.logo)
+        SimpleDraweeView logo;
+        @BindView(R.id.count)
+        TextView count;
+        @BindView(R.id.logoLayout)
+        RelativeLayout logoLayout;
+        @BindView(R.id.title)
+        TextView title;
+        @BindView(R.id.time)
+        TextView time;
+        @BindView(R.id.root)
+        LinearLayout root;
+        @BindView(R.id.timePrefix)
+        TextView timePrefix;
+
+
+        public GallerieViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
+    }
+
+
     public class AnchorViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.logo)
         SimpleDraweeView logo;
         @BindView(R.id.title)
         TextView title;
+        @BindView(R.id.fanNum)
+        TextView fanNum;
+        @BindView(R.id.attention)
+        TextView attention;
         @BindView(R.id.root)
         RelativeLayout root;
 
         public AnchorViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
+    }
+
+
+    public class OrganizationViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.logo)
+        SimpleDraweeView logo;
+        @BindView(R.id.title)
+        TextView title;
+        @BindView(R.id.fanNum)
+        TextView fanNum;
+        @BindView(R.id.attention)
+        TextView attention;
+        @BindView(R.id.root)
+        RelativeLayout root;
+
+        public OrganizationViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
@@ -461,11 +582,16 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             return TYPE_VIDEO;
         } else if (mSearchResults.get(position).getSearch_type() == 7) {
             return TYPE_TV;
-        } else {
+        } else if (mSearchResults.get(position).getSearch_type() == 8) {
             return TYPE_SPECIAL;
+        } else if (mSearchResults.get(position).getSearch_type() == 9) {
+            return TYPE_GALLERIE;
+        } else {
+            return TYPE_ORGANIZATION;
         }
 
     }
+
 
 
 }

@@ -2,11 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 apply from: '../MobSDK.gradle'
 apply plugin: 'com.aliyun.ams.emas-services'
+apply plugin: 'mtj-circle-plugin'
 
 
 static def releaseTime() {
     return new Date().format("yyyy-MM-dd-HH.mm", TimeZone.getTimeZone("GMT+8"))
 }
+
 
 android {
     compileSdkVersion externalCompileSdkVersion
@@ -18,6 +20,16 @@ android {
         versionName externalVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+
+    }
+
+    MtjCirclePluginConfig {
+
+        appkey = "8bc0e3d645"
+        // 设置debug 开关，如果需要查看日志则打开开关，为避免影响性能建议上线前关闭（设置为false）
+        debug = false
+        // 默认启动此插件，如果开发者不需要可以禁用（设置为false）
+        enabled = true
     }
 
     signingConfigs {
@@ -36,22 +48,21 @@ android {
             keyPassword "123456"
         }
 
-
-
-
-
-        debug {
-            storeFile file("release_lingting.keystore")
+        yjhlq {
+            storeFile file("../keystore/yjhlq.jks")
             storePassword "123456"
-            keyAlias "xiongjie"
+            keyAlias "yjhlq"
             keyPassword "123456"
         }
-        release {
-            storeFile file("release_lingting.keystore")
+
+        fcg {
+            storeFile file("../keystore/fcg.jks")
             storePassword "123456"
-            keyAlias "xiongjie"
+            keyAlias "fcg"
             keyPassword "123456"
         }
+
+
     }
     flavorDimensions "default"
     productFlavors {
@@ -59,7 +70,7 @@ android {
         ltsj {
             applicationId "com.shuangling.software"
             signingConfig signingConfigs.ltsj
-
+            String bdtjAppkey= "8a3086f16e"                         //百度统计appkey
             //            buildConfigField "String",           "QQ_ID", qq_id
             //            buildConfigField "String",           "WX_ID", '"wxxxxxxxxxxxxxxxxx"' // 配置微信appid
             manifestPlaceholders = [
@@ -71,8 +82,32 @@ android {
         jx {
             applicationId "com.shuangling.software.jx"
             signingConfig signingConfigs.jx         //配置签名
+            String bdtjAppkey = "ed95bcc12a"
             manifestPlaceholders = [
                     GD_KEY: "6d951523e28be6cb3fa6cffcb125a21b"
+            ]
+
+
+        }
+
+        yjhlq {
+            applicationId "com.shuangling.software.yjhlq"
+            signingConfig signingConfigs.yjhlq         //配置签名
+            String bdtjAppkey = "15eb09e817"
+            manifestPlaceholders = [
+                    GD_KEY: "991b888296921f1880e2d3a4f6cb0dfd"
+            ]
+
+
+        }
+
+
+        fcg {
+            applicationId "com.shuangling.software.fcg"
+            signingConfig signingConfigs.fcg         //配置签名
+            String bdtjAppkey = "8bc0e3d645"
+            manifestPlaceholders = [
+                    GD_KEY: "e2b638dd8d5507018ca114460cd5f624"
             ]
 
 
@@ -105,7 +140,7 @@ android {
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            debuggable true
+            debuggable false
         }
     }
 

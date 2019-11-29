@@ -254,7 +254,7 @@ public class SettingActivity extends AppCompatActivity {
                             ToastUtils.show("清理完成");
 
                             try {
-                                cacheSize.setText(DataCleanManager.getTotalCacheSize(SettingActivity.this));
+                                cacheSize.setText("0KB");
                             } catch (Exception e) {
                                 cacheSize.setText("0KB");
                             }

@@ -178,13 +178,12 @@ public class RadioListActivity extends AppCompatActivity implements Handler.Call
                                         startActivity(it);
                                         return true;
                                     }else{
-                                        Intent it=new Intent(RadioListActivity.this,TvDetailActivity.class);
-//                                        it.putExtra("Radio",radioGroups.get(groupPosition).getList().get(childPosition));
-//                                        ArrayList<RadioSet> radioGroupList=new ArrayList<>();
-//                                        radioGroupList.addAll(radioGroups);
-//                                        it.putParcelableArrayListExtra("RadioGroups",radioGroupList);
-                                        it.putExtra("radioId",radioGroups.get(groupPosition).getList().get(childPosition).getId());
-                                        startActivity(it);
+                                        if(childPosition<radioGroups.get(groupPosition).getList().size()){
+                                            Intent it=new Intent(RadioListActivity.this,TvDetailActivity.class);
+                                            it.putExtra("radioId",radioGroups.get(groupPosition).getList().get(childPosition).getId());
+                                            startActivity(it);
+
+                                        }
                                         return true;
                                     }
 

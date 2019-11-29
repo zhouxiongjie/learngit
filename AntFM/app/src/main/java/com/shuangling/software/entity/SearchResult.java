@@ -4,14 +4,16 @@ public class SearchResult {
 
 
     /**
-     * id : 110
+     * id : 313
      * type : 1
-     * title : 歌曲1
-     * name : 歌曲1
+     * title :
+     * name : 双菱品管部
      * des :
-     * cover :
-     * search_type : 1
-     * duration : 240.0130
+     * cover : https://sl-ucenter.static.slradio.cn/platform/HY8XGC3A2XZyzGsXNZpBGm57Bb2zKt531560908069829.jpg
+     * search_type : 10
+     * duration : 0
+     * is_follow : 0
+     * follows : 1
      */
 
     private int id;
@@ -22,6 +24,8 @@ public class SearchResult {
     private String cover;
     private int search_type;
     private String duration;
+    private int is_follow;
+    private int follows;
 
     public int getId() {
         return id;
@@ -85,5 +89,21 @@ public class SearchResult {
 
     public void setDuration(String duration) {
         this.duration = duration;
+    }
+
+    public int getIs_follow() {
+        return is_follow;
+    }
+
+    public void setIs_follow(int is_follow) {
+        this.is_follow = is_follow;
+    }
+
+    public int getFollows() {
+        return follows;
+    }
+
+    public void setFollows(int follows) {
+        this.follows = follows;
     }
 }

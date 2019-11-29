@@ -63,6 +63,7 @@ import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.activity.WebViewBackActivity;
 import com.shuangling.software.adapter.ColumnAlbumContentAdapter;
 import com.shuangling.software.adapter.ColumnContentAdapter;
+import com.shuangling.software.adapter.ColumnDecorateVideoContentAdapter;
 import com.shuangling.software.adapter.MoudleGridViewAdapter;
 import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.MyGridView;
@@ -838,7 +839,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                     if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
                         List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
                         RecyclerView recyclerView = mContentRecyclerView.get(position);
-                        ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView, columnContents);
+                        ColumnContentAdapter adapter = new ColumnContentAdapter(getActivity(),recyclerView, columnContents);
                         recyclerView.setAdapter(adapter);
 
 
@@ -863,20 +864,28 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                             List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
                             if(animated==3){
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)recyclerView.getLayoutParams();
+                                lp.leftMargin=CommonUtils.dip2px(5);
+                                lp.rightMargin=CommonUtils.dip2px(5);
+                                recyclerView.setLayoutParams(lp);
                                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
                                 DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
-                                ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), recyclerView,columnContents);
+                                ColumnDecorateVideoContentAdapter adapter = new ColumnDecorateVideoContentAdapter(getContext(), recyclerView,columnContents);
                                 recyclerView.setAdapter(adapter);
                             }else if(animated==4){
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)recyclerView.getLayoutParams();
+                                lp.leftMargin=CommonUtils.dip2px(5);
+                                lp.rightMargin=CommonUtils.dip2px(5);
+                                recyclerView.setLayoutParams(lp);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
                                 recyclerView.setLayoutManager(manager);
                                 DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
-                                final ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView, columnContents);
+                                final ColumnDecorateVideoContentAdapter adapter = new ColumnDecorateVideoContentAdapter(getContext(),recyclerView, columnContents);
                                 manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                                     @Override
                                     public int getSpanSize(int position) {
@@ -896,12 +905,16 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                             }else if(animated==7){
                                 //1+4
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
+                                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)recyclerView.getLayoutParams();
+                                lp.leftMargin=CommonUtils.dip2px(5);
+                                lp.rightMargin=CommonUtils.dip2px(5);
+                                recyclerView.setLayoutParams(lp);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
                                 recyclerView.setLayoutManager(manager);
                                 DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
-                                final ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView, columnContents);
+                                final ColumnDecorateVideoContentAdapter adapter = new ColumnDecorateVideoContentAdapter(getContext(),recyclerView, columnContents);
                                 manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                                     @Override
                                     public int getSpanSize(int position) {
@@ -1540,7 +1553,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                     public void onClick(View v) {
                                         Column switchColumn=new Column();
                                         switchColumn.setId(Integer.parseInt(columnId));
-                                        ((MainActivity)getActivity()).switchRecommend(switchColumn);
+                                        ((RecommendFragment)getParentFragment()).switchColumn(switchColumn);
                                     }
                                 });
                                 RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);

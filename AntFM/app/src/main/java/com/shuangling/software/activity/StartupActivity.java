@@ -82,9 +82,11 @@ public class StartupActivity extends Activity implements Handler.Callback {
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //隐藏顶部状态栏
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_startup);
-        CommonUtils.transparentStatusBar(this);
+        ImmersionBar.with(this).transparentStatusBar().init();
         ButterKnife.bind(this);
 
         if (!isTaskRoot()) {
@@ -207,12 +209,15 @@ public class StartupActivity extends Activity implements Handler.Callback {
                                     logo.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
-                                            mSkip=true;
-                                            Intent it=new Intent(StartupActivity.this, AdvertActivity.class);
-                                            it.putExtra("url", advert.getUrl());
-                                            it.putExtra("id",advert.getId());
-                                            startActivity(it);
-                                            finish();
+                                            if(advert.getSkip()==1){
+                                                mSkip=true;
+                                                Intent it=new Intent(StartupActivity.this, AdvertActivity.class);
+                                                it.putExtra("url", advert.getUrl());
+                                                it.putExtra("id",advert.getId());
+                                                startActivity(it);
+                                                finish();
+                                            }
+
                                         }
                                     });
                                 }else{
@@ -225,12 +230,15 @@ public class StartupActivity extends Activity implements Handler.Callback {
                                     surface.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
-                                            mSkip=true;
-                                            Intent it=new Intent(StartupActivity.this, AdvertActivity.class);
-                                            it.putExtra("url", advert.getUrl());
-                                            it.putExtra("id",advert.getId());
-                                            startActivity(it);
-                                            finish();
+                                            if(advert.getSkip()==1){
+                                                mSkip=true;
+                                                Intent it=new Intent(StartupActivity.this, AdvertActivity.class);
+                                                it.putExtra("url", advert.getUrl());
+                                                it.putExtra("id",advert.getId());
+                                                startActivity(it);
+                                                finish();
+                                            }
+
                                         }
                                     });
 

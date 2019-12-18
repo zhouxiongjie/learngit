@@ -168,22 +168,7 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
             }
         });
         String url = mUrl;
-
-        if (User.getInstance() == null) {
-            if (MainActivity.sCurrentCity != null) {
-                url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
-            } else {
-                url = url + "?app=android";
-            }
-
-        } else {
-            if (MainActivity.sCurrentCity != null) {
-                url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
-            } else {
-                url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-            }
-
-        }
+        url=initUrl(url);
         WebSettings s = webView.getSettings();
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
@@ -486,67 +471,9 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getEventBus(CommonEvent event) {
-        if (event.getEventName().equals("OnLoginSuccess")) {
-//            String url = webView.getUrl();
-//            if(url.indexOf("?")>0){
-//                url = url.substring(0, url.indexOf("?"));
-//                if (User.getInstance() == null) {
-//                    url = url + "?app=android";
-//                } else {
-//                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-//                }
-//
-//            }
-//            webView.loadUrl(url);
-
-
-            String url = mUrl;
-
-            if (User.getInstance() == null) {
-                if (MainActivity.sCurrentCity != null) {
-                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
-                } else {
-                    url = url + "?app=android";
-                }
-
-            } else {
-                if (MainActivity.sCurrentCity != null) {
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
-                } else {
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                }
-            }
-            webView.loadUrl(url);
-
-        } else if (event.getEventName().equals("OnQuitLogin")) {
-//            String url = webView.getUrl();
-//            if(url.indexOf("?")>0){
-//                url = url.substring(0, url.indexOf("?"));
-//                if (User.getInstance() == null) {
-//                    url = url + "?app=android";
-//                } else {
-//                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-//                }
-//
-//            }
-
-
-            String url = mUrl;
-
-            if (User.getInstance() == null) {
-                if (MainActivity.sCurrentCity != null) {
-                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
-                } else {
-                    url = url + "?app=android";
-                }
-
-            } else {
-                if (MainActivity.sCurrentCity != null) {
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
-                } else {
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                }
-            }
+        if (event.getEventName().equals("OnLoginSuccess")||event.getEventName().equals("OnQuitLogin")) {
+            String url=mUrl;
+            url=initUrl(mUrl);
             webView.loadUrl(url);
         }
     }
@@ -749,6 +676,44 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
             }
         });
 
+    }
+
+
+    private String initUrl(String url){
+        if (User.getInstance() == null) {
+            if (MainActivity.sCurrentCity != null) {
+                if(url.contains("?")){
+                    url = url + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                }else{
+                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
+                }
+            } else {
+                if(url.contains("?")){
+                    url = url + "&app=android";
+                }else{
+                    url = url + "?app=android";
+                }
+            }
+
+
+        } else {
+            if (MainActivity.sCurrentCity != null) {
+                if(url.contains("?")){
+                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                }else{
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                }
+            } else {
+                if(url.contains("?")){
+                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }else{
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }
+            }
+        }
+
+
+        return url;
     }
 
 

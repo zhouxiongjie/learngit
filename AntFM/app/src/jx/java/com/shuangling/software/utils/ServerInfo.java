@@ -177,6 +177,8 @@ public class ServerInfo {
 
 	public static String updateInfo="/v1/consumer/app_version";					//APP获取是否需要更新
 
+	public static String updateInfoV2="/v2/consumer/app_version";
+
 	public static String shareStatistics="/v2/share";							//分享添加来记录
 
     public static String bottomMenus="/v2/consumer/menus";					    //C端获取底部菜单
@@ -191,4 +193,7 @@ public class ServerInfo {
 
 	public static String getAnchorOrOrganizationColumn="/v2/merchant_columns/";	//机构或者主播栏目
 
+	public static String getAnchorOrOrganizationLive="/v2/live/";
+
+	public static String getServices="/v1/services";
 }

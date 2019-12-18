@@ -65,6 +65,6 @@ ext {
     externalLiveMinSdkVersion = 18
     externalTargetSdkVersion = 26
 
-    externalVersionCode =211
-    externalVersionName ='2.1.1'
+    externalVersionCode =220
+    externalVersionName ='2.2.0'
 }

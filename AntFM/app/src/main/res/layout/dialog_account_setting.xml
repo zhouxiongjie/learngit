@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:textSize="@dimen/font_size_34px"
+            android:textColor="#232323"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:text="输入提现账号"/>
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="姓    名"
+                android:textColor="#2D2E2D"
+                android:textSize="@dimen/font_size_30px"/>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="请输入真实姓名"
+                android:textColor="#C9C9C9"
+                android:textSize="@dimen/font_size_30px"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/edittext_bg"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="支付宝"
+                android:textColor="#2D2E2D"
+                android:textSize="@dimen/font_size_30px"/>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="请输入账号"
+                android:textColor="#C9C9C9"
+                android:textSize="@dimen/font_size_30px"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/edittext_bg"/>
+
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="5dp"
+            android:text="温馨提示"
+            android:textColor="#2D2E2D"
+            android:textSize="@dimen/font_size_30px" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:text="1、支付宝账号或姓名输入错误将无法提现到账\n2、使用支付宝提现需要您已注册支付宝并 在支付宝中实名认证；\n3、支付宝账号是您注册支付宝的手机号或 者邮箱号您可以登陆支付宝查看。"
+            android:textColor="#666666"
+            android:lineSpacingExtra="5dp"
+            android:textSize="@dimen/font_size_30px" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginTop="10dp"
+            android:background="@color/divideColorOne" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/cancel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="15dp"
+                android:text="取消"
+                android:textStyle="bold"
+                android:textColor="#232323"
+                android:textSize="@dimen/font_size_32px" />
+            <ImageView
+                android:layout_width="1px"
+                android:layout_height="match_parent"
+                android:background="@color/divideColorOne"/>
+
+            <TextView
+                android:id="@+id/ok"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="15dp"
+                android:text="确认"
+                android:textStyle="bold"
+                android:textColor="#158CFF"
+                android:textSize="@dimen/font_size_32px" />
+
+        </LinearLayout>
+
+
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

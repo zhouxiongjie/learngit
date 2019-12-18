@@ -49,6 +49,11 @@
     <string name="view_icon">&#xe66a;</string>
     <string name="comment_icon">&#xe6cb;</string>
 
+    <string name="live_network">&#xe673;</string>
+    <string name="live_tv">&#xe616;</string>
+    <string name="live_radio">&#xe61f;</string>
+    <string name="live_shop">&#xe673;</string>
+
     <string name="radio">电台</string>
     <string name="tv">电视台</string>
     <string name="album">专辑</string>
@@ -63,6 +68,10 @@
 
     <string name="organization">机构</string>
     <string name="anchor">主播</string>
+
+
+    <string name="income">现金收益</string>
+    <string name="cash_record">提现记录</string>
 
     <string name="auth_cancel">授权操作已取消</string>
     <string name="auth_error">授权操作遇到错误，请阅读Logcat输出; \n 如微信登录，需要微信客户端</string>

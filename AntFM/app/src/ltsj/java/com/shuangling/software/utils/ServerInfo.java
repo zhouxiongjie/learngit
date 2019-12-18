@@ -8,15 +8,15 @@ public class ServerInfo {
 
 
 
-	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
+	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
 
-	public static String h5IP="http://www-cms-c.review.slradio.cn";
+	public static String h5IP="http://www-cms-c.staging.slradio.cn";
 
-	public static String h5HttpsIP="https://www-cms-c.review.slradio.cn";
+	public static String h5HttpsIP="https://www-cms-c.staging.slradio.cn";
 
-	public static String activity="https://www-asc-c.review.slradio.cn/";
+	public static String activity="https://www-asc-c.staging.slradio.cn/";
 
-	public static String scs="http://www-scs-c.review.slradio.cn";
+	public static String scs="http://www-scs-c.staging.slradio.cn";
 
 
 
@@ -30,6 +30,8 @@ public class ServerInfo {
 //	public static String activity="http://asc.on-radio.cn/";
 //
 //	public static String scs="http://scs.on-radio.cn";
+
+
 
 //    public static String apkDownloadAddr="https://shuangln-cdn.on-radio.cn/cms/apk/ltsj.apk";
 
@@ -179,6 +181,8 @@ public class ServerInfo {
 
 	public static String updateInfo="/v1/consumer/app_version";					//APP获取是否需要更新
 
+	public static String updateInfoV2="/v2/consumer/app_version";
+
 	public static String shareStatistics="/v2/share";							//分享添加来记录
 
     public static String bottomMenus="/v2/consumer/menus";					    //C端获取底部菜单
@@ -193,4 +197,7 @@ public class ServerInfo {
 
 	public static String getAnchorOrOrganizationColumn="/v2/merchant_columns/";	//机构或者主播栏目
 
+	public static String getAnchorOrOrganizationLive="/v2/live/";
+
+	public static String getServices="/v1/services";
 }

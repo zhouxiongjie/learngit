@@ -10,10 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
@@ -22,15 +26,14 @@ import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
+import com.shuangling.software.activity.WebViewBackActivity;
 import com.shuangling.software.customview.BannerView;
-import com.shuangling.software.entity.BannerInfo;
+import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.entity.ColumnContent;
-import com.shuangling.software.entity.DecorModule;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.TimeUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -53,8 +56,10 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
     public static final int TYPE_SPECIAL = 5;           //专题
     public static final int TYPE_GALLERIE_ONE = 6;      //一图集
     public static final int TYPE_GALLERIE_THREE = 7;    //三图集
-    public static final int TYPE_HEAD = 8;              //头
-    public static final int TYPE_DECORATE = 9;          //装修头
+    public static final int TYPE_ACTIVITY = 8;    //三图集
+    public static final int TYPE_LIVE = 9;    //三图集
+    public static final int TYPE_HEAD = 10;              //头
+    public static final int TYPE_DECORATE = 11;          //装修头
 
     private Context mContext;
 
@@ -63,8 +68,17 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
     private View mHeaderView;
     private LinearLayout mDecorateLayout;
     private boolean mIsHot = false;
-
     private boolean mIsVideo = false;
+    private boolean mIsActivity = false;
+
+    public boolean isActivity() {
+        return mIsActivity;
+    }
+
+    public void setIsActivity(boolean isActivity) {
+        this.mIsActivity = isActivity;
+    }
+
 
     public boolean isIsHot() {
         return mIsHot;
@@ -109,7 +123,6 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
     }
 
 
-
     public void setData(List<ColumnContent> columnContent) {
         this.mColumnContent = columnContent;
 
@@ -147,18 +160,22 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
         } else if (viewType == TYPE_ARTICLE_THREE) {
             return new ArticleViewThreeHolder(inflater.inflate(R.layout.content_article_three_item, parent, false));
         } else if (viewType == TYPE_VIDEO) {
-            if (isVideo()) {
-                return new VideoViewHolder(inflater.inflate(R.layout.content_video_item_one, parent, false));
-            } else {
-                return new VideoViewHolder(inflater.inflate(R.layout.content_video_item, parent, false));
-            }
+//            if (isVideo()) {
+//                return new VideoViewHolder(inflater.inflate(R.layout.content_video_item_one, parent, false));
+//            } else {
+            return new VideoViewHolder(inflater.inflate(R.layout.content_video_item, parent, false));
+//            }
 
         } else if (viewType == TYPE_GALLERIE_ONE) {
             return new GallerieOneViewHolder(inflater.inflate(R.layout.content_gallerie_one_item, parent, false));
         } else if (viewType == TYPE_GALLERIE_THREE) {
             return new GallerieViewThreeHolder(inflater.inflate(R.layout.content_gallerie_three_item, parent, false));
-        } else {
+        } else if (viewType == TYPE_SPECIAL) {
             return new SpecialViewHolder(inflater.inflate(R.layout.content_special_item, parent, false));
+        } else if (viewType == TYPE_ACTIVITY) {
+            return new ActivityViewHolder(inflater.inflate(R.layout.content_activity_item, parent, false));
+        } else {
+            return new LiveViewHolder(inflater.inflate(R.layout.content_live_item, parent, false));
         }
     }
 
@@ -168,26 +185,26 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
         if (mHeaderView != null) {
             if (position == 0) {
                 content = null;
-            } else if(mDecorateLayout!=null){
-                if(position==1){
-                    content=null;
-                }else{
+            } else if (mDecorateLayout != null) {
+                if (position == 1) {
+                    content = null;
+                } else {
                     content = mColumnContent.get(position - 2);
                 }
 
-            }else{
+            } else {
                 content = mColumnContent.get(position - 1);
             }
 
         } else {
-            if(mDecorateLayout!=null){
-                if(position==0){
-                    content=null;
-                }else{
-                    content = mColumnContent.get(position-1);
+            if (mDecorateLayout != null) {
+                if (position == 0) {
+                    content = null;
+                } else {
+                    content = mColumnContent.get(position - 1);
                 }
 
-            }else{
+            } else {
                 content = mColumnContent.get(position);
             }
 
@@ -197,10 +214,10 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
         int itemViewType = getItemViewType(position);
         if (itemViewType == TYPE_HEAD) {
 
-        }else if(itemViewType == TYPE_DECORATE){
+        } else if (itemViewType == TYPE_DECORATE) {
 
 
-        }else if (itemViewType == TYPE_AUDIO) {
+        } else if (itemViewType == TYPE_AUDIO) {
             AudioViewHolder audioViewHolder = (AudioViewHolder) holder;
 
             audioViewHolder.excellent.setVisibility(View.GONE);
@@ -312,11 +329,11 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
             albumViewHolder.count.setText("" + content.getAlbums().getCount() + "集");
 
-            if(content.getComment()>1){
-                albumViewHolder.commentNum.setText(content.getComment()+"评论");
-            }else if(content.getView()>10&&content.getComment()<1){
-                albumViewHolder.commentNum.setText(content.getView()+"阅读");
-            }else{
+            if (content.getComment() >= 1) {
+                albumViewHolder.commentNum.setText(content.getComment() + "评论");
+            } else if (content.getView() >= 10 && content.getComment() < 1) {
+                albumViewHolder.commentNum.setText(content.getView() + "阅读");
+            } else {
                 albumViewHolder.commentNum.setText("");
             }
             albumViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -411,11 +428,11 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             articleViewHolder.title.setText(content.getTitle());
 
             articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            if(content.getComment()>1){
-                articleViewHolder.commentNum.setText(content.getComment()+"评论");
-            }else if(content.getView()>10&&content.getComment()<1){
-                articleViewHolder.commentNum.setText(content.getView()+"阅读");
-            }else{
+            if (content.getComment() >= 1) {
+                articleViewHolder.commentNum.setText(content.getComment() + "评论");
+            } else if (content.getView() >= 10 && content.getComment() < 1) {
+                articleViewHolder.commentNum.setText(content.getView() + "阅读");
+            } else {
                 articleViewHolder.commentNum.setText("");
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
@@ -472,11 +489,11 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             articleViewHolder.title.setText(content.getTitle());
 
             articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            if(content.getComment()>1){
-                articleViewHolder.commentNum.setText(content.getComment()+"评论");
-            }else if(content.getView()>10&&content.getComment()<1){
-                articleViewHolder.commentNum.setText(content.getView()+"阅读");
-            }else{
+            if (content.getComment() >= 1) {
+                articleViewHolder.commentNum.setText(content.getComment() + "评论");
+            } else if (content.getView() >= 10 && content.getComment() < 1) {
+                articleViewHolder.commentNum.setText(content.getView() + "阅读");
+            } else {
                 articleViewHolder.commentNum.setText("");
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
@@ -513,27 +530,27 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 videoViewHolder.organization.setText(content.getAuthor_info().getMerchant().getName());
-                if (isVideo()) {
-                    if (!TextUtils.isEmpty(content.getAuthor_info().getMerchant().getLogo())) {
-                        Uri uri = Uri.parse(content.getAuthor_info().getMerchant().getLogo());
-                        int width = CommonUtils.dip2px(35);
-                        int height = width;
-                        ImageLoader.showThumb(uri, videoViewHolder.organizationLogo, width, height);
-                    }
-                }
+//                if (isVideo()) {
+//                    if (!TextUtils.isEmpty(content.getAuthor_info().getMerchant().getLogo())) {
+//                        Uri uri = Uri.parse(content.getAuthor_info().getMerchant().getLogo());
+//                        int width = CommonUtils.dip2px(35);
+//                        int height = width;
+//                        ImageLoader.showThumb(uri, videoViewHolder.organizationLogo, width, height);
+//                    }
+//                }
             }
-            if (content.getVideo()!=null&&!TextUtils.isEmpty(content.getVideo().getDuration())) {
+            if (content.getVideo() != null && !TextUtils.isEmpty(content.getVideo().getDuration())) {
                 videoViewHolder.duration.setText(CommonUtils.getShowTime((long) Float.parseFloat(content.getVideo().getDuration()) * 1000));
             } else {
                 videoViewHolder.duration.setText("00:00");
             }
             videoViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             videoViewHolder.title.setText(content.getTitle());
-            if(content.getComment()>1){
-                videoViewHolder.commentNum.setText(content.getComment()+"评论");
-            }else if(content.getView()>10&&content.getComment()<1){
-                videoViewHolder.commentNum.setText(content.getView()+"阅读");
-            }else{
+            if (content.getComment() >= 1) {
+                videoViewHolder.commentNum.setText(content.getComment() + "评论");
+            } else if (content.getView() >= 10 && content.getComment() < 1) {
+                videoViewHolder.commentNum.setText(content.getView() + "阅读");
+            } else {
                 videoViewHolder.commentNum.setText("");
             }
             videoViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -568,11 +585,11 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             }
             gallerieOneViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieOneViewHolder.title.setText(content.getTitle());
-            if(content.getComment()>1){
-                gallerieOneViewHolder.commentNum.setText(content.getComment()+"评论");
-            }else if(content.getView()>10&&content.getComment()<1){
-                gallerieOneViewHolder.commentNum.setText(content.getView()+"阅读");
-            }else{
+            if (content.getComment() >= 1) {
+                gallerieOneViewHolder.commentNum.setText(content.getComment() + "评论");
+            } else if (content.getView() >= 10 && content.getComment() < 1) {
+                gallerieOneViewHolder.commentNum.setText(content.getView() + "阅读");
+            } else {
                 gallerieOneViewHolder.commentNum.setText("");
             }
             gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
@@ -625,11 +642,11 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             }
             gallerieViewThreeHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieViewThreeHolder.title.setText(content.getTitle());
-            if(content.getComment()>1){
-                gallerieViewThreeHolder.commentNum.setText(content.getComment()+"评论");
-            }else if(content.getView()>10&&content.getComment()<1){
-                gallerieViewThreeHolder.commentNum.setText(content.getView()+"阅读");
-            }else{
+            if (content.getComment() >= 1) {
+                gallerieViewThreeHolder.commentNum.setText(content.getComment() + "评论");
+            } else if (content.getView() >= 10 && content.getComment() < 1) {
+                gallerieViewThreeHolder.commentNum.setText(content.getView() + "阅读");
+            } else {
                 gallerieViewThreeHolder.commentNum.setText("");
             }
             gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
@@ -642,7 +659,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                 }
             });
 
-        } else {
+        } else if (itemViewType == TYPE_SPECIAL) {
             final SpecialViewHolder specialViewHolder = (SpecialViewHolder) holder;
 
             specialViewHolder.excellent.setVisibility(View.GONE);
@@ -715,11 +732,11 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                 specialViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
             specialViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            if(content.getComment()>1){
-                specialViewHolder.commentNum.setText(content.getComment()+"评论");
-            }else if(content.getView()>10&&content.getComment()<1){
-                specialViewHolder.commentNum.setText(content.getView()+"阅读");
-            }else{
+            if (content.getComment() >= 1) {
+                specialViewHolder.commentNum.setText(content.getComment() + "评论");
+            } else if (content.getView() >= 10 && content.getComment() < 1) {
+                specialViewHolder.commentNum.setText(content.getView() + "阅读");
+            } else {
                 specialViewHolder.commentNum.setText("");
             }
             specialViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -728,6 +745,124 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                     Intent it = new Intent(mContext, SpecialDetailActivity.class);
                     it.putExtra("specialId", content.getId());
 
+                    mContext.startActivity(it);
+                }
+            });
+
+        } else if (itemViewType == TYPE_ACTIVITY) {
+            final ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
+
+            if (content.getTop() != null) {
+                activityViewHolder.top.setVisibility(View.VISIBLE);
+            } else {
+                activityViewHolder.top.setVisibility(View.GONE);
+            }
+            if (isActivity()) {
+                activityViewHolder.activity.setVisibility(View.GONE);
+            } else {
+                activityViewHolder.activity.setVisibility(View.VISIBLE);
+            }
+            activityViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
+            if(content.getActivitiy().getType()==1){
+                GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
+                hierarchy.setPlaceholderImage(R.drawable.activity_sign_up_logo);
+            }else if(content.getActivitiy().getType()==2){
+                GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
+                hierarchy.setPlaceholderImage(R.drawable.activity_answer_logo);
+            }else if(content.getActivitiy().getType()==3){
+                GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
+                hierarchy.setPlaceholderImage(R.drawable.activity_vote_logo);
+            }else if(content.getActivitiy().getType()==4){
+                GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
+                hierarchy.setPlaceholderImage(R.drawable.activity_luck_logo);
+            }else if(content.getActivitiy().getType()==5){
+                GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
+                hierarchy.setPlaceholderImage(R.drawable.activity_marathon_logo);
+            }else if(content.getActivitiy().getType()==6){
+                GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
+                hierarchy.setPlaceholderImage(R.drawable.activity_interact_logo);
+            }
+            if (!TextUtils.isEmpty(content.getCover())) {
+                Uri uri = Uri.parse(content.getCover());
+                int width = CommonUtils.getScreenWidth();
+                int height = (int) (9f * width / 16f);
+                ImageLoader.showThumb(uri, activityViewHolder.logo, width, height);
+            } else {
+                ImageLoader.showThumb(activityViewHolder.logo, R.drawable.video_placeholder);
+            }
+            if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
+                activityViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
+            }
+            activityViewHolder.title.setText(content.getTitle());
+            if (content.getActivitiy() != null) {
+                if(content.getActivitiy().getJoin_count()>0){
+                    activityViewHolder.commentNum.setText(content.getActivitiy().getJoin_count() + "人参与");
+                }else {
+                    activityViewHolder.commentNum.setText("");
+                }
+
+            }
+            activityViewHolder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent it = new Intent(mContext, WebViewBackActivity.class);
+                    it.putExtra("url", content.getActivitiy().getUrl());
+                    it.putExtra("title",content.getTitle());
+                    if (content.getActivitiy().getType() == 2) {
+                        it.putExtra("activityId", content.getActivitiy().getId());
+                    }
+                    mContext.startActivity(it);
+                }
+            });
+
+
+        } else if (itemViewType == TYPE_LIVE) {
+            final LiveViewHolder liveViewHolder = (LiveViewHolder) holder;
+
+            if (content.getTop() != null) {
+                liveViewHolder.top.setVisibility(View.VISIBLE);
+            } else {
+                liveViewHolder.top.setVisibility(View.GONE);
+            }
+            if (!TextUtils.isEmpty(content.getCover())) {
+                Uri uri = Uri.parse(content.getCover());
+                int width = CommonUtils.getScreenWidth();
+                int height = (int) (9f * width / 16f);
+                ImageLoader.showThumb(uri, liveViewHolder.logo, width, height);
+            } else {
+                ImageLoader.showThumb(liveViewHolder.logo, R.drawable.video_placeholder);
+            }
+            Glide.with(mContext).load(R.drawable.wave).diskCacheStrategy(DiskCacheStrategy.ALL).into(liveViewHolder.statusIcon);
+            if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
+                liveViewHolder.organization.setText(content.getAuthor_info().getMerchant().getName());
+            }
+            liveViewHolder.title.setText(content.getTitle());
+            liveViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
+            if (content.getLive() != null) {
+                liveViewHolder.popularity.setText(content.getLive().getPopularity() + "人气");
+                if (content.getLive().getType() == 1) {
+                    liveViewHolder.type.setText("网络");
+                    liveViewHolder.typeIcon.setText(R.string.live_network);
+
+                } else if (content.getLive().getType() == 2) {
+                    liveViewHolder.type.setText("电台");
+                    liveViewHolder.typeIcon.setText(R.string.live_radio);
+                } else if (content.getLive().getType() == 3) {
+                    liveViewHolder.type.setText("电视");
+                    liveViewHolder.typeIcon.setText(R.string.live_tv);
+                } else if (content.getLive().getType() == 4) {
+                    liveViewHolder.type.setText("电商");
+                    liveViewHolder.typeIcon.setText(R.string.live_shop);
+                }
+
+            }
+
+            liveViewHolder.root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent it = new Intent(mContext, WebViewBackActivity.class);
+                    it.putExtra("url", content.getLive().getUrl());
+                    it.putExtra("title",content.getTitle());
                     mContext.startActivity(it);
                 }
             });
@@ -865,6 +1000,79 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
         }
     }
 
+    public class ActivityViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.excellentLogo)
+        SimpleDraweeView excellentLogo;
+        @BindView(R.id.excellent)
+        RelativeLayout excellent;
+        @BindView(R.id.title)
+        TextView title;
+        @BindView(R.id.logo)
+        SimpleDraweeView logo;
+        @BindView(R.id.count)
+        TextView count;
+        @BindView(R.id.top)
+        TextView top;
+        @BindView(R.id.activity)
+        TextView activity;
+        @BindView(R.id.merchant)
+        TextView merchant;
+        @BindView(R.id.publishTime)
+        TextView publishTime;
+        @BindView(R.id.commentNum)
+        TextView commentNum;
+        @BindView(R.id.root)
+        LinearLayout root;
+
+        public ActivityViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+
+        }
+    }
+
+    public class LiveViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.excellentLogo)
+        SimpleDraweeView excellentLogo;
+        @BindView(R.id.excellent)
+        RelativeLayout excellent;
+        @BindView(R.id.title)
+        TextView title;
+        @BindView(R.id.logo)
+        SimpleDraweeView logo;
+        @BindView(R.id.playIcon)
+        ImageView playIcon;
+        @BindView(R.id.statusIcon)
+        ImageView statusIcon;
+        @BindView(R.id.status)
+        TextView status;
+        @BindView(R.id.statusLayout)
+        LinearLayout statusLayout;
+        @BindView(R.id.popularity)
+        TextView popularity;
+        @BindView(R.id.typeIcon)
+        FontIconView typeIcon;
+        @BindView(R.id.type)
+        TextView type;
+        @BindView(R.id.organizationLogo)
+        SimpleDraweeView organizationLogo;
+        @BindView(R.id.top)
+        TextView top;
+        @BindView(R.id.organization)
+        TextView organization;
+        @BindView(R.id.commentNum)
+        TextView commentNum;
+        @BindView(R.id.publishTime)
+        TextView publishTime;
+        @BindView(R.id.root)
+        LinearLayout root;
+
+        public LiveViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+
+        }
+    }
 
     public class VideoViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.title)
@@ -1026,15 +1234,15 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
     @Override
     public int getItemCount() {
-        int count=0;
-        if(mHeaderView!=null){
+        int count = 0;
+        if (mHeaderView != null) {
             count++;
         }
-        if(mDecorateLayout!=null){
+        if (mDecorateLayout != null) {
             count++;
         }
-        if(mColumnContent!=null){
-            count+=mColumnContent.size();
+        if (mColumnContent != null) {
+            count += mColumnContent.size();
         }
         return count;
 
@@ -1045,10 +1253,10 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
         if (mHeaderView != null) {
             if (position == 0) {
                 return TYPE_HEAD;
-            } else if(mDecorateLayout!=null) {
-                if(position==1) {
+            } else if (mDecorateLayout != null) {
+                if (position == 1) {
                     return TYPE_DECORATE;
-                }else {
+                } else {
                     if (mColumnContent.get(position - 2).getType() == 1) {
                         return TYPE_AUDIO;
                     } else if (mColumnContent.get(position - 2).getType() == 2) {
@@ -1059,7 +1267,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                         } else if (mColumnContent.get(position - 2).getArticle().getType() == 2) {
                             return TYPE_ARTICLE_THREE;
                         } else {
-                            if (mColumnContent.get(position - 2).getArticle().getCovers().size() >2) {
+                            if (mColumnContent.get(position - 2).getArticle().getCovers().size() > 2) {
                                 return TYPE_ARTICLE_THREE;
                             } else {
                                 return TYPE_ARTICLE;
@@ -1069,7 +1277,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                         return TYPE_VIDEO;
                     } else if (mColumnContent.get(position - 2).getType() == 5) {
                         return TYPE_SPECIAL;
-                    } else {
+                    } else if (mColumnContent.get(position - 2).getType() == 7) {
                         if (mColumnContent.get(position - 2).getGallerie().getType() == 1) {
                             return TYPE_GALLERIE_ONE;
                         } else if (mColumnContent.get(position - 2).getGallerie().getType() == 2) {
@@ -1082,9 +1290,13 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                             }
                         }
 
+                    } else if (mColumnContent.get(position - 2).getType() == 9) {
+                        return TYPE_ACTIVITY;
+                    } else {
+                        return TYPE_LIVE;
                     }
                 }
-            }else {
+            } else {
                 if (mColumnContent.get(position - 1).getType() == 1) {
                     return TYPE_AUDIO;
                 } else if (mColumnContent.get(position - 1).getType() == 2) {
@@ -1095,7 +1307,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                     } else if (mColumnContent.get(position - 1).getArticle().getType() == 2) {
                         return TYPE_ARTICLE_THREE;
                     } else {
-                        if (mColumnContent.get(position - 1).getArticle().getCovers().size() >2) {
+                        if (mColumnContent.get(position - 1).getArticle().getCovers().size() > 2) {
                             return TYPE_ARTICLE_THREE;
                         } else {
                             return TYPE_ARTICLE;
@@ -1105,7 +1317,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                     return TYPE_VIDEO;
                 } else if (mColumnContent.get(position - 1).getType() == 5) {
                     return TYPE_SPECIAL;
-                } else {
+                } else if (mColumnContent.get(position - 1).getType() == 7) {
                     if (mColumnContent.get(position - 1).getGallerie().getType() == 1) {
                         return TYPE_GALLERIE_ONE;
                     } else if (mColumnContent.get(position - 1).getGallerie().getType() == 2) {
@@ -1118,27 +1330,31 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                         }
                     }
 
+                } else if (mColumnContent.get(position - 1).getType() == 9) {
+                    return TYPE_ACTIVITY;
+                } else {
+                    return TYPE_LIVE;
                 }
             }
         } else {
-            if(mDecorateLayout!=null){
-                if(position==0){
+            if (mDecorateLayout != null) {
+                if (position == 0) {
                     return TYPE_DECORATE;
-                }else {
-                    if (mColumnContent.get(position-1).getType() == 1) {
+                } else {
+                    if (mColumnContent.get(position - 1).getType() == 1) {
                         return TYPE_AUDIO;
-                    } else if (mColumnContent.get(position-1).getType() == 2) {
+                    } else if (mColumnContent.get(position - 1).getType() == 2) {
                         return TYPE_ALBUM;
-                    } else if (mColumnContent.get(position-1).getType() == 3) {
-                        if(mColumnContent.get(position-1).getTop()!=null){
+                    } else if (mColumnContent.get(position - 1).getType() == 3) {
+                        if (mColumnContent.get(position - 1).getTop() != null) {
                             return TYPE_ARTICLE;
-                        }else{
-                            if (mColumnContent.get(position-1).getArticle().getType() == 1) {
+                        } else {
+                            if (mColumnContent.get(position - 1).getArticle().getType() == 1) {
                                 return TYPE_ARTICLE;
-                            } else if (mColumnContent.get(position-1).getArticle().getType() == 2) {
+                            } else if (mColumnContent.get(position - 1).getArticle().getType() == 2) {
                                 return TYPE_ARTICLE_THREE;
                             } else {
-                                if (mColumnContent.get(position-1).getArticle().getCovers().size() >2) {
+                                if (mColumnContent.get(position - 1).getArticle().getCovers().size() > 2) {
                                     return TYPE_ARTICLE_THREE;
                                 } else {
                                     return TYPE_ARTICLE;
@@ -1146,41 +1362,45 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                             }
                         }
 
-                    } else if (mColumnContent.get(position-1).getType() == 4) {
+                    } else if (mColumnContent.get(position - 1).getType() == 4) {
                         return TYPE_VIDEO;
-                    } else if (mColumnContent.get(position-1).getType() == 5) {
+                    } else if (mColumnContent.get(position - 1).getType() == 5) {
                         return TYPE_SPECIAL;
-                    } else {
-                        if (mColumnContent.get(position-1).getGallerie().getType() == 1) {
+                    } else if (mColumnContent.get(position - 1).getType() == 7) {
+                        if (mColumnContent.get(position - 1).getGallerie().getType() == 1) {
                             return TYPE_GALLERIE_ONE;
-                        } else if (mColumnContent.get(position-1).getGallerie().getType() == 2) {
+                        } else if (mColumnContent.get(position - 1).getGallerie().getType() == 2) {
                             return TYPE_GALLERIE_THREE;
                         } else {
-                            if (mColumnContent.get(position-1).getGallerie().getCovers().size() < 3) {
+                            if (mColumnContent.get(position - 1).getGallerie().getCovers().size() < 3) {
                                 return TYPE_GALLERIE_ONE;
                             } else {
                                 return TYPE_GALLERIE_THREE;
                             }
                         }
 
+                    } else if (mColumnContent.get(position - 1).getType() == 9) {
+                        return TYPE_ACTIVITY;
+                    } else {
+                        return TYPE_LIVE;
                     }
                 }
 
-            }else{
+            } else {
                 if (mColumnContent.get(position).getType() == 1) {
                     return TYPE_AUDIO;
                 } else if (mColumnContent.get(position).getType() == 2) {
                     return TYPE_ALBUM;
                 } else if (mColumnContent.get(position).getType() == 3) {
-                    if(mColumnContent.get(position).getTop()!=null){
+                    if (mColumnContent.get(position).getTop() != null) {
                         return TYPE_ARTICLE;
-                    }else{
+                    } else {
                         if (mColumnContent.get(position).getArticle().getType() == 1) {
                             return TYPE_ARTICLE;
                         } else if (mColumnContent.get(position).getArticle().getType() == 2) {
                             return TYPE_ARTICLE_THREE;
                         } else {
-                            if (mColumnContent.get(position).getArticle().getCovers().size() >2) {
+                            if (mColumnContent.get(position).getArticle().getCovers().size() > 2) {
                                 return TYPE_ARTICLE_THREE;
                             } else {
                                 return TYPE_ARTICLE;
@@ -1192,7 +1412,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                     return TYPE_VIDEO;
                 } else if (mColumnContent.get(position).getType() == 5) {
                     return TYPE_SPECIAL;
-                } else {
+                } else if (mColumnContent.get(position).getType() == 7) {
                     if (mColumnContent.get(position).getGallerie().getType() == 1) {
                         return TYPE_GALLERIE_ONE;
                     } else if (mColumnContent.get(position).getGallerie().getType() == 2) {
@@ -1205,6 +1425,10 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                         }
                     }
 
+                } else if (mColumnContent.get(position).getType() == 9) {
+                    return TYPE_ACTIVITY;
+                } else {
+                    return TYPE_LIVE;
                 }
             }
 

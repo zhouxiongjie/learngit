@@ -1,0 +1,89 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+    <View
+        android:id="@+id/statusBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/white"/>
+    <com.shuangling.software.customview.TopTitleBar
+        android:id="@+id/activity_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/white"
+        fresco:canBack="false"
+        fresco:titleText="电台" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <ListView
+            android:id="@+id/categoryList"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/divideColorOne"
+            android:divider="@null"
+            android:scrollbars="none">
+
+        </ListView>
+
+        <com.scwang.smartrefresh.layout.SmartRefreshLayout
+            android:id="@+id/refreshLayout"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:clickable="true"
+            fresco:srlEnableLoadMore="false"
+            fresco:srlEnableRefresh="false">
+
+            <com.scwang.smartrefresh.layout.header.ClassicsHeader
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                fresco:srlAccentColor="@android:color/black"
+                fresco:srlClassicsSpinnerStyle="Translate"
+                fresco:srlDrawableProgress="@drawable/smart_refresh_progress_logo"
+                fresco:srlDrawableProgressSize="20dp"
+                fresco:srlPrimaryColor="@color/transparent" />
+
+
+            <ExpandableListView
+                android:id="@+id/contentList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:childDivider="@color/divideColorTwo"
+                android:divider="@null"
+                android:groupIndicator="@null"
+                android:overScrollMode="always"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:scrollbars="none">
+
+            </ExpandableListView>
+
+            <com.scwang.smartrefresh.layout.footer.ClassicsFooter
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                fresco:srlAccentColor="@android:color/black"
+                fresco:srlClassicsSpinnerStyle="Translate"
+                fresco:srlDrawableProgress="@drawable/smart_refresh_progress_logo"
+                fresco:srlDrawableProgressSize="20dp"
+                fresco:srlPrimaryColor="@color/transparent" />
+
+
+        </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>
+
+
+

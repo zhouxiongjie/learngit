@@ -9,43 +9,25 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Message;
 import android.os.StrictMode;
 import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
 import android.util.Log;
-
-//import com.alibaba.sdk.android.push.CloudPushService;
-//import com.alibaba.sdk.android.push.CommonCallback;
-//import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.sdk.android.oss.ClientConfiguration;
-import com.alibaba.sdk.android.oss.OSS;
-import com.alibaba.sdk.android.oss.OSSClient;
-import com.alibaba.sdk.android.oss.common.OSSLog;
-import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
-import com.facebook.cache.disk.DiskCacheConfig;
-import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.hjq.toast.IToastStyle;
 import com.hjq.toast.ToastUtils;
-import com.hjq.toast.style.ToastBlackStyle;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.mob.MobSDK;
 import com.shuangling.software.dao.DaoMaster;
 import com.shuangling.software.dao.DaoSession;
-import com.shuangling.software.entity.Album;
-import com.shuangling.software.entity.OssInfo;
 import com.shuangling.software.entity.Station;
 import com.shuangling.software.network.ElnImageDownloaderFetcher;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
-
 import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.MyToastStyle;
@@ -56,7 +38,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import okhttp3.Call;
 
 

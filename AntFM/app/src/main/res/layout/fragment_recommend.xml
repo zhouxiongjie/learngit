@@ -106,9 +106,9 @@
                     android:layout_alignStart="@+id/frameLayout"
                     android:layout_alignParentLeft="true"
                     android:visibility="visible"
-                    app:actualImageScaleType="fitXY"
-                    app:failureImageScaleType="fitXY"
-                    app:placeholderImageScaleType="fitXY"
+                    app:actualImageScaleType="fitStart"
+                    app:failureImageScaleType="fitStart"
+                    app:placeholderImageScaleType="fitStart"
                     app:roundingBorderColor="@color/white"
                     app:roundingBorderWidth="0dp" />
             </FrameLayout>

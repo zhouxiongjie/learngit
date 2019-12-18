@@ -18,6 +18,7 @@
         <item name="colorAccent">@color/themeBlue</item>
         <item name="android:navigationBarColor">@color/themeBlue</item>
         <item name="themeColor">@color/themeBlue</item>
+        <item name="android:windowAnimationStyle">@style/activityAnimation</item>
     </style>
     <!--主题紫-->
     <style name="AppThemePurple" parent="Theme.AppCompat.Light.NoActionBar">
@@ -26,6 +27,7 @@
         <item name="colorAccent">@color/themePurple</item>
         <item name="android:navigationBarColor">@color/themePurple</item>
         <item name="themeColor">@color/themePurple</item>
+        <item name="android:windowAnimationStyle">@style/activityAnimation</item>
     </style>
     <!--主题红-->
     <style name="AppThemeRed" parent="Theme.AppCompat.Light.NoActionBar">
@@ -35,6 +37,7 @@
         <item name="colorAccent">@color/themeRed</item>
         <item name="android:navigationBarColor">@color/themeRed</item>
         <item name="themeColor">@color/themeRed</item>
+        <item name="android:windowAnimationStyle">@style/activityAnimation</item>
     </style>
     <!--主题绿-->
     <style name="AppThemeGreen" parent="Theme.AppCompat.Light.NoActionBar">
@@ -44,6 +47,7 @@
         <item name="colorAccent">@color/themeGreen</item>
         <item name="android:navigationBarColor">@color/themeGreen</item>
         <item name="themeColor">@color/themeGreen</item>
+        <item name="android:windowAnimationStyle">@style/activityAnimation</item>
     </style>
     <!--主题橙-->
     <style name="AppThemeOrange" parent="Theme.AppCompat.Light.NoActionBar">
@@ -53,6 +57,7 @@
         <item name="colorAccent">@color/themeOrange</item>
         <item name="android:navigationBarColor">@color/themeOrange</item>
         <item name="themeColor">@color/themeOrange</item>
+        <item name="android:windowAnimationStyle">@style/activityAnimation</item>
     </style>
 
 
@@ -84,6 +89,12 @@
         <item name="android:maxHeight">4dp</item>
     </style>
 
+    <style name="activityAnimation" parent="@android:style/Animation">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_right_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_left_out</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_left_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_right_out</item>
+    </style>
 
 
 </resources>

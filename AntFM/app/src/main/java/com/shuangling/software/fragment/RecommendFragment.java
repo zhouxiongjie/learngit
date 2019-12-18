@@ -24,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
@@ -68,6 +69,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -687,6 +689,27 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                             }
 
                             if (useLocal == 1) {
+                                String customColumn=SharedPreferencesUtils.getStringValue("custom_column","");
+                                List<Column> customColumns= JSONObject.parseArray(customColumn, Column.class);
+
+                                List<Column> tempColumns=new ArrayList<>();
+                                List<Integer> columnIds=new ArrayList<>();
+                                for(int i=0;i<customColumns.size();i++){
+                                    columnIds.add(customColumns.get(i).getId());
+                                }
+                                Iterator<Column> iterator = mRemoteColumns.iterator();
+                                while (iterator.hasNext()) {
+                                    Column column = iterator.next();
+                                    if (columnIds.contains(column.getId())) {
+                                        tempColumns.add(column);
+
+                                    }
+                                }
+
+                                String custom_column=JSON.toJSONString(tempColumns);
+                                if(!custom_column.equals(customColumn)) {
+                                    SharedPreferencesUtils.putPreferenceTypeValue("custom_column", SharedPreferencesUtils.PreferenceType.String, custom_column);
+                                }
                                 return true;
                             }
                             mColumns = mRemoteColumns;

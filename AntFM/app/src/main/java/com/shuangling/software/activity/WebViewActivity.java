@@ -34,6 +34,7 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
@@ -44,6 +45,10 @@ import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.engine.impl.GlideEngine;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.io.IOException;
@@ -89,6 +94,7 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
 
     private Handler mHandler;
     private String mUrl;
+    private int mActivityId;
 
 
     @Override
@@ -104,22 +110,11 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
 
 
     private void init() {
+        EventBus.getDefault().register(this);
         mUrl = getIntent().getStringExtra("url");
-        if (User.getInstance() == null) {
-            if (MainActivity.sCurrentCity != null) {
-                mUrl = mUrl + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
-            } else {
-                mUrl = mUrl + "?app=android";
-            }
-
-        } else {
-            if (MainActivity.sCurrentCity != null) {
-                mUrl = mUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
-            } else {
-                mUrl = mUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-            }
-
-        }
+        mActivityId= getIntent().getIntExtra("activityId",-1);
+        String url=mUrl;
+        url=initUrl(url);
 
         mHandler = new Handler(this);
         WebSettings s = webView.getSettings();
@@ -311,9 +306,60 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
             }
         });
         webView.addJavascriptInterface(new JsToAndroid(), "clientJS");
-        webView.loadUrl(mUrl);
+        webView.loadUrl(url);
 
 
+    }
+
+
+
+    private String initUrl(String url){
+        if (User.getInstance() == null) {
+            if (MainActivity.sCurrentCity != null) {
+                if(url.contains("?")){
+                    url = url + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                }else{
+                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
+                }
+            } else {
+                if(url.contains("?")){
+                    url = url + "&app=android";
+                }else{
+                    url = url + "?app=android";
+                }
+            }
+
+
+        } else {
+            if (MainActivity.sCurrentCity != null) {
+                if(url.contains("?")){
+                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                }else{
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                }
+            } else {
+                if(url.contains("?")){
+                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }else{
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }
+            }
+        }
+        if(mActivityId!=-1){
+            url=url+"&qaa_act_id="+mActivityId;
+        }
+
+        return url;
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if (event.getEventName().equals("OnLoginSuccess")||event.getEventName().equals("OnQuitLogin")) {
+            String url=mUrl;
+            url=initUrl(mUrl);
+            webView.loadUrl(url);
+        }
     }
 
     @Override
@@ -464,16 +510,7 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == LOGIN_RESULT && resultCode == Activity.RESULT_OK) {
-            String url = webView.getUrl();
-            if (User.getInstance() == null) {
-                url = url + "?app=android";
-            } else {
-                url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-            }
-            webView.loadUrl(url);
-
-        }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (requestCode == REQUEST_SELECT_FILE&&resultCode == RESULT_OK && data != null) {
                 if (uploadMessage == null)
                     return;
@@ -627,5 +664,15 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
             }
         });
 
+    }
+
+
+
+
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 }

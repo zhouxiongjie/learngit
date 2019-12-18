@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:padding="10dp"
+    android:orientation="vertical">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/logo"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_gravity="center_horizontal"
+        app:actualImageScaleType="centerCrop"
+        app:placeholderImage="@drawable/special_placeholder"
+        app:placeholderImageScaleType="centerCrop"
+        app:failureImage="@drawable/special_placeholder"
+        app:failureImageScaleType="centerCrop"
+        app:viewAspectRatio="1"
+        app:roundingBorderWidth="0dp"
+        app:roundingBorderColor="@color/white" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:text="政务大厅"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        android:textSize="@dimen/font_size_26px" />
+
+
+</LinearLayout>
+    
+
+

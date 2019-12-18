@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -37,7 +38,8 @@
             android:layout_height="wrap_content"
             android:padding="20dp"
             android:textSize="@dimen/font_size_32px"
-            android:textColor="#C7C7CC"
+            android:textColor="@color/black"
+            android:textColorHint="#C7C7CC"
             android:layout_gravity="center_vertical"
             android:background="@null"
             android:hint="请输入手机号"
@@ -66,7 +68,8 @@
             android:background="@null"
             android:hint="请输入验证码"
             android:inputType="number"
-            android:textColor="#C7C7CC"
+            android:textColor="@color/black"
+            android:textColorHint="#C7C7CC"
             android:textSize="@dimen/font_size_32px" />
 
 

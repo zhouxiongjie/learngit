@@ -53,13 +53,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        android:background="#F6F8FA">
 
         <LinearLayout
             android:id="@+id/servicesLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#F6F8FA"
             android:orientation="horizontal" />
 
     </HorizontalScrollView>

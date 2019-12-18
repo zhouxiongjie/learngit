@@ -6,9 +6,11 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
@@ -18,6 +20,7 @@ import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.shuangling.software.R;
+import com.shuangling.software.entity.Comment;
 import com.shuangling.software.utils.CommonUtils;
 
 public class ReadMoreTextViewWithIcon extends TextView {
@@ -44,6 +47,16 @@ public class ReadMoreTextViewWithIcon extends TextView {
     private int lineEndIndex;
     private int trimLines;
 
+    public void setOnCollapseOrExpande(OnCollapseOrExpande onCollapseOrExpande) {
+        this.onCollapseOrExpande = onCollapseOrExpande;
+    }
+
+    private OnCollapseOrExpande onCollapseOrExpande;
+
+    public interface OnCollapseOrExpande {
+        void textCollapseOrExpanded(boolean collapse);
+    }
+
     public ReadMoreTextViewWithIcon(Context context) {
         this(context, null);
     }
@@ -69,6 +82,8 @@ public class ReadMoreTextViewWithIcon extends TextView {
         onGlobalLayoutLineEndIndex();
         setText();
     }
+
+
 
     private void setText() {
         super.setText(getDisplayableText(), bufferType);
@@ -115,7 +130,8 @@ public class ReadMoreTextViewWithIcon extends TextView {
         int trimEndIndex = text.length();
         switch (trimMode) {
             case TRIM_MODE_LINES:
-                trimEndIndex = lineEndIndex - (ELLIPSIZE.length() + trimCollapsedText.length() + 1);
+                //trimEndIndex = lineEndIndex - (ELLIPSIZE.length() + trimCollapsedText.length() + 1);
+                trimEndIndex = lineEndIndex - (ELLIPSIZE.length()  + 1);
                 if (trimEndIndex < 0) {
                     trimEndIndex = trimLength + 1;
                 }
@@ -181,6 +197,9 @@ public class ReadMoreTextViewWithIcon extends TextView {
         public void onClick(View widget) {
             readMore = !readMore;
             setText();
+            if(onCollapseOrExpande!=null){
+                onCollapseOrExpande.textCollapseOrExpanded(readMore);
+            }
         }
 
         @Override
@@ -205,18 +224,37 @@ public class ReadMoreTextViewWithIcon extends TextView {
 
     private void onGlobalLayoutLineEndIndex() {
         if (trimMode == TRIM_MODE_LINES) {
+
+//            addTextChangedListener(new TextWatcher() {
+//                @Override
+//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//                }
+//
+//                @Override
+//                public void onTextChanged(CharSequence s, int start, int before, int count) {
+//
+//                }
+//
+//                @Override
+//                public void afterTextChanged(Editable s) {
+//                    refreshLineEndIndex();
+//                    setText();
+//                }
+//            });
+
             getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
                     ViewTreeObserver obs = getViewTreeObserver();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        obs.removeOnGlobalLayoutListener(this);
-                    } else {
-                        obs.removeGlobalOnLayoutListener(this);
-                    }
                     refreshLineEndIndex();
+                    if(lineEndIndex!=0&&lineEndIndex!=INVALID_END_INDEX){
+                        obs.removeOnGlobalLayoutListener(this);
+                    }
                     setText();
                 }
+
+
             });
         }
     }

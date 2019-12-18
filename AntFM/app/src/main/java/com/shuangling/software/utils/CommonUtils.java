@@ -875,6 +875,9 @@ public class CommonUtils {
         if ((seconds / 60) % 60 < 10) {
             timecodeMinutes = "0" + timecodeMinutes;
         }
+        if (seconds / 3600 < 10) {
+            timecodeHours = "0" + timecodeHours;
+        }
         if (seconds / 3600 < 1) {
             return timecodeMinutes + ":" + timecodeSeconds;
         } else {

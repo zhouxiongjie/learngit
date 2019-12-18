@@ -48,11 +48,14 @@ import com.shuangling.software.dialog.UpdateDialog;
 import com.shuangling.software.entity.BottomMenu;
 import com.shuangling.software.entity.City;
 import com.shuangling.software.entity.Column;
+import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.UpdateInfo;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.fragment.DiscoverFragment;
 import com.shuangling.software.fragment.PersonalCenterFragment;
+import com.shuangling.software.fragment.RadioListFragment;
 import com.shuangling.software.fragment.RecommendFragment;
+import com.shuangling.software.fragment.ServiceFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
@@ -68,6 +71,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -117,7 +121,8 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     LinearLayout menuContainer;
 
 
-    private Fragment indexFragment;
+    private Fragment serverFragment;
+    private Fragment radioListFragment;
     private Fragment recommendFragment;
     private Fragment discoverFragment;
     private Fragment personalCenterFragment;
@@ -582,9 +587,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
     public void getUpdateInfo() {
 
-        String url = ServerInfo.serviceIP + ServerInfo.updateInfo;
+        String url = ServerInfo.serviceIP + ServerInfo.updateInfoV2;
         Map<String, String> params = new HashMap<>();
-        params.put("version", "v" + getVersionName());
+        params.put("version", getVersionName());
         params.put("type", "android");
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
 
@@ -694,369 +699,502 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         List<BottomMenu> menus = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), BottomMenu.class);
+
+                        Iterator<BottomMenu> iterator = menus.iterator();
+                        while (iterator.hasNext()) {
+                            BottomMenu bottomMenu = iterator.next();
+                            if (bottomMenu.getDisplay()==0) {
+                                iterator.remove();
+                            }
+                        }
                         if(menus!=null&&menus.size()>0){
                            mMenus.clear();
-                        }
-                        for (int i = 0; menus != null && i < menus.size(); i++) {
-                            final BottomMenu bottomMenu = menus.get(i);
-                            LayoutInflater inflater = LayoutInflater.from(this);
-                            View root = inflater.inflate(R.layout.bottom_menu, menuContainer, false);
-                            final FontIconView iconView = root.findViewById(R.id.icon);
-                            final TextView name = root.findViewById(R.id.name);
-                            name.setText(bottomMenu.getName());
-                            final BottomMenuHolder bottomMenuHolder=new BottomMenuHolder(root);
-                            mMenus.add(bottomMenuHolder);
-                            if (bottomMenu.getType() == 1) {
-                                //首页
-                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_index));
-                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        //
-                                        bottomMenuHolder.name.setSelected(true);
-                                        bottomMenuHolder.icon.setSelected(true);
-                                        for(int i=0;i<mMenus.size();i++){
-                                            BottomMenuHolder holder=mMenus.get(i);
-                                            if(holder!=bottomMenuHolder){
-                                                holder.name.setSelected(false);
-                                                holder.icon.setSelected(false);
+
+
+                            for (int i = 0; menus != null && i < menus.size(); i++) {
+                                final BottomMenu bottomMenu = menus.get(i);
+                                LayoutInflater inflater = LayoutInflater.from(this);
+                                View root = inflater.inflate(R.layout.bottom_menu, menuContainer, false);
+                                final FontIconView iconView = root.findViewById(R.id.icon);
+                                final TextView name = root.findViewById(R.id.name);
+                                name.setText(bottomMenu.getName());
+                                final BottomMenuHolder bottomMenuHolder=new BottomMenuHolder(root);
+                                mMenus.add(bottomMenuHolder);
+                                if (bottomMenu.getType() == 1) {
+                                    //首页
+                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_index));
+                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            //
+                                            bottomMenuHolder.name.setSelected(true);
+                                            bottomMenuHolder.icon.setSelected(true);
+                                            for(int i=0;i<mMenus.size();i++){
+                                                BottomMenuHolder holder=mMenus.get(i);
+                                                if(holder!=bottomMenuHolder){
+                                                    holder.name.setSelected(false);
+                                                    holder.icon.setSelected(false);
+                                                }
                                             }
-                                        }
 
-                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                        if (recommendFragment == null) {
-                                            recommendFragment = new RecommendFragment();
-                                            transaction.add(R.id.content, recommendFragment);
-                                        } else {
-                                            transaction.show(recommendFragment);
-                                        }
-                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
-                                            transaction.hide(personalCenterFragment);
-                                        }
-                                        if(discoverFragment!=null&&!discoverFragment.isHidden()){
-                                            transaction.hide(discoverFragment);
-                                        }
-
-                                        transaction.commit();
-                                    }
-                                });
-                            } else if (bottomMenu.getType() == 2) {
-                                //个人中心
-                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_personal_center));
-                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        //
-                                        bottomMenuHolder.name.setSelected(true);
-                                        bottomMenuHolder.icon.setSelected(true);
-                                        for(int i=0;i<mMenus.size();i++){
-                                            BottomMenuHolder holder=mMenus.get(i);
-                                            if(holder!=bottomMenuHolder){
-                                                holder.name.setSelected(false);
-                                                holder.icon.setSelected(false);
+                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                            if (recommendFragment == null) {
+                                                recommendFragment = new RecommendFragment();
+                                                transaction.add(R.id.content, recommendFragment);
+                                            } else {
+                                                transaction.show(recommendFragment);
                                             }
-                                        }
-
-                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                        if (personalCenterFragment == null) {
-                                            personalCenterFragment = new PersonalCenterFragment();
-                                            transaction.add(R.id.content, personalCenterFragment);
-                                        } else {
-                                            transaction.show(personalCenterFragment);
-                                        }
-                                        if(recommendFragment!=null&&!recommendFragment.isHidden()){
-                                            transaction.hide(recommendFragment);
-                                        }
-                                        if(discoverFragment!=null&&!discoverFragment.isHidden()){
-                                            transaction.hide(discoverFragment);
-                                        }
-                                        transaction.commit();
-                                    }
-                                });
-                            } else if (bottomMenu.getType() == 3) {
-                                //媒体矩阵
-                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_media_matrix));
-                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                        bottomMenuHolder.name.setSelected(true);
-                                        bottomMenuHolder.icon.setSelected(true);
-                                        for(int i=0;i<mMenus.size();i++){
-                                            BottomMenuHolder holder=mMenus.get(i);
-                                            if(holder!=bottomMenuHolder){
-                                                holder.name.setSelected(false);
-                                                holder.icon.setSelected(false);
+                                            if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                                transaction.hide(personalCenterFragment);
                                             }
-                                        }
-
-                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                        if (discoverFragment == null) {
-                                            discoverFragment = new DiscoverFragment();
-                                            Bundle bundle = new Bundle();
-                                            bundle.putString("url", ServerInfo.h5HttpsIP + "/gover");
-                                            bundle.putString("title",bottomMenu.getName());
-                                            discoverFragment.setArguments(bundle);
-                                            transaction.add(R.id.content, discoverFragment);
-                                        } else {
-
-                                            ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/gover",bottomMenu.getName());
-                                            transaction.show(discoverFragment);
-                                        }
-                                        if(recommendFragment!=null&&!recommendFragment.isHidden()){
-                                            transaction.hide(recommendFragment);
-                                        }
-                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
-                                            transaction.hide(personalCenterFragment);
-                                        }
-                                        transaction.commit();
-
-
-                                        //跳到媒体矩阵
-                                    }
-                                });
-                            } else if (bottomMenu.getType() == 4) {
-                                //建言咨政
-                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_suggest_consult));
-                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        //跳到建言咨政
-                                        bottomMenuHolder.name.setSelected(true);
-                                        bottomMenuHolder.icon.setSelected(true);
-                                        for(int i=0;i<mMenus.size();i++){
-                                            BottomMenuHolder holder=mMenus.get(i);
-                                            if(holder!=bottomMenuHolder){
-                                                holder.name.setSelected(false);
-                                                holder.icon.setSelected(false);
+                                            if(serverFragment!=null&&!serverFragment.isHidden()){
+                                                transaction.hide(serverFragment);
                                             }
-                                        }
-
-                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                        if (discoverFragment == null) {
-                                            discoverFragment = new DiscoverFragment();
-                                            Bundle bundle = new Bundle();
-                                            bundle.putString("url", ServerInfo.h5HttpsIP + "/interact");
-                                            bundle.putString("title",bottomMenu.getName());
-                                            discoverFragment.setArguments(bundle);
-                                            transaction.add(R.id.content, discoverFragment);
-                                        } else {
-
-                                            ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/interact",bottomMenu.getName());
-                                            transaction.show(discoverFragment);
-                                        }
-                                        if(recommendFragment!=null&&!recommendFragment.isHidden()){
-                                            transaction.hide(recommendFragment);
-                                        }
-                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
-                                            transaction.hide(personalCenterFragment);
-                                        }
-                                        transaction.commit();
-                                    }
-                                });
-                            } else if (bottomMenu.getType() == 5) {
-                                //办事指南
-                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_affairs_guide));
-                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        bottomMenuHolder.name.setSelected(true);
-                                        bottomMenuHolder.icon.setSelected(true);
-                                        for(int i=0;i<mMenus.size();i++){
-                                            BottomMenuHolder holder=mMenus.get(i);
-                                            if(holder!=bottomMenuHolder){
-                                                holder.name.setSelected(false);
-                                                holder.icon.setSelected(false);
+                                            if(discoverFragment!=null&&!discoverFragment.isHidden()){
+                                                transaction.hide(discoverFragment);
                                             }
-                                        }
-
-                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                        if (discoverFragment == null) {
-                                            discoverFragment = new DiscoverFragment();
-                                            Bundle bundle = new Bundle();
-                                            bundle.putString("url", ServerInfo.h5HttpsIP + "/guide");
-                                            bundle.putString("title",bottomMenu.getName());
-                                            discoverFragment.setArguments(bundle);
-                                            transaction.add(R.id.content, discoverFragment);
-                                        } else {
-
-                                            ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/guide",bottomMenu.getName());
-                                            transaction.show(discoverFragment);
-                                        }
-                                        if(recommendFragment!=null&&!recommendFragment.isHidden()){
-                                            transaction.hide(recommendFragment);
-                                        }
-                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
-                                            transaction.hide(personalCenterFragment);
-                                        }
-                                        transaction.commit();
-                                    }
-                                });
-                            } else if (bottomMenu.getType() == 6) {
-                                //便民服务
-                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_facilitate_people));
-                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        bottomMenuHolder.name.setSelected(true);
-                                        bottomMenuHolder.icon.setSelected(true);
-                                        for(int i=0;i<mMenus.size();i++){
-                                            BottomMenuHolder holder=mMenus.get(i);
-                                            if(holder!=bottomMenuHolder){
-                                                holder.name.setSelected(false);
-                                                holder.icon.setSelected(false);
+                                            if(radioListFragment!=null&&!radioListFragment.isHidden()){
+                                                transaction.hide(radioListFragment);
                                             }
-                                        }
 
-                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                        if (discoverFragment == null) {
-                                            discoverFragment = new DiscoverFragment();
-                                            Bundle bundle = new Bundle();
-                                            bundle.putString("url", ServerInfo.h5HttpsIP + "/services");
-                                            bundle.putString("title",bottomMenu.getName());
-                                            discoverFragment.setArguments(bundle);
-                                            transaction.add(R.id.content, discoverFragment);
-                                        } else {
-
-                                            ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/services",bottomMenu.getName());
-                                            transaction.show(discoverFragment);
+                                            transaction.commit();
                                         }
-                                        if(recommendFragment!=null&&!recommendFragment.isHidden()){
-                                            transaction.hide(recommendFragment);
-                                        }
-                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
-                                            transaction.hide(personalCenterFragment);
-                                        }
-                                        transaction.commit();
-                                    }
-                                });
-                            } else if (bottomMenu.getType() == 7) {
-                                //活动中心
-                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_activity_center));
-                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        bottomMenuHolder.name.setSelected(true);
-                                        bottomMenuHolder.icon.setSelected(true);
-                                        for(int i=0;i<mMenus.size();i++){
-                                            BottomMenuHolder holder=mMenus.get(i);
-                                            if(holder!=bottomMenuHolder){
-                                                holder.name.setSelected(false);
-                                                holder.icon.setSelected(false);
+                                    });
+                                } else if (bottomMenu.getType() == 2) {
+                                    //个人中心
+                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_personal_center));
+                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            //
+                                            bottomMenuHolder.name.setSelected(true);
+                                            bottomMenuHolder.icon.setSelected(true);
+                                            for(int i=0;i<mMenus.size();i++){
+                                                BottomMenuHolder holder=mMenus.get(i);
+                                                if(holder!=bottomMenuHolder){
+                                                    holder.name.setSelected(false);
+                                                    holder.icon.setSelected(false);
+                                                }
                                             }
-                                        }
 
-                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                        if (discoverFragment == null) {
-                                            discoverFragment = new DiscoverFragment();
-                                            Bundle bundle = new Bundle();
-                                            bundle.putString("url", ServerInfo.activity + "activity");
-                                            bundle.putString("title",bottomMenu.getName());
-                                            discoverFragment.setArguments(bundle);
-                                            transaction.add(R.id.content, discoverFragment);
-                                        } else {
-
-                                            ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.activity + "activity",bottomMenu.getName());
-                                            transaction.show(discoverFragment);
-                                        }
-                                        if(recommendFragment!=null&&!recommendFragment.isHidden()){
-                                            transaction.hide(recommendFragment);
-                                        }
-                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
-                                            transaction.hide(personalCenterFragment);
-                                        }
-                                        transaction.commit();
-                                    }
-                                });
-                            } else if (bottomMenu.getType() == 8) {
-                                //电视
-                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_tv));
-                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Intent it=new Intent(MainActivity.this,RadioListActivity.class);
-                                        it.putExtra("type","2");
-                                        startActivity(it);
-                                    }
-                                });
-                            } else if (bottomMenu.getType() == 9) {
-                                //电台
-                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_radio));
-                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        Intent it=new Intent(MainActivity.this,RadioListActivity.class);
-                                        it.putExtra("type","1");
-                                        startActivity(it);
-                                    }
-                                });
-                            } else if (bottomMenu.getType() == 10) {
-                                //资讯分类
-
-
-
-                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_news));
-                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-
-                                        bottomMenuHolder.name.setSelected(true);
-                                        bottomMenuHolder.icon.setSelected(true);
-                                        for(int i=0;i<mMenus.size();i++){
-                                            BottomMenuHolder holder=mMenus.get(i);
-                                            if(holder!=bottomMenuHolder){
-                                                holder.name.setSelected(false);
-                                                holder.icon.setSelected(false);
+                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                            if (personalCenterFragment == null) {
+                                                personalCenterFragment = new PersonalCenterFragment();
+                                                transaction.add(R.id.content, personalCenterFragment);
+                                            } else {
+                                                transaction.show(personalCenterFragment);
                                             }
-                                        }
-
-
-                                        bottomMenuHolder.name.setSelected(true);
-                                        bottomMenuHolder.icon.setSelected(true);
-                                        for(int i=0;i<mMenus.size();i++){
-                                            BottomMenuHolder holder=mMenus.get(i);
-                                            if(holder!=bottomMenuHolder){
-                                                holder.name.setSelected(false);
-                                                holder.icon.setSelected(false);
+                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                                transaction.hide(recommendFragment);
                                             }
+                                            if(serverFragment!=null&&!serverFragment.isHidden()){
+                                                transaction.hide(serverFragment);
+                                            }
+                                            if(discoverFragment!=null&&!discoverFragment.isHidden()){
+                                                transaction.hide(discoverFragment);
+                                            }
+                                            if(radioListFragment!=null&&!radioListFragment.isHidden()){
+                                                transaction.hide(radioListFragment);
+                                            }
+                                            transaction.commit();
                                         }
+                                    });
+                                } else if (bottomMenu.getType() == 3) {
+                                    //媒体矩阵
+                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_media_matrix));
+                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
 
-                                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                        if (recommendFragment == null) {
-                                            recommendFragment = new RecommendFragment();
-                                            transaction.add(R.id.content, recommendFragment);
-                                        } else {
-                                            transaction.show(recommendFragment);
+                                            bottomMenuHolder.name.setSelected(true);
+                                            bottomMenuHolder.icon.setSelected(true);
+                                            for(int i=0;i<mMenus.size();i++){
+                                                BottomMenuHolder holder=mMenus.get(i);
+                                                if(holder!=bottomMenuHolder){
+                                                    holder.name.setSelected(false);
+                                                    holder.icon.setSelected(false);
+                                                }
+                                            }
+
+                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                            if (discoverFragment == null) {
+                                                discoverFragment = new DiscoverFragment();
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString("url", ServerInfo.h5HttpsIP + "/gover");
+                                                bundle.putString("title",bottomMenu.getName());
+                                                discoverFragment.setArguments(bundle);
+                                                transaction.add(R.id.content, discoverFragment);
+                                            } else {
+
+                                                ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/gover",bottomMenu.getName());
+                                                transaction.show(discoverFragment);
+                                            }
+                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                                transaction.hide(recommendFragment);
+                                            }
+                                            if(serverFragment!=null&&!serverFragment.isHidden()){
+                                                transaction.hide(serverFragment);
+                                            }
+                                            if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                                transaction.hide(personalCenterFragment);
+                                            }
+                                            if(radioListFragment!=null&&!radioListFragment.isHidden()){
+                                                transaction.hide(radioListFragment);
+                                            }
+                                            transaction.commit();
+
+
+                                            //跳到媒体矩阵
                                         }
-                                        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
-                                            transaction.hide(personalCenterFragment);
+                                    });
+                                } else if (bottomMenu.getType() == 4) {
+                                    //建言咨政
+                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_suggest_consult));
+                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            //跳到建言咨政
+                                            bottomMenuHolder.name.setSelected(true);
+                                            bottomMenuHolder.icon.setSelected(true);
+                                            for(int i=0;i<mMenus.size();i++){
+                                                BottomMenuHolder holder=mMenus.get(i);
+                                                if(holder!=bottomMenuHolder){
+                                                    holder.name.setSelected(false);
+                                                    holder.icon.setSelected(false);
+                                                }
+                                            }
+
+                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                            if (discoverFragment == null) {
+                                                discoverFragment = new DiscoverFragment();
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString("url", ServerInfo.h5HttpsIP + "/interact");
+                                                bundle.putString("title",bottomMenu.getName());
+                                                discoverFragment.setArguments(bundle);
+                                                transaction.add(R.id.content, discoverFragment);
+                                            } else {
+
+                                                ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/interact",bottomMenu.getName());
+                                                transaction.show(discoverFragment);
+                                            }
+                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                                transaction.hide(recommendFragment);
+                                            }
+                                            if(serverFragment!=null&&!serverFragment.isHidden()){
+                                                transaction.hide(serverFragment);
+                                            }
+                                            if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                                transaction.hide(personalCenterFragment);
+                                            }
+                                            if(radioListFragment!=null&&!radioListFragment.isHidden()){
+                                                transaction.hide(radioListFragment);
+                                            }
+                                            transaction.commit();
                                         }
-                                        if(discoverFragment!=null&&!discoverFragment.isHidden()){
-                                            transaction.hide(discoverFragment);
+                                    });
+                                } else if (bottomMenu.getType() == 5) {
+                                    //办事指南
+                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_affairs_guide));
+                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            bottomMenuHolder.name.setSelected(true);
+                                            bottomMenuHolder.icon.setSelected(true);
+                                            for(int i=0;i<mMenus.size();i++){
+                                                BottomMenuHolder holder=mMenus.get(i);
+                                                if(holder!=bottomMenuHolder){
+                                                    holder.name.setSelected(false);
+                                                    holder.icon.setSelected(false);
+                                                }
+                                            }
+
+                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                            if (discoverFragment == null) {
+                                                discoverFragment = new DiscoverFragment();
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString("url", ServerInfo.h5HttpsIP + "/guide");
+                                                bundle.putString("title",bottomMenu.getName());
+                                                discoverFragment.setArguments(bundle);
+                                                transaction.add(R.id.content, discoverFragment);
+                                            } else {
+
+                                                ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/guide",bottomMenu.getName());
+                                                transaction.show(discoverFragment);
+                                            }
+                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                                transaction.hide(recommendFragment);
+                                            }
+                                            if(serverFragment!=null&&!serverFragment.isHidden()){
+                                                transaction.hide(serverFragment);
+                                            }
+                                            if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                                transaction.hide(personalCenterFragment);
+                                            }
+                                            if(radioListFragment!=null&&!radioListFragment.isHidden()){
+                                                transaction.hide(radioListFragment);
+                                            }
+                                            transaction.commit();
                                         }
+                                    });
+                                } else if (bottomMenu.getType() == 6) {
+                                    //便民服务
+                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_facilitate_people));
+                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            bottomMenuHolder.name.setSelected(true);
+                                            bottomMenuHolder.icon.setSelected(true);
+                                            for(int i=0;i<mMenus.size();i++){
+                                                BottomMenuHolder holder=mMenus.get(i);
+                                                if(holder!=bottomMenuHolder){
+                                                    holder.name.setSelected(false);
+                                                    holder.icon.setSelected(false);
+                                                }
+                                            }
 
-                                        transaction.commit();
+                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                            if (serverFragment == null) {
+                                                serverFragment = new ServiceFragment();
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString("title",bottomMenu.getName());
+                                                serverFragment.setArguments(bundle);
+                                                transaction.add(R.id.content, serverFragment);
+                                            } else {
+                                                transaction.show(serverFragment);
+                                            }
+                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                                transaction.hide(recommendFragment);
+                                            }
+                                            if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                                transaction.hide(personalCenterFragment);
+                                            }
+                                            if(discoverFragment!=null&&!discoverFragment.isHidden()){
+                                                transaction.hide(discoverFragment);
+                                            }
+                                            if(radioListFragment!=null&&!radioListFragment.isHidden()){
+                                                transaction.hide(radioListFragment);
+                                            }
+                                            transaction.commit();
+                                        }
+                                    });
+                                } else if (bottomMenu.getType() == 7) {
+                                    //活动中心
+                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_activity_center));
+                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            bottomMenuHolder.name.setSelected(true);
+                                            bottomMenuHolder.icon.setSelected(true);
+                                            for(int i=0;i<mMenus.size();i++){
+                                                BottomMenuHolder holder=mMenus.get(i);
+                                                if(holder!=bottomMenuHolder){
+                                                    holder.name.setSelected(false);
+                                                    holder.icon.setSelected(false);
+                                                }
+                                            }
+
+                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                            if (discoverFragment == null) {
+                                                discoverFragment = new DiscoverFragment();
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString("url", ServerInfo.activity + "activity");
+                                                bundle.putString("title",bottomMenu.getName());
+                                                discoverFragment.setArguments(bundle);
+                                                transaction.add(R.id.content, discoverFragment);
+                                            } else {
+
+                                                ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.activity + "activity",bottomMenu.getName());
+                                                transaction.show(discoverFragment);
+                                            }
+                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                                transaction.hide(recommendFragment);
+                                            }
+                                            if(serverFragment!=null&&!serverFragment.isHidden()){
+                                                transaction.hide(serverFragment);
+                                            }
+                                            if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                                transaction.hide(personalCenterFragment);
+                                            }
+                                            if(radioListFragment!=null&&!radioListFragment.isHidden()){
+                                                transaction.hide(radioListFragment);
+                                            }
+                                            transaction.commit();
+                                        }
+                                    });
+                                } else if (bottomMenu.getType() == 8) {
+                                    //电视
+                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_tv));
+                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            bottomMenuHolder.name.setSelected(true);
+                                            bottomMenuHolder.icon.setSelected(true);
+                                            for(int i=0;i<mMenus.size();i++){
+                                                BottomMenuHolder holder=mMenus.get(i);
+                                                if(holder!=bottomMenuHolder){
+                                                    holder.name.setSelected(false);
+                                                    holder.icon.setSelected(false);
+                                                }
+                                            }
+
+                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                            if (radioListFragment == null) {
+                                                radioListFragment = new RadioListFragment();
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString("type","2");
+                                                radioListFragment.setArguments(bundle);
+                                                transaction.add(R.id.content, radioListFragment);
+                                            } else {
+                                                ((RadioListFragment)radioListFragment).setType("2");
+                                                transaction.show(radioListFragment);
+                                            }
+                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                                transaction.hide(recommendFragment);
+                                            }
+                                            if(serverFragment!=null&&!serverFragment.isHidden()){
+                                                transaction.hide(serverFragment);
+                                            }
+                                            if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                                transaction.hide(personalCenterFragment);
+                                            }
+                                            if(discoverFragment!=null&&!discoverFragment.isHidden()){
+                                                transaction.hide(discoverFragment);
+                                            }
+
+                                            transaction.commit();
+
+
+
+//                                        Intent it=new Intent(MainActivity.this,RadioListActivity.class);
+//                                        it.putExtra("type","2");
+//                                        startActivity(it);
+                                        }
+                                    });
+                                } else if (bottomMenu.getType() == 9) {
+                                    //电台
+                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_radio));
+                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            bottomMenuHolder.name.setSelected(true);
+                                            bottomMenuHolder.icon.setSelected(true);
+                                            for(int i=0;i<mMenus.size();i++){
+                                                BottomMenuHolder holder=mMenus.get(i);
+                                                if(holder!=bottomMenuHolder){
+                                                    holder.name.setSelected(false);
+                                                    holder.icon.setSelected(false);
+                                                }
+                                            }
+
+                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                            if (radioListFragment == null) {
+                                                radioListFragment = new RadioListFragment();
+                                                Bundle bundle = new Bundle();
+                                                bundle.putString("type","1");
+                                                radioListFragment.setArguments(bundle);
+                                                transaction.add(R.id.content, radioListFragment);
+                                            } else {
+                                                ((RadioListFragment)radioListFragment).setType("1");
+                                                transaction.show(radioListFragment);
+                                            }
+                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                                transaction.hide(recommendFragment);
+                                            }
+                                            if(serverFragment!=null&&!serverFragment.isHidden()){
+                                                transaction.hide(serverFragment);
+                                            }
+                                            if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                                transaction.hide(personalCenterFragment);
+                                            }
+                                            if(discoverFragment!=null&&!discoverFragment.isHidden()){
+                                                transaction.hide(discoverFragment);
+                                            }
+
+                                            transaction.commit();
+//                                        Intent it=new Intent(MainActivity.this,RadioListActivity.class);
+//                                        it.putExtra("type","1");
+//                                        startActivity(it);
+                                        }
+                                    });
+                                } else if (bottomMenu.getType() == 10) {
+                                    //资讯分类
+
+                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_news));
+                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+                                            bottomMenuHolder.name.setSelected(true);
+                                            bottomMenuHolder.icon.setSelected(true);
+                                            for(int i=0;i<mMenus.size();i++){
+                                                BottomMenuHolder holder=mMenus.get(i);
+                                                if(holder!=bottomMenuHolder){
+                                                    holder.name.setSelected(false);
+                                                    holder.icon.setSelected(false);
+                                                }
+                                            }
+
+
+                                            bottomMenuHolder.name.setSelected(true);
+                                            bottomMenuHolder.icon.setSelected(true);
+                                            for(int i=0;i<mMenus.size();i++){
+                                                BottomMenuHolder holder=mMenus.get(i);
+                                                if(holder!=bottomMenuHolder){
+                                                    holder.name.setSelected(false);
+                                                    holder.icon.setSelected(false);
+                                                }
+                                            }
+
+                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                            if (recommendFragment == null) {
+                                                recommendFragment = new RecommendFragment();
+                                                transaction.add(R.id.content, recommendFragment);
+                                            } else {
+                                                transaction.show(recommendFragment);
+                                            }
+                                            if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                                transaction.hide(personalCenterFragment);
+                                            }
+                                            if(discoverFragment!=null&&!discoverFragment.isHidden()){
+                                                transaction.hide(discoverFragment);
+                                            }
+
+                                            if(serverFragment!=null&&!serverFragment.isHidden()){
+                                                transaction.hide(serverFragment);
+                                            }
+                                            if(radioListFragment!=null&&!radioListFragment.isHidden()){
+                                                transaction.hide(radioListFragment);
+                                            }
+
+
+                                            transaction.commit();
 
 
 
 
 
-                                        Column column=new Column();
-                                        column.setId(Integer.parseInt(bottomMenu.getSource_id()));
-                                        column.setName(bottomMenu.getName());
-                                        ((RecommendFragment)recommendFragment).switchColumn(column);
-                                    }
-                                });
+                                            Column column=new Column();
+                                            column.setId(Integer.parseInt(bottomMenu.getSource_id()));
+                                            column.setName(bottomMenu.getName());
+                                            ((RecommendFragment)recommendFragment).switchColumn(column);
+                                        }
+                                    });
+                                }
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                params.weight = 1;
+                                menuContainer.addView(root, params);
+
                             }
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                            params.weight = 1;
-                            menuContainer.addView(root, params);
 
+                            if(mMenus.size()>0){
+                                mMenus.get(0).root.performClick();
+                            }
                         }
 
-                        if(mMenus.size()>0){
-                            mMenus.get(0).root.performClick();
-                        }
+
+
+
+
 
 
                     }

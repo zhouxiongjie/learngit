@@ -160,11 +160,15 @@ public class ContentFragment extends Fragment implements Handler.Callback {
             divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_video_divider_drawable));
             recyclerView.addItemDecoration(divider);
             mAdapter.setIsVideo(true);
-        } else {
+        } else if(mColumn.getPost_type() == 9){
             DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
             divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
             recyclerView.addItemDecoration(divider);
-            mAdapter.setIsVideo(false);
+            mAdapter.setIsActivity(true);
+        }else{
+            DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+            divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
+            recyclerView.addItemDecoration(divider);
         }
         recyclerView.setAdapter(mAdapter);
 
@@ -465,7 +469,10 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                     columnContent.getType()!=3&&
                                     columnContent.getType()!=4&&
                                     columnContent.getType()!=5&&
-                                    columnContent.getType()!=7) {
+                                    columnContent.getType()!=7&&
+                                    columnContent.getType()!=9&&
+                                    columnContent.getType()!=10) {
+
                                 iterator.remove();
 
                             }

@@ -40,6 +40,8 @@ public class ColumnContent  implements Serializable {
     private SpecialBean special;
     private AlbumsBean albums;
     private VideoBean video;
+    private ActivitiyBean activitiy;
+    private LiveBean live;
     private List<CategoriesBean> categories;
     private TopBean top;
 
@@ -169,6 +171,22 @@ public class ColumnContent  implements Serializable {
 
     public void setVideo(VideoBean video) {
         this.video = video;
+    }
+
+    public ActivitiyBean getActivitiy() {
+        return activitiy;
+    }
+
+    public void setActivitiy(ActivitiyBean activitiy) {
+        this.activitiy = activitiy;
+    }
+
+    public LiveBean getLive() {
+        return live;
+    }
+
+    public void setLive(LiveBean live) {
+        this.live = live;
     }
 
     public List<CategoriesBean> getCategories() {
@@ -667,6 +685,251 @@ public class ColumnContent  implements Serializable {
 
         public void setSource_id(int source_id) {
             this.source_id = source_id;
+        }
+    }
+
+
+    public static class ActivitiyBean{
+
+        /**
+         * id : 21
+         * post_id : 12362
+         * activitiy_id : 1053
+         * type : 2
+         * qr_code : http://api-asc.review.slradio.cn/storage/activities/qrCode/1053.png
+         * url : http://www-asc-c.review.slradio.cn/signup/1053
+         * start_status : 1
+         * join_number : 0
+         * join_count : 0
+         * view_count : 0
+         */
+
+        private int id;
+        private int post_id;
+        private int activitiy_id;
+        private int type;
+        private String qr_code;
+        private String url;
+        private int start_status;
+        private int join_number;
+        private int join_count;
+        private int view_count;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public int getPost_id() {
+            return post_id;
+        }
+
+        public void setPost_id(int post_id) {
+            this.post_id = post_id;
+        }
+
+        public int getActivitiy_id() {
+            return activitiy_id;
+        }
+
+        public void setActivitiy_id(int activitiy_id) {
+            this.activitiy_id = activitiy_id;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
+        }
+
+        public String getQr_code() {
+            return qr_code;
+        }
+
+        public void setQr_code(String qr_code) {
+            this.qr_code = qr_code;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public int getStart_status() {
+            return start_status;
+        }
+
+        public void setStart_status(int start_status) {
+            this.start_status = start_status;
+        }
+
+        public int getJoin_number() {
+            return join_number;
+        }
+
+        public void setJoin_number(int join_number) {
+            this.join_number = join_number;
+        }
+
+        public int getJoin_count() {
+            return join_count;
+        }
+
+        public void setJoin_count(int join_count) {
+            this.join_count = join_count;
+        }
+
+        public int getView_count() {
+            return view_count;
+        }
+
+        public void setView_count(int view_count) {
+            this.view_count = view_count;
+        }
+    }
+
+    public static class LiveBean{
+
+        /**
+         * id : 2
+         * post_id : 12467
+         * room_id : 73
+         * type : 2
+         * push_url : rtmp://video-center-bj.alivecdn.com/4/75FC35FCCD8B6E2579AFCE36BBF82851?vhost=slvedio-test.slradio.cn
+         * pull_url :
+         * use_stream : 1
+         * rtmp_play_url : rtmp://slvedio-test.slradio.cn/4/75FC35FCCD8B6E2579AFCE36BBF82851
+         * flv_play_url : http://slvedio-test.slradio.cn/4/75FC35FCCD8B6E2579AFCE36BBF82851.flv
+         * hls_play_url : http://slvedio-test.slradio.cn/4/75FC35FCCD8B6E2579AFCE36BBF82851.m3u8
+         * status : 2
+         * popularity : 0
+         * url : velit ea
+         */
+
+        private int id;
+        private int post_id;
+        private int room_id;
+        private int type;
+        private String push_url;
+        private String pull_url;
+        private int use_stream;
+        private String rtmp_play_url;
+        private String flv_play_url;
+        private String hls_play_url;
+        private int status;
+        private int popularity;
+        private String url;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public int getPost_id() {
+            return post_id;
+        }
+
+        public void setPost_id(int post_id) {
+            this.post_id = post_id;
+        }
+
+        public int getRoom_id() {
+            return room_id;
+        }
+
+        public void setRoom_id(int room_id) {
+            this.room_id = room_id;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
+        }
+
+        public String getPush_url() {
+            return push_url;
+        }
+
+        public void setPush_url(String push_url) {
+            this.push_url = push_url;
+        }
+
+        public String getPull_url() {
+            return pull_url;
+        }
+
+        public void setPull_url(String pull_url) {
+            this.pull_url = pull_url;
+        }
+
+        public int getUse_stream() {
+            return use_stream;
+        }
+
+        public void setUse_stream(int use_stream) {
+            this.use_stream = use_stream;
+        }
+
+        public String getRtmp_play_url() {
+            return rtmp_play_url;
+        }
+
+        public void setRtmp_play_url(String rtmp_play_url) {
+            this.rtmp_play_url = rtmp_play_url;
+        }
+
+        public String getFlv_play_url() {
+            return flv_play_url;
+        }
+
+        public void setFlv_play_url(String flv_play_url) {
+            this.flv_play_url = flv_play_url;
+        }
+
+        public String getHls_play_url() {
+            return hls_play_url;
+        }
+
+        public void setHls_play_url(String hls_play_url) {
+            this.hls_play_url = hls_play_url;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
+        }
+
+        public int getPopularity() {
+            return popularity;
+        }
+
+        public void setPopularity(int popularity) {
+            this.popularity = popularity;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
         }
     }
 

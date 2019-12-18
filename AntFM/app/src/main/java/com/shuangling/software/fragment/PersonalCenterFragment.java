@@ -40,10 +40,11 @@ import com.shuangling.software.activity.HistoryActivity;
 import com.shuangling.software.activity.LoginActivity;
 import com.shuangling.software.activity.MessageListActivity;
 import com.shuangling.software.activity.ModifyUserInfoActivity;
+import com.shuangling.software.activity.MyWalletsActivity;
 import com.shuangling.software.activity.SettingActivity;
 import com.shuangling.software.activity.SubscribeActivity;
 import com.shuangling.software.activity.WebViewActivity;
-import com.shuangling.software.activity.WebViewBackActivity;
+import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.dialog.UpdateDialog;
 import com.shuangling.software.entity.UpdateInfo;
 import com.shuangling.software.entity.User;
@@ -120,6 +121,10 @@ public class PersonalCenterFragment extends Fragment {
     RelativeLayout checkUpdate;
     @BindView(R.id.myPublish)
     RelativeLayout myPublish;
+    @BindView(R.id.myWalletsIcon)
+    FontIconView myWalletsIcon;
+    @BindView(R.id.myWallets)
+    RelativeLayout myWallets;
 
     private Handler mHandler;
     private DialogFragment mDialogFragment;
@@ -154,7 +159,7 @@ public class PersonalCenterFragment extends Fragment {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.history, R.id.collect, R.id.subscribe, R.id.accountAndSecurity, R.id.headBg, R.id.login, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.messageLayout, R.id.setting, R.id.attentionNumber, R.id.checkUpdate,R.id.myPublish})
+    @OnClick({R.id.history, R.id.collect, R.id.subscribe, R.id.accountAndSecurity, R.id.headBg, R.id.login, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.messageLayout, R.id.setting, R.id.attentionNumber, R.id.checkUpdate, R.id.myPublish,R.id.myWallets})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.history:
@@ -226,9 +231,9 @@ public class PersonalCenterFragment extends Fragment {
                 break;
             case R.id.myPublish:
                 if (User.getInstance() != null) {
-                    Intent it=new Intent(getContext(),WebViewActivity.class);
-                    it.putExtra("url",ServerInfo.h5HttpsIP+"/publish");
-                    it.putExtra("title","我的发布");
+                    Intent it = new Intent(getContext(), WebViewActivity.class);
+                    it.putExtra("url", ServerInfo.h5HttpsIP + "/publish");
+                    it.putExtra("title", "我的发布");
                     startActivity(it);
                 } else {
                     Intent it = new Intent(getContext(), LoginActivity.class);
@@ -255,6 +260,14 @@ public class PersonalCenterFragment extends Fragment {
                 getUpdateInfo();
 
                 break;
+            case R.id.myWallets:
+                if (User.getInstance() != null) {
+                    startActivity(new Intent(getContext(), MyWalletsActivity.class));
+                } else {
+                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    startActivity(it);
+                }
+                break;
         }
     }
 
@@ -262,9 +275,9 @@ public class PersonalCenterFragment extends Fragment {
     public void getUpdateInfo() {
         mDialogFragment = CommonUtils.showLoadingDialog(getFragmentManager());
 
-        String url = ServerInfo.serviceIP + ServerInfo.updateInfo;
+        String url = ServerInfo.serviceIP + ServerInfo.updateInfoV2;
         Map<String, String> params = new HashMap<>();
-        params.put("version", "v" + getVersionName());
+        params.put("version", getVersionName());
         params.put("type", "android");
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
 
@@ -298,7 +311,9 @@ public class PersonalCenterFragment extends Fragment {
                                     ToastUtils.show("当前已是最新版本");
                                 }
 
-                            } else if (jsonObject != null && !TextUtils.isEmpty(jsonObject.getString("msg"))) {
+                            } else if (jsonObject != null && jsonObject.getIntValue("code") == -1) {
+                                ToastUtils.show("当前已是最新版本");
+                            }else if (jsonObject != null && !TextUtils.isEmpty(jsonObject.getString("msg"))) {
                                 ToastUtils.show(jsonObject.getString("msg"));
                             }
 

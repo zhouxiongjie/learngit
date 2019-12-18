@@ -255,6 +255,12 @@
             android:name="com.shuangling.software.activity.AdvertActivity"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="com.shuangling.software.activity.MyWalletsActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+
 
 
         <activity

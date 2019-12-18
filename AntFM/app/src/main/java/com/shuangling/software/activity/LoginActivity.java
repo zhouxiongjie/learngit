@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -100,6 +101,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
     private String mPhoneNumber;
     private DialogFragment mDialogFragment;
     private VerifyCodeViewHolder verifyCodeViewHolder;
+    private AccountViewHolder accountViewHolder;
     private CountDownTimer mCountDownTimer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -221,7 +223,7 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
 
 
         View accountPwdLoginView = LayoutInflater.from(this).inflate(R.layout.account_password_login, null);
-        final AccountViewHolder accountViewHolder = new AccountViewHolder(accountPwdLoginView);
+        accountViewHolder = new AccountViewHolder(accountPwdLoginView);
         accountViewHolder.phoneNum.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -345,11 +347,17 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
                 verifyCodeLogin.setSelected(true);
                 accountLogin.setSelected(false);
                 viewPager.setCurrentItem(0);
+                if(TextUtils.isEmpty(verifyCodeViewHolder.phoneNum.getText().toString().trim())&&!TextUtils.isEmpty(accountViewHolder.phoneNum.getText().toString().trim())){
+                    verifyCodeViewHolder.phoneNum.setText(accountViewHolder.phoneNum.getText().toString());
+                }
                 break;
             case R.id.accountLogin:
                 accountLogin.setSelected(true);
                 verifyCodeLogin.setSelected(false);
                 viewPager.setCurrentItem(1);
+                if(!TextUtils.isEmpty(verifyCodeViewHolder.phoneNum.getText().toString().trim())&&TextUtils.isEmpty(accountViewHolder.phoneNum.getText().toString().trim())){
+                    accountViewHolder.phoneNum.setText(verifyCodeViewHolder.phoneNum.getText().toString());
+                }
                 break;
             case R.id.weiXin:
                 Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
@@ -568,8 +576,8 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
     }
 
     static class AccountViewHolder {
-        @BindView(R.id.countryCode)
-        TextView countryCode;
+//        @BindView(R.id.countryCode)
+//        TextView countryCode;
         @BindView(R.id.phoneNum)
         EditText phoneNum;
         @BindView(R.id.password)

@@ -21,14 +21,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.Anchor;
 import com.shuangling.software.entity.AnchorOrganizationColumn;
+import com.shuangling.software.entity.LiveInfo;
 import com.shuangling.software.entity.Station;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.fragment.ProgramContentFragment;
@@ -68,6 +71,8 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
 
     public static final int MSG_GET_ANCHOR_COLUMN = 0x6;
 
+    public static final int MSG_GET_ANCHOR_LIVE = 0x7;
+
     //private static final int[] category = new int[]{ R.string.article, R.string.video,R.string.album, R.string.photo, R.string.special};
 
     @BindView(R.id.activity_title)
@@ -104,6 +109,8 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
     TextView authentication;
     @BindView(R.id.noData)
     LinearLayout noData;
+    @BindView(R.id.layout)
+    LinearLayout layout;
 
 
     private int mAnchorId;
@@ -127,7 +134,7 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
         init();
 
         getAnchorDetail();
-
+        getAnchorLive();
     }
 
     private void init() {
@@ -156,6 +163,7 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
 
         String url = ServerInfo.serviceIP + ServerInfo.getAnchorOrOrganizationColumn + mAnchorId;
         Map<String, String> params = new HashMap<>();
+        params.put("mode","all");
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
 
             @Override
@@ -177,12 +185,39 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
         });
     }
 
+
+    private void getAnchorLive() {
+
+
+        String url = ServerInfo.serviceIP + ServerInfo.getAnchorOrOrganizationLive + mAnchorId;
+        Map<String, String> params = new HashMap<>();
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_ANCHOR_LIVE;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+    }
+
     private void getAnchorDetail() {
 
 
         String url = ServerInfo.serviceIP + ServerInfo.anchorDetail + mAnchorId;
         Map<String, String> params = new HashMap<>();
         params.put("type", "0");
+        params.put("mode","all");
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
 
             @Override
@@ -192,7 +227,6 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
                 msg.what = MSG_GET_ANCHOR_DETAIL;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-
 
             }
 
@@ -565,9 +599,9 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
                         mColumns = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), AnchorOrganizationColumn.class);
-                        if(mColumns==null||mColumns.size()==0){
+                        if (mColumns == null || mColumns.size() == 0) {
                             noData.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             noData.setVisibility(View.GONE);
                             initFragment();
                         }
@@ -578,6 +612,71 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                break;
+            case MSG_GET_ANCHOR_LIVE:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        final LiveInfo liveInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), LiveInfo.class);
+
+                        if (liveInfo != null) {
+                            LayoutInflater inflater = LayoutInflater.from(this);
+                            View root = inflater.inflate(R.layout.anchor_or_organization_live_item, layout, false);
+
+                            ViewHolder vh = new ViewHolder(root);
+
+                            if (!TextUtils.isEmpty(liveInfo.getCover())) {
+                                Uri uri = Uri.parse(liveInfo.getCover());
+                                int width = CommonUtils.getScreenWidth();
+                                int height = (int) (9f * width / 16f);
+                                ImageLoader.showThumb(uri, vh.logo, width, height);
+                            } else {
+                                ImageLoader.showThumb(vh.logo, R.drawable.video_placeholder);
+                            }
+                            Glide.with(this).load(R.drawable.wave).diskCacheStrategy(DiskCacheStrategy.ALL).into(vh.statusIcon);
+
+                            vh.title.setText(liveInfo.getTitle());
+                            if (liveInfo.getLive() != null) {
+                                vh.popularity.setText(liveInfo.getLive().getPopularity() + "人气");
+                                if (liveInfo.getLive().getType() == 1) {
+                                    vh.type.setText("网络");
+                                    vh.typeIcon.setText(R.string.live_network);
+                                } else if (liveInfo.getLive().getType() == 2) {
+                                    vh.type.setText("电台");
+                                    vh.typeIcon.setText(R.string.live_radio);
+                                } else if (liveInfo.getLive().getType() == 3) {
+                                    vh.type.setText("电视");
+                                    vh.typeIcon.setText(R.string.live_tv);
+                                } else if (liveInfo.getLive().getType() == 4) {
+                                    vh.type.setText("电商");
+                                    vh.typeIcon.setText(R.string.live_shop);
+                                }
+
+                            }
+
+                            vh.root.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent it = new Intent(AnchorDetailActivity.this, WebViewBackActivity.class);
+                                    it.putExtra("url", liveInfo.getLive().getUrl());
+                                    startActivity(it);
+                                }
+                            });
+
+                            layout.addView(root,5);
+                        }
+
+
+                    }
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
                 break;
         }
         return false;
@@ -680,5 +779,33 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    class ViewHolder {
+        @BindView(R.id.logo)
+        SimpleDraweeView logo;
+        @BindView(R.id.playIcon)
+        ImageView playIcon;
+        @BindView(R.id.statusIcon)
+        ImageView statusIcon;
+        @BindView(R.id.status)
+        TextView status;
+        @BindView(R.id.statusLayout)
+        LinearLayout statusLayout;
+        @BindView(R.id.popularity)
+        TextView popularity;
+        @BindView(R.id.typeIcon)
+        FontIconView typeIcon;
+        @BindView(R.id.type)
+        TextView type;
+        @BindView(R.id.root)
+        LinearLayout root;
+        @BindView(R.id.title)
+        TextView title;
+
+        ViewHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
     }
 }

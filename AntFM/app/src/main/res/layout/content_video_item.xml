@@ -34,11 +34,24 @@
 
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:ellipsize="end"
+        android:lineSpacingExtra="5dp"
+        android:lineSpacingMultiplier="1.0"
+        android:maxLines="2"
+        android:textColor="@color/textColorTwo"
+        android:textSize="@dimen/font_size_34px"
+        tools:text="资讯文章内容中只有2张图片以下的，按左图右文的方式显示（左图为封面图）" />
 
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         >
 
         <com.facebook.drawee.view.SimpleDraweeView
@@ -79,18 +92,7 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:ellipsize="end"
-        android:lineSpacingExtra="5dp"
-        android:lineSpacingMultiplier="1.0"
-        android:maxLines="2"
-        android:textColor="@color/textColorTwo"
-        android:textSize="@dimen/font_size_34px"
-        tools:text="资讯文章内容中只有2张图片以下的，按左图右文的方式显示（左图为封面图）" />
+
 
 
     <LinearLayout

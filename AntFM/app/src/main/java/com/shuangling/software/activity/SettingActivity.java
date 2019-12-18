@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.gyf.immersionbar.ImmersionBar;
@@ -240,6 +241,7 @@ public class SettingActivity extends AppCompatActivity {
         imagePipeline.clearMemoryCaches();
         imagePipeline.clearDiskCaches();
         ACache.get(this).clear();
+        SharedPreferencesUtils.putPreferenceTypeValue("custom_column", SharedPreferencesUtils.PreferenceType.String,"");
         RxPermissions rxPermissions = new RxPermissions(this);
 
         rxPermissions.request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)

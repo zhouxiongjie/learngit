@@ -798,9 +798,9 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                         for (int i = 0; i < serviceList.size(); i++) {
                             final Service service = serviceList.get(i);
 
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                            int margin = CommonUtils.dip2px(5);
-                            params.setMargins(margin, margin, margin, margin);
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((CommonUtils.getScreenWidth()-CommonUtils.dip2px(20))/3, LinearLayout.LayoutParams.WRAP_CONTENT);
+//                            int margin = CommonUtils.dip2px(5);
+//                            params.setMargins(margin, margin, margin, margin);
                             View serviceView = LayoutInflater.from(getContext()).inflate(R.layout.service_gridview_item, anchorsLayout, false);
                             SimpleDraweeView logo = serviceView.findViewById(R.id.service);
                             TextView serviceName = serviceView.findViewById(R.id.serviceName);

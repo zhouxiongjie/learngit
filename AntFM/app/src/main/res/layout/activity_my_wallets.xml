@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <com.shuangling.software.customview.TopTitleBar
+        android:id="@+id/activtyTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:canBack="true"
+        app:moreText=""
+        app:titleText="我的钱包" />
+
+
+    <RelativeLayout
+        android:id="@+id/aa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_below="@+id/activtyTitle">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_money"
+                android:drawablePadding="5dp"
+                android:textSize="@dimen/font_size_28px"
+                android:textColor="#333333"
+                android:text="现金收益(元)"/>
+
+            <TextView
+                android:id="@+id/money"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:textSize="@dimen/font_size_60px"
+                android:textColor="#4690FF"
+                tools:text="1000.00"/>
+            
+        </LinearLayout>
+        
+        <TextView
+            android:id="@+id/cash"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_size_30px"
+            android:layout_centerVertical="true"
+            android:background="@drawable/login_button_bg"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:textStyle="bold"
+            android:text="去提现"/>
+    </RelativeLayout>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_below="@+id/aa"
+        android:background="@color/divideColorOne"/>
+
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabPageIndicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/aa"
+        android:textSize="@dimen/font_size_30px"
+        android:textStyle="bold"
+        app:tabIndicatorColor="?attr/themeColor"
+        app:tabIndicatorFullWidth="false"
+        app:tabIndicatorHeight="2dp"
+        app:tabMode="fixed"
+        app:tabSelectedTextColor="?attr/themeColor"
+        app:tabTextAppearance="@style/TabTextStyle"
+        app:tabTextColor="@color/black" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tabPageIndicator"
+        android:layout_above="@+id/actionLayout"/>
+
+</RelativeLayout>

@@ -455,7 +455,9 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                     columnContent.getType()!=3&&
                                     columnContent.getType()!=4&&
                                     columnContent.getType()!=5&&
-                                    columnContent.getType()!=7) {
+                                    columnContent.getType()!=7&&
+                                    columnContent.getType()!=9&&
+                                    columnContent.getType()!=10) {
                                 iterator.remove();
 
                             }
@@ -483,7 +485,9 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                     columnContent.getType()!=3&&
                                     columnContent.getType()!=4&&
                                     columnContent.getType()!=5&&
-                                    columnContent.getType()!=7) {
+                                    columnContent.getType()!=7&&
+                                    columnContent.getType()!=9&&
+                                    columnContent.getType()!=10) {
                                 iterator.remove();
 
                             }

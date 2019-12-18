@@ -17,6 +17,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.CommentDetailActivity;
 import com.shuangling.software.customview.ReadMoreTextView;
+import com.shuangling.software.customview.ReadMoreTextViewWithIcon;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.Comment;
 import com.shuangling.software.entity.VideoDetail;
@@ -153,10 +154,20 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
 
 
         if (getItemViewType(position) == TYPE_HEAD) {
-            HeadViewHolder viewHolder = (HeadViewHolder) holder;
+            final HeadViewHolder viewHolder = (HeadViewHolder) holder;
             if (mVideoDetail != null) {
                 viewHolder.videoTitle.setText(mVideoDetail.getTitle());
-                viewHolder.playTimes.setText(mVideoDetail.getView() + "次播放");
+                viewHolder.playTimes.setText("简介:"+mVideoDetail.getDes());
+                viewHolder.videoTitle.setOnCollapseOrExpande(new ReadMoreTextViewWithIcon.OnCollapseOrExpande() {
+                    @Override
+                    public void textCollapseOrExpanded(boolean collapse) {
+                        if(collapse){
+                            viewHolder.playTimes.setVisibility(View.GONE);
+                        }else{
+                            viewHolder.playTimes.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
                 if (mVideoDetail.getIs_likes() == 0) {
                     viewHolder.praiseSum.setActivated(true);
                 } else {
@@ -311,7 +322,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
 
     class HeadViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.videoTitle)
-        TextView videoTitle;
+        ReadMoreTextViewWithIcon videoTitle;
         @BindView(R.id.playTimes)
         TextView playTimes;
         @BindView(R.id.praiseSum)

@@ -734,8 +734,12 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                             @Override
                             public void onClick(View v) {
                                 if (mVideoDetail.getAuthor_info() != null && mVideoDetail.getAuthor_info().getMerchant() != null) {
-                                    Intent it = new Intent(VideoDetailActivity.this, OrganizationDetailActivity.class);
-                                    it.putExtra("organizationId", mVideoDetail.getAuthor_info().getMerchant().getId());
+//                                    Intent it = new Intent(VideoDetailActivity.this, OrganizationDetailActivity.class);
+//                                    it.putExtra("organizationId", mVideoDetail.getAuthor_info().getMerchant().getId());
+//                                    startActivity(it);
+
+                                    Intent it = new Intent(VideoDetailActivity.this, WebViewActivity.class);
+                                    it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+mVideoDetail.getAuthor_info().getMerchant().getId());
                                     startActivity(it);
                                 }
                             }

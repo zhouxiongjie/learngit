@@ -442,7 +442,7 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
                         it.putExtra("albumId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("3")) {
-                        Intent it = new Intent(WebViewActivity.this, WebViewActivity.class);
+                        Intent it = new Intent(WebViewActivity.this, ArticleDetailActivity.class);
                         it.putExtra("articleId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("4")) {

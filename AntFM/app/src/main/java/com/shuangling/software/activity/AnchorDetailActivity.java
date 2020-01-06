@@ -464,8 +464,12 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
                                 anchorView.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Intent it = new Intent(AnchorDetailActivity.this, AnchorDetailActivity.class);
-                                        it.putExtra("anchorId", anchor.getId());
+//                                        Intent it = new Intent(AnchorDetailActivity.this, AnchorDetailActivity.class);
+//                                        it.putExtra("anchorId", anchor.getId());
+//                                        startActivity(it);
+
+                                        Intent it = new Intent(AnchorDetailActivity.this, WebViewActivity.class);
+                                        it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+anchor.getId());
                                         startActivity(it);
                                     }
                                 });
@@ -696,8 +700,12 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
             case R.id.more:
                 break;
             case R.id.organizationLayout:
-                Intent it = new Intent(this, OrganizationDetailActivity.class);
-                it.putExtra("organizationId", mAnchor.getMerchant().getId());
+//                Intent it = new Intent(this, OrganizationDetailActivity.class);
+//                it.putExtra("organizationId", mAnchor.getMerchant().getId());
+//                startActivity(it);
+
+                Intent it = new Intent(this, WebViewActivity.class);
+                it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+mAnchor.getMerchant().getId());
                 startActivity(it);
                 break;
         }

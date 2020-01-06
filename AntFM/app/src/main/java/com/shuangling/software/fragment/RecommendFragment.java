@@ -909,13 +909,21 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 
         } else if (url.startsWith(ServerInfo.h5IP + "/orgs/") || url.startsWith(ServerInfo.h5HttpsIP + "/orgs/")) {
             String organizationId = url.substring(url.lastIndexOf("/") + 1);
-            Intent it = new Intent(getContext(), OrganizationDetailActivity.class);
-            it.putExtra("organizationId", Integer.parseInt(organizationId));
+//            Intent it = new Intent(getContext(), OrganizationDetailActivity.class);
+//            it.putExtra("organizationId", Integer.parseInt(organizationId));
+//            startActivity(it);
+
+            Intent it = new Intent(getContext(), WebViewActivity.class);
+            it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+organizationId);
             startActivity(it);
+
         } else if (url.startsWith(ServerInfo.h5IP + "/anchors/") || url.startsWith(ServerInfo.h5HttpsIP + "/anchors/")) {
             String anchorId = url.substring(url.lastIndexOf("/") + 1);
-            Intent it = new Intent(getContext(), AnchorDetailActivity.class);
-            it.putExtra("anchorId", Integer.parseInt(anchorId));
+//            Intent it = new Intent(getContext(), AnchorDetailActivity.class);
+//            it.putExtra("anchorId", Integer.parseInt(anchorId));
+//            startActivity(it);
+            Intent it = new Intent(getContext(), WebViewActivity.class);
+            it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+anchorId);
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/atlas/") || url.startsWith(ServerInfo.h5HttpsIP + "/atlas/")) {
             String galleriaId = url.substring(url.lastIndexOf("/") + 1);
@@ -965,6 +973,22 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                 startActivity(it);
             }
 
+        }else if (url.startsWith(ServerInfo.h5IP + "/invitation-post") || url.startsWith(ServerInfo.h5HttpsIP + "/invitation-post")) {
+            Intent it = new Intent(getContext(), WebViewActivity.class);
+            it.putExtra("url", url);
+            startActivity(it);
+        }else if (url.startsWith(ServerInfo.h5IP + "/actrank") || url.startsWith(ServerInfo.h5HttpsIP + "/actrank")) {
+            Intent it = new Intent(getContext(), WebViewActivity.class);
+            it.putExtra("url", url);
+            startActivity(it);
+        }else if (url.startsWith(ServerInfo.h5IP + "/wish") || url.startsWith(ServerInfo.h5HttpsIP + "/wish")) {
+            Intent it = new Intent(getContext(), WebViewActivity.class);
+            it.putExtra("url", url);
+            startActivity(it);
+        }else if (url.startsWith(ServerInfo.h5IP + "/actlist") || url.startsWith(ServerInfo.h5HttpsIP + "/actlist")) {
+            Intent it = new Intent(getContext(), WebViewActivity.class);
+            it.putExtra("url", url);
+            startActivity(it);
         } else {
             Intent it = new Intent(getContext(), WebViewBackActivity.class);
             it.putExtra("url", url);

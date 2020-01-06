@@ -499,8 +499,12 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
                                 @Override
                                 public void onClick(View v) {
                                     if (mRadioDetail.getChannel().getMerchant_id() != null) {
-                                        Intent it = new Intent(RadioDetailActivity.this, OrganizationDetailActivity.class);
-                                        it.putExtra("organizationId", mRadioDetail.getChannel().getMerchant_id().getId());
+//                                        Intent it = new Intent(RadioDetailActivity.this, OrganizationDetailActivity.class);
+//                                        it.putExtra("organizationId", mRadioDetail.getChannel().getMerchant_id().getId());
+//                                        startActivity(it);
+
+                                        Intent it = new Intent(RadioDetailActivity.this, WebViewActivity.class);
+                                        it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+mRadioDetail.getChannel().getMerchant_id().getId());
                                         startActivity(it);
                                     }
                                 }

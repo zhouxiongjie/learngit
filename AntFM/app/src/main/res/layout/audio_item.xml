@@ -19,13 +19,15 @@
             android:layout_height="wrap_content"
             android:text="1"
             android:padding="10dp"
+            android:layout_gravity="center"
             android:textColor="@color/textColorNine"
             android:textSize="@dimen/font_size_36px" />
 
         <com.shuangling.software.customview.AudioJumpView
             android:id="@+id/audioJump"
             android:layout_width="20dp"
-            android:layout_height="20dp" />
+            android:layout_height="20dp"
+            android:layout_gravity="center"/>
 
     </FrameLayout>
 
@@ -56,18 +58,31 @@
                 android:id="@+id/publishTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:text="2019-03-27"
                 android:textSize="@dimen/font_size_24px"
                 android:textColor="@color/textColorThree"
                 />
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/indexIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_gravity="center_vertical"
+                android:text="&#xe623;"
+                android:textColor="@color/textColorThree"
+                android:textSize="@dimen/font_size_24px" />
             <TextView
                 android:id="@+id/duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="时长 24:20"
+                android:layout_marginLeft="2dp"
+                android:layout_gravity="center_vertical"
+                android:text="24:20"
                 android:textSize="@dimen/font_size_24px"
                 android:textColor="@color/textColorThree"
-                android:layout_marginStart="20dp"
+
                 />
         </LinearLayout>
 

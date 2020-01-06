@@ -11,7 +11,6 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
@@ -21,8 +20,11 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ethanhua.skeleton.Skeleton;
+import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.gyf.immersionbar.ImmersionBar;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -67,6 +69,8 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
     private static final int SHARE_FAILED = 0x4;
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
+    @BindView(R.id.root)
+    RelativeLayout root;
     private int mArticleId;
 
 
@@ -75,6 +79,14 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
 
     private Handler mHandler;
     private Article mArticle;
+    private ViewSkeletonScreen mViewSkeletonScreen;
+
+//    private Runnable runnable=new Runnable() {
+//        @Override
+//        public void run() {
+//            mViewSkeletonScreen.hide();
+//        }
+//    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,14 +98,19 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
         ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).keyboardEnable(true)  //解决软键盘与底部输入框冲突问题，默认为false，还有一个重载方法，可以指定软键盘mode
                 .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE).init();
         ButterKnife.bind(this);
-//        StatusBarUtil.setTransparent(this);
-//        StatusBarManager.setImmersiveStatusBar(this, true);
+
+//        mViewSkeletonScreen = Skeleton.bind(root)
+//                .load(R.layout.skeleton_article_detail)
+//                .shimmer(false)
+//                .angle(20)
+//                .duration(1000)
+//                .color(R.color.shimmer_color)
+//                .show();
         init();
     }
 
 
     private void getArticleDetail() {
-
 
         String url = ServerInfo.serviceIP + ServerInfo.getArticleDetail + mArticleId;
         Map<String, String> params = new HashMap<>();
@@ -120,22 +137,22 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
 
 
     private void init() {
-        long id=Thread.currentThread().getId();
         progressBar.setMax(100);
         mHandler = new Handler(this);
+        //mHandler.postDelayed(runnable,8000);
         mArticleId = getIntent().getIntExtra("articleId", 0);
         getArticleDetail();
         String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
-        int size=1;
-        int netLoad=SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD,1);
-        if(netLoad==0||CommonUtils.getNetWorkType(this)==NETWORKTYPE_WIFI){
-           size=2;
+        int size = 1;
+        int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 1);
+        if (netLoad == 0 || CommonUtils.getNetWorkType(this) == NETWORKTYPE_WIFI) {
+            size = 2;
         }
 
         if (User.getInstance() == null) {
-            url = url + "?app=android&size="+size;
+            url = url + "?app=android&size=" + size;
         } else {
-            url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size="+size;
+            url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size;
         }
         WebSettings s = webView.getSettings();
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
@@ -156,7 +173,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
 
 //        webView.requestFocus();
         // webView.setScrollBarStyle(0);
-        webView.setWebViewClient(new WebViewClient(){
+        webView.setWebViewClient(new WebViewClient() {
             // url拦截
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -196,37 +213,43 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
         });
 
 
-        webView.setWebChromeClient(new WebChromeClient(){
+        webView.setWebChromeClient(new WebChromeClient() {
             @Override
             // 处理javascript中的alert
             public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
                 return super.onJsAlert(view, url, message, result);
-            };
+            }
+
+            ;
 
             @Override
             // 处理javascript中的confirm
             public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
                 return super.onJsConfirm(view, url, message, result);
-            };
+            }
+
+            ;
 
             @Override
             // 处理javascript中的prompt
             public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, final JsPromptResult result) {
                 return super.onJsPrompt(view, url, message, defaultValue, result);
-            };
+            }
+
+            ;
 
             // 设置网页加载的进度条
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-                long id=Thread.currentThread().getId();
-                Log.i("onProgressChanged",""+newProgress);
-                if (newProgress == 100) {
-                    progressBar.setVisibility(GONE);
-                } else {
-                    if (progressBar.getVisibility() == GONE)
-                        progressBar.setVisibility(VISIBLE);
-                    progressBar.setProgress(newProgress);
-                }
+                long id = Thread.currentThread().getId();
+                Log.i("onProgressChanged", "" + newProgress);
+//                if (newProgress == 100) {
+//                    progressBar.setVisibility(GONE);
+//                } else {
+//                    if (progressBar.getVisibility() == GONE)
+//                        progressBar.setVisibility(VISIBLE);
+//                    progressBar.setProgress(newProgress);
+//                }
                 super.onProgressChanged(view, newProgress);
             }
 
@@ -364,17 +387,35 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
                 public void run() {
                     if (type.equals("2")) {
                         //主播
-                        Intent it = new Intent(ArticleDetailActivity.this, AnchorDetailActivity.class);
-                        it.putExtra("anchorId", Integer.parseInt(id));
+//                        Intent it = new Intent(ArticleDetailActivity.this, AnchorDetailActivity.class);
+//                        it.putExtra("anchorId", Integer.parseInt(id));
+//                        startActivity(it);
+                        Intent it = new Intent(ArticleDetailActivity.this, WebViewActivity.class);
+                        it.putExtra("url", ServerInfo.h5HttpsIP + "/anchors/" + id);
                         startActivity(it);
                     } else if (type.equals("3")) {
                         //机构
-                        Intent it = new Intent(ArticleDetailActivity.this, OrganizationDetailActivity.class);
-                        it.putExtra("organizationId", Integer.parseInt(id));
+//                        Intent it = new Intent(ArticleDetailActivity.this, OrganizationDetailActivity.class);
+//                        it.putExtra("organizationId", Integer.parseInt(id));
+//                        startActivity(it);
+
+                        Intent it = new Intent(ArticleDetailActivity.this, WebViewActivity.class);
+                        it.putExtra("url", ServerInfo.h5HttpsIP + "/orgs/" + id);
                         startActivity(it);
                     }
                 }
             });
+
+        }
+
+        @JavascriptInterface
+        public void bonesEvent(String str) {
+//            mHandler.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mViewSkeletonScreen.hide();
+//                }
+//            });
 
         }
 
@@ -386,15 +427,15 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
 
         if (requestCode == LOGIN_RESULT && resultCode == Activity.RESULT_OK) {
             String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
-            int size=1;
-            int netLoad=SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD,1);
-            if(netLoad==0||CommonUtils.getNetWorkType(this)==NETWORKTYPE_WIFI){
-                size=2;
+            int size = 1;
+            int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 1);
+            if (netLoad == 0 || CommonUtils.getNetWorkType(this) == NETWORKTYPE_WIFI) {
+                size = 2;
             }
             if (User.getInstance() == null) {
-                url = url + "?app=android&size="+size;
+                url = url + "?app=android&size=" + size;
             } else {
-                url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size="+size;
+                url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size;
             }
             webView.loadUrl(url);
 
@@ -424,16 +465,16 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
             @Override
             public void onShare(Platform platform, ShareParams paramsToShare) {
                 //点击新浪微博
-                String chanel="1";
+                String chanel = "1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
-                    chanel="2";
+                    chanel = "2";
                     //限制微博分享的文字不能超过20
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setText(title + url);
                 } else if (QQ.NAME.equals(platform.getName())) {
-                    chanel="3";
+                    chanel = "3";
                     paramsToShare.setTitle(title);
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
@@ -467,7 +508,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
                     }
                 }
 
-                shareStatistics(chanel,""+mArticle.getId(),ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?app=android");
+                shareStatistics(chanel, "" + mArticle.getId(), ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?app=android");
             }
         });
         oks.setCallback(new PlatformActionListener() {
@@ -496,14 +537,12 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
     }
 
 
-
-
-    public void shareStatistics(String channel,String postId,String shardUrl) {
+    public void shareStatistics(String channel, String postId, String shardUrl) {
 
         String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
         Map<String, String> params = new HashMap<>();
-        if(User.getInstance()!=null){
-            params.put("user_id", ""+User.getInstance().getId());
+        if (User.getInstance() != null) {
+            params.put("user_id", "" + User.getInstance().getId());
         }
         params.put("channel", channel);
         params.put("post_id", postId);
@@ -514,15 +553,23 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Log.i("test",response);
+                Log.i("test", response);
             }
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                Log.i("test",exception.toString());
+                Log.i("test", exception.toString());
 
             }
         });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+//        if(runnable!=null){
+//            mHandler.removeCallbacks(runnable);
+//        }
+        super.onDestroy();
     }
 }

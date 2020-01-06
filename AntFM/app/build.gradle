@@ -25,7 +25,7 @@ android {
 
     MtjCirclePluginConfig {
 
-        appkey = "8a3086f16e"
+        appkey = "ed95bcc12a"
         // 设置debug 开关，如果需要查看日志则打开开关，为避免影响性能建议上线前关闭（设置为false）
         debug = false
         // 默认启动此插件，如果开发者不需要可以禁用（设置为false）
@@ -230,5 +230,6 @@ dependencies {
     implementation 'com.gyf.immersionbar:immersionbar:3.0.0'
     // fragment快速实现（可选）
     implementation 'com.gyf.immersionbar:immersionbar-components:3.0.0'
+    implementation 'io.sentry:sentry-android:1.7.27'
     implementation externalGlide
 }

@@ -221,8 +221,12 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
                             @Override
                             public void onClick(View v) {
                                 if (mAlbum.getAuthor_info() != null && mAlbum.getAuthor_info().getMerchant() != null) {
-                                    Intent it = new Intent(AlbumDetailActivity.this, OrganizationDetailActivity.class);
-                                    it.putExtra("organizationId", mAlbum.getAuthor_info().getMerchant().getId());
+//                                    Intent it = new Intent(AlbumDetailActivity.this, OrganizationDetailActivity.class);
+//                                    it.putExtra("organizationId", mAlbum.getAuthor_info().getMerchant().getId());
+//                                    startActivity(it);
+
+                                    Intent it = new Intent(AlbumDetailActivity.this, WebViewActivity.class);
+                                    it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+mAlbum.getAuthor_info().getMerchant().getId());
                                     startActivity(it);
                                 }
 

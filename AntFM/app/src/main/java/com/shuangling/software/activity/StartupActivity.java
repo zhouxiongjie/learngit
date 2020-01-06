@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -17,6 +18,11 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -58,6 +64,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 
 public class StartupActivity extends Activity implements Handler.Callback {
@@ -102,15 +111,89 @@ public class StartupActivity extends Activity implements Handler.Callback {
 
     private void init() {
         mHandler = new Handler(this);
-//        mHandler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                gotoHome();
-//            }
-//        }, 4000);
 
         getAdvert();
         verifyUserInfo();
+        //缓存文章详情资源
+//        WebView webView=new WebView(this);
+//        webView.setWebViewClient(new WebViewClient() {
+//            // url拦截
+//            @Override
+//            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//                // 使用自己的WebView组件来响应Url加载事件，而不是使用默认浏览器器加载页面
+//                view.loadUrl(url);
+//                // 相应完成返回true
+//                return true;
+//
+//            }
+//
+//            // 页面开始加载
+//            @Override
+//            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+//                //progressBar.setVisibility(View.VISIBLE);
+//                super.onPageStarted(view, url, favicon);
+//            }
+//
+//            // 页面加载完成
+//            @Override
+//            public void onPageFinished(WebView view, String url) {
+//                //progressBar.setVisibility(View.GONE);
+//                super.onPageFinished(view, url);
+//            }
+//
+//            // WebView加载的所有资源url
+//            @Override
+//            public void onLoadResource(WebView view, String url) {
+//                super.onLoadResource(view, url);
+//            }
+//
+//            @Override
+//            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+////				view.loadData(errorHtml, "text/html; charset=UTF-8", null);
+//                super.onReceivedError(view, errorCode, description, failingUrl);
+//            }
+//
+//        });
+//
+//
+//        webView.setWebChromeClient(new WebChromeClient() {
+//            @Override
+//            // 处理javascript中的alert
+//            public boolean onJsAlert(WebView view, String url, String message, final JsResult result) {
+//                return super.onJsAlert(view, url, message, result);
+//            }
+//
+//            ;
+//
+//            @Override
+//            // 处理javascript中的confirm
+//            public boolean onJsConfirm(WebView view, String url, String message, final JsResult result) {
+//                return super.onJsConfirm(view, url, message, result);
+//            }
+//
+//            ;
+//
+//            @Override
+//            // 处理javascript中的prompt
+//            public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, final JsPromptResult result) {
+//                return super.onJsPrompt(view, url, message, defaultValue, result);
+//            }
+//
+//            ;
+//
+//            // 设置网页加载的进度条
+//            @Override
+//            public void onProgressChanged(WebView view, int newProgress) {
+//                super.onProgressChanged(view, newProgress);
+//            }
+//
+//            // 设置程序的Title
+//            @Override
+//            public void onReceivedTitle(WebView view, String title) {
+//                super.onReceivedTitle(view, title);
+//            }
+//        });
+//        webView.loadUrl(ServerInfo.h5IP + ServerInfo.getArticlePage + 0);
     }
 
     public void getAdvert() {

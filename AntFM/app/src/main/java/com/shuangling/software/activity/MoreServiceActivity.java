@@ -205,7 +205,7 @@ public class MoreServiceActivity extends AppCompatActivity implements Handler.Ca
                         it.putExtra("albumId", Integer.parseInt(id));
                         startActivity(it);
                     }else if(type.equals("3")){
-                        Intent it = new Intent(MoreServiceActivity.this, MoreServiceActivity.class);
+                        Intent it = new Intent(MoreServiceActivity.this, ArticleDetailActivity.class);
                         it.putExtra("articleId", Integer.parseInt(id));
                         startActivity(it);
                     }else if(type.equals("4")){

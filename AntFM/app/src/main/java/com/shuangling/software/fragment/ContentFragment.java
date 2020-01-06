@@ -33,6 +33,7 @@ import com.ethanhua.skeleton.Skeleton;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -125,6 +126,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
         mACache = ACache.get(getContext());
         mColumn = (Column) args.getSerializable("Column");
         mHandler = new Handler(this);
+        ClassicsFooter.REFRESH_FOOTER_ALLLOADED="没有更多了";
         super.onCreate(savedInstanceState);
     }
 
@@ -457,7 +459,6 @@ public class ContentFragment extends Fragment implements Handler.Callback {
             case MSG_UPDATE_LIST:
                 try {
                     String result = (String) msg.obj;
-
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         List<ColumnContent> columnContents=JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), ColumnContent.class);
@@ -481,6 +482,10 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                         if (msg.arg1 == GetContent.Refresh.ordinal()) {
                             mColumnContents.addAll(0, columnContents);
                         } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
+                            if(columnContents==null||columnContents.size()==0){
+                                //refreshLayout.setEnableLoadMore(false);
+                                refreshLayout.finishLoadMoreWithNoMoreData();
+                            }
                             mColumnContents.addAll(columnContents);
                         } else {
                             mColumnContents = columnContents;

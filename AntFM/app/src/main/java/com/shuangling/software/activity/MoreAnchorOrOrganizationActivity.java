@@ -197,12 +197,21 @@ public class MoreAnchorOrOrganizationActivity extends AppCompatActivity implemen
                                 @Override
                                 public void onItemClick(int pos) {
                                     if(mType==1){
-                                        Intent it = new Intent(MoreAnchorOrOrganizationActivity.this, OrganizationDetailActivity.class);
-                                        it.putExtra("organizationId", mAnchors.get(pos).getId());
+//                                        Intent it = new Intent(MoreAnchorOrOrganizationActivity.this, OrganizationDetailActivity.class);
+//                                        it.putExtra("organizationId", mAnchors.get(pos).getId());
+//                                        startActivity(it);
+
+                                        Intent it = new Intent(MoreAnchorOrOrganizationActivity.this, WebViewActivity.class);
+                                        it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+mAnchors.get(pos).getId());
                                         startActivity(it);
+
                                     }else {
-                                        Intent it = new Intent(MoreAnchorOrOrganizationActivity.this, AnchorDetailActivity.class);
-                                        it.putExtra("anchorId", mAnchors.get(pos).getId());
+//                                        Intent it = new Intent(MoreAnchorOrOrganizationActivity.this, AnchorDetailActivity.class);
+//                                        it.putExtra("anchorId", mAnchors.get(pos).getId());
+//                                        startActivity(it);
+
+                                        Intent it = new Intent(MoreAnchorOrOrganizationActivity.this, WebViewActivity.class);
+                                        it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+mAnchors.get(pos).getId());
                                         startActivity(it);
                                     }
                                 }

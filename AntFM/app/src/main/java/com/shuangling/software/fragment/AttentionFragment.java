@@ -24,8 +24,10 @@ import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AnchorDetailActivity;
+import com.shuangling.software.activity.AnchorOrOrganizationDetailActivityH5;
 import com.shuangling.software.activity.HistoryActivity;
 import com.shuangling.software.activity.OrganizationDetailActivity;
+import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.adapter.AttentionAdapter;
 import com.shuangling.software.entity.Attention;
 import com.shuangling.software.network.OkHttpCallback;
@@ -197,12 +199,21 @@ public class AttentionFragment extends Fragment implements Handler.Callback {
                                 @Override
                                 public void onItemClick(int pos) {
                                     if (mCategory == R.string.organization) {
-                                        Intent it = new Intent(getContext(), OrganizationDetailActivity.class);
-                                        it.putExtra("organizationId", mAttentions.get(pos).getId());
+//                                        Intent it = new Intent(getContext(), OrganizationDetailActivity.class);
+//                                        it.putExtra("organizationId", mAttentions.get(pos).getId());
+//                                        startActivity(it);
+
+                                        Intent it = new Intent(getContext(), WebViewActivity.class);
+                                        it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+mAttentions.get(pos).getId());
                                         startActivity(it);
+
                                     } else {
-                                        Intent it = new Intent(getContext(), AnchorDetailActivity.class);
-                                        it.putExtra("anchorId", mAttentions.get(pos).getId());
+//                                        Intent it = new Intent(getContext(), AnchorDetailActivity.class);
+//                                        it.putExtra("anchorId", mAttentions.get(pos).getId());
+//                                        startActivity(it);
+
+                                        Intent it = new Intent(getContext(), WebViewActivity.class);
+                                        it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+mAttentions.get(pos).getId());
                                         startActivity(it);
                                     }
                                 }

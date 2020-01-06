@@ -339,13 +339,21 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
                 public void run() {
                     if (type.equals("2")) {
                         //主播
-                        Intent it = new Intent(SpecialDetailActivity.this, AnchorDetailActivity.class);
-                        it.putExtra("anchorId", Integer.parseInt(id));
+//                        Intent it = new Intent(SpecialDetailActivity.this, AnchorDetailActivity.class);
+//                        it.putExtra("anchorId", Integer.parseInt(id));
+//                        startActivity(it);
+                        Intent it = new Intent(SpecialDetailActivity.this, WebViewActivity.class);
+                        it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+id);
                         startActivity(it);
+
                     } else if (type.equals("3")) {
                         //机构
-                        Intent it = new Intent(SpecialDetailActivity.this, OrganizationDetailActivity.class);
-                        it.putExtra("organizationId", Integer.parseInt(id));
+//                        Intent it = new Intent(SpecialDetailActivity.this, OrganizationDetailActivity.class);
+//                        it.putExtra("organizationId", Integer.parseInt(id));
+//                        startActivity(it);
+
+                        Intent it = new Intent(SpecialDetailActivity.this, WebViewActivity.class);
+                        it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+id);
                         startActivity(it);
                     }
                 }

@@ -157,17 +157,36 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
             final HeadViewHolder viewHolder = (HeadViewHolder) holder;
             if (mVideoDetail != null) {
                 viewHolder.videoTitle.setText(mVideoDetail.getTitle());
-                viewHolder.playTimes.setText("简介:"+mVideoDetail.getDes());
-                viewHolder.videoTitle.setOnCollapseOrExpande(new ReadMoreTextViewWithIcon.OnCollapseOrExpande() {
+                viewHolder.playTimes.setText("简介:" + mVideoDetail.getDes());
+                viewHolder.playTimes.setVisibility(View.GONE);
+                viewHolder.showMore.setTag(false);
+                viewHolder.showMore.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void textCollapseOrExpanded(boolean collapse) {
-                        if(collapse){
-                            viewHolder.playTimes.setVisibility(View.GONE);
-                        }else{
+                    public void onClick(View v) {
+                        boolean extend=(boolean)v.getTag();
+                        extend=!extend;
+                        v.setTag(extend);
+                        if(extend){
+                            viewHolder.videoTitle.setMaxLines(Integer.MAX_VALUE);
                             viewHolder.playTimes.setVisibility(View.VISIBLE);
+                            viewHolder.showMore.setImageResource(R.drawable.more_up);
+                        }else{
+                            viewHolder.playTimes.setVisibility(View.GONE);
+                            viewHolder.videoTitle.setMaxLines(1);
+                            viewHolder.showMore.setImageResource(R.drawable.more_down);
                         }
                     }
                 });
+//                viewHolder.videoTitle.setOnCollapseOrExpande(new ReadMoreTextViewWithIcon.OnCollapseOrExpande() {
+//                    @Override
+//                    public void textCollapseOrExpanded(boolean collapse) {
+//                        if (collapse) {
+//                            viewHolder.playTimes.setVisibility(View.GONE);
+//                        } else {
+//                            viewHolder.playTimes.setVisibility(View.VISIBLE);
+//                        }
+//                    }
+//                });
                 if (mVideoDetail.getIs_likes() == 0) {
                     viewHolder.praiseSum.setActivated(true);
                 } else {
@@ -234,9 +253,9 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
 
         } else if (getItemViewType(position) == TYPE_COMMENT_TOP) {
             CommentTopViewHolder viewHolder = (CommentTopViewHolder) holder;
-            if(mTotalComments==0){
+            if (mTotalComments == 0) {
                 viewHolder.commentNum.setText("");
-            }else{
+            } else {
                 viewHolder.commentNum.setText("(" + mTotalComments + ")");
             }
 
@@ -244,7 +263,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
         } else if (getItemViewType(position) == TYPE_NO_COMMENT) {
 
 
-        }else {
+        } else {
             final CommentViewHolder viewHolder = (CommentViewHolder) holder;
             int pos = mPostContents != null ? position - 2 - mPostContents.size() : position - 2;
             final Comment comment = mComments.get(pos);
@@ -322,7 +341,9 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
 
     class HeadViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.videoTitle)
-        ReadMoreTextViewWithIcon videoTitle;
+        TextView videoTitle;
+        @BindView(R.id.showMore)
+        ImageView showMore;
         @BindView(R.id.playTimes)
         TextView playTimes;
         @BindView(R.id.praiseSum)
@@ -376,7 +397,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
     }
 
 
-    static class NoCommentViewHolder extends RecyclerView.ViewHolder{
+    static class NoCommentViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.noScriptText)
         TextView noScriptText;
         @BindView(R.id.noData)
@@ -447,7 +468,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
                     } else if (position == mPostContents.size() + 2) {
                         if (mComments == null || mComments.size() == 0) {
                             return TYPE_NO_COMMENT;
-                        }else{
+                        } else {
                             return TYPE_COMMENT;
                         }
                     } else {
@@ -457,13 +478,13 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
             } else {
                 if (position == 1) {
                     return TYPE_COMMENT_TOP;
-                } else if(position==2){
+                } else if (position == 2) {
                     if (mComments == null || mComments.size() == 0) {
                         return TYPE_NO_COMMENT;
-                    }else{
+                    } else {
                         return TYPE_COMMENT;
                     }
-                }else{
+                } else {
                     return TYPE_COMMENT;
                 }
             }

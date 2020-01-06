@@ -25,9 +25,11 @@ import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.TvDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
+import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.entity.SearchResult;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
+import com.shuangling.software.utils.ServerInfo;
 
 import java.util.List;
 
@@ -266,8 +268,11 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             anchorViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, AnchorDetailActivity.class);
-                    it.putExtra("anchorId", content.getId());
+//                    Intent it = new Intent(mContext, AnchorDetailActivity.class);
+//                    it.putExtra("anchorId", content.getId());
+//                    mContext.startActivity(it);
+                    Intent it = new Intent(mContext, WebViewActivity.class);
+                    it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+content.getId());
                     mContext.startActivity(it);
                 }
             });
@@ -338,8 +343,12 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             organizationViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, OrganizationDetailActivity.class);
-                    it.putExtra("organizationId", content.getId());
+//                    Intent it = new Intent(mContext, OrganizationDetailActivity.class);
+//                    it.putExtra("organizationId", content.getId());
+//                    mContext.startActivity(it);
+
+                    Intent it = new Intent(mContext, WebViewActivity.class);
+                    it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+content.getId());
                     mContext.startActivity(it);
                 }
             });

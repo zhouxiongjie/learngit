@@ -30,7 +30,6 @@
         android:layout_marginTop="5dp"
         android:textSize="@dimen/font_size_24px"
         android:textColor="@color/textColorTwo"
-        android:textStyle="bold"
         android:text="李小四"/>
 
 

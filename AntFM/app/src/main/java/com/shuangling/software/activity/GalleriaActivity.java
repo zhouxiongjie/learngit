@@ -350,13 +350,22 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
                 public void run() {
                     if (type.equals("2")) {
                         //主播
-                        Intent it = new Intent(GalleriaActivity.this, AnchorDetailActivity.class);
-                        it.putExtra("anchorId", Integer.parseInt(id));
+//                        Intent it = new Intent(GalleriaActivity.this, AnchorDetailActivity.class);
+//                        it.putExtra("anchorId", Integer.parseInt(id));
+//                        startActivity(it);
+
+                        Intent it = new Intent(GalleriaActivity.this, WebViewActivity.class);
+                        it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+id);
                         startActivity(it);
+
                     } else if (type.equals("3")) {
                         //机构
-                        Intent it = new Intent(GalleriaActivity.this, OrganizationDetailActivity.class);
-                        it.putExtra("organizationId", Integer.parseInt(id));
+//                        Intent it = new Intent(GalleriaActivity.this, OrganizationDetailActivity.class);
+//                        it.putExtra("organizationId", Integer.parseInt(id));
+//                        startActivity(it);
+
+                        Intent it = new Intent(GalleriaActivity.this, WebViewActivity.class);
+                        it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+id);
                         startActivity(it);
                     }
                 }

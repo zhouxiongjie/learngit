@@ -131,7 +131,8 @@ public class ReadMoreTextViewWithIcon extends TextView {
         switch (trimMode) {
             case TRIM_MODE_LINES:
                 //trimEndIndex = lineEndIndex - (ELLIPSIZE.length() + trimCollapsedText.length() + 1);
-                trimEndIndex = lineEndIndex - (ELLIPSIZE.length()  + 1);
+                int s=ELLIPSIZE.length();
+                trimEndIndex = lineEndIndex - (ELLIPSIZE.length()/2);
                 if (trimEndIndex < 0) {
                     trimEndIndex = trimLength + 1;
                 }
@@ -250,8 +251,9 @@ public class ReadMoreTextViewWithIcon extends TextView {
                     refreshLineEndIndex();
                     if(lineEndIndex!=0&&lineEndIndex!=INVALID_END_INDEX){
                         obs.removeOnGlobalLayoutListener(this);
+                        setText();
                     }
-                    setText();
+
                 }
 
 

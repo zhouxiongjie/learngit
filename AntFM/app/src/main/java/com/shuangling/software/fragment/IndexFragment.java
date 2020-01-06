@@ -41,6 +41,7 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.AnchorDetailActivity;
+import com.shuangling.software.activity.AnchorOrOrganizationDetailActivityH5;
 import com.shuangling.software.activity.ArticleDetailActivity;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.CityListActivity;
@@ -634,8 +635,12 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                             anchorView.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Intent it = new Intent(getContext(), AnchorDetailActivity.class);
-                                    it.putExtra("anchorId", anchor.getId());
+//                                    Intent it = new Intent(getContext(), AnchorDetailActivity.class);
+//                                    it.putExtra("anchorId", anchor.getId());
+//                                    startActivity(it);
+
+                                    Intent it = new Intent(getContext(), WebViewActivity.class);
+                                    it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+anchor.getId());
                                     startActivity(it);
                                 }
                             });
@@ -728,8 +733,13 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                             anchorView.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Intent it = new Intent(getContext(), OrganizationDetailActivity.class);
-                                    it.putExtra("organizationId", organization.getId());
+//                                    Intent it = new Intent(getContext(), OrganizationDetailActivity.class);
+//                                    it.putExtra("organizationId", organization.getId());
+//                                    startActivity(it);
+
+
+                                    Intent it = new Intent(getContext(), WebViewActivity.class);
+                                    it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+organization.getId());
                                     startActivity(it);
                                 }
                             });

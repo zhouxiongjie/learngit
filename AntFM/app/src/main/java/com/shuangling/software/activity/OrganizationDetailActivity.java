@@ -626,8 +626,12 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
                                 anchorView.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        Intent it = new Intent(OrganizationDetailActivity.this, OrganizationDetailActivity.class);
-                                        it.putExtra("organizationId", organization.getId());
+//                                        Intent it = new Intent(OrganizationDetailActivity.this, OrganizationDetailActivity.class);
+//                                        it.putExtra("organizationId", organization.getId());
+//                                        startActivity(it);
+
+                                        Intent it = new Intent(OrganizationDetailActivity.this, WebViewActivity.class);
+                                        it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+organization.getId());
                                         startActivity(it);
                                     }
                                 });

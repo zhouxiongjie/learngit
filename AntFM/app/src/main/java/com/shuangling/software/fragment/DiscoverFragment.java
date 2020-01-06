@@ -32,6 +32,7 @@ import com.gyf.immersionbar.components.SimpleImmersionFragment;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.LoginActivity;
@@ -446,7 +447,7 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
                         it.putExtra("albumId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("3")) {
-                        Intent it = new Intent(getContext(), WebViewActivity.class);
+                        Intent it = new Intent(getContext(), ArticleDetailActivity.class);
                         it.putExtra("articleId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("4")) {

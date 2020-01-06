@@ -80,6 +80,7 @@ import butterknife.ButterKnife;
 import cn.jake.share.frdialog.dialog.FRDialog;
 import cn.jake.share.frdialog.interfaces.FRDialogClickListener;
 import io.reactivex.functions.Consumer;
+import io.sentry.Sentry;
 import okhttp3.Call;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;

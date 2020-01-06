@@ -22,6 +22,7 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.hjq.toast.ToastUtils;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.mob.MobSDK;
+import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 import com.shuangling.software.dao.DaoMaster;
 import com.shuangling.software.dao.DaoSession;
 import com.shuangling.software.entity.Station;
@@ -29,6 +30,7 @@ import com.shuangling.software.network.ElnImageDownloaderFetcher;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.service.AudioPlayerService;
+import com.shuangling.software.utils.CrashHandler;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.MyToastStyle;
 import com.shuangling.software.utils.ServerInfo;
@@ -38,6 +40,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import io.sentry.Sentry;
+import io.sentry.android.AndroidSentryClientFactory;
 import okhttp3.Call;
 
 
@@ -77,6 +82,9 @@ public class MyApplication extends MultiDexApplication {
 //
 //        Fresco.initialize(this, config);
 //        Fresco.initialize(this);
+        Sentry.init("http://a31a66f6b5ee4bd4ad7ef75899bfd28f@47.94.104.239:9000/7", new AndroidSentryClientFactory(this));
+        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler());
+
         initFresco();
 
 		MobSDK.init(this);

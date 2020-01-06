@@ -7,7 +7,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="10dp">
-
     <TextView
         android:id="@+id/excellent"
         android:layout_marginBottom="5dp"
@@ -18,6 +17,7 @@
         android:textSize="@dimen/font_size_36px"
         android:textStyle="bold"
         android:visibility="gone"/>
+
 
     <RelativeLayout
         android:layout_width="match_parent"

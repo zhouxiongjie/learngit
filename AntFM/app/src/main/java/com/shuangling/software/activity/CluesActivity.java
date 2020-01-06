@@ -387,7 +387,7 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
                         it.putExtra("albumId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("3")) {
-                        Intent it = new Intent(CluesActivity.this, CluesActivity.class);
+                        Intent it = new Intent(CluesActivity.this, ArticleDetailActivity.class);
                         it.putExtra("articleId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("4")) {

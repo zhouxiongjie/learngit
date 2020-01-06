@@ -501,7 +501,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
             });
 
         }else if(itemViewType == TYPE_ACTIVITY){
-            final ColumnContentAdapter.ActivityViewHolder activityViewHolder = (ColumnContentAdapter.ActivityViewHolder) holder;
+            final ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
 
             if (content.getTop() != null) {
                 activityViewHolder.top.setVisibility(View.VISIBLE);
@@ -568,7 +568,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
             });
 
         }else if(itemViewType == TYPE_LIVE){
-            final ColumnContentAdapter.LiveViewHolder liveViewHolder = (ColumnContentAdapter.LiveViewHolder) holder;
+            final LiveViewHolder liveViewHolder = (LiveViewHolder) holder;
 
             if (content.getTop() != null) {
                 liveViewHolder.top.setVisibility(View.VISIBLE);

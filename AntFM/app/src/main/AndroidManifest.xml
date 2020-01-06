@@ -268,6 +268,11 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="com.shuangling.software.activity.AnchorOrOrganizationDetailActivityH5"
+            android:screenOrientation="portrait" >
+        </activity>
+
 
 
         <service android:name="com.shuangling.software.service.AudioPlayerService" />
@@ -301,6 +306,7 @@
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="${GD_KEY}" />
+
 
     </application>
 </manifest>

@@ -7,10 +7,10 @@
     android:paddingBottom="20dp"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:padding="10dp">
 
         <!--<TextView-->
@@ -22,31 +22,56 @@
             <!--android:textSize="@dimen/font_size_34px"-->
             <!--android:textStyle="bold" />-->
 
-        <com.shuangling.software.customview.ReadMoreTextViewWithIcon
+        <!--<com.shuangling.software.customview.ReadMoreTextViewWithIcon-->
+            <!--android:id="@+id/videoTitle"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:trimCollapsedText="全文"-->
+            <!--app:trimLength="22"-->
+            <!--app:trimMode="trimModeLength"-->
+            <!--app:trimLines="1"-->
+            <!--android:textStyle="bold"-->
+            <!--tools:text="伊金霍洛旗新闻坚持时事政治、地方特色，大力开展文化运动，呼吁大家爱岗敬业伊金霍洛旗新闻坚持时事政治、地方特色，大力开展文化运动，呼吁大家爱岗敬业"-->
+            <!--android:textColor="@color/textColorTwo"-->
+            <!--android:textSize="@dimen/font_size_34px" />-->
+
+        <TextView
             android:id="@+id/videoTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            app:trimCollapsedText="全文"
-            app:trimLength="20"
-            app:trimMode="trimModeLine"
-            app:trimLines="1"
+            android:layout_toLeftOf="@+id/showMore"
+            android:layout_centerVertical="true"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:textStyle="bold"
-            tools:text="伊金霍洛旗新闻坚持时事政治、地方特色，大力开展文化运动，呼吁大家爱岗敬业伊金霍洛旗新闻坚持时事政治、地方特色，大力开展文化运动，呼吁大家爱岗敬业"
+            tools:text="伊金霍洛旗新闻坚持时事政治、地方特色，伊金霍洛旗新闻坚持时事政治、地方特色，大力开展文化运动，呼吁大家爱岗敬业伊金霍洛旗新闻坚持时事政治、地方特色，大力开展文化运动，呼吁大家爱岗敬业"
             android:textColor="@color/textColorTwo"
             android:textSize="@dimen/font_size_34px" />
 
-
-        <TextView
-            android:id="@+id/playTimes"
+        <ImageView
+            android:id="@+id/showMore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="25万次播放"
-            android:textColor="@color/textColorSeven"
-            android:textSize="@dimen/font_size_22px" />
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/more_down"
+            android:padding="5dp"/>
 
-    </LinearLayout>
+
+
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/playTimes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="25万次播放"
+        android:textColor="@color/textColorSeven"
+        android:textSize="@dimen/font_size_24px" />
 
     <LinearLayout
         android:layout_width="wrap_content"

@@ -23,6 +23,8 @@ import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AnchorDetailActivity;
+import com.shuangling.software.activity.AnchorOrOrganizationDetailActivityH5;
+import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.adapter.ProgramAnchorAdapter;
 import com.shuangling.software.entity.Anchor;
 import com.shuangling.software.entity.AnchorOrganizationColumn;
@@ -214,8 +216,11 @@ public class ProgramAnchorFragment extends Fragment implements Handler.Callback 
                                 @Override
                                 public void onItemClick(int pos) {
 
-                                    Intent it = new Intent(getContext(), AnchorDetailActivity.class);
-                                    it.putExtra("anchorId", mAnchors.get(pos).getId());
+//                                    Intent it = new Intent(getContext(), AnchorDetailActivity.class);
+//                                    it.putExtra("anchorId", mAnchors.get(pos).getId());
+//                                    startActivity(it);
+                                    Intent it = new Intent(getContext(), WebViewActivity.class);
+                                    it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+mAnchors.get(pos).getId());
                                     startActivity(it);
                                 }
                             });

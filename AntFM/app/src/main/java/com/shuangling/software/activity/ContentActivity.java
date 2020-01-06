@@ -1194,13 +1194,21 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
 
         }else if(url.startsWith(ServerInfo.h5IP+"/orgs/")||url.startsWith(ServerInfo.h5HttpsIP+"/orgs/")){
             String organizationId=url.substring(url.lastIndexOf("/")+1);
-            Intent it = new Intent(this, OrganizationDetailActivity.class);
-            it.putExtra("organizationId", Integer.parseInt(organizationId));
+//            Intent it = new Intent(this, OrganizationDetailActivity.class);
+//            it.putExtra("organizationId", Integer.parseInt(organizationId));
+//            startActivity(it);
+            Intent it = new Intent(this, WebViewActivity.class);
+            it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+organizationId);
             startActivity(it);
+
         }else if(url.startsWith(ServerInfo.h5IP+"/anchors/")||url.startsWith(ServerInfo.h5HttpsIP+"/anchors/")){
             String anchorId=url.substring(url.lastIndexOf("/")+1);
-            Intent it = new Intent(this, AnchorDetailActivity.class);
-            it.putExtra("anchorId", Integer.parseInt(anchorId));
+//            Intent it = new Intent(this, AnchorDetailActivity.class);
+//            it.putExtra("anchorId", Integer.parseInt(anchorId));
+//            startActivity(it);
+
+            Intent it = new Intent(this, WebViewActivity.class);
+            it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+anchorId);
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/atlas/")||url.startsWith(ServerInfo.h5HttpsIP+"/atlas/")){
             String galleriaId=url.substring(url.lastIndexOf("/")+1);
@@ -1249,6 +1257,22 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
                 Intent it = new Intent(this, LoginActivity.class);
                 startActivity(it);
             }
+        }else if (url.startsWith(ServerInfo.h5IP + "/invitation-post") || url.startsWith(ServerInfo.h5HttpsIP + "/invitation-post")) {
+            Intent it = new Intent(this, WebViewActivity.class);
+            it.putExtra("url", url);
+            startActivity(it);
+        }else if (url.startsWith(ServerInfo.h5IP + "/actrank") || url.startsWith(ServerInfo.h5HttpsIP + "/actrank")) {
+            Intent it = new Intent(this, WebViewActivity.class);
+            it.putExtra("url", url);
+            startActivity(it);
+        }else if (url.startsWith(ServerInfo.h5IP + "/wish") || url.startsWith(ServerInfo.h5HttpsIP + "/wish")) {
+            Intent it = new Intent(this, WebViewActivity.class);
+            it.putExtra("url", url);
+            startActivity(it);
+        }else if (url.startsWith(ServerInfo.h5IP + "/actlist") || url.startsWith(ServerInfo.h5HttpsIP + "/actlist")) {
+            Intent it = new Intent(this, WebViewActivity.class);
+            it.putExtra("url", url);
+            startActivity(it);
         }else {
             Intent it=new Intent(this,WebViewBackActivity.class);
             it.putExtra("url",url);

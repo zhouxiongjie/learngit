@@ -749,7 +749,7 @@ public class AudioRecyclerAdapter extends RecyclerView.Adapter implements View.O
 
     public class VideoViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.excellent)
-        RelativeLayout excellent;
+        TextView excellent;
         @BindView(R.id.logo)
         SimpleDraweeView logo;
         @BindView(R.id.duration)

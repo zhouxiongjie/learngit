@@ -18,6 +18,8 @@ public class ServerInfo {
 
 	public static String scs="http://www-scs-c.staging.slradio.cn";
 
+    public static String emc="http://api-emc.staging.slradio.cn";
+
 
 
 
@@ -200,4 +202,23 @@ public class ServerInfo {
 	public static String getAnchorOrOrganizationLive="/v2/live/";
 
 	public static String getServices="/v1/services";
+
+
+
+	public static String accountDetail="/v1/consumer/account";
+
+	public static String incomeDetail="/v1/consumer/account/details";
+
+	public static String takeCashDetail="/v1/consumer/transfers";
+
+	public static String takeCashAccount="/v1/consumer/transfer_alipay";
+
+	public static String bindZhifubao="/v1/consumer/transfer_alipay";			//绑定支付宝
+
+	public static String requestCash="/v1/consumer/transfers";					//发起提现请求
+
+	public static String getCashDetail="/v1/consumer/transfers/";				//获取提现详情
+
+	public static String getCashRegular="/v1/consumer/transfer_config";			//获取提现设置
+
 }

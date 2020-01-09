@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:orientation="vertical">
 
     <com.shuangling.software.customview.TopTitleBar
         android:id="@+id/activtyTitle"
@@ -17,66 +17,64 @@
         app:titleText="提现详情" />
 
 
-
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:padding="30dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="30dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:drawableLeft="@drawable/ic_zhifubao_circle"
             android:drawablePadding="5dp"
-            android:layout_gravity="center_horizontal"
-            android:textSize="@dimen/font_size_28px"
+            android:text="支付宝"
             android:textColor="#333333"
-            android:text="支付宝"/>
+            android:textSize="@dimen/font_size_28px" />
 
         <TextView
             android:id="@+id/money"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:textColor="#383838"
             android:textSize="@dimen/font_size_60px"
-            android:textColor="#4690FF"
-            tools:text="1000.00"/>
+            tools:text="1000.00" />
 
         <TextView
             android:id="@+id/status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_gravity="center_horizontal"
-            android:textSize="@dimen/font_size_30px"
+            android:layout_marginTop="10dp"
             android:textColor="#4690FF"
-            tools:text="已到账"/>
+            android:textSize="@dimen/font_size_30px"
+            tools:text="已到账" />
 
     </LinearLayout>
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="6dp"
-        android:background="@color/divideColorOne"/>
+        android:background="@color/divideColorOne" />
 
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:layout_marginTop="10dp">
+        android:paddingRight="10dp">
+
         <TextView
-            android:id="@+id/account"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="处理进度"
             android:textColor="#939393"
-            android:textSize="@dimen/font_size_30px"
-            android:text="处理进度"/>
+            android:textSize="@dimen/font_size_30px" />
 
 
         <LinearLayout
@@ -84,33 +82,37 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:orientation="vertical">
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
+
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:background="@drawable/ic_success"/>
+                        android:background="@drawable/ic_success" />
+
                     <ImageView
                         android:layout_width="2dp"
                         android:layout_height="15dp"
-                        android:background="#18B9FD"
-                        android:layout_gravity="center_horizontal"/>
+                        android:layout_gravity="center_horizontal"
+                        android:background="#18B9FD" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:textSize="@dimen/font_size_30px"
+                    android:text="申请成功"
                     android:textColor="#06B4FD"
-                    android:text="申请成功"/>
+                    android:textSize="@dimen/font_size_30px" />
 
             </LinearLayout>
 
@@ -121,12 +123,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            tools:text="12-05 15:46"
             android:textColor="#8A8A8A"
-            android:textSize="@dimen/font_size_24px" />
+            android:textSize="@dimen/font_size_24px"
+            tools:text="12-05 15:46" />
 
     </RelativeLayout>
-
 
 
     <RelativeLayout
@@ -140,54 +141,56 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:orientation="vertical">
+            android:orientation="horizontal">
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <LinearLayout
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="2dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="#18B9FD" />
+
+                <ImageView
+                    android:id="@+id/processIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <ImageView
-                        android:layout_width="2dp"
-                        android:layout_height="10dp"
-                        android:background="#18B9FD"
-                        android:layout_gravity="center_horizontal"/>
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:background="@drawable/ic_fail"/>
-                    <ImageView
-                        android:layout_width="2dp"
-                        android:layout_height="10dp"
-                        android:background="#18B9FD"
-                        android:layout_gravity="center_horizontal"/>
-                </LinearLayout>
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/ic_fail" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_gravity="center_vertical"
-                    android:textSize="@dimen/font_size_30px"
-                    android:textColor="#F32E0D"
-                    android:text="提现失败"/>
-
+                <ImageView
+                    android:id="@+id/processDown"
+                    android:layout_width="2dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="#18B9FD" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/processDes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:text="提现失败"
+                android:textColor="#F32E0D"
+                android:textSize="@dimen/font_size_30px" />
 
         </LinearLayout>
 
-        <TextView
 
+        <TextView
+            android:id="@+id/processTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            tools:text="12-05 15:46"
             android:textColor="#8A8A8A"
-            android:textSize="@dimen/font_size_24px" />
+            android:textSize="@dimen/font_size_24px"
+            tools:text="12-05 15:46" />
 
     </RelativeLayout>
 
@@ -199,44 +202,55 @@
 
 
         <LinearLayout
+            android:id="@+id/a"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:orientation="vertical">
+            android:orientation="horizontal">
+
             <LinearLayout
+                android:id="@+id/c"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <LinearLayout
-                    android:id="@+id/c"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/finishUp"
+                    android:layout_width="2dp"
+                    android:layout_height="15dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="#18B9FD" />
+
+                <ImageView
+                    android:id="@+id/finishIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <ImageView
-                        android:layout_width="2dp"
-                        android:layout_height="15dp"
-                        android:background="#18B9FD"
-                        android:layout_gravity="center_horizontal"/>
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:background="@drawable/ic_process"/>
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-
-                    android:layout_marginLeft="10dp"
-                    android:layout_gravity="bottom"
-                    android:textSize="@dimen/font_size_30px"
-                    android:textColor="#898989"
-                    android:text="到账成功"/>
-
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/ic_process" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/finishDes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginLeft="10dp"
+                android:text="到账成功"
+                android:textColor="#898989"
+                android:textSize="@dimen/font_size_30px" />
+
         </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/finishTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/a"
+            android:layout_alignParentRight="true"
+            android:textColor="#8A8A8A"
+            android:textSize="@dimen/font_size_24px"
+            tools:text="12-05 15:46" />
 
 
     </RelativeLayout>
@@ -251,16 +265,18 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/font_size_30px"
+            android:text="提现到"
             android:textColor="#939393"
-            android:text="提现到"/>
+            android:textSize="@dimen/font_size_30px" />
+
         <TextView
+            android:id="@+id/account"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:textSize="@dimen/font_size_30px"
             android:textColor="#2F2F2F"
-            tools:text="支付宝(18627448956)"/>
+            android:textSize="@dimen/font_size_30px"
+            tools:text="支付宝(18627448956)" />
 
     </RelativeLayout>
 
@@ -269,7 +285,7 @@
         android:layout_height="1px"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:background="#DFDFDF"/>
+        android:background="#DFDFDF" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -279,16 +295,18 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/font_size_30px"
+            android:text="创建时间"
             android:textColor="#939393"
-            android:text="创建时间"/>
+            android:textSize="@dimen/font_size_30px" />
+
         <TextView
+            android:id="@+id/createTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:textSize="@dimen/font_size_30px"
             android:textColor="#2F2F2F"
-            tools:text="2019-12-02 15:46"/>
+            android:textSize="@dimen/font_size_30px"
+            tools:text="2019-12-02 15:46" />
 
     </RelativeLayout>
 
@@ -301,16 +319,18 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/font_size_30px"
+            android:text="订单号"
             android:textColor="#939393"
-            android:text="订单号"/>
+            android:textSize="@dimen/font_size_30px" />
+
         <TextView
+            android:id="@+id/orderNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:textSize="@dimen/font_size_30px"
             android:textColor="#2F2F2F"
-            tools:text="20191202200040011100390095644749"/>
+            android:textSize="@dimen/font_size_30px"
+            tools:text="20191202200040011100390095644749" />
 
     </RelativeLayout>
 

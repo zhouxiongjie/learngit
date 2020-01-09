@@ -105,6 +105,7 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(MyApplication.getInstance().getCurrentTheme());
         setContentView(R.layout.activity_album_detail);
         super.onCreate(savedInstanceState);
 

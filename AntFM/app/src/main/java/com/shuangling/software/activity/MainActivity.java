@@ -53,6 +53,7 @@ import com.shuangling.software.entity.UpdateInfo;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.fragment.DiscoverFragment;
 import com.shuangling.software.fragment.PersonalCenterFragment;
+import com.shuangling.software.fragment.PersonalCenterFragment01;
 import com.shuangling.software.fragment.RadioListFragment;
 import com.shuangling.software.fragment.RecommendFragment;
 import com.shuangling.software.fragment.ServiceFragment;
@@ -780,7 +781,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
                                             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                                             if (personalCenterFragment == null) {
-                                                personalCenterFragment = new PersonalCenterFragment();
+                                                personalCenterFragment = new PersonalCenterFragment01();
                                                 transaction.add(R.id.content, personalCenterFragment);
                                             } else {
                                                 transaction.show(personalCenterFragment);

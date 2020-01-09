@@ -1,6 +1,9 @@
 package com.shuangling.software.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,23 +14,39 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSONObject;
+import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
+import com.shuangling.software.entity.AccountInfo;
+import com.shuangling.software.entity.User;
 import com.shuangling.software.fragment.AttentionFragment;
+import com.shuangling.software.fragment.CashIncomeFragment;
+import com.shuangling.software.fragment.TakeCashFragment;
+import com.shuangling.software.network.OkHttpCallback;
+import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.Call;
 
 @EnableDragToClose()
-public class MyWalletsActivity extends AppCompatActivity {
+public class MyWalletsActivity extends AppCompatActivity implements Handler.Callback {
 
     public static final String TAG = "MyWalletsActivity";
+
+    private static final int MSG_ACCOUNT_DETAIL = 0;
 
 
     public static final int[] category = new int[]{R.string.income, R.string.cash_record};
@@ -45,6 +64,7 @@ public class MyWalletsActivity extends AppCompatActivity {
 
     private FragmentAdapter mFragmentPagerAdapter;
     public int mCurrentItem;
+    private Handler mHandler;
 
 
     @Override
@@ -60,6 +80,7 @@ public class MyWalletsActivity extends AppCompatActivity {
 
 
     private void init() {
+        mHandler=new Handler(this);
         mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager());
         viewPager.setAdapter(mFragmentPagerAdapter);
         tabPageIndicator.setupWithViewPager(viewPager);
@@ -81,18 +102,83 @@ public class MyWalletsActivity extends AppCompatActivity {
             }
         });
 
+        getAccountDetail();
+
+    }
+
+
+    private void getAccountDetail() {
+
+        String url = ServerInfo.emc + ServerInfo.accountDetail;
+        Map<String, String> params = new HashMap<String, String>();
+
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = mHandler.obtainMessage(MSG_ACCOUNT_DETAIL);
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
     }
 
 
 
-    @OnClick({R.id.cash})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.cash:
-                //EventBus.getDefault().post("historySelectAll");
-                break;
+//    @OnClick({R.id.cash})
+//    public void onViewClicked(View view) {
+//        switch (view.getId()) {
+//            case R.id.cash:
+//                Intent it=new Intent(this,CashDetailActivity.class);
+//                startActivity(it);
+//                break;
+//
+//        }
+//    }
 
+    @Override
+    public boolean handleMessage(Message msg) {
+
+        switch (msg.what) {
+            case MSG_ACCOUNT_DETAIL:
+                try{
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        final AccountInfo accountInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), AccountInfo.class);
+
+                        if(accountInfo!=null){
+                            money.setText(String.format("%.2f",(float)accountInfo.getFree_balance()/100));
+
+                            cash.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    Intent it=new Intent(MyWalletsActivity.this,CashActivity.class);
+                                    it.putExtra("money",accountInfo.getFree_balance());
+                                    startActivity(it);
+                                }
+                            });
+                        }
+
+
+                    }else if(jsonObject != null){
+                        ToastUtils.show(jsonObject.getString("msg"));
+                    }
+                }catch (Exception e){
+
+                }
+                break;
         }
+        return false;
     }
 
 
@@ -115,11 +201,21 @@ public class MyWalletsActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
 
 
-            AttentionFragment fragment = new AttentionFragment();
-            Bundle bundle = new Bundle();
-            bundle.putInt("category", category[position]);
-            fragment.setArguments(bundle);
-            return fragment;
+            if(position==0){
+                CashIncomeFragment fragment = new CashIncomeFragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt("category", category[position]);
+                fragment.setArguments(bundle);
+                return fragment;
+            }else{
+                TakeCashFragment fragment = new TakeCashFragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt("category", category[position]);
+                fragment.setArguments(bundle);
+                return fragment;
+            }
+
+
 
 
         }

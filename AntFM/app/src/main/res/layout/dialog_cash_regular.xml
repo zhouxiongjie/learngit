@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_account_setting_bg"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_gravity="right|top"
+            android:padding="10dp"
+            android:src="@drawable/float_close_icon"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-15dp"
+            android:padding="10dp"
+            android:textSize="@dimen/font_size_34px"
+            android:textColor="#232323"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:text="规则说明"/>
+
+
+        <TextView
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            tools:text="1、支付宝账号或姓名输入错误将无法提现到账\n2、使用支付宝提现需要您已注册支付宝并 在支付宝中实名认证；\n3、支付宝账号是您注册支付宝的手机号或 者邮箱号您可以登陆支付宝查看。"
+            android:textColor="#232323"
+            android:lineSpacingExtra="5dp"
+            android:textSize="@dimen/font_size_34px"
+            android:layout_marginBottom="50dp"
+            android:layout_marginTop="10dp"/>
+
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

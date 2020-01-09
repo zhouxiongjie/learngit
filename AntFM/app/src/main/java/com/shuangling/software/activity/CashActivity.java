@@ -1,48 +1,76 @@
 package com.shuangling.software.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSONObject;
+import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
-import com.shuangling.software.fragment.AttentionFragment;
+import com.shuangling.software.dialog.AccountSettingDialog;
+import com.shuangling.software.dialog.CashRegularDialog;
+import com.shuangling.software.dialog.UpdateDialog;
+import com.shuangling.software.entity.User;
+import com.shuangling.software.entity.ZhifubaoAccountInfo;
+import com.shuangling.software.network.OkHttpCallback;
+import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.Call;
 
 @EnableDragToClose()
-public class CashActivity extends AppCompatActivity {
+public class CashActivity extends AppCompatActivity implements Handler.Callback {
 
-    public static final String TAG = "MyWalletsActivity";
+    public static final String TAG = "CashActivity";
 
-
-    public static final int[] category = new int[]{R.string.income, R.string.cash_record};
+    private static final int MSG_ACCOUNT_DETAIL = 0;
+    private static final int MSG_TAKE_CASH = 1;
+    private static final int MSG_CASH_REGULAR = 2;
     @BindView(R.id.activtyTitle)
     TopTitleBar activtyTitle;
     @BindView(R.id.money)
     TextView money;
+    @BindView(R.id.allMoney)
+    TextView allMoney;
+    @BindView(R.id.account)
+    TextView account;
+    @BindView(R.id.modifyAccount)
+    TextView modifyAccount;
     @BindView(R.id.cash)
     TextView cash;
-    @BindView(R.id.tabPageIndicator)
-    TabLayout tabPageIndicator;
-    @BindView(R.id.viewPager)
-    ViewPager viewPager;
+    @BindView(R.id.regular)
+    LinearLayout regular;
+    @BindView(R.id.cashAll)
+    LinearLayout cashAll;
+    @BindView(R.id.customAmount)
+    EditText customAmount;
+    @BindView(R.id.accountLayout)
+    RelativeLayout accountLayout;
 
-
-    private FragmentAdapter mFragmentPagerAdapter;
-    public int mCurrentItem;
+    private int moneySum;
+    private Handler mHandler;
+    private ZhifubaoAccountInfo mZhifubaoAccountInfo;
 
 
     @Override
@@ -50,7 +78,7 @@ public class CashActivity extends AppCompatActivity {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_my_wallets);
+        setContentView(R.layout.activity_cash);
         CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
@@ -58,88 +86,341 @@ public class CashActivity extends AppCompatActivity {
 
 
     private void init() {
-        mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(mFragmentPagerAdapter);
-        tabPageIndicator.setupWithViewPager(viewPager);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mHandler = new Handler(this);
+        moneySum = getIntent().getIntExtra("money", 0);
+        money.setText(String.format("%.2f", (float) moneySum / 100));
+        allMoney.setText(String.format("%.2f", (float) moneySum / 100) + "元");
+        cashAll.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onPageScrolled(int i, float v, int i1) {
-
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                   CommonUtils.hideInput(CashActivity.this);
+                   customAmount.setHint("自定义");
+                }else{
+                    customAmount.setHint("请输入金额");
+                }
             }
-
+        });
+        customAmount.clearFocus();
+        cashAll.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onPageSelected(int i) {
-                mCurrentItem = i;
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-
+            public void onClick(View v) {
+                cashAll.requestFocus();
+//                customAmount.setSelected(false);
+                customAmount.clearFocus();
             }
         });
 
+//        customAmount.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                cashAll.setSelected(false);
+//                customAmount.setSelected(true);
+//            }
+//        });
+        //默认两位小数
+        customAmount.addTextChangedListener(new MoneyTextWatcher(customAmount));
+//手动设置其他位数，例如3
+        customAmount.addTextChangedListener(new MoneyTextWatcher(customAmount).setDigits(2));
+
+        getAccountDetail();
+    }
+
+
+    private void getAccountDetail() {
+
+        String url = ServerInfo.emc + ServerInfo.takeCashAccount;
+        Map<String, String> params = new HashMap<String, String>();
+
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = mHandler.obtainMessage(MSG_ACCOUNT_DETAIL);
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+    }
+
+
+    private void getCashRegular() {
+
+        String url = ServerInfo.emc + ServerInfo.getCashRegular;
+        Map<String, String> params = new HashMap<String, String>();
+
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = mHandler.obtainMessage(MSG_CASH_REGULAR);
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
     }
 
 
 
-    @OnClick({R.id.cash})
+    private void takeCash(int money) {
+
+        String url = ServerInfo.emc + ServerInfo.requestCash;
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("money",""+money);
+        params.put("account",mZhifubaoAccountInfo.getAccount());
+        params.put("name",mZhifubaoAccountInfo.getName());
+
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = mHandler.obtainMessage(MSG_TAKE_CASH);
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        ToastUtils.show("提现请求失败，稍候再试");
+                    }
+                });
+            }
+        });
+    }
+
+
+    @OnClick({R.id.cash, R.id.regular})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.cash:
-                //EventBus.getDefault().post("historySelectAll");
+                if(mZhifubaoAccountInfo==null){
+                    ToastUtils.show("请先设置提现账号");
+                }else{
+                    if(cashAll.isFocused()){
+                        if(moneySum>0){
+                         //提现
+                            takeCash(moneySum);
+                        }else{
+                            ToastUtils.show("金额不足，无法提现");
+                        }
+                    }else{
+                        if(TextUtils.isEmpty(customAmount.getText().toString().trim())){
+                            ToastUtils.show("请输入提现金额");
+                        }else{
+                            float money=Float.parseFloat(customAmount.getText().toString().trim());
+                            if(money>0&&(int)(money*100)<=moneySum){
+                                //提现
+                                takeCash((int)(money*100));
+                            }else if((int)(money*100)>moneySum){
+                                ToastUtils.show("余额不足");
+                            }else{
+                                ToastUtils.show("金额要大于0");
+                            }
+                        }
+
+                    }
+                }
+
                 break;
+            case R.id.regular:
 
+                getCashRegular();
+                break;
         }
     }
 
+    @Override
+    public boolean handleMessage(Message msg) {
+        switch (msg.what) {
+            case MSG_ACCOUNT_DETAIL:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        JSONObject jo=jsonObject.getJSONObject("data");
+                        if(jo==null){
+                            account.setText("请输入提现账号");
+                            modifyAccount.setText("");
+                            accountLayout.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    AccountSettingDialog dialog = AccountSettingDialog.getInstance(0, mZhifubaoAccountInfo);
+                                    dialog.setOnOkClickListener(new AccountSettingDialog.OnOkClickListener() {
+                                        @Override
+                                        public void ok() {
+                                            getAccountDetail();
+                                        }
+                                    });
+                                    dialog.show(getSupportFragmentManager(), "AccountSettingDialog");
+                                }
+                            });
+                        }else{
+                            mZhifubaoAccountInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), ZhifubaoAccountInfo.class);
 
-    public class FragmentAdapter extends FragmentStatePagerAdapter {
+                            if (mZhifubaoAccountInfo != null) {
 
-        //private FragmentManager fm;
+                                String acc=mZhifubaoAccountInfo.getAccount();
+                                if(acc.length()>7){
+                                    String sub=acc.substring(3,7);
+                                    account.setText("提现账号" + acc.replace(sub,"****"));
+                                }else{
+                                    account.setText("提现账号" + acc);
+                                }
 
-        public FragmentAdapter(FragmentManager fm) {
-            super(fm);
-            //this.fm = fm;
+                                modifyAccount.setText("修改");
+                                modifyAccount.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        AccountSettingDialog dialog = AccountSettingDialog.getInstance(1, mZhifubaoAccountInfo);
+                                        dialog.setOnOkClickListener(new AccountSettingDialog.OnOkClickListener() {
+                                            @Override
+                                            public void ok() {
+                                                getAccountDetail();
+                                            }
+                                        });
+                                        dialog.show(getSupportFragmentManager(), "AccountSettingDialog");
+                                    }
+                                });
+
+                            }
+                        }
+
+                    } else if (jsonObject != null) {
+                        ToastUtils.show(jsonObject.getString("msg"));
+                    }
+                } catch (Exception e) {
+
+                }
+                break;
+            case MSG_TAKE_CASH:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        int requestId=jsonObject.getJSONObject("data").getInteger("id");
+                        Intent it=new Intent(this,CashDetailActivity.class);
+                        it.putExtra("id",requestId);
+                        startActivity(it);
+
+                    } else if (jsonObject != null) {
+                        ToastUtils.show(jsonObject.getString("msg"));
+                    }else {
+                        ToastUtils.show("提现请求失败");
+                    }
+                } catch (Exception e) {
+
+                }
+                break;
+            case MSG_CASH_REGULAR:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        String rule=jsonObject.getJSONObject("data").getString("rule");
+                        //rule=rule.replace("\\\\n","\\n");
+                        CashRegularDialog.getInstance(rule.replace("\\n","\n")).show(getSupportFragmentManager(), "CashRegularDialog");
+
+
+
+                    } else if (jsonObject != null) {
+                        ToastUtils.show(jsonObject.getString("msg"));
+                    }else {
+                        ToastUtils.show("获取规则说明失败");
+                    }
+                } catch (Exception e) {
+
+                }
+                break;
+        }
+        return false;
+    }
+
+
+    /**
+     * 描述   ：金额输入字体监听类，限制小数点后输入位数
+     * <p>
+     * 默认限制小数点2位
+     * 默认第一位输入小数点时，转换为0.
+     * 如果起始位置为0,且第二位跟的不是".",则无法后续输入
+     * <p>
+     * 作者   ：Created by DuanRui on 2017/9/28.
+     */
+    public class MoneyTextWatcher implements TextWatcher {
+        private EditText editText;
+        private int digits = 2;
+
+        public MoneyTextWatcher(EditText et) {
+            editText = et;
+        }
+
+        public MoneyTextWatcher setDigits(int d) {
+            digits = d;
+            return this;
         }
 
 
         @Override
-        public int getCount() {
-            return category.length;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-
-
-            AttentionFragment fragment = new AttentionFragment();
-            Bundle bundle = new Bundle();
-            bundle.putInt("category", category[position]);
-            fragment.setArguments(bundle);
-            return fragment;
-
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
         }
 
         @Override
-        public CharSequence getPageTitle(int position) {
-            return getResources().getString(category[position]);
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            //删除“.”后面超过2位后的数据
+            if (s.toString().contains(".")) {
+                if (s.length() - 1 - s.toString().indexOf(".") > digits) {
+                    s = s.toString().subSequence(0,
+                            s.toString().indexOf(".") + digits + 1);
+                    editText.setText(s);
+                    editText.setSelection(s.length()); //光标移到最后
+                }
+            }
+            //如果"."在起始位置,则起始位置自动补0
+            if (s.toString().trim().substring(0).equals(".")) {
+                s = "0" + s;
+                editText.setText(s);
+                editText.setSelection(2);
+            }
+
+            //如果起始位置为0,且第二位跟的不是".",则无法后续输入
+            if (s.toString().startsWith("0")
+                    && s.toString().trim().length() > 1) {
+                if (!s.toString().substring(1, 2).equals(".")) {
+                    editText.setText(s.subSequence(0, 1));
+                    editText.setSelection(1);
+                    return;
+                }
+            }
         }
 
         @Override
-        public int getItemPosition(Object object) {
-            return POSITION_NONE;
-        }
+        public void afterTextChanged(Editable s) {
 
-
-        @Override
-        public Object instantiateItem(ViewGroup container, final int position) {
-            Fragment fragment = (Fragment) super.instantiateItem(container, position);
-
-            return fragment;
         }
 
     }
-
 }

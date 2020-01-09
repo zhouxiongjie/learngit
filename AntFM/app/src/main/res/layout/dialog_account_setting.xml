@@ -9,11 +9,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@drawable/dialog_account_setting_bg"
         android:orientation="vertical">
 
 
         <TextView
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="15dp"
@@ -36,10 +37,12 @@
                 android:textColor="#2D2E2D"
                 android:textSize="@dimen/font_size_30px"/>
             <EditText
+                android:id="@+id/name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="请输入真实姓名"
-                android:textColor="#C9C9C9"
+                android:textColorHint="#C9C9C9"
+                android:textColor="@color/textColorTwo"
                 android:textSize="@dimen/font_size_30px"
                 android:layout_marginLeft="10dp"
                 android:background="@drawable/edittext_bg"/>
@@ -60,10 +63,12 @@
                 android:textColor="#2D2E2D"
                 android:textSize="@dimen/font_size_30px"/>
             <EditText
+                android:id="@+id/account"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="请输入账号"
-                android:textColor="#C9C9C9"
+                android:textColorHint="#C9C9C9"
+                android:textColor="@color/textColorTwo"
                 android:textSize="@dimen/font_size_30px"
                 android:layout_marginLeft="10dp"
                 android:background="@drawable/edittext_bg"/>

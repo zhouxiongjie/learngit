@@ -51,9 +51,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-
         Intent it = new Intent(this, AudioPlayerService.class);
         bindService(it, mConnection, Context.BIND_AUTO_CREATE);
     }

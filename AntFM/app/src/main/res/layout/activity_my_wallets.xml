@@ -20,7 +20,7 @@
         android:id="@+id/aa"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
+        android:padding="20dp"
         android:layout_below="@+id/activtyTitle">
 
         <LinearLayout
@@ -44,27 +44,29 @@
                 android:layout_marginTop="20dp"
                 android:textSize="@dimen/font_size_60px"
                 android:textColor="#4690FF"
+                android:textStyle="bold"
                 tools:text="1000.00"/>
             
         </LinearLayout>
-        
+
         <TextView
             android:id="@+id/cash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:textColor="@color/white"
-            android:textSize="@dimen/font_size_30px"
             android:layout_centerVertical="true"
             android:background="@drawable/login_button_bg"
-            android:paddingRight="10dp"
-            android:paddingLeft="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:textStyle="bold"
-            android:text="去提现"/>
+            android:paddingLeft="15dp"
+            android:paddingTop="8dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="8dp"
+            android:text="去提现"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_size_30px"
+            android:textStyle="bold" />
     </RelativeLayout>
     <ImageView
+        android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="6dp"
         android:layout_below="@+id/aa"
@@ -75,16 +77,16 @@
         android:id="@+id/tabPageIndicator"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/aa"
+        android:layout_below="@+id/divider"
         android:textSize="@dimen/font_size_30px"
         android:textStyle="bold"
-        app:tabIndicatorColor="?attr/themeColor"
+        app:tabIndicatorColor="#4690FF"
         app:tabIndicatorFullWidth="false"
         app:tabIndicatorHeight="2dp"
         app:tabMode="fixed"
-        app:tabSelectedTextColor="?attr/themeColor"
+        app:tabSelectedTextColor="#4690FF"
         app:tabTextAppearance="@style/TabTextStyle"
-        app:tabTextColor="@color/black" />
+        app:tabTextColor="#666666" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"

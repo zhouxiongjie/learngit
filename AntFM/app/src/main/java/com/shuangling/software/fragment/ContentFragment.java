@@ -282,13 +282,18 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (getContent == GetContent.Refresh) {
-                            if (refreshLayout.isRefreshing()) {
-                                refreshLayout.finishRefresh();
+                        try{
+                            if (getContent == GetContent.Refresh) {
+                                if (refreshLayout.isRefreshing()) {
+                                    refreshLayout.finishRefresh();
+                                }
+                            } else {
+                                mSkeletonScreen.hide();
                             }
-                        } else {
-                            mSkeletonScreen.hide();
+                        }catch (Exception e){
+
                         }
+
                     }
                 });
 
@@ -304,13 +309,19 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (getContent == GetContent.Refresh) {
-                            if (refreshLayout.isRefreshing()) {
-                                refreshLayout.finishRefresh();
+
+                        try{
+                            if (getContent == GetContent.Refresh) {
+                                if (refreshLayout.isRefreshing()) {
+                                    refreshLayout.finishRefresh();
+                                }
+                            } else {
+                                mSkeletonScreen.hide();
                             }
-                        } else {
-                            mSkeletonScreen.hide();
+                        }catch (Exception e){
+
                         }
+
                     }
                 });
 
@@ -360,15 +371,21 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (getContent == GetContent.Refresh) {
-                            if (refreshLayout.isRefreshing()) {
-                                refreshLayout.finishRefresh();
+
+                        try{
+                            if (getContent == GetContent.Refresh) {
+                                if (refreshLayout.isRefreshing()) {
+                                    refreshLayout.finishRefresh();
+                                }
+                            } else if (getContent == GetContent.LoadMore) {
+                                if (refreshLayout.isLoading()) {
+                                    refreshLayout.finishLoadMore();
+                                }
                             }
-                        } else if (getContent == GetContent.LoadMore) {
-                            if (refreshLayout.isLoading()) {
-                                refreshLayout.finishLoadMore();
-                            }
+                        }catch (Exception e){
+
                         }
+
                     }
                 });
 
@@ -387,15 +404,20 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (getContent == GetContent.Refresh) {
-                            if (refreshLayout.isRefreshing()) {
-                                refreshLayout.finishRefresh();
+                        try{
+                            if (getContent == GetContent.Refresh) {
+                                if (refreshLayout.isRefreshing()) {
+                                    refreshLayout.finishRefresh();
+                                }
+                            } else if (getContent == GetContent.LoadMore) {
+                                if (refreshLayout.isLoading()) {
+                                    refreshLayout.finishLoadMore();
+                                }
                             }
-                        } else if (getContent == GetContent.LoadMore) {
-                            if (refreshLayout.isLoading()) {
-                                refreshLayout.finishLoadMore();
-                            }
+                        }catch (Exception e){
+
                         }
+
                     }
                 });
 

@@ -24,12 +24,14 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:padding="30dp"
+
         android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableLeft="@drawable/ic_money"
+            android:layout_gravity="center_horizontal"
             android:drawablePadding="5dp"
             android:textSize="@dimen/font_size_28px"
             android:textColor="#333333"
@@ -39,10 +41,12 @@
             android:id="@+id/money"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:textSize="@dimen/font_size_60px"
             android:textColor="#4690FF"
-            tools:text="1000.00"/>
+            android:textStyle="bold"
+            tools:text="1.00"/>
 
     </LinearLayout>
 
@@ -72,16 +76,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+
         android:padding="15dp">
 
         <LinearLayout
+            android:id="@+id/cashAll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:background="@drawable/cash_amount_bg"
             android:focusable="true"
-            android:focusableInTouchMode="true">
+            android:focusableInTouchMode="true"
+            android:background="@drawable/cash_amount_bg">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -102,11 +108,14 @@
 
         </LinearLayout>
         <EditText
+            android:id="@+id/customAmount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
+            android:inputType="numberDecimal"
             android:background="@drawable/cash_amount_bg"
             android:hint="自定义"
+            android:cursorVisible="false"
             android:gravity="center">
 
         </EditText>
@@ -118,6 +127,7 @@
         android:background="@color/divideColorOne"/>
 
     <RelativeLayout
+        android:id="@+id/accountLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="15dp">
@@ -137,7 +147,7 @@
             android:layout_centerVertical="true"
             android:drawableRight="@drawable/ic_right"
             android:drawablePadding="5dp"
-            android:text="修改"
+            android:text=""
             android:textColor="#4690FF"
             android:textSize="@dimen/font_size_30px"/>
 

@@ -27,6 +27,7 @@ import com.shuangling.software.activity.AnchorDetailActivity;
 import com.shuangling.software.activity.AnchorOrOrganizationDetailActivityH5;
 import com.shuangling.software.activity.HistoryActivity;
 import com.shuangling.software.activity.OrganizationDetailActivity;
+import com.shuangling.software.activity.SubscribeActivity;
 import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.adapter.AttentionAdapter;
 import com.shuangling.software.entity.Attention;
@@ -134,15 +135,21 @@ public class AttentionFragment extends Fragment implements Handler.Callback {
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
-                if (getContent == GetContent.Refresh) {
-                    if (refreshLayout.isRefreshing()) {
-                        refreshLayout.finishRefresh();
+
+                try{
+                    if (getContent == GetContent.Refresh) {
+                        if (refreshLayout.isRefreshing()) {
+                            refreshLayout.finishRefresh();
+                        }
+                    } else if (getContent == GetContent.LoadMore) {
+                        if (refreshLayout.isLoading()) {
+                            refreshLayout.finishLoadMore();
+                        }
                     }
-                } else if (getContent == GetContent.LoadMore) {
-                    if (refreshLayout.isLoading()) {
-                        refreshLayout.finishLoadMore();
-                    }
+                }catch (Exception e){
+
                 }
+
 
                 Message msg = Message.obtain();
                 msg.what = MSG_UPDATE_LIST;
@@ -155,15 +162,20 @@ public class AttentionFragment extends Fragment implements Handler.Callback {
             @Override
             public void onFailure(Call call, Exception exception) {
 
-                if (getContent == GetContent.Refresh) {
-                    if (refreshLayout.isRefreshing()) {
-                        refreshLayout.finishRefresh();
+                try{
+                    if (getContent == GetContent.Refresh) {
+                        if (refreshLayout.isRefreshing()) {
+                            refreshLayout.finishRefresh();
+                        }
+                    } else if (getContent == GetContent.LoadMore) {
+                        if (refreshLayout.isLoading()) {
+                            refreshLayout.finishLoadMore();
+                        }
                     }
-                } else if (getContent == GetContent.LoadMore) {
-                    if (refreshLayout.isLoading()) {
-                        refreshLayout.finishLoadMore();
-                    }
+                }catch (Exception e){
+
                 }
+
             }
         });
 

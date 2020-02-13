@@ -6,22 +6,36 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.RemoteException;
 import android.view.WindowManager;
 
-import com.aliyun.vodplayer.media.AliyunLocalSource;
-import com.aliyun.vodplayer.media.AliyunVodPlayer;
-import com.aliyun.vodplayer.media.IAliyunVodPlayer;
+import com.alibaba.fastjson.JSONObject;
+import com.aliyun.player.AliPlayer;
+import com.aliyun.player.AliPlayerFactory;
+import com.aliyun.player.IPlayer;
+import com.aliyun.player.bean.ErrorInfo;
+import com.aliyun.player.bean.InfoBean;
+import com.aliyun.player.bean.InfoCode;
+import com.aliyun.player.nativeclass.TrackInfo;
+import com.aliyun.player.source.UrlSource;
+import com.aliyun.player.source.VidAuth;
 import com.hjq.toast.ToastUtils;
-import com.shuangling.software.entity.Audio;
-import com.shuangling.software.entity.AudioDetail;
 import com.shuangling.software.entity.AudioInfo;
+import com.shuangling.software.entity.ResAuthInfo;
 import com.shuangling.software.event.PlayerEvent;
+import com.shuangling.software.network.OkHttpCallback;
+import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ServerInfo;
-
 import org.greenrobot.eventbus.EventBus;
+
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+
+import okhttp3.Call;
 
 public class AudioPlayerService extends Service {
 
@@ -30,7 +44,6 @@ public class AudioPlayerService extends Service {
     public final static int PLAY_ORDER = 0x1;                   //顺序播放
     public final static int PLAY_RANDOM = 0x2;                  //随机播放
     public final static int PLAY_LOOP = 0x3;                    //循环播放
-
     public final static int POSITIVE = 0x0;                     //正序排列
     public final static int INVERTED = 0x1;                     //倒叙排列
 
@@ -58,21 +71,16 @@ public class AudioPlayerService extends Service {
 
     private TimerType mTimerType=TimerType.Cancel;
     private PlaySpeed mPlaySpeed=PlaySpeed.Speed100;
-    private AliyunVodPlayer mAliyunVodPlayer;
-
-    //private AudioDetail mCurrentAudioDetail;
-    //private AudioInfo mCurrentAudioInfo;
-
-//    private static AudioPlayerService sService;
-//    public static AudioPlayerService getInstance() {
-//        return sService;
-//    }
+    private AliPlayer mAliyunVodPlayer;
+    
     private AudioInfo mCurrentAudio;
     private List<AudioInfo> mAudioList;
-    //private List<AudioInfo> mAudioInfoList;
 
     private WindowManager.LayoutParams mLayoutParams;
     private WindowManager mWindowManager;
+
+    private int mPlayerState = IPlayer.idle;
+    private  long mCurrentPosition;
 
     //录制视频计时器
     class PlayCountDownTimer extends CountDownTimer {
@@ -112,9 +120,6 @@ public class AudioPlayerService extends Service {
             }
 
 
-//            mLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL;
-//            mLayoutParams.token = activity.getWindow().getDecorView().getWindowToken();             //必须要
-//            mWindowManager.addView(view, layoutParams);
         }
 
 
@@ -179,24 +184,35 @@ public class AudioPlayerService extends Service {
         public void playAudio (AudioInfo audioInfo) throws RemoteException{
             if (mCurrentAudio == null) {
                 mCurrentAudio = audioInfo;
-                AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
-                asb.setSource(audioInfo.getUrl());
-                //aliyunVodPlayer.setLocalSource(asb.build());
-                AliyunLocalSource mLocalSource = asb.build();
-                mAliyunVodPlayer.prepareAsync(mLocalSource);
+                if(audioInfo.getIsRadio()==1){
+
+                    UrlSource urlSource = new UrlSource();
+                    urlSource.setUri(audioInfo.getUrl());
+                    urlSource.setTitle(audioInfo.getTitle());
+                    mAliyunVodPlayer.setDataSource(urlSource);
+                    mAliyunVodPlayer.prepare();
+                }else{
+                    getAudioAuth(audioInfo.getSourceId());
+                }
+
             } else {
                 if (mCurrentAudio.getId() == audioInfo.getId()) {
                     //如果处于暂停状态，则开始播放
-                    IAliyunVodPlayer.PlayerState playerState=mAliyunVodPlayer.getPlayerState();
-                    if(mAliyunVodPlayer.getPlayerState()!=IAliyunVodPlayer.PlayerState.Prepared&&
-                            mAliyunVodPlayer.getPlayerState()!=IAliyunVodPlayer.PlayerState.Started&&
-                            mAliyunVodPlayer.getPlayerState()!=IAliyunVodPlayer.PlayerState.Paused){
+                    if(mPlayerState!=IPlayer.prepared&&
+                            mPlayerState!=IPlayer.started&&
+                            mPlayerState!=IPlayer.paused){
                         mCurrentAudio = audioInfo;
-                        AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
-                        asb.setSource(audioInfo.getUrl());
-                        //aliyunVodPlayer.setLocalSource(asb.build());
-                        AliyunLocalSource mLocalSource = asb.build();
-                        mAliyunVodPlayer.prepareAsync(mLocalSource);
+                        if(audioInfo.getIsRadio()==1){
+
+                            UrlSource urlSource = new UrlSource();
+                            urlSource.setUri(audioInfo.getUrl());
+                            urlSource.setTitle(audioInfo.getTitle());
+                            mAliyunVodPlayer.setDataSource(urlSource);
+                            mAliyunVodPlayer.prepare();
+                        }else{
+                            getAudioAuth(audioInfo.getSourceId());
+                        }
+
                     }else{
                         EventBus.getDefault().post(new PlayerEvent("OnPrepared",mCurrentAudio));
                     }
@@ -204,50 +220,21 @@ public class AudioPlayerService extends Service {
                     //如果正在播放，则暂停播放
                 } else {
                     mCurrentAudio = audioInfo;
-                    AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
-                    asb.setSource(audioInfo.getUrl());
-                    //aliyunVodPlayer.setLocalSource(asb.build());
-                    AliyunLocalSource mLocalSource = asb.build();
-                    mAliyunVodPlayer.prepareAsync(mLocalSource);
+                    if(audioInfo.getIsRadio()==1){
+
+                        UrlSource urlSource = new UrlSource();
+                        urlSource.setUri(audioInfo.getUrl());
+                        urlSource.setTitle(audioInfo.getTitle());
+                        mAliyunVodPlayer.setDataSource(urlSource);
+                        mAliyunVodPlayer.prepare();
+                    }else{
+                        getAudioAuth(audioInfo.getSourceId());
+                    }
                 }
             }
         }
 
 
-//        @Override
-//        public void playAudioDetail (AudioDetail audioDetail) throws RemoteException{
-//            if (mCurrentAudioDetail == null) {
-//                mCurrentAudioDetail = audioDetail;
-//                AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
-//                asb.setSource(audioDetail.getAudio().getUrl());
-//                //aliyunVodPlayer.setLocalSource(asb.build());
-//                AliyunLocalSource mLocalSource = asb.build();
-//                mAliyunVodPlayer.prepareAsync(mLocalSource);
-//            } else {
-//                if (mCurrentAudioDetail.getAudio().getPost_id() == audioDetail.getAudio().getPost_id()) {
-//                    //如果处于暂停状态，则开始播放
-//                        if(mAliyunVodPlayer.getPlayerState()!=IAliyunVodPlayer.PlayerState.Prepared||
-//                                mAliyunVodPlayer.getPlayerState()!=IAliyunVodPlayer.PlayerState.Started||
-//                                mAliyunVodPlayer.getPlayerState()!=IAliyunVodPlayer.PlayerState.Paused){
-//                            mCurrentAudioDetail = audioDetail;
-//                            AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
-//                            asb.setSource(audioDetail.getAudio().getUrl());
-//                            //aliyunVodPlayer.setLocalSource(asb.build());
-//                            AliyunLocalSource mLocalSource = asb.build();
-//                            mAliyunVodPlayer.prepareAsync(mLocalSource);
-//                        }
-//
-//                    //如果正在播放，则暂停播放
-//                } else {
-//                    mCurrentAudioDetail = audioDetail;
-//                    AliyunLocalSource.AliyunLocalSourceBuilder asb = new AliyunLocalSource.AliyunLocalSourceBuilder();
-//                    asb.setSource(audioDetail.getAudio().getUrl());
-//                    //aliyunVodPlayer.setLocalSource(asb.build());
-//                    AliyunLocalSource mLocalSource = asb.build();
-//                    mAliyunVodPlayer.prepareAsync(mLocalSource);
-//                }
-//            }
-//        }
 
         //设置播放器定时类型
         @Override
@@ -270,7 +257,7 @@ public class AudioPlayerService extends Service {
                 countDownTimer=new PlayCountDownTimer(60*60000,500);
                 countDownTimer.start();
             }else if(mTimerType==TimerType.PlayThis){
-                countDownTimer=new PlayCountDownTimer(mAliyunVodPlayer.getDuration()-mAliyunVodPlayer.getCurrentPosition(),500);
+                countDownTimer=new PlayCountDownTimer(mAliyunVodPlayer.getDuration()-mCurrentPosition,500);
                 countDownTimer.start();
             }
         }
@@ -284,8 +271,7 @@ public class AudioPlayerService extends Service {
         //获取播放器状态
         @Override
         public int getPlayerState() {
-            int i=mAliyunVodPlayer.getPlayerState().ordinal();
-            return mAliyunVodPlayer.getPlayerState().ordinal();
+            return mPlayerState;
         }
 
         //开始播放
@@ -312,7 +298,7 @@ public class AudioPlayerService extends Service {
         //重播，播放上一次的url
         @Override
         public void replay() throws RemoteException{
-            mAliyunVodPlayer.replay();
+            mAliyunVodPlayer.prepare();
         }
 
         //Seek，跳转到指定时间点的视频画面，时间单位为秒
@@ -324,19 +310,19 @@ public class AudioPlayerService extends Service {
         //循环播放
         @Override
         public void setCirclePlay(boolean circle) throws RemoteException{
-            mAliyunVodPlayer.setCirclePlay(true);
+            mAliyunVodPlayer.setLoop(true);
         }
 
-        //视频设置清晰度   IAliyunVodPlayer.QualityValue.QUALITY_LOW
+        //视频设置清晰度   IPlayer.QualityValue.QUALITY_LOW
         @Override
         public void changeQuality(String quality) throws RemoteException{
-            mAliyunVodPlayer.changeQuality(quality);
+            //mAliyunVodPlayer.changeQuality(quality);
         }
 
         //获取播放的当前时间，单位为秒
         @Override
         public long getCurrentPosition() throws RemoteException{
-            return mAliyunVodPlayer.getCurrentPosition();
+            return mCurrentPosition;
         }
 
         //获取视频的总时长，单位为秒
@@ -350,15 +336,15 @@ public class AudioPlayerService extends Service {
         public void setPlaySpeed(int speed) throws RemoteException {
             mPlaySpeed=PlaySpeed.values()[speed];
             if(PlaySpeed.values()[speed]==PlaySpeed.Speed050){
-                mAliyunVodPlayer.setPlaySpeed(0.5f);
+                mAliyunVodPlayer.setSpeed(0.5f);
             }else if(PlaySpeed.values()[speed]==PlaySpeed.Speed075){
-                mAliyunVodPlayer.setPlaySpeed(0.75f);
+                mAliyunVodPlayer.setSpeed(0.75f);
             }else if(PlaySpeed.values()[speed]==PlaySpeed.Speed100){
-                mAliyunVodPlayer.setPlaySpeed(1.0f);
+                mAliyunVodPlayer.setSpeed(1.0f);
             }else if(PlaySpeed.values()[speed]==PlaySpeed.Speed125){
-                mAliyunVodPlayer.setPlaySpeed(1.25f);
+                mAliyunVodPlayer.setSpeed(1.25f);
             }else if(PlaySpeed.values()[speed]==PlaySpeed.Speed150){
-                mAliyunVodPlayer.setPlaySpeed(1.5f);
+                mAliyunVodPlayer.setSpeed(1.5f);
             }
             EventBus.getDefault().post(new PlayerEvent("SpeedChanged",mPlaySpeed));
 
@@ -387,7 +373,7 @@ public class AudioPlayerService extends Service {
         //设置为静音
         @Override
         public void setMuteMode(boolean bMute) throws RemoteException{
-            mAliyunVodPlayer.setMuteMode(bMute);
+            mAliyunVodPlayer.setMute(bMute);
         }
 
 
@@ -395,7 +381,7 @@ public class AudioPlayerService extends Service {
         //设置亮度（系统亮度），值为0~100
         @Override
         public void setScreenBrightness(int brightness) throws RemoteException{
-            mAliyunVodPlayer.setScreenBrightness(brightness);
+            //mAliyunVodPlayer.setScreenBrightness(brightness);
         }
 
 
@@ -555,10 +541,10 @@ public class AudioPlayerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        mAliyunVodPlayer = new AliyunVodPlayer(this);
+        mAliyunVodPlayer = AliPlayerFactory.createAliPlayer(getApplicationContext());
         mAliyunVodPlayer.setAutoPlay(true);
-        mAliyunVodPlayer.setReferer(ServerInfo.h5IP);
-        mAliyunVodPlayer.setOnPreparedListener(new IAliyunVodPlayer.OnPreparedListener() {
+        //mAliyunVodPlayer.setReferer(ServerInfo.h5IP);
+        mAliyunVodPlayer.setOnPreparedListener(new IPlayer.OnPreparedListener() {
             @Override
             public void onPrepared() {
                 //准备完成触发
@@ -566,64 +552,81 @@ public class AudioPlayerService extends Service {
 
             }
         });
-        mAliyunVodPlayer.setOnFirstFrameStartListener(new IAliyunVodPlayer.OnFirstFrameStartListener() {
+        mAliyunVodPlayer.setOnRenderingStartListener(new IPlayer.OnRenderingStartListener() {
             @Override
-            public void onFirstFrameStart() {
-                //首帧显示触发
+            public void onRenderingStart() {
+
             }
+
         });
-        mAliyunVodPlayer.setOnErrorListener(new IAliyunVodPlayer.OnErrorListener() {
+        mAliyunVodPlayer.setOnErrorListener(new IPlayer.OnErrorListener() {
             @Override
-            public void onError(int arg0, int arg1, String msg) {
-                //出错时处理，查看接口文档中的错误码和错误消息
-                ToastUtils.show("播放异常");
+            public void onError(ErrorInfo errorInfo) {
+
+                if(errorInfo!=null&&errorInfo.getMsg()!=null){
+                    ToastUtils.show(errorInfo.getMsg());
+                }
             }
+
         });
-        mAliyunVodPlayer.setOnCompletionListener(new IAliyunVodPlayer.OnCompletionListener() {
+        mAliyunVodPlayer.setOnCompletionListener(new IPlayer.OnCompletionListener() {
             @Override
             public void onCompletion() {
                 //播放正常完成时触发
                 EventBus.getDefault().post(new PlayerEvent("OnCompleted",mCurrentAudio));
-                try {
-                    if(sPlayOrder==PLAY_CIRCLE){
-                        ((IAudioPlayer.Stub)mBinder).playAudio(mCurrentAudio);
-                    }else{
-                        ((IAudioPlayer.Stub)mBinder).next();
-                    }
 
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
             }
         });
-        mAliyunVodPlayer.setOnSeekCompleteListener(new IAliyunVodPlayer.OnSeekCompleteListener() {
+        mAliyunVodPlayer.setOnSeekCompleteListener(new IPlayer.OnSeekCompleteListener() {
             @Override
             public void onSeekComplete() {
                 //seek完成时触发
             }
         });
-        mAliyunVodPlayer.setOnStoppedListner(new IAliyunVodPlayer.OnStoppedListener() {
+        mAliyunVodPlayer.setOnStateChangedListener(new IPlayer.OnStateChangedListener() {
             @Override
-            public void onStopped() {
-                //使用stop功能时触发
+            public void onStateChanged(int i) {
+                mPlayerState=i;
+                if(mPlayerState==IPlayer.completion){
+                    try {
+                        if(sPlayOrder==PLAY_CIRCLE){
+                            ((IAudioPlayer.Stub)mBinder).playAudio(mCurrentAudio);
+                        }else{
+                            ((IAudioPlayer.Stub)mBinder).next();
+                        }
+
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+
             }
+
+
         });
-        mAliyunVodPlayer.setOnChangeQualityListener(new IAliyunVodPlayer.OnChangeQualityListener() {
+        mAliyunVodPlayer.setOnTrackChangedListener(new IPlayer.OnTrackChangedListener() {
             @Override
-            public void onChangeQualitySuccess(String finalQuality) {
-                //视频清晰度切换成功后触发
+            public void onChangedSuccess(TrackInfo trackInfo) {
+
             }
 
             @Override
-            public void onChangeQualityFail(int code, String msg) {
-                //视频清晰度切换失败时触发
+            public void onChangedFail(TrackInfo trackInfo, ErrorInfo errorInfo) {
+
             }
+
         });
-        mAliyunVodPlayer.setOnCircleStartListener(new IAliyunVodPlayer.OnCircleStartListener() {
+        mAliyunVodPlayer.setOnInfoListener(new IPlayer.OnInfoListener() {
             @Override
-            public void onCircleStart() {
-                //循环播放开始
+            public void onInfo(InfoBean infoBean) {
+                if(infoBean.getCode() == InfoCode.LoopingStart){
+                    //循环开始
+                }else if(infoBean.getCode() == InfoCode.CurrentPosition){
+                    mCurrentPosition=infoBean.getExtraValue();
+                }
             }
+
+
         });
 
     }
@@ -639,5 +642,38 @@ public class AudioPlayerService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         return super.onUnbind(intent);
+    }
+
+
+    private void getAudioAuth(int sourceId) {
+        String url = ServerInfo.vms + "/v1/sources/" +sourceId+ "/playAuth";
+        Map<String, String> params = new HashMap<>();
+        OkHttpUtils.get(url, params, new OkHttpCallback(getApplicationContext()) {
+
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                JSONObject jsonObject = JSONObject.parseObject(response);
+                if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                    ResAuthInfo resAuthInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), ResAuthInfo.class);
+
+                    VidAuth vidAuth = new VidAuth();
+                    vidAuth.setPlayAuth(resAuthInfo.getPlay_auth());
+                    vidAuth.setVid(resAuthInfo.getVideo_id());
+                    vidAuth.setRegion("cn-shanghai");
+
+                    mAliyunVodPlayer.setDataSource(vidAuth);
+                    mAliyunVodPlayer.prepare();
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+            }
+        });
     }
 }

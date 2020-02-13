@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.RemoteException;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -20,17 +21,23 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.AccountInfo;
+import com.shuangling.software.entity.AudioInfo;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.event.CommonEvent;
+import com.shuangling.software.event.PlayerEvent;
 import com.shuangling.software.fragment.AttentionFragment;
 import com.shuangling.software.fragment.CashIncomeFragment;
 import com.shuangling.software.fragment.TakeCashFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -81,6 +88,7 @@ public class MyWalletsActivity extends AppCompatActivity implements Handler.Call
 
     private void init() {
         mHandler=new Handler(this);
+        EventBus.getDefault().register(this);
         mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager());
         viewPager.setAdapter(mFragmentPagerAdapter);
         tabPageIndicator.setupWithViewPager(viewPager);
@@ -134,16 +142,20 @@ public class MyWalletsActivity extends AppCompatActivity implements Handler.Call
 
 
 
-//    @OnClick({R.id.cash})
-//    public void onViewClicked(View view) {
-//        switch (view.getId()) {
-//            case R.id.cash:
-//                Intent it=new Intent(this,CashDetailActivity.class);
-//                startActivity(it);
-//                break;
-//
-//        }
-//    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if (event.getEventName().equals("OnMoneyChanged")) {
+            getAccountDetail();
+
+        }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
 
     @Override
     public boolean handleMessage(Message msg) {

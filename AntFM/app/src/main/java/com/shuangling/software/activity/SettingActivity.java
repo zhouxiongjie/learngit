@@ -96,6 +96,7 @@ public class SettingActivity extends AppCompatActivity {
     TextView update;
 
     private Handler mHandler;
+    private UpdateDialog mUpdateDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -346,10 +347,13 @@ public class SettingActivity extends AppCompatActivity {
                             if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                                 final UpdateInfo updateInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), UpdateInfo.class);
                                 if (updateInfo.getNew_version() != null) {
-                                    UpdateDialog dialog = UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(), updateInfo.getNew_version().getContent());
-                                    dialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
+                                    mUpdateDialog = UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(), updateInfo.getNew_version().getContent());
+                                    mUpdateDialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
                                         @Override
                                         public void download() {
+                                            if(mUpdateDialog!=null){
+                                                mUpdateDialog.dismiss();
+                                            }
                                             if (!TextUtils.isEmpty(updateInfo.getNew_version().getUrl())) {
                                                 downloadApk(updateInfo.getNew_version().getUrl());
                                             } else {
@@ -358,8 +362,8 @@ public class SettingActivity extends AppCompatActivity {
 
                                         }
                                     });
-                                    dialog.showNoUpdate(true);
-                                    dialog.show(getSupportFragmentManager(), "UpdateDialog");
+                                    mUpdateDialog.showNoUpdate(true);
+                                    mUpdateDialog.show(getSupportFragmentManager(), "UpdateDialog");
                                 } else {
                                     ToastUtils.show("当前已是最新版本");
                                 }
@@ -399,6 +403,8 @@ public class SettingActivity extends AppCompatActivity {
                     @Override
                     public void accept(Boolean granted) throws Exception {
                         if (granted) {
+
+
 
                             File file = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk");
                             if (file.exists()) {
@@ -521,10 +527,18 @@ public class SettingActivity extends AppCompatActivity {
                             //queueSet.downloadTogether(tasks);
                             queueSet.start();
 
+                        }else{
+                            ToastUtils.show("没有文件写权限，请开启该权限");
                         }
 
                     }
                 });
 
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 }

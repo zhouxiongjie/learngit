@@ -105,6 +105,7 @@ public class ImageLoader {
 
     public static void showThumb(Uri uri, SimpleDraweeView draweeView, int width, int height) {
         ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
+                .setAutoRotateEnabled(true)
                 .setResizeOptions(new ResizeOptions(width, height))
                 .build();
 
@@ -122,6 +123,7 @@ public class ImageLoader {
 
     public static void showThumb(SimpleDraweeView draweeView, int drawableID) {
         ImageRequest request = ImageRequestBuilder.newBuilderWithResourceId(drawableID)
+                .setAutoRotateEnabled(true)
                 .build();
         PipelineDraweeController controller = (PipelineDraweeController)
                 Fresco.newDraweeControllerBuilder()

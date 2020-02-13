@@ -27,7 +27,7 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.aliyun.vodplayer.media.IAliyunVodPlayer;
+import com.aliyun.player.IPlayer;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
@@ -379,7 +379,7 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
     @Override
     protected void onPause() {
         try{
-            if(mAudioPlayer.getPlayerState()==IAliyunVodPlayer.PlayerState.Started.ordinal()){
+            if(mAudioPlayer.getPlayerState()==IPlayer.started){
                 FloatWindowUtil.getInstance().showFloatWindow();
             }
         }catch (RemoteException e){
@@ -668,11 +668,11 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
                 break;
             case R.id.play:
                 try {
-                    if (mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Paused.ordinal()) {
+                    if (mAudioPlayer.getPlayerState() == IPlayer.paused) {
                         mAudioPlayer.start();
                         //play.setBackgroundResource(R.drawable.ic_suspended);
                         play.setText(R.string.play_icon_pause);
-                    } else if (mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Started.ordinal()) {
+                    } else if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                         mAudioPlayer.pause();
                         //play.setBackgroundResource(R.drawable.ic_play);
                         play.setText(R.string.play_icon_play);

@@ -191,14 +191,15 @@ public class RadioListFragment extends SimpleImmersionFragment implements Handle
 
                                     if (mType.equals("1")) {
                                         Intent it = new Intent(getContext(), RadioDetailActivity.class);
-                                        //it.putExtra("radioId",radioGroups.get(groupPosition).getList().get(childPosition));
-                                        it.putExtra("radioId", radioGroups.get(groupPosition).getList().get(childPosition).getId());
+                                        RadioSet.Radio radio=mRadioListAdapter.getChild(groupPosition,childPosition);
+                                        it.putExtra("radioId", radio.getId());
                                         startActivity(it);
                                         return true;
                                     } else {
-                                        if (childPosition < radioGroups.get(groupPosition).getList().size()) {
+                                        RadioSet radioSet=mRadioListAdapter.getGroup(groupPosition);
+                                        if (childPosition < radioSet.getList().size()) {
                                             Intent it = new Intent(getContext(), TvDetailActivity.class);
-                                            it.putExtra("radioId", radioGroups.get(groupPosition).getList().get(childPosition).getId());
+                                            it.putExtra("radioId", radioSet.getList().get(childPosition).getId());
                                             startActivity(it);
 
                                         }

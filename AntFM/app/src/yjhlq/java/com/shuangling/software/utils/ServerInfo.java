@@ -31,6 +31,8 @@ public class ServerInfo {
 
 	public static String emc="http://api-emc.yjhlnews.cn";
 
+	public static String vms="http://api-vms.yjhlnews.cn";
+
 
 //	public static String serviceIP="http://api-cms.on-radio.cn";
 //

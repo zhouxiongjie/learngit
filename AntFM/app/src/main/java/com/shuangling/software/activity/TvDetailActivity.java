@@ -27,18 +27,14 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alivc.player.VcPlayerLog;
-import com.aliyun.vodplayer.media.AliyunLocalSource;
-import com.aliyun.vodplayer.media.IAliyunVodPlayer;
+import com.aliyun.player.IPlayer;
+import com.aliyun.player.source.UrlSource;
 import com.aliyun.vodplayerview.constants.PlayParameter;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
-import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -54,19 +50,14 @@ import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.service.IAudioPlayer;
 import com.shuangling.software.utils.CommonUtils;
-import com.shuangling.software.utils.DataCleanManager;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
-import com.youngfeng.snake.annotations.EnableDragToClose;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -160,7 +151,7 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
             @Override
             public void onServiceConnection(IAudioPlayer audioPlayer) {
                 try{
-                    if(audioPlayer.getPlayerState()==IAliyunVodPlayer.PlayerState.Started.ordinal()||audioPlayer.getPlayerState()==IAliyunVodPlayer.PlayerState.Paused.ordinal()){
+                    if(audioPlayer.getPlayerState()==IPlayer.started||audioPlayer.getPlayerState()==IPlayer.paused){
                         audioPlayer.pause();
                         mNeedResumeAudioPlay=true;
                         FloatWindowUtil.getInstance().hideWindow();
@@ -265,17 +256,7 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
                 SharedPreferencesUtils.putIntValue(SettingActivity.NEED_TIP_PLAY, 0);
             }
         });
-//        aliyunVodPlayerView.setOnPreparedListener(new AliyunPlayerSkinActivity.MyPrepareListener(this));
-//        aliyunVodPlayerView.setNetConnectedListener(new AliyunPlayerSkinActivity.MyNetConnectedListener(this));
-//        aliyunVodPlayerView.setOnCompletionListener(new AliyunPlayerSkinActivity.MyCompletionListener(this));
-//        aliyunVodPlayerView.setOnFirstFrameStartListener(new AliyunPlayerSkinActivity.MyFrameInfoListener(this));
-//        aliyunVodPlayerView.setOnChangeQualityListener(new AliyunPlayerSkinActivity.MyChangeQualityListener(this));
-//        aliyunVodPlayerView.setOnStoppedListener(new AliyunPlayerSkinActivity.MyStoppedListener(this));
-//        aliyunVodPlayerView.setmOnPlayerViewClickListener(new AliyunPlayerSkinActivity.MyPlayViewClickListener());
-//        aliyunVodPlayerView.setOrientationChangeListener(new AliyunPlayerSkinActivity.MyOrientationChangeListener(this));
-//        aliyunVodPlayerView.setOnUrlTimeExpiredListener(new AliyunPlayerSkinActivity.MyOnUrlTimeExpiredListener(this));
-//        aliyunVodPlayerView.setOnShowMoreClickListener(new AliyunPlayerSkinActivity.MyShowMoreClickLisener(this));
-//        aliyunVodPlayerView.enableNativeLog();
+
 
     }
 
@@ -386,19 +367,24 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
     }
 
 
-    private void setPlaySource(String url) {
-        if ("localSource".equals(PlayParameter.PLAY_PARAM_TYPE)) {
-            AliyunLocalSource.AliyunLocalSourceBuilder alsb = new AliyunLocalSource.AliyunLocalSourceBuilder();
-            PlayParameter.PLAY_PARAM_URL = url;
-            alsb.setSource(PlayParameter.PLAY_PARAM_URL);
-            Uri uri = Uri.parse(PlayParameter.PLAY_PARAM_URL);
-            if ("rtmp".equals(uri.getScheme())) {
-                alsb.setTitle("");
-            }
-            AliyunLocalSource localSource = alsb.build();
-            aliyunVodPlayerView.setLocalSource(localSource);
+    private void setPlaySource(String url,String title) {
+//        if ("localSource".equals(PlayParameter.PLAY_PARAM_TYPE)) {
+//            AliyunLocalSource.AliyunLocalSourceBuilder alsb = new AliyunLocalSource.AliyunLocalSourceBuilder();
+//            PlayParameter.PLAY_PARAM_URL = url;
+//            alsb.setSource(PlayParameter.PLAY_PARAM_URL);
+//            Uri uri = Uri.parse(PlayParameter.PLAY_PARAM_URL);
+//            if ("rtmp".equals(uri.getScheme())) {
+//                alsb.setTitle("");
+//            }
+//            AliyunLocalSource localSource = alsb.build();
+//            aliyunVodPlayerView.setLocalSource(localSource);
+//
+//        }
 
-        }
+        UrlSource urlSource = new UrlSource();
+        urlSource.setUri(url);
+        urlSource.setTitle(title);
+        aliyunVodPlayerView.setLocalSource(urlSource);
     }
 
 
@@ -465,7 +451,6 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
                 || ("V4".equalsIgnoreCase(Build.DEVICE) && "Meitu".equalsIgnoreCase(Build.MANUFACTURER))
                 || ("m1metal".equalsIgnoreCase(Build.DEVICE) && "Meizu".equalsIgnoreCase(Build.MANUFACTURER));
 
-        VcPlayerLog.e("lfj1115 ", " Build.Device = " + Build.DEVICE + " , isStrange = " + strangePhone);
         return strangePhone;
     }
 
@@ -484,8 +469,9 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
     protected void onDestroy() {
         if(mNeedResumeAudioPlay){
 //            try{
-                //mAudioPlayer.start();
+
                 FloatWindowUtil.getInstance().visibleWindow();
+//                mAudioPlayer.start();
 //            }catch (RemoteException e){
 //
 //            }
@@ -622,7 +608,7 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
                         });
                         mNetPlay=SharedPreferencesUtils.getIntValue(SettingActivity.NET_PLAY,0);
                         mNeedTipPlay=SharedPreferencesUtils.getIntValue(SettingActivity.NEED_TIP_PLAY,0);
-                        setPlaySource(mRadioDetail.getChannel().getStream());
+                        setPlaySource(mRadioDetail.getChannel().getStream(),mRadioDetail.getChannel().getName());
 
 
                         addRadioHistory();

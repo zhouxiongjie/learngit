@@ -800,7 +800,7 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
                             } else {
                                 ImageLoader.showThumb(vh.logo, R.drawable.video_placeholder);
                             }
-                            Glide.with(this).load(R.drawable.wave).diskCacheStrategy(DiskCacheStrategy.ALL).into(vh.statusIcon);
+                            Glide.with(this).load(R.drawable.wave).into(vh.statusIcon);
 
                             vh.title.setText(liveInfo.getTitle());
                             if (liveInfo.getLive() != null) {

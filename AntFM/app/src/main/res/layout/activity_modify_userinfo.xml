@@ -38,21 +38,22 @@
                 android:text="头像"
                 android:textColor="@color/textColorTwo"
                 android:textSize="@dimen/font_size_30px" />
+
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/head"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_toLeftOf="@+id/headRightIcon"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="20dp"
+                android:layout_toLeftOf="@+id/headRightIcon"
                 fresco:actualImageScaleType="centerCrop"
-                fresco:placeholderImage="@drawable/ic_user1"
-                fresco:placeholderImageScaleType="centerCrop"
                 fresco:failureImage="@drawable/ic_user1"
                 fresco:failureImageScaleType="centerCrop"
+                fresco:placeholderImage="@drawable/ic_user1"
+                fresco:placeholderImageScaleType="centerCrop"
                 fresco:roundAsCircle="true"
-                fresco:roundingBorderWidth="0dp"
-                fresco:roundingBorderColor="@color/textColorSeven"/>
+                fresco:roundingBorderColor="@color/textColorSeven"
+                fresco:roundingBorderWidth="0dp" />
 
             <ImageView
                 android:id="@+id/headRightIcon"

@@ -1,16 +1,12 @@
 package com.shuangling.software.activity;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -18,27 +14,19 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.JsPromptResult;
-import android.webkit.JsResult;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
-import com.alivc.player.AliyunErrorCode;
-import com.alivc.player.VcPlayerLog;
-import com.aliyun.vodplayer.media.AliyunLocalSource;
-import com.aliyun.vodplayer.media.AliyunVodPlayer;
-import com.aliyun.vodplayer.media.IAliyunVodPlayer;
-import com.aliyun.vodplayerview.constants.PlayParameter;
-import com.aliyun.vodplayerview.utils.NetWatchdog;
-import com.aliyun.vodplayerview.view.control.ControlView;
-import com.aliyun.vodplayerview.view.interfaces.ViewAction;
+import com.aliyun.player.AliPlayer;
+import com.aliyun.player.AliPlayerFactory;
+import com.aliyun.player.IPlayer;
+import com.aliyun.player.bean.ErrorInfo;
+import com.aliyun.player.bean.InfoBean;
+import com.aliyun.player.nativeclass.TrackInfo;
+import com.aliyun.player.source.UrlSource;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
@@ -65,8 +53,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 
 
 public class StartupActivity extends Activity implements Handler.Callback {
@@ -84,8 +70,10 @@ public class StartupActivity extends Activity implements Handler.Callback {
     private Handler mHandler;
     private CountDownTimer mCountDownTimer;
     //播放器
-    private AliyunVodPlayer mAliyunVodPlayer;
+    private AliPlayer mAliyunVodPlayer;
     private boolean mSkip=false;
+
+    private int mPlayerState = IPlayer.idle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -237,10 +225,48 @@ public class StartupActivity extends Activity implements Handler.Callback {
     }
 
 
+    public void updateStatistics() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.statistics;
+
+        Map<String, String> params = new HashMap<>();
+
+
+        OkHttpUtils.get(url, null, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+
+                String result = response;
+                final JSONObject jsonObject = JSONObject.parseObject(result);
+                if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+
+    }
+
+
     private void gotoHome() {
 
         startActivity(new Intent(this, MainActivity.class));
-        finish();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                finish();
+            }
+        },200);
+
     }
 
     private void verifyUserInfo() {
@@ -259,6 +285,7 @@ public class StartupActivity extends Activity implements Handler.Callback {
                     Log.i("bindAccount-onFailed", s1);
                 }
             });
+            updateStatistics();
         }
         EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
 
@@ -430,7 +457,7 @@ public class StartupActivity extends Activity implements Handler.Callback {
             public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width,
                                        int height) {
                 if(mAliyunVodPlayer!=null){
-                    mAliyunVodPlayer.surfaceChanged();
+                    mAliyunVodPlayer.redraw();
                 }
 
             }
@@ -440,9 +467,9 @@ public class StartupActivity extends Activity implements Handler.Callback {
 
             }
         });
-        mAliyunVodPlayer = new AliyunVodPlayer(this);
+        mAliyunVodPlayer = AliPlayerFactory.createAliPlayer(getApplicationContext());
         //设置准备回调
-        mAliyunVodPlayer.setOnPreparedListener(new IAliyunVodPlayer.OnPreparedListener() {
+        mAliyunVodPlayer.setOnPreparedListener(new IPlayer.OnPreparedListener() {
             @Override
             public void onPrepared() {
 
@@ -450,124 +477,112 @@ public class StartupActivity extends Activity implements Handler.Callback {
             }
         });
         //播放器出错监听
-        mAliyunVodPlayer.setOnErrorListener(new IAliyunVodPlayer.OnErrorListener() {
+        mAliyunVodPlayer.setOnErrorListener(new IPlayer.OnErrorListener() {
             @Override
-            public void onError(int errorCode, int errorEvent, String errorMsg) {
+            public void onError(ErrorInfo errorInfo) {
 
             }
-        });
-        //请求源过期信息
-        mAliyunVodPlayer.setOnTimeExpiredErrorListener(new IAliyunVodPlayer.OnTimeExpiredErrorListener() {
-            @Override
-            public void onTimeExpiredError() {
 
-            }
         });
+
         //播放器加载回调
-        mAliyunVodPlayer.setOnLoadingListener(new IAliyunVodPlayer.OnLoadingListener() {
+        mAliyunVodPlayer.setOnLoadingStatusListener(new IPlayer.OnLoadingStatusListener() {
             @Override
-            public void onLoadStart() {
+            public void onLoadingBegin() {
 
             }
 
             @Override
-            public void onLoadEnd() {
+            public void onLoadingProgress(int i, float v) {
 
             }
 
             @Override
-            public void onLoadProgress(int percent) {
+            public void onLoadingEnd() {
 
             }
+
         });
         //播放结束
-        mAliyunVodPlayer.setOnCompletionListener(new IAliyunVodPlayer.OnCompletionListener() {
+        mAliyunVodPlayer.setOnCompletionListener(new IPlayer.OnCompletionListener() {
             @Override
             public void onCompletion() {
 
             }
         });
-        mAliyunVodPlayer.setOnBufferingUpdateListener(new IAliyunVodPlayer.OnBufferingUpdateListener() {
+        mAliyunVodPlayer.setOnInfoListener(new IPlayer.OnInfoListener() {
             @Override
-            public void onBufferingUpdate(int percent) {
+            public void onInfo(InfoBean infoBean) {
 
             }
+
         });
         //播放信息监听
-        mAliyunVodPlayer.setOnInfoListener(new IAliyunVodPlayer.OnInfoListener() {
+        mAliyunVodPlayer.setOnInfoListener(new IPlayer.OnInfoListener() {
             @Override
-            public void onInfo(int arg0, int arg1) {
+            public void onInfo(InfoBean infoBean) {
 
             }
+
         });
         //切换清晰度结果事件
-        mAliyunVodPlayer.setOnChangeQualityListener(new IAliyunVodPlayer.OnChangeQualityListener() {
+        mAliyunVodPlayer.setOnTrackChangedListener(new IPlayer.OnTrackChangedListener() {
             @Override
-            public void onChangeQualitySuccess(String finalQuality) {
-                //切换成功后就开始播放
+            public void onChangedSuccess(TrackInfo trackInfo) {
 
             }
 
             @Override
-            public void onChangeQualityFail(int code, String msg) {
-                //失败的话，停止播放，通知上层
+            public void onChangedFail(TrackInfo trackInfo, ErrorInfo errorInfo) {
 
+            }
+
+
+        });
+        mAliyunVodPlayer.setOnStateChangedListener(new IPlayer.OnStateChangedListener() {
+            @Override
+            public void onStateChanged(int i) {
+                mPlayerState = i;
             }
         });
-        //重播监听
-        mAliyunVodPlayer.setOnRePlayListener(new IAliyunVodPlayer.OnRePlayListener() {
-            @Override
-            public void onReplaySuccess() {
-                //重播、重试成功
 
-            }
-        });
-        //自动播放
-        mAliyunVodPlayer.setOnAutoPlayListener(new IAliyunVodPlayer.OnAutoPlayListener() {
-            @Override
-            public void onAutoPlayStarted() {
-                //自动播放开始,需要设置播放状态
 
-            }
-        });
         //seek结束事件
-        mAliyunVodPlayer.setOnSeekCompleteListener(new IAliyunVodPlayer.OnSeekCompleteListener() {
+        mAliyunVodPlayer.setOnSeekCompleteListener(new IPlayer.OnSeekCompleteListener() {
             @Override
             public void onSeekComplete() {
 
             }
         });
-        //PCM原始数据监听
-        mAliyunVodPlayer.setOnPcmDataListener(new IAliyunVodPlayer.OnPcmDataListener() {
-            @Override
-            public void onPcmData(byte[] data, int size) {
 
-            }
-        });
         //第一帧显示
-        mAliyunVodPlayer.setOnFirstFrameStartListener(new IAliyunVodPlayer.OnFirstFrameStartListener() {
+        mAliyunVodPlayer.setOnRenderingStartListener(new IPlayer.OnRenderingStartListener() {
             @Override
-            public void onFirstFrameStart() {
+            public void onRenderingStart() {
 
             }
-        });
-        mAliyunVodPlayer.setOnUrlTimeExpiredListener(new IAliyunVodPlayer.OnUrlTimeExpiredListener() {
-            @Override
-            public void onUrlTimeExpired(String vid, String quality) {
 
-            }
         });
+
         mAliyunVodPlayer.setDisplay(surface.getHolder());
         mAliyunVodPlayer.setAutoPlay(true);
 
-        AliyunLocalSource.AliyunLocalSourceBuilder alsb = new AliyunLocalSource.AliyunLocalSourceBuilder();
-        alsb.setSource(url);
-        Uri uri = Uri.parse(url);
-        if ("rtmp".equals(uri.getScheme())) {
-            alsb.setTitle("");
-        }
-        AliyunLocalSource localSource = alsb.build();
-        mAliyunVodPlayer.prepareAsync(localSource);
+//        AliyunLocalSource.AliyunLocalSourceBuilder alsb = new AliyunLocalSource.AliyunLocalSourceBuilder();
+//        alsb.setSource(url);
+//        Uri uri = Uri.parse(url);
+//        if ("rtmp".equals(uri.getScheme())) {
+//            alsb.setTitle("");
+//        }
+//        AliyunLocalSource localSource = alsb.build();
+//        mAliyunVodPlayer.prepareAsync(localSource);
+
+        UrlSource urlSource = new UrlSource();
+        urlSource.setUri(url);
+        //urlSource.setTitle(title);
+
+        mAliyunVodPlayer.setDataSource(urlSource);
+        mAliyunVodPlayer.prepare();
+
 
     }
 
@@ -577,10 +592,11 @@ public class StartupActivity extends Activity implements Handler.Callback {
         super.onStop();
 
         if (mAliyunVodPlayer != null) {
-            IAliyunVodPlayer.PlayerState playerState = mAliyunVodPlayer.getPlayerState();
-            if (playerState == IAliyunVodPlayer.PlayerState.Started || mAliyunVodPlayer.isPlaying()) {
+
+            if (mPlayerState == IPlayer.started || mPlayerState == IPlayer.prepared) {
                 mAliyunVodPlayer.pause();
             }
+
         }
     }
 
@@ -589,8 +605,9 @@ public class StartupActivity extends Activity implements Handler.Callback {
         super.onResume();
 
         if (mAliyunVodPlayer != null) {
-            IAliyunVodPlayer.PlayerState playerState = mAliyunVodPlayer.getPlayerState();
-            if (playerState == IAliyunVodPlayer.PlayerState.Paused || playerState == IAliyunVodPlayer.PlayerState.Prepared || mAliyunVodPlayer.isPlaying()) {
+
+
+            if (mPlayerState == IPlayer.paused || mPlayerState == IPlayer.prepared) {
                 mAliyunVodPlayer.start();
             }
         }

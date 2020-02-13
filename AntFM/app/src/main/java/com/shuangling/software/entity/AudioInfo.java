@@ -3,9 +3,6 @@ package com.shuangling.software.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class AudioInfo implements Parcelable {
 
 
@@ -17,6 +14,7 @@ public class AudioInfo implements Parcelable {
     private String publish_at;
     private String logo;
     private int isRadio;    //是否是电台  0 音频  1 电台
+    private int sourceId;
 
 
     public AudioInfo(){
@@ -87,7 +85,13 @@ public class AudioInfo implements Parcelable {
         this.isRadio = isRadio;
     }
 
+    public int getSourceId() {
+        return sourceId;
+    }
 
+    public void setSourceId(int sourceId) {
+        this.sourceId = sourceId;
+    }
 
     @Override
     public int describeContents() {
@@ -107,6 +111,7 @@ public class AudioInfo implements Parcelable {
         out.writeString(publish_at);
         out.writeString(logo);
         out.writeInt(isRadio);
+        out.writeInt(sourceId);
 
     }
 
@@ -131,6 +136,7 @@ public class AudioInfo implements Parcelable {
         publish_at=in.readString();
         logo=in.readString();
         isRadio=in.readInt();
+        sourceId=in.readInt();
 
     }
 }

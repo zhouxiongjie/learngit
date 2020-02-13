@@ -216,8 +216,9 @@ public final class CameraManager {
    */
   public Rect getFramingRect() {
     Point screenResolution = configManager.getScreenResolution();
-    if(screenResolution == null)
-       return null;
+    if(screenResolution == null){
+      return null;
+    }
     if (framingRect == null) {
       if (camera == null) {
         return null;

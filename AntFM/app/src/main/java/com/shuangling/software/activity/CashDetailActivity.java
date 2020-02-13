@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
@@ -13,7 +15,6 @@ import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
-import com.shuangling.software.dialog.CashRegularDialog;
 import com.shuangling.software.entity.CashDetail;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
@@ -70,6 +71,10 @@ public class CashDetailActivity extends AppCompatActivity implements Handler.Cal
     ImageView processDown;
     @BindView(R.id.finishUp)
     ImageView finishUp;
+    @BindView(R.id.failReason)
+    TextView failReason;
+    @BindView(R.id.failLayout)
+    RelativeLayout failLayout;
 
     private int mId;
     private Handler mHandler;
@@ -214,8 +219,9 @@ public class CashDetailActivity extends AppCompatActivity implements Handler.Cal
                                 finishDes.setTextColor(Color.parseColor("#C6C6C8"));
                                 finishUp.setBackgroundColor(Color.parseColor("#C6C6C8"));
                                 processDown.setBackgroundColor(Color.parseColor("#C6C6C8"));
-                                applyTime.setText(mCashDetail.getCreated_at());
-                                processTime.setText(mCashDetail.getUpdated_at());
+                                failLayout.setVisibility(View.VISIBLE);
+                                failReason.setText(mCashDetail.getFail_msg());
+
 
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 Date createAt = dateFormat.parse(mCashDetail.getCreated_at());

@@ -141,6 +141,7 @@ public class AlbumAudiosFragment extends Fragment implements Handler.Callback {
                             audioInfo.setUrl(audio.getAudios().get(0).getAudio().getUrl());
                             audioInfo.setDuration("" + audio.getAudios().get(0).getAudio().getDuration());
                             audioInfo.setPublish_at(audio.getAudios().get(0).getPublish_at());
+                            audioInfo.setSourceId(audio.getAudios().get(0).getAudio().getSource_id());
                             mAudios.add(audioInfo);
                             mSelect.add(i + 1);
                         }

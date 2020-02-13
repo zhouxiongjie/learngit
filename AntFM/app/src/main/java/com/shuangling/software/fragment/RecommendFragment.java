@@ -148,7 +148,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 
     public void switchColumn(Column switchColumn) {
 
-        for (int i = 0; i < mColumns.size(); i++) {
+        for (int i = 0; mColumns!=null&&i < mColumns.size(); i++) {
             if (mColumns.get(i).getId() == switchColumn.getId()) {
                 mColumnSelectIndex = i;
                 break;

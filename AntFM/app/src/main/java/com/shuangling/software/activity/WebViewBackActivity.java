@@ -104,6 +104,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
 
         mHandler = new Handler(this);
         WebSettings s = webView.getSettings();
+        CommonUtils.setWebviewUserAgent(s);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }

@@ -334,4 +334,30 @@
 
     </RelativeLayout>
 
+
+    <RelativeLayout
+        android:id="@+id/failLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="失败原因"
+            android:textColor="#939393"
+            android:textSize="@dimen/font_size_30px" />
+
+        <TextView
+            android:id="@+id/failReason"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textColor="#2F2F2F"
+            android:textSize="@dimen/font_size_30px"
+            tools:text="提现失败资金被冻结" />
+
+    </RelativeLayout>
+
 </LinearLayout>

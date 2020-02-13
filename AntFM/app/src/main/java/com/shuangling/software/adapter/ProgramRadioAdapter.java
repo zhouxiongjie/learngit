@@ -85,9 +85,10 @@ public class ProgramRadioAdapter extends RecyclerView.Adapter implements View.On
         final RadioViewHolder articleViewHolder = (RadioViewHolder) holder;
 
         if (!TextUtils.isEmpty(content.getLogo())) {
-            Uri uri = Uri.parse(content.getLogo());
+
             int width = CommonUtils.dip2px(50);
             int height = width;
+            Uri uri = Uri.parse(content.getLogo()+CommonUtils.getOssResize(width,height));
             ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
         }else{
             ImageLoader.showThumb(articleViewHolder.logo, R.drawable.article_placeholder);

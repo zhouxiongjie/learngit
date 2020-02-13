@@ -38,6 +38,7 @@ import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.MyGlideEngine;
 import com.shuangling.software.utils.ServerInfo;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.youngfeng.snake.annotations.EnableDragToClose;
@@ -118,6 +119,7 @@ public class AnchorOrOrganizationDetailActivityH5 extends AppCompatActivity impl
 
         mHandler = new Handler(this);
         WebSettings s = webView.getSettings();
+        CommonUtils.setWebviewUserAgent(s);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
@@ -264,7 +266,7 @@ public class AnchorOrOrganizationDetailActivityH5 extends AppCompatActivity impl
                                             .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                                             .thumbnailScale(1.0f) // 缩略图的比例
                                             .theme(R.style.Matisse_Zhihu)
-                                            .imageEngine(new GlideEngine()) // 使用的图片加载引擎
+                                            .imageEngine(new MyGlideEngine()) // 使用的图片加载引擎
                                             .forResult(REQUEST_SELECT_FILE); // 设置作为标记的请求码
                                 }else{
                                     ToastUtils.show("未能获取相关权限，功能可能不能正常使用");

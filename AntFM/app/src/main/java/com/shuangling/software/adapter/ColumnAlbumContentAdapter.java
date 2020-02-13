@@ -69,6 +69,10 @@ public class ColumnAlbumContentAdapter extends RecyclerView.Adapter implements V
 
     }
 
+    public String getOssResize(int width,int height){
+        return "?x-oss-process=image/resize,m_fill,h_"+height+",w_"+width;
+    }
+
     public ColumnAlbumContentAdapter(Context context, List<ColumnContent> columnContent) {
         this.mContext = context;
         this.mColumnContent = columnContent;
@@ -107,9 +111,10 @@ public class ColumnAlbumContentAdapter extends RecyclerView.Adapter implements V
             final AlbumViewHolder albumViewHolder = (AlbumViewHolder) holder;
             albumViewHolder.root.setPadding(CommonUtils.dip2px(5),CommonUtils.dip2px(10),CommonUtils.dip2px(5),CommonUtils.dip2px(10));
             if (!TextUtils.isEmpty(content.getCover())) {
-                Uri uri = Uri.parse(content.getCover());
+
                 int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                 int height = (int) (2f * width / 3f);
+                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
                 ImageLoader.showThumb(uri, albumViewHolder.logo, width, height);
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
@@ -186,9 +191,10 @@ public class ColumnAlbumContentAdapter extends RecyclerView.Adapter implements V
             AlbumSquareViewHolder albumViewHolder = (AlbumSquareViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
-                Uri uri = Uri.parse(content.getCover());
+
                 int width = CommonUtils.getScreenWidth()/3;
                 int height = width;
+                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
                 ImageLoader.showThumb(uri, albumViewHolder.logo, width, height);
             }
 

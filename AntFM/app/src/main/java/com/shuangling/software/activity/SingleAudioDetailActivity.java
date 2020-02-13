@@ -31,7 +31,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
-import com.aliyun.vodplayer.media.IAliyunVodPlayer;
+import com.aliyun.player.IPlayer;
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -610,11 +610,11 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
             case R.id.play:
                 try {
                     int sta = mAudioPlayer.getPlayerState();
-                    if (mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Paused.ordinal()) {
+                    if (mAudioPlayer.getPlayerState() == IPlayer.paused) {
                         mAudioPlayer.start();
                         //play.setBackgroundResource(R.drawable.ic_suspended);
                         play.setText(R.string.play_icon_pause);
-                    } else if (mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Started.ordinal()) {
+                    } else if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                         mAudioPlayer.pause();
                         //play.setBackgroundResource(R.drawable.ic_play);
                         play.setText(R.string.play_icon_play);
@@ -1026,7 +1026,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
                     try {
                         //1.更新当前时间
                         //2.更新当前进度条
-                        if (mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Started.ordinal()) {
+                        if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                             currentTime.setText(CommonUtils.getShowTime(mAudioPlayer.getCurrentPosition()));
                             seekBar.setProgress((int) (mAudioPlayer.getCurrentPosition()));
                         }

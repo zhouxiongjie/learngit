@@ -22,13 +22,21 @@ import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.dialog.AccountSettingDialog;
 import com.shuangling.software.dialog.CashRegularDialog;
 import com.shuangling.software.dialog.UpdateDialog;
+import com.shuangling.software.entity.AccountInfo;
+import com.shuangling.software.entity.CashRegular;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.entity.ZhifubaoAccountInfo;
+import com.shuangling.software.event.CommonEvent;
+import com.shuangling.software.event.PlayerEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,6 +55,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
     private static final int MSG_ACCOUNT_DETAIL = 0;
     private static final int MSG_TAKE_CASH = 1;
     private static final int MSG_CASH_REGULAR = 2;
+    private static final int MSG_GET_MONEY = 3;
     @BindView(R.id.activtyTitle)
     TopTitleBar activtyTitle;
     @BindView(R.id.money)
@@ -71,6 +80,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
     private int moneySum;
     private Handler mHandler;
     private ZhifubaoAccountInfo mZhifubaoAccountInfo;
+    private CashRegular mCashRegular;
 
 
     @Override
@@ -87,6 +97,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
 
     private void init() {
         mHandler = new Handler(this);
+        EventBus.getDefault().register(this);
         moneySum = getIntent().getIntExtra("money", 0);
         money.setText(String.format("%.2f", (float) moneySum / 100));
         allMoney.setText(String.format("%.2f", (float) moneySum / 100) + "元");
@@ -124,6 +135,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
         customAmount.addTextChangedListener(new MoneyTextWatcher(customAmount).setDigits(2));
 
         getAccountDetail();
+        getCashRegular();
     }
 
 
@@ -139,6 +151,32 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
             public void onResponse(Call call, String response) throws IOException {
 
                 Message msg = mHandler.obtainMessage(MSG_ACCOUNT_DETAIL);
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+    }
+
+
+    private void getMoney() {
+
+        String url = ServerInfo.emc + ServerInfo.accountDetail;
+        Map<String, String> params = new HashMap<String, String>();
+
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = mHandler.obtainMessage(MSG_GET_MONEY);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
 
@@ -177,6 +215,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
             }
         });
     }
+
 
 
 
@@ -221,25 +260,45 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
                     ToastUtils.show("请先设置提现账号");
                 }else{
                     if(cashAll.isFocused()){
-                        if(moneySum>0){
-                         //提现
-                            takeCash(moneySum);
+
+                        if(mCashRegular!=null){
+                            if(moneySum>=mCashRegular.getMin_money()&&moneySum<=mCashRegular.getMax_money()){
+                                //提现
+                                takeCash(moneySum);
+                            }else if(moneySum<mCashRegular.getMin_money()){
+                                ToastUtils.show("金额小于最小提现额");
+                            }else if(moneySum>mCashRegular.getMax_money()){
+                                ToastUtils.show("金额大于最大提现额");
+                            }
                         }else{
-                            ToastUtils.show("金额不足，无法提现");
+                            ToastUtils.show("提现规则获取失败");
                         }
+
+
                     }else{
                         if(TextUtils.isEmpty(customAmount.getText().toString().trim())){
                             ToastUtils.show("请输入提现金额");
                         }else{
-                            float money=Float.parseFloat(customAmount.getText().toString().trim());
-                            if(money>0&&(int)(money*100)<=moneySum){
-                                //提现
-                                takeCash((int)(money*100));
-                            }else if((int)(money*100)>moneySum){
-                                ToastUtils.show("余额不足");
+                            if(mCashRegular!=null){
+
+                                float money=Float.parseFloat(customAmount.getText().toString().trim());
+
+                                if((int)(money*100)>=mCashRegular.getMin_money()&&(int)(money*100)<=moneySum&&(int)(money*100)<=mCashRegular.getMax_money()){
+                                    //提现
+                                    takeCash((int)(money*100));
+                                }else if((int)(money*100)>moneySum){
+                                    ToastUtils.show("余额不足");
+                                }else if((int)(money*100)>mCashRegular.getMax_money()){
+                                    ToastUtils.show("金额大于最大提现额");
+                                }else if((int)(money*100)<mCashRegular.getMin_money()){
+                                    ToastUtils.show("金额小于最小提现额");
+                                }
                             }else{
-                                ToastUtils.show("金额要大于0");
+                                ToastUtils.show("提现规则获取失败");
                             }
+
+
+
                         }
 
                     }
@@ -249,6 +308,13 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
             case R.id.regular:
 
                 getCashRegular();
+                if(mCashRegular!=null){
+                    String rule=mCashRegular.getRule();
+                    //rule=rule.replace("\\\\n","\\n");
+                    CashRegularDialog.getInstance(rule.replace("\\n","\n")).show(getSupportFragmentManager(), "CashRegularDialog");
+                }
+
+
                 break;
         }
     }
@@ -321,6 +387,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        EventBus.getDefault().post(new CommonEvent("OnMoneyChanged"));
                         int requestId=jsonObject.getJSONObject("data").getInteger("id");
                         Intent it=new Intent(this,CashDetailActivity.class);
                         it.putExtra("id",requestId);
@@ -340,9 +407,9 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        String rule=jsonObject.getJSONObject("data").getString("rule");
-                        //rule=rule.replace("\\\\n","\\n");
-                        CashRegularDialog.getInstance(rule.replace("\\n","\n")).show(getSupportFragmentManager(), "CashRegularDialog");
+                        mCashRegular =JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), CashRegular.class);
+
+
 
 
 
@@ -354,6 +421,32 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
                 } catch (Exception e) {
 
                 }
+                break;
+            case MSG_GET_MONEY:
+                try{
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        final AccountInfo accountInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), AccountInfo.class);
+
+                        if(accountInfo!=null){
+                            moneySum = accountInfo.getFree_balance();
+                            money.setText(String.format("%.2f", (float) moneySum / 100));
+                            allMoney.setText(String.format("%.2f", (float) moneySum / 100) + "元");
+
+
+
+                        }
+
+
+                    }else if(jsonObject != null){
+                        ToastUtils.show(jsonObject.getString("msg"));
+                    }
+                }catch (Exception e){
+
+                }
+
+
                 break;
         }
         return false;
@@ -422,5 +515,21 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
 
         }
 
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if (event.getEventName().equals("OnMoneyChanged")) {
+            getMoney();
+
+        }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 }

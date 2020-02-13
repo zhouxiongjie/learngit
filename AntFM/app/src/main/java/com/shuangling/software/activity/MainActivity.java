@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -16,9 +17,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -30,6 +34,8 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.vodplayerview.activity.AliyunPlayerSkinActivity;
+import com.aliyun.vodplayerview.utils.FixedToastUtils;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
@@ -91,34 +97,11 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
     public static final String TAG = "MainActivity";
     public static final int REQUEST_PERMISSION_CODE = 0x0110;
+    private static final int REQUEST_EXTERNAL_STORAGE = 0x0111;
     public static final int MSG_GET_CITY_LIST = 0x1;
     public static final int MSG_GET_UPDATE_INFO = 0x2;
     public static final int MSG_GET_BOTTOM_MENUS = 0x3;
 
-    //    @BindView(R.id.indexIcon)
-//    FontIconView indexIcon;
-//    @BindView(R.id.index)
-//    TextView index;
-//    @BindView(R.id.indexLayout)
-//    LinearLayout indexLayout;
-//    @BindView(R.id.recommendIcon)
-//    FontIconView recommendIcon;
-//    @BindView(R.id.recommend)
-//    TextView recommend;
-//    @BindView(R.id.recommendLayout)
-//    LinearLayout recommendLayout;
-//    @BindView(R.id.discoverIcon)
-//    FontIconView discoverIcon;
-//    @BindView(R.id.discover)
-//    TextView discover;
-//    @BindView(R.id.discoverLayout)
-//    LinearLayout discoverLayout;
-//    @BindView(R.id.personalCenterIcon)
-//    FontIconView personalCenterIcon;
-//    @BindView(R.id.personalCenter)
-//    TextView personalCenter;
-//    @BindView(R.id.personalCenterLayout)
-//    LinearLayout personalCenterLayout;
     @BindView(R.id.menuContainer)
     LinearLayout menuContainer;
 
@@ -131,6 +114,10 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
 
     private Handler mHandler;
+
+    public static final String[] PERMISSION_STORAGE = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+    };
 
     protected String[] needPermissions = {
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -148,8 +135,10 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     private static long lastClickTime;
     private static final int MIN_CLICK_DELAY_TIME = 2000;
 
+    private String mApkDownloadUrl;
 
     ArrayList<BottomMenuHolder> mMenus=new ArrayList<>();
+    private UpdateDialog mUpdateDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,6 +160,8 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
             initLocation();
             startLocation();
         }
+
+        getUpdateInfo();
 
 
     }
@@ -453,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
     @Override
     protected void onResume() {
-        getUpdateInfo();
+
         super.onResume();
     }
 
@@ -654,35 +645,69 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                             MyApplication.getInstance().findNewVerison=true;
                         }
                         if (updateInfo.isSupport()) {
-                            UpdateDialog dialog = UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(), updateInfo.getNew_version().getContent());
-                            dialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
+                            mUpdateDialog = UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(), updateInfo.getNew_version().getContent());
+                            mUpdateDialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
                                 @Override
                                 public void download() {
-                                    if(!TextUtils.isEmpty(updateInfo.getNew_version().getUrl())){
-                                        downloadApk(updateInfo.getNew_version().getUrl());
+                                    if(!TextUtils.isEmpty(updateInfo.getNew_version().getUrl())) {
+
+                                        RxPermissions rxPermissions = new RxPermissions(MainActivity.this);
+                                        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                                .subscribe(new Consumer<Boolean>() {
+                                                    @Override
+                                                    public void accept(Boolean granted) throws Exception {
+                                                        if (granted) {
+                                                            if(mUpdateDialog!=null){
+                                                                mUpdateDialog.dismiss();
+                                                            }
+
+                                                            downloadApk(updateInfo.getNew_version().getUrl());
+                                                        }else {
+                                                            ToastUtils.show("没有文件写权限，请开启该权限");
+                                                        }
+                                                    }
+                                                });
                                     }else {
                                         ToastUtils.show("下载地址有误");
                                     }
                                 }
                             });
-                            dialog.show(getSupportFragmentManager(), "UpdateDialog");
+                            mUpdateDialog.show(getSupportFragmentManager(), "UpdateDialog");
                         }else{
                             String version=SharedPreferencesUtils.getStringValue("version",null);
                             if(TextUtils.isEmpty(version)||(updateInfo.getNew_version()!=null&&!updateInfo.getNew_version().getVersion().equals(version))){
-                                UpdateDialog dialog = UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(), updateInfo.getNew_version().getContent());
-                                dialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
+                                mUpdateDialog  = UpdateDialog.getInstance(updateInfo.getNew_version().getVersion(), updateInfo.getNew_version().getContent());
+                                mUpdateDialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
                                     @Override
                                     public void download() {
+
+                                        if(mUpdateDialog!=null){
+                                            mUpdateDialog.dismiss();
+                                        }
                                         if(!TextUtils.isEmpty(updateInfo.getNew_version().getUrl())){
-                                            downloadApk(updateInfo.getNew_version().getUrl());
+
+                                            RxPermissions rxPermissions = new RxPermissions(MainActivity.this);
+                                            rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                                    .subscribe(new Consumer<Boolean>() {
+                                                        @Override
+                                                        public void accept(Boolean granted) throws Exception {
+                                                            if (granted) {
+                                                                downloadApk(updateInfo.getNew_version().getUrl());
+                                                            }else {
+                                                                ToastUtils.show("没有文件写权限，请开启该权限");
+                                                            }
+                                                        }
+                                                    });
+
+
                                         }else {
                                             ToastUtils.show("下载地址有误");
                                         }
 
                                     }
                                 });
-                                dialog.showNoUpdate(true);
-                                dialog.show(getSupportFragmentManager(), "UpdateDialog");
+                                mUpdateDialog.showNoUpdate(true);
+                                mUpdateDialog.show(getSupportFragmentManager(), "UpdateDialog");
                             }
                         }
 
@@ -1237,30 +1262,40 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
     public void downloadApk(final String downloadUrl) {
 
+//        mApkDownloadUrl=downloadUrl;
+//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+//            int permission = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+//            if (permission != PackageManager.PERMISSION_GRANTED) {
+//                ActivityCompat.requestPermissions(MainActivity.this, PERMISSION_STORAGE, REQUEST_EXTERNAL_STORAGE);
+//            } else {
+//                //下载安装apk
+//                downloadInstallApk();
+//            }
+//        }else{
+//            //下载安装apk
+//            downloadInstallApk();
+//        }
 
-        RxPermissions rxPermissions = new RxPermissions(this);
-        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean granted) throws Exception {
-                        if (granted) {
 
-                            File file = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk");
-                            if (file.exists()) {
-                                file.delete();
-                            }
 
-                            final CircleDialog.Builder builder = new CircleDialog.Builder();
-                            final DialogFragment dialogFragment = builder
-                                    .setCancelable(false)
-                                    .setCanceledOnTouchOutside(false)
+
+
+        File file = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk");
+        if (file.exists()) {
+            file.delete();
+        }
+
+        final CircleDialog.Builder builder = new CircleDialog.Builder();
+        final DialogFragment dialogFragment = builder
+                .setCancelable(false)
+                .setCanceledOnTouchOutside(false)
 //                                    .configDialog(params -> params.backgroundColor = Color.CYAN)
-                                    .setTitle("下载")
-                                    .setProgressText("已经下载")
-                                    //.setProgressText("已经下载%s了")
-                                    .setProgressDrawable(R.drawable.bg_progress_h)
-                                    //.setNegative("取消", v -> timer.cancel())
-                                    .show(getSupportFragmentManager());
+                .setTitle("下载")
+                .setProgressText("已经下载")
+                //.setProgressText("已经下载%s了")
+                .setProgressDrawable(R.drawable.bg_progress_h)
+                //.setNegative("取消", v -> timer.cancel())
+                .show(getSupportFragmentManager());
 //                            TimerTask timerTask = new TimerTask() {
 //                                final int max = 222;
 //                                int progress = 0;
@@ -1280,99 +1315,235 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 //                            };
 //                            timer.schedule(timerTask, 0, 50);
 
-                            final FileDownloadListener downloadListener = new FileDownloadListener() {
-                                @Override
-                                protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                                    Log.i("test", "pending");
-                                }
+        final FileDownloadListener downloadListener = new FileDownloadListener() {
+            @Override
+            protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                Log.i("test", "pending");
+            }
 
-                                @Override
-                                protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
-                                    Log.i("test", "connected");
-                                }
+            @Override
+            protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
+                Log.i("test", "connected");
+            }
 
-                                @Override
-                                protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                                    //StyledDialog.updateProgress(dialog, (int)((long)soFarBytes * 100 / (long)totalBytes), 100, "素材下载中...", true);
-                                    builder.setProgress(totalBytes, soFarBytes).create();
-                                }
+            @Override
+            protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                //StyledDialog.updateProgress(dialog, (int)((long)soFarBytes * 100 / (long)totalBytes), 100, "素材下载中...", true);
+                builder.setProgress(totalBytes, soFarBytes).create();
+            }
 
-                                @Override
-                                protected void blockComplete(BaseDownloadTask task) {
-                                    try {
-                                        dialogFragment.dismiss();
+            @Override
+            protected void blockComplete(BaseDownloadTask task) {
+                try {
+                    dialogFragment.dismiss();
 
-                                        Intent intent = new Intent();
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        intent.setAction(Intent.ACTION_VIEW);
-                                        File file = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk");
-                                        boolean exist = file.exists();
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                            String packageName = getPackageName();
-                                            Uri contentUri = FileProvider.getUriForFile(MainActivity.this
-                                                    , packageName + ".fileprovider"
-                                                    , file);
+                    Intent intent = new Intent();
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.setAction(Intent.ACTION_VIEW);
+                    File file = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk");
+                    boolean exist = file.exists();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        String packageName = getPackageName();
+                        Uri contentUri = FileProvider.getUriForFile(MainActivity.this
+                                , packageName + ".fileprovider"
+                                , file);
 
 
-                                            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
-                                        } else {
-                                            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
-                                        }
-                                        startActivity(intent);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-
-                                }
-
-                                @Override
-                                protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
-                                    Log.i("test", ex.toString());
-
-                                }
-
-                                @Override
-                                protected void completed(BaseDownloadTask task) {
-
-                                }
-
-                                @Override
-                                protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                                }
-
-                                @Override
-                                protected void error(BaseDownloadTask task, Throwable e) {
-                                    Log.i("test", e.toString());
-                                }
-
-                                @Override
-                                protected void warn(BaseDownloadTask task) {
-                                }
-                            };
-
-                            final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(downloadListener);
-
-                            final List<BaseDownloadTask> tasks = new ArrayList<>();
-
-                            tasks.add(FileDownloader.getImpl().create(downloadUrl).setPath(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk"));
-                            //queueSet.setCallbackProgressMinInterval(200);
-                            //queueSet.disableCallbackProgressTimes();
-                            // 由于是队列任务, 这里是我们假设了现在不需要每个任务都回调`FileDownloadListener#progress`, 我们只关系每个任务是否完成, 所以这里这样设置可以很有效的减少ipc.
-                            // 所有任务在下载失败的时候都自动重试一次
-                            queueSet.setAutoRetryTimes(1);
-                            // 串行执行该任务队列
-                            queueSet.downloadSequentially(tasks);
-                            //queueSet.downloadTogether(tasks);
-                            queueSet.start();
-
-                        }
-
+                        intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+                    } else {
+                        intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
                     }
-                });
+                    startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
+                Log.i("test", ex.toString());
+
+            }
+
+            @Override
+            protected void completed(BaseDownloadTask task) {
+
+            }
+
+            @Override
+            protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+            }
+
+            @Override
+            protected void error(BaseDownloadTask task, Throwable e) {
+                Log.i("test", e.toString());
+            }
+
+            @Override
+            protected void warn(BaseDownloadTask task) {
+            }
+        };
+
+        final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(downloadListener);
+
+        final List<BaseDownloadTask> tasks = new ArrayList<>();
+
+        tasks.add(FileDownloader.getImpl().create(downloadUrl).setPath(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk"));
+        //queueSet.setCallbackProgressMinInterval(200);
+        //queueSet.disableCallbackProgressTimes();
+        // 由于是队列任务, 这里是我们假设了现在不需要每个任务都回调`FileDownloadListener#progress`, 我们只关系每个任务是否完成, 所以这里这样设置可以很有效的减少ipc.
+        // 所有任务在下载失败的时候都自动重试一次
+        queueSet.setAutoRetryTimes(1);
+        // 串行执行该任务队列
+        queueSet.downloadSequentially(tasks);
+        //queueSet.downloadTogether(tasks);
+        queueSet.start();
 
     }
 
+
+
+    public void downloadInstallApk() {
+        File file = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk");
+        if (file.exists()) {
+            file.delete();
+        }
+
+        final CircleDialog.Builder builder = new CircleDialog.Builder();
+        final DialogFragment dialogFragment = builder
+                .setCancelable(false)
+                .setCanceledOnTouchOutside(false)
+//                                    .configDialog(params -> params.backgroundColor = Color.CYAN)
+                .setTitle("下载")
+                .setProgressText("已经下载")
+                //.setProgressText("已经下载%s了")
+                .setProgressDrawable(R.drawable.bg_progress_h)
+                //.setNegative("取消", v -> timer.cancel())
+                .show(getSupportFragmentManager());
+//                            TimerTask timerTask = new TimerTask() {
+//                                final int max = 222;
+//                                int progress = 0;
+//
+//                                @Override
+//                                public void run() {
+//                                    progress++;
+//                                    if (progress >= max) {
+//                                        MainActivity.this.runOnUiThread(() -> {
+//                                            builder.setProgressText("下载完成").refresh();
+//                                            timer.cancel();
+//                                        });
+//                                    } else {
+//                                        builder.setProgress(max, progress).refresh();
+//                                    }
+//                                }
+//                            };
+//                            timer.schedule(timerTask, 0, 50);
+
+        final FileDownloadListener downloadListener = new FileDownloadListener() {
+            @Override
+            protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                Log.i("test", "pending");
+            }
+
+            @Override
+            protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
+                Log.i("test", "connected");
+            }
+
+            @Override
+            protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                //StyledDialog.updateProgress(dialog, (int)((long)soFarBytes * 100 / (long)totalBytes), 100, "素材下载中...", true);
+                builder.setProgress(totalBytes, soFarBytes).create();
+            }
+
+            @Override
+            protected void blockComplete(BaseDownloadTask task) {
+                try {
+                    dialogFragment.dismiss();
+
+                    Intent intent = new Intent();
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.setAction(Intent.ACTION_VIEW);
+                    File file = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk");
+                    boolean exist = file.exists();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        String packageName = getPackageName();
+                        Uri contentUri = FileProvider.getUriForFile(MainActivity.this
+                                , packageName + ".fileprovider"
+                                , file);
+
+
+                        intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+                    } else {
+                        intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+                    }
+                    startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
+                Log.i("test", ex.toString());
+
+            }
+
+            @Override
+            protected void completed(BaseDownloadTask task) {
+
+            }
+
+            @Override
+            protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+            }
+
+            @Override
+            protected void error(BaseDownloadTask task, Throwable e) {
+                Log.i("test", e.toString());
+            }
+
+            @Override
+            protected void warn(BaseDownloadTask task) {
+            }
+        };
+
+        final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(downloadListener);
+
+        final List<BaseDownloadTask> tasks = new ArrayList<>();
+
+        tasks.add(FileDownloader.getImpl().create(mApkDownloadUrl).setPath(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk"));
+        //queueSet.setCallbackProgressMinInterval(200);
+        //queueSet.disableCallbackProgressTimes();
+        // 由于是队列任务, 这里是我们假设了现在不需要每个任务都回调`FileDownloadListener#progress`, 我们只关系每个任务是否完成, 所以这里这样设置可以很有效的减少ipc.
+        // 所有任务在下载失败的时候都自动重试一次
+        queueSet.setAutoRetryTimes(1);
+        // 串行执行该任务队列
+        queueSet.downloadSequentially(tasks);
+        //queueSet.downloadTogether(tasks);
+        queueSet.start();
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_EXTERNAL_STORAGE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                downloadInstallApk();
+            } else {
+                // Permission Denied
+                ToastUtils.show( "没有sd卡读写权限, 无法下载");
+            }
+            return;
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
     public static boolean isLocServiceEnable(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);

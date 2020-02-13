@@ -35,14 +35,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
 import com.alibaba.fastjson.JSONObject;
-import com.aliyun.vodplayer.media.IAliyunVodPlayer;
+import com.aliyun.player.IPlayer;
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
 import com.ethanhua.skeleton.Skeleton;
-import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigInput;
@@ -718,6 +715,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                             mAudioInfo.setDuration(mAudioDetail.getAudio().getDuration());
                             mAudioInfo.setPublish_at(mAudioDetail.getAlbum().get(0).getPublish_at());
                             mAudioInfo.setLogo(mAudioDetail.getAlbum().get(0).getCover());
+                            mAudioInfo.setSourceId(mAudioDetail.getAudio().getSource_id());
                             mAudioInfo.setIsRadio(0);
 
 
@@ -862,6 +860,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                                 audioInfo.setDuration("" + audio.getAudios().get(0).getAudio().getDuration());
                                 audioInfo.setPublish_at(audio.getAudios().get(0).getPublish_at());
                                 audioInfo.setLogo(mAudioDetail.getAlbum().get(0).getCover());
+                                audioInfo.setSourceId(audio.getAudios().get(0).getAudio().getSource_id());
                                 audioInfo.setIsRadio(0);
                                 audioInfos.add(audioInfo);
                             }
@@ -1020,10 +1019,10 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
             case R.id.play:
                 try {
                     int sta = mAudioPlayer.getPlayerState();
-                    if (mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Paused.ordinal()) {
+                    if (mAudioPlayer.getPlayerState() == IPlayer.paused) {
                         mAudioPlayer.start();
                         mHeadViewHolder.play.setText(R.string.play_icon_pause);
-                    } else if (mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Started.ordinal()) {
+                    } else if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                         mAudioPlayer.pause();
                         mHeadViewHolder.play.setText(R.string.play_icon_play);
                     }
@@ -1071,7 +1070,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                     try {
                         //1.更新当前时间
                         //2.更新当前进度条
-                        if (mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Started.ordinal()) {
+                        if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                             mHeadViewHolder.currentTime.setText(CommonUtils.getShowTime(mAudioPlayer.getCurrentPosition()));
                             mHeadViewHolder.seekBar.setProgress((int) (mAudioPlayer.getCurrentPosition()));
                         }
@@ -1148,8 +1147,8 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     @Override
     protected void onPause() {
         try{
-            if(mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Paused.ordinal()||
-                    mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Started.ordinal()){
+            if(mAudioPlayer.getPlayerState() == IPlayer.paused||
+                    mAudioPlayer.getPlayerState() == IPlayer.started){
 
                 if(FloatWindowUtil.getInstance().checkFloatWindowPermission()){
                     FloatWindowUtil.getInstance().showFloatWindow();

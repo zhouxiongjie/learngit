@@ -27,13 +27,13 @@ import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import com.aliyun.vodplayer.media.IAliyunVodPlayer;
+
+import com.aliyun.player.IPlayer;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AudioDetailActivity;
-import com.shuangling.software.activity.MainActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.customview.FloatView;
 import com.shuangling.software.customview.ProgressCircleImageView;
@@ -44,13 +44,8 @@ import com.shuangling.software.service.IAudioPlayer;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
 import java.util.Timer;
 import java.util.TimerTask;
-
-import cn.jake.share.frdialog.dialog.FRDialog;
-import cn.jake.share.frdialog.interfaces.FRDialogClickListener;
-
 import static android.content.Context.WINDOW_SERVICE;
 
 /**
@@ -157,7 +152,7 @@ public class FloatWindowUtil {
             mNext=mView.findViewById(R.id.next);
             mClose=mView.findViewById(R.id.close);
             //mProgressCircleImageView.setDisableCircularTransformation(true);
-            Glide.with(mContext).load(R.drawable.player_dynamic).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+            Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
             mWindowManager.getDefaultDisplay().getSize(point);
 
             mLayoutParams = new WindowManager.LayoutParams();
@@ -214,13 +209,13 @@ public class FloatWindowUtil {
         try{
             mProgressCircleImageView.setDuration(mAudioPlayer.getDuration());
             mProgressCircleImageView.updateProgress(mAudioPlayer.getCurrentPosition());
-            if(mAudioPlayer.getPlayerState()==IAliyunVodPlayer.PlayerState.Started.ordinal()){
+            if(mAudioPlayer.getPlayerState()==IPlayer.started){
                 mPlay.setImageResource(R.drawable.float_pause_icon);
-                Glide.with(mContext).load(R.drawable.player_dynamic).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
                 startUpdateTimer();
             }else{
                 mPlay.setImageResource(R.drawable.float_play_icon);
-                Glide.with(mContext).load(R.drawable.player_static).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
             }
         }catch (RemoteException e){
 
@@ -264,10 +259,10 @@ public class FloatWindowUtil {
                                     String logo=mAudioPlayer.getCurrentAudio()!=null?mAudioPlayer.getCurrentAudio().getLogo():null;
                                     if(!TextUtils.isEmpty(logo)){
                                         //mProgressCircleImageView.setDisableCircularTransformation(false);
-                                        Glide.with(mContext).load(logo).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                                        Glide.with(mContext).load(logo).into(mProgressCircleImageView);
                                     }else{
                                         //mProgressCircleImageView.setDisableCircularTransformation(false);
-                                        Glide.with(mContext).load(R.drawable.player_static).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                                        Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
                                     }
 
                                 }catch (RemoteException e){
@@ -317,10 +312,10 @@ public class FloatWindowUtil {
                                     String logo=mAudioPlayer.getCurrentAudio()!=null?mAudioPlayer.getCurrentAudio().getLogo():null;
                                     if(!TextUtils.isEmpty(logo)){
                                         //mProgressCircleImageView.setDisableCircularTransformation(false);
-                                        Glide.with(mContext).load(logo).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                                        Glide.with(mContext).load(logo).into(mProgressCircleImageView);
                                     }else{
                                         //mProgressCircleImageView.setDisableCircularTransformation(false);
-                                        Glide.with(mContext).load(R.drawable.player_static).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                                        Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
                                     }
 
                                 }catch (RemoteException e){
@@ -374,11 +369,11 @@ public class FloatWindowUtil {
 
                 try {
                     int sta = mAudioPlayer.getPlayerState();
-                    if (mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Paused.ordinal()) {
+                    if (mAudioPlayer.getPlayerState() == IPlayer.paused) {
                         mAudioPlayer.start();
                         mPlay.setImageResource(R.drawable.float_pause_icon);
 
-                    } else if (mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Started.ordinal()) {
+                    } else if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                         mAudioPlayer.pause();
                         mPlay.setImageResource(R.drawable.float_play_icon);
                     }
@@ -527,10 +522,10 @@ public class FloatWindowUtil {
                         mLayoutParams.width =CommonUtils.dip2px(40);
                         updateViewLayout();
                         try{
-                            if(mAudioPlayer.getPlayerState()==IAliyunVodPlayer.PlayerState.Started.ordinal()){
-                                Glide.with(mContext).load(R.drawable.player_dynamic).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                            if(mAudioPlayer.getPlayerState()==IPlayer.started){
+                                Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
                             }else{
-                                Glide.with(mContext).load(R.drawable.player_static).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                                Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
                             }
                         }catch (RemoteException e){
 
@@ -578,10 +573,10 @@ public class FloatWindowUtil {
                         mLayoutParams.width =CommonUtils.dip2px(40);
                         updateViewLayout();
                         try{
-                            if(mAudioPlayer.getPlayerState()==IAliyunVodPlayer.PlayerState.Started.ordinal()){
-                                Glide.with(mContext).load(R.drawable.player_dynamic).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                            if(mAudioPlayer.getPlayerState()==IPlayer.started){
+                                Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
                             }else{
-                                Glide.with(mContext).load(R.drawable.player_static).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                                Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
                             }
                         }catch (RemoteException e){
 
@@ -644,7 +639,7 @@ public class FloatWindowUtil {
                 mProgressCircleImageView.setDuration(mAudioPlayer.getDuration());
                 mPlay.setImageResource(R.drawable.float_pause_icon);
                 if(mControllerLayout.getVisibility()==View.GONE){
-                    Glide.with(mContext).load(R.drawable.player_dynamic).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                    Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
                 }
                 startUpdateTimer();
             }catch (RemoteException e){
@@ -658,7 +653,7 @@ public class FloatWindowUtil {
 
         }else if (event.getEventName().equals("OnCompleted")) {
             if(mControllerLayout.getVisibility()==View.GONE){
-                Glide.with(mContext).load(R.drawable.player_static).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
             }
             mPlay.setImageResource(R.drawable.float_play_icon);
 
@@ -668,14 +663,14 @@ public class FloatWindowUtil {
             mPlay.setImageResource(R.drawable.float_play_icon);
             cancelUpdateTimer();
             if(mControllerLayout.getVisibility()==View.GONE){
-                Glide.with(mContext).load(R.drawable.player_static).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
             }
         }else if(event.getEventName().equals("OnStart")){
             try{
                 mProgressCircleImageView.setDuration(mAudioPlayer.getDuration());
                 mPlay.setImageResource(R.drawable.float_pause_icon);
                 if(mControllerLayout.getVisibility()==View.GONE){
-                    Glide.with(mContext).load(R.drawable.player_dynamic).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
+                    Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
                 }
                 startUpdateTimer();
             }catch (RemoteException e){
@@ -710,7 +705,7 @@ public class FloatWindowUtil {
             try {
                 //1.更新当前时间
                 //2.更新当前进度条
-                if (mAudioPlayer.getPlayerState() == IAliyunVodPlayer.PlayerState.Started.ordinal()) {
+                if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {

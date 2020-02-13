@@ -107,7 +107,7 @@ public class UpdateDialog extends BaseCircleDialog {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.update:
-                dismiss();
+                //dismiss();
                 if (mOnUpdateClickListener != null) {
                     mOnUpdateClickListener.download();
                 }

@@ -125,9 +125,10 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
 			view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 			view.setTag(data);
 			int width=CommonUtils.getScreenWidth()-CommonUtils.dip2px(40);
+			int height=10*width/23;
 			if(!TextUtils.isEmpty(data.getLogo())){
-				Uri uri = Uri.parse(data.getLogo());
-				ImageLoader.showThumb(uri, view, width, 10*width/23);
+				Uri uri = Uri.parse(data.getLogo()+CommonUtils.getOssResize(width,height));
+				ImageLoader.showThumb(uri, view, width, height);
 			}
 			mAutoViews.add(view);
 			view.setOnClickListener(new OnClickListener() {

@@ -166,9 +166,10 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
         } else if (itemViewType == TYPE_AUDIO) {
             AudioViewHolder audioViewHolder = (AudioViewHolder) holder;
             if (!TextUtils.isEmpty(content.getCover())) {
-                Uri uri = Uri.parse(content.getCover());
+
                 int width = CommonUtils.dip2px(100);
                 int height = width;
+                Uri uri = Uri.parse(content.getCover()+CommonUtils.getOssResize(width,height));
                 ImageLoader.showThumb(uri, audioViewHolder.logo, width, height);
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
@@ -191,9 +192,10 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
             final AlbumViewHolder albumViewHolder = (AlbumViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
-                Uri uri = Uri.parse(content.getCover());
+
                 int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                 int height = (int) (2f * width / 3f);
+                Uri uri = Uri.parse(content.getCover()+CommonUtils.getOssResize(width,height));
                 ImageLoader.showThumb(uri, albumViewHolder.logo, width, height);
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
@@ -263,9 +265,10 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
 
             if (!TextUtils.isEmpty(content.getCover())) {
                 articleViewHolder.logo.setVisibility(View.VISIBLE);
-                Uri uri = Uri.parse(content.getCover());
+
                 int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                 int height = (int) (2f * width / 3f);
+                Uri uri = Uri.parse(content.getCover()+CommonUtils.getOssResize(width,height));
                 ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
             }else {
                 articleViewHolder.logo.setVisibility(View.GONE);
@@ -333,18 +336,20 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
         } else if (itemViewType == TYPE_VIDEO) {
             VideoViewHolder videoViewHolder = (VideoViewHolder) holder;
             if (!TextUtils.isEmpty(content.getCover())) {
-                Uri uri = Uri.parse(content.getCover());
+
                 int width = CommonUtils.getScreenWidth() - CommonUtils.dip2px(20);
                 int height = (int) (9f * width / 16f);
+                Uri uri = Uri.parse(content.getCover()+CommonUtils.getOssResize(width,height));
                 ImageLoader.showThumb(uri, videoViewHolder.logo, width, height);
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 videoViewHolder.organization.setText(content.getAuthor_info().getMerchant().getName());
                 if(isVideo()){
                     if (!TextUtils.isEmpty(content.getAuthor_info().getMerchant().getLogo())) {
-                        Uri uri = Uri.parse(content.getAuthor_info().getMerchant().getLogo());
+
                         int width = CommonUtils.dip2px(50);
                         int height = width;
+                        Uri uri = Uri.parse(content.getAuthor_info().getMerchant().getLogo()+CommonUtils.getOssResize(width,height));
                         ImageLoader.showThumb(uri, videoViewHolder.organizationLogo, width, height);
                     }
                 }
@@ -370,9 +375,10 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
             GallerieOneViewHolder gallerieOneViewHolder = (GallerieOneViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
-                Uri uri = Uri.parse(content.getCover());
+
                 int width = CommonUtils.getScreenWidth();
                 int height = (int) (9f * width / 16f);
+                Uri uri = Uri.parse(content.getCover()+CommonUtils.getOssResize(width,height));
                 ImageLoader.showThumb(uri, gallerieOneViewHolder.logo, width, height);
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
@@ -395,21 +401,24 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
             GallerieViewThreeHolder gallerieViewThreeHolder = (GallerieViewThreeHolder) holder;
 
             if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(0))) {
-                Uri uri = Uri.parse(content.getGallerie().getCovers().get(0));
+
                 int width = (CommonUtils.getScreenWidth()-CommonUtils.dip2px(30))/3;
                 int height = (int) (2f * width / 3f);
+                Uri uri = Uri.parse(content.getGallerie().getCovers().get(0)+CommonUtils.getOssResize(width,height));
                 ImageLoader.showThumb(uri, gallerieViewThreeHolder.pic1, width, height);
             }
             if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(1))) {
-                Uri uri = Uri.parse(content.getGallerie().getCovers().get(1));
+
                 int width = (CommonUtils.getScreenWidth()-CommonUtils.dip2px(30))/3;
                 int height = (int) (2f * width / 3f);
+                Uri uri = Uri.parse(content.getGallerie().getCovers().get(1)+CommonUtils.getOssResize(width,height));
                 ImageLoader.showThumb(uri, gallerieViewThreeHolder.pic2, width, height);
             }
             if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(2))) {
-                Uri uri = Uri.parse(content.getGallerie().getCovers().get(2));
+
                 int width = (CommonUtils.getScreenWidth()-CommonUtils.dip2px(30))/3;
                 int height = (int) (2f * width / 3f);
+                Uri uri = Uri.parse(content.getGallerie().getCovers().get(2)+CommonUtils.getOssResize(width,height));
                 ImageLoader.showThumb(uri, gallerieViewThreeHolder.pic3, width, height);
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
@@ -431,9 +440,10 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
         }else if(itemViewType == TYPE_SPECIAL){
             final SpecialViewHolder specialViewHolder = (SpecialViewHolder) holder;
             if (!TextUtils.isEmpty(content.getCover())) {
-                Uri uri = Uri.parse(content.getCover());
+
                 int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                 int height = (int) (2f * width / 3f);
+                Uri uri = Uri.parse(content.getCover()+CommonUtils.getOssResize(width,height));
                 ImageLoader.showThumb(uri, specialViewHolder.logo, width, height);
             }
 
@@ -529,9 +539,10 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
             }
 
             if (!TextUtils.isEmpty(content.getCover())) {
-                Uri uri = Uri.parse(content.getCover());
+
                 int width = CommonUtils.getScreenWidth();
                 int height = (int) (9f * width / 16f);
+                Uri uri = Uri.parse(content.getCover()+CommonUtils.getOssResize(width,height));
                 ImageLoader.showThumb(uri, activityViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(activityViewHolder.logo, R.drawable.video_placeholder);
@@ -576,14 +587,15 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
                 liveViewHolder.top.setVisibility(View.GONE);
             }
             if (!TextUtils.isEmpty(content.getCover())) {
-                Uri uri = Uri.parse(content.getCover());
+
                 int width = CommonUtils.getScreenWidth();
                 int height = (int) (9f * width / 16f);
+                Uri uri = Uri.parse(content.getCover()+CommonUtils.getOssResize(width,height));
                 ImageLoader.showThumb(uri, liveViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(liveViewHolder.logo, R.drawable.video_placeholder);
             }
-            Glide.with(mContext).load(R.drawable.wave).diskCacheStrategy(DiskCacheStrategy.ALL).into(liveViewHolder.statusIcon);
+            Glide.with(mContext).load(R.drawable.wave).into(liveViewHolder.statusIcon);
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 liveViewHolder.organization.setText(content.getAuthor_info().getMerchant().getName());
             }

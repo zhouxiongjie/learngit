@@ -37,6 +37,7 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebSettings;
 import android.widget.TextView;
 
 import com.gyf.immersionbar.ImmersionBar;
@@ -1019,5 +1020,15 @@ public class CommonUtils {
 
     static public void transparentStatusBar(Activity activity){
         ImmersionBar.with(activity).transparentStatusBar().statusBarDarkFont(true).fitsSystemWindows(true).init();
+    }
+
+
+    public static void setWebviewUserAgent(WebSettings s){
+        String ua = s.getUserAgentString();
+        s.setUserAgentString(ua+"/webview");
+    }
+
+    public static String getOssResize(int width,int height){
+        return "?x-oss-process=image/resize,m_fill,h_"+height+",w_"+width;
     }
 }

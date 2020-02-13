@@ -158,22 +158,34 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
-                if (refreshLayout.isLoading()) {
-                    refreshLayout.finishLoadMore();
+
+                try{
+                    if (refreshLayout.isLoading()) {
+                        refreshLayout.finishLoadMore();
+                    }
+                    Message msg = Message.obtain();
+                    msg.what = MSG_UPDATE_LIST;
+                    msg.obj = response;
+                    mHandler.sendMessage(msg);
+                }catch (Exception e){
+
                 }
 
-                Message msg = Message.obtain();
-                msg.what = MSG_UPDATE_LIST;
-                msg.obj = response;
-                mHandler.sendMessage(msg);
+
+
 
             }
 
             @Override
             public void onFailure(Call call, Exception exception) {
 
-                if (refreshLayout.isLoading()) {
-                    refreshLayout.finishLoadMore();
+
+                try{
+                    if (refreshLayout.isLoading()) {
+                        refreshLayout.finishLoadMore();
+                    }
+                }catch (Exception e){
+
                 }
             }
         });

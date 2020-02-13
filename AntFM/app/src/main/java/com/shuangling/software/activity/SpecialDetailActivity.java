@@ -117,6 +117,7 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
             url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
         }
         WebSettings s = webView.getSettings();
+        CommonUtils.setWebviewUserAgent(s);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
@@ -337,24 +338,30 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    if (type.equals("2")) {
+                    if (type.equals("1")) {
+                        //电台
+                        Intent it=new Intent(SpecialDetailActivity.this,RadioDetailActivity.class);
+                        //it.putExtra("radioId",radioGroups.get(groupPosition).getList().get(childPosition));
+                        it.putExtra("radioId",Integer.parseInt(id));
+                        startActivity(it);
+
+                    }else if (type.equals("2")) {
                         //主播
-//                        Intent it = new Intent(SpecialDetailActivity.this, AnchorDetailActivity.class);
-//                        it.putExtra("anchorId", Integer.parseInt(id));
-//                        startActivity(it);
                         Intent it = new Intent(SpecialDetailActivity.this, WebViewActivity.class);
                         it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+id);
                         startActivity(it);
 
                     } else if (type.equals("3")) {
                         //机构
-//                        Intent it = new Intent(SpecialDetailActivity.this, OrganizationDetailActivity.class);
-//                        it.putExtra("organizationId", Integer.parseInt(id));
-//                        startActivity(it);
-
                         Intent it = new Intent(SpecialDetailActivity.this, WebViewActivity.class);
                         it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+id);
                         startActivity(it);
+                    }else if (type.equals("4")) {
+                        //电视台
+                        Intent it=new Intent(SpecialDetailActivity.this,TvDetailActivity.class);
+                        it.putExtra("radioId",Integer.parseInt(id));
+                        startActivity(it);
+
                     }
                 }
             });

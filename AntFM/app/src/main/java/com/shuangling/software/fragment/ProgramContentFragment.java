@@ -155,16 +155,20 @@ public class ProgramContentFragment extends Fragment implements Handler.Callback
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
+                try{
+                    if (getContent == GetContent.Refresh) {
+                        if (refreshLayout.isRefreshing()) {
+                            refreshLayout.finishRefresh();
+                        }
+                    } else if (getContent == GetContent.LoadMore) {
+                        if (refreshLayout.isLoading()) {
+                            refreshLayout.finishLoadMore();
+                        }
+                    }
+                }catch (Exception e){
 
-                if (getContent == GetContent.Refresh) {
-                    if (refreshLayout.isRefreshing()) {
-                        refreshLayout.finishRefresh();
-                    }
-                } else if (getContent == GetContent.LoadMore) {
-                    if (refreshLayout.isLoading()) {
-                        refreshLayout.finishLoadMore();
-                    }
                 }
+
 
                 Message msg = Message.obtain();
                 msg.what = MSG_UPDATE_LIST;
@@ -176,16 +180,20 @@ public class ProgramContentFragment extends Fragment implements Handler.Callback
 
             @Override
             public void onFailure(Call call, Exception exception) {
+                try{
+                    if (getContent == GetContent.Refresh) {
+                        if (refreshLayout.isRefreshing()) {
+                            refreshLayout.finishRefresh();
+                        }
+                    } else if (getContent == GetContent.LoadMore) {
+                        if (refreshLayout.isLoading()) {
+                            refreshLayout.finishLoadMore();
+                        }
+                    }
+                }catch (Exception e){
 
-                if (getContent == GetContent.Refresh) {
-                    if (refreshLayout.isRefreshing()) {
-                        refreshLayout.finishRefresh();
-                    }
-                } else if (getContent == GetContent.LoadMore) {
-                    if (refreshLayout.isLoading()) {
-                        refreshLayout.finishLoadMore();
-                    }
                 }
+
             }
         });
 

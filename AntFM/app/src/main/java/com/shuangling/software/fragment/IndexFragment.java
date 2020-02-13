@@ -212,12 +212,10 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-
-                if (refreshLayout.isRefreshing()) {
-                    refreshLayout.finishRefresh();
-                }
                 try{
-
+                    if (refreshLayout.isRefreshing()) {
+                        refreshLayout.finishRefresh();
+                    }
                     JSONObject jsonObject = JSONObject.parseObject(response);
 
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
@@ -241,9 +239,14 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                if (refreshLayout.isRefreshing()) {
-                    refreshLayout.finishRefresh();
+                try{
+                    if (refreshLayout.isRefreshing()) {
+                        refreshLayout.finishRefresh();
+                    }
+                }catch (Exception e){
+
                 }
+
                 EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
 
             }
@@ -261,9 +264,15 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
-                if (refreshLayout.isRefreshing()) {
-                    refreshLayout.finishRefresh();
+                try{
+                    if (refreshLayout.isRefreshing()) {
+                        refreshLayout.finishRefresh();
+                    }
+                }catch (Exception e){
+
                 }
+
+
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_INDEX_DECOR;
@@ -275,9 +284,14 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             @Override
             public void onFailure(Call call, Exception exception) {
 
-                if (refreshLayout.isRefreshing()) {
-                    refreshLayout.finishRefresh();
+                try{
+                    if (refreshLayout.isRefreshing()) {
+                        refreshLayout.finishRefresh();
+                    }
+                }catch (Exception e){
+
                 }
+
             }
         });
 

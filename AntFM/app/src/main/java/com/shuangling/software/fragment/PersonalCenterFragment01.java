@@ -148,7 +148,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.history, R.id.collect, R.id.subscribeNumber, R.id.headBg, R.id.login, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet,R.id.award})
+    @OnClick({R.id.history, R.id.collect, R.id.subscribeNumber, R.id.userLayout, R.id.login, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet,R.id.award})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.history:
@@ -183,7 +183,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                     startActivity(it);
                 }
                 break;
-            case R.id.headBg:
+            case R.id.userLayout:
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), ModifyUserInfoActivity.class));
                 } else {
@@ -378,7 +378,10 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
             loginLayout.setVisibility(View.VISIBLE);
             login.setVisibility(View.GONE);
             if (!TextUtils.isEmpty(User.getInstance().getAvatar())) {
+                //String urlStr="https://shuangln-cdn.on-radio.cn/cms/avatar/iZiSDSFQHin5B45c1566434560982.jpg";
                 Uri uri = Uri.parse(User.getInstance().getAvatar());
+                //Uri uri = Uri.parse(urlStr);
+
                 int width = CommonUtils.dip2px(50);
                 int height = width;
                 ImageLoader.showThumb(uri, head, width, height);
@@ -414,7 +417,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                         @Override
                         public void run() {
                             attentionNumber.setText("关注 " + jsonObject.getJSONObject("data").getInteger("follows_count"));
-                            subscribeNumber.setText("关注 " + jsonObject.getJSONObject("data").getInteger("subscribe_count"));
+                            subscribeNumber.setText("订阅 " + jsonObject.getJSONObject("data").getInteger("subscribe_count"));
 //                            messageNumber.setText("" + jsonObject.getJSONObject("data").getInteger("not_read_num"));
 //                            if (jsonObject.getJSONObject("data").getInteger("not_read_num") > 0) {
 //                                messageNumber.setVisibility(View.VISIBLE);

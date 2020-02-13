@@ -84,6 +84,7 @@ public class ServiceDetailActivity extends AppCompatActivity implements Handler.
         String url = mService.getLink_url();
 
         WebSettings s = webView.getSettings();
+        CommonUtils.setWebviewUserAgent(s);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }

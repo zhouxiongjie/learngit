@@ -244,6 +244,7 @@ public class Audio implements Parcelable {
             private double duration;
             private int size;
             private String url;
+            private int source_id;
 
             public AudioBean(){
 
@@ -281,6 +282,14 @@ public class Audio implements Parcelable {
                 this.url = url;
             }
 
+            public int getSource_id() {
+                return source_id;
+            }
+
+            public void setSource_id(int source_id) {
+                this.source_id = source_id;
+            }
+
             @Override
             public int describeContents() {
                 return 0;
@@ -293,6 +302,7 @@ public class Audio implements Parcelable {
                 out.writeDouble(duration);
                 out.writeInt(size);
                 out.writeString(url);
+                out.writeInt(source_id);
 
             }
 
@@ -314,6 +324,7 @@ public class Audio implements Parcelable {
                 duration=in.readDouble();
                 size=in.readInt();
                 url=in.readString();
+                source_id=in.readInt();
 
             }
 

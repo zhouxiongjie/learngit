@@ -1,5 +1,5 @@
 include ':app'
-include ':player_demo'
+include ':AliyunVideoCommon'
+include ':Aliyunplayer:AlivcPlayer'
 include ':zxing'
-//include ':AliyunVideoCommon'
-//include ':player_demo__'
+include ':Aliyunplayer:player_demo'

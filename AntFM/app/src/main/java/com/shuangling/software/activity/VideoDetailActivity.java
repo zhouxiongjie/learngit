@@ -29,14 +29,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.alibaba.fastjson.JSONObject;
-import com.alivc.player.VcPlayerLog;
-import com.aliyun.vodplayer.media.AliyunLocalSource;
-import com.aliyun.vodplayer.media.IAliyunVodPlayer;
+import com.aliyun.player.IPlayer;
+import com.aliyun.player.source.VidAuth;
 import com.aliyun.vodplayerview.constants.PlayParameter;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigInput;
@@ -44,16 +42,11 @@ import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
-import com.shuangling.software.adapter.ColumnContentAdapter;
-import com.shuangling.software.adapter.CommentListAdapter;
-import com.shuangling.software.adapter.RecommendContentAdapter;
 import com.shuangling.software.adapter.VideoRecyclerAdapter;
-import com.shuangling.software.customview.FontIconView;
-import com.shuangling.software.customview.MyListView;
-import com.shuangling.software.customview.MyRecyclerView;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.Comment;
+import com.shuangling.software.entity.ResAuthInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.entity.VideoDetail;
 import com.shuangling.software.network.OkHttpCallback;
@@ -65,7 +58,6 @@ import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.shuangling.software.utils.TimeUtil;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -114,6 +106,8 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     private static final int SHARE_FAILED = 0xb;
 
     private static final int MSG_DELETE_COMMENT=0xc;
+
+    private static final int MSG_GET_VIDEO_AUTH=0xd;
 
     @BindView(R.id.aliyunVodPlayerView)
     AliyunVodPlayerView aliyunVodPlayerView;
@@ -185,6 +179,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     private boolean mNeedResumeAudioPlay=false;
 
     private VideoRecyclerAdapter mAdapter;
+    private boolean mIsInBackground = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,7 +187,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             @Override
             public void onServiceConnection(IAudioPlayer audioPlayer) {
                 try{
-                    if(audioPlayer.getPlayerState()==IAliyunVodPlayer.PlayerState.Started.ordinal()||audioPlayer.getPlayerState()==IAliyunVodPlayer.PlayerState.Paused.ordinal()){
+                    if(audioPlayer.getPlayerState()==IPlayer.started||audioPlayer.getPlayerState()==IPlayer.paused){
                       audioPlayer.pause();
                       mNeedResumeAudioPlay=true;
                         FloatWindowUtil.getInstance().hideWindow();
@@ -236,6 +231,12 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
             }
         });
+        activityTitle.setBackListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         initAliyunPlayerView();
         getVideoDetail();
         getRelatedPosts();
@@ -253,8 +254,8 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
         aliyunVodPlayerView.setTheme(AliyunVodPlayerView.Theme.Blue);
         //aliyunVodPlayerView.setCirclePlay(true);
         aliyunVodPlayerView.setAutoPlay(true);
-        aliyunVodPlayerView.setReferer(ServerInfo.h5IP);
-
+//        aliyunVodPlayerView.setReferer(ServerInfo.h5IP);
+//
         if(mNetPlay==0){
             //每次提醒
             aliyunVodPlayerView.setShowFlowTip(true);
@@ -273,48 +274,52 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
         });
 
-//        aliyunVodPlayerView.setOnPreparedListener(new AliyunPlayerSkinActivity.MyPrepareListener(this));
-//        aliyunVodPlayerView.setNetConnectedListener(new AliyunPlayerSkinActivity.MyNetConnectedListener(this));
-//        aliyunVodPlayerView.setOnCompletionListener(new AliyunPlayerSkinActivity.MyCompletionListener(this));
-//        aliyunVodPlayerView.setOnFirstFrameStartListener(new AliyunPlayerSkinActivity.MyFrameInfoListener(this));
-//        aliyunVodPlayerView.setOnChangeQualityListener(new AliyunPlayerSkinActivity.MyChangeQualityListener(this));
-//        aliyunVodPlayerView.setOnStoppedListener(new AliyunPlayerSkinActivity.MyStoppedListener(this));
-//        aliyunVodPlayerView.setmOnPlayerViewClickListener(new AliyunPlayerSkinActivity.MyPlayViewClickListener());
-//        aliyunVodPlayerView.setOrientationChangeListener(new AliyunPlayerSkinActivity.MyOrientationChangeListener(this));
-//        aliyunVodPlayerView.setOnUrlTimeExpiredListener(new AliyunPlayerSkinActivity.MyOnUrlTimeExpiredListener(this));
-//        aliyunVodPlayerView.setOnShowMoreClickListener(new AliyunPlayerSkinActivity.MyShowMoreClickLisener(this));
-//        aliyunVodPlayerView.enableNativeLog();
+
+
+
 
     }
 
 
     private void getVideoDetail() {
-
-
         String url = ServerInfo.serviceIP + ServerInfo.getVideoDetail + mVideoId;
         Map<String, String> params = new HashMap<>();
-
-
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-
             @Override
             public void onResponse(Call call, String response) throws IOException {
-
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_VIDEO_DETAIL;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-
-
             }
 
             @Override
             public void onFailure(Call call, Exception exception) {
 
+            }
+        });
+    }
+
+
+    private void getVideoAuth(int sourceId) {
+        String url = ServerInfo.vms + "/v1/sources/" +sourceId+ "/playAuth";
+        Map<String, String> params = new HashMap<>();
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_VIDEO_AUTH;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
 
             }
         });
     }
+
 
 
     private void getRelatedPosts() {
@@ -550,13 +555,10 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                 msg.setData(bundle);
                 msg.obj = view;
                 mHandler.sendMessage(msg);
-
-
             }
 
             @Override
             public void onFailure(Call call, Exception exception) {
-
 
             }
         });
@@ -564,7 +566,6 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
 
     public void updateStatus() {
-
 
         String url = ServerInfo.serviceIP + ServerInfo.getVideoDetail + mVideoId;
         Map<String, String> params = new HashMap<>();
@@ -578,7 +579,6 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                 msg.obj = response;
                 mHandler.sendMessage(msg);
 
-
             }
 
             @Override
@@ -591,18 +591,19 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
 
     private void setPlaySource(String url) {
-        if ("localSource".equals(PlayParameter.PLAY_PARAM_TYPE)) {
-            AliyunLocalSource.AliyunLocalSourceBuilder alsb = new AliyunLocalSource.AliyunLocalSourceBuilder();
-            PlayParameter.PLAY_PARAM_URL = url;
-            alsb.setSource(PlayParameter.PLAY_PARAM_URL);
-            Uri uri = Uri.parse(PlayParameter.PLAY_PARAM_URL);
-            if ("rtmp".equals(uri.getScheme())) {
-                alsb.setTitle("");
-            }
-            AliyunLocalSource localSource = alsb.build();
-            aliyunVodPlayerView.setLocalSource(localSource);
-
-        }
+//        if ("localSource".equals(PlayParameter.PLAY_PARAM_TYPE)) {
+//            AliyunLocalSource.AliyunLocalSourceBuilder alsb = new AliyunLocalSource.AliyunLocalSourceBuilder();
+//            PlayParameter.PLAY_PARAM_URL = url;
+//            alsb.setSource(PlayParameter.PLAY_PARAM_URL);
+//            Uri uri = Uri.parse(PlayParameter.PLAY_PARAM_URL);
+//            if ("rtmp".equals(uri.getScheme())) {
+//                alsb.setTitle("");
+//            }
+//            AliyunLocalSource localSource = alsb.build();
+//            aliyunVodPlayerView.setLocalSource(localSource);
+//
+//
+//        }
     }
 
 
@@ -626,9 +627,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                 layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
                 ViewGroup.LayoutParams lp = aliyunVodPlayerView.getLayoutParams();
                 aliyunVodPlayerView.setLayoutParams(lp);
-                //                if (!isStrangePhone()) {
-                //                    aliVcVideoViewLayoutParams.topMargin = getSupportActionBar().getHeight();
-                //                }
+
                 bottom.setVisibility(View.VISIBLE);
                 activityTitle.setVisibility(View.VISIBLE);
                 aliyunVodPlayerView.setBackBtnVisiable(View.INVISIBLE);
@@ -653,9 +652,6 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                 layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
                 layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
                 aliyunVodPlayerView.setLayoutParams(layoutParams);
-                //                if (!isStrangePhone()) {
-                //                    aliVcVideoViewLayoutParams.topMargin = 0;
-                //                }
                 bottom.setVisibility(View.GONE);
                 activityTitle.setVisibility(View.GONE);
                 aliyunVodPlayerView.setBackBtnVisiable(View.VISIBLE);
@@ -674,7 +670,6 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                 || ("V4".equalsIgnoreCase(Build.DEVICE) && "Meitu".equalsIgnoreCase(Build.MANUFACTURER))
                 || ("m1metal".equalsIgnoreCase(Build.DEVICE) && "Meizu".equalsIgnoreCase(Build.MANUFACTURER));
 
-        VcPlayerLog.e("lfj1115 ", " Build.Device = " + Build.DEVICE + " , isStrange = " + strangePhone);
         return strangePhone;
     }
 
@@ -682,9 +677,10 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     @Override
     protected void onResume() {
         super.onResume();
-
+        mIsInBackground = false;
         updatePlayerViewMode();
         if (aliyunVodPlayerView != null) {
+            aliyunVodPlayerView.setAutoPlay(true);
             aliyunVodPlayerView.onResume();
         }
     }
@@ -693,10 +689,37 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     @Override
     protected void onStop() {
         super.onStop();
+        mIsInBackground = true;
         if (aliyunVodPlayerView != null) {
+            aliyunVodPlayerView.setAutoPlay(false);
             aliyunVodPlayerView.onStop();
         }
 
+    }
+
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (aliyunVodPlayerView != null) {
+            aliyunVodPlayerView.onDestroy();
+            aliyunVodPlayerView = null;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mNeedResumeAudioPlay){
+            FloatWindowUtil.getInstance().visibleWindow();
+        }
+        if (aliyunVodPlayerView != null) {
+            aliyunVodPlayerView.onDestroy();
+            aliyunVodPlayerView = null;
+        }
+        super.onBackPressed();
     }
 
     @Override
@@ -710,82 +733,71 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_GET_VIDEO_DETAIL:
-
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-
                         mVideoDetail = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), VideoDetail.class);
+                        if(mVideoDetail.getVideo()!=null) {
+                            getVideoAuth(mVideoDetail.getVideo().getSource_id());
 
 
-                        if (mVideoDetail.getAuthor_info() != null && mVideoDetail.getAuthor_info().getMerchant() != null) {
-                            if (!TextUtils.isEmpty(mVideoDetail.getAuthor_info().getMerchant().getLogo())) {
-                                Uri uri = Uri.parse(mVideoDetail.getAuthor_info().getMerchant().getLogo());
-                                int width = CommonUtils.dip2px(50);
-                                int height = width;
-                                ImageLoader.showThumb(uri, organizationLogo, width, height);
-                            }
-
-                            organization.setText(mVideoDetail.getAuthor_info().getMerchant().getName());
-                        }
-
-                        organizationLogo.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (mVideoDetail.getAuthor_info() != null && mVideoDetail.getAuthor_info().getMerchant() != null) {
-//                                    Intent it = new Intent(VideoDetailActivity.this, OrganizationDetailActivity.class);
-//                                    it.putExtra("organizationId", mVideoDetail.getAuthor_info().getMerchant().getId());
-//                                    startActivity(it);
-
-                                    Intent it = new Intent(VideoDetailActivity.this, WebViewActivity.class);
-                                    it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+mVideoDetail.getAuthor_info().getMerchant().getId());
-                                    startActivity(it);
+                            if (mVideoDetail.getAuthor_info() != null && mVideoDetail.getAuthor_info().getMerchant() != null) {
+                                if (!TextUtils.isEmpty(mVideoDetail.getAuthor_info().getMerchant().getLogo())) {
+                                    Uri uri = Uri.parse(mVideoDetail.getAuthor_info().getMerchant().getLogo());
+                                    int width = CommonUtils.dip2px(50);
+                                    int height = width;
+                                    ImageLoader.showThumb(uri, organizationLogo, width, height);
                                 }
+                                organization.setText(mVideoDetail.getAuthor_info().getMerchant().getName());
                             }
-                        });
-                        time.setText(TimeUtil.formatDateTime(mVideoDetail.getPublish_at()));
-
-                        if (mVideoDetail.getIs_follow() == 1) {
-                            attention.setText("已关注");
-                            attention.setActivated(false);
-
-                        } else {
-                            attention.setText("关注");
-                            attention.setActivated(true);
-                        }
-
-                        mAdapter.setVideoDetail(mVideoDetail);
-                        mAdapter.setOnPraiseVideo(new VideoRecyclerAdapter.OnPraiseVideo() {
-                            @Override
-                            public void praiseVideo() {
-                                if (User.getInstance() == null) {
-                                    startActivityForResult(new Intent(VideoDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
-                                } else {
-                                    if (mVideoDetail.getIs_likes() == 0) {
-                                        like(true);
-                                    } else {
-                                        like(false);
+                            organizationLogo.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (mVideoDetail.getAuthor_info() != null && mVideoDetail.getAuthor_info().getMerchant() != null) {
+                                        Intent it = new Intent(VideoDetailActivity.this, WebViewActivity.class);
+                                        it.putExtra("url", ServerInfo.h5HttpsIP + "/orgs/" + mVideoDetail.getAuthor_info().getMerchant().getId());
+                                        startActivity(it);
                                     }
                                 }
+                            });
+                            time.setText(TimeUtil.formatDateTime(mVideoDetail.getPublish_at()));
+                            if (mVideoDetail.getIs_follow() == 1) {
+                                attention.setText("已关注");
+                                attention.setActivated(false);
+                            } else {
+                                attention.setText("关注");
+                                attention.setActivated(true);
                             }
-                        });
-
-                        mAdapter.setOnCollectVideo(new VideoRecyclerAdapter.OnCollectVideo() {
-                            @Override
-                            public void collectVideo() {
-                                if (User.getInstance() == null) {
-                                    startActivityForResult(new Intent(VideoDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
-                                } else {
-                                    if (mVideoDetail.getIs_collection() == 0) {
-                                        collect(true);
+                            mAdapter.setVideoDetail(mVideoDetail);
+                            mAdapter.setOnPraiseVideo(new VideoRecyclerAdapter.OnPraiseVideo() {
+                                @Override
+                                public void praiseVideo() {
+                                    if (User.getInstance() == null) {
+                                        startActivityForResult(new Intent(VideoDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
                                     } else {
-                                        collect(false);
+                                        if (mVideoDetail.getIs_likes() == 0) {
+                                            like(true);
+                                        } else {
+                                            like(false);
+                                        }
                                     }
                                 }
-                            }
-                        });
-
+                            });
+                            mAdapter.setOnCollectVideo(new VideoRecyclerAdapter.OnCollectVideo() {
+                                @Override
+                                public void collectVideo() {
+                                    if (User.getInstance() == null) {
+                                        startActivityForResult(new Intent(VideoDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                    } else {
+                                        if (mVideoDetail.getIs_collection() == 0) {
+                                            collect(true);
+                                        } else {
+                                            collect(false);
+                                        }
+                                    }
+                                }
+                            });
 //                        videoTitle.setText(mVideoDetail.getTitle());
 ////                        playTimes.setText(mVideoDetail.getView() + "次播放");
 ////                        if (mVideoDetail.getIs_likes() == 0) {
@@ -802,7 +814,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 ////                            collectText.setText("已收藏");
 ////                        }
 
-                        setPlaySource(mVideoDetail.getVideo().getUrl());
+//                        setPlaySource(mVideoDetail.getVideo().getUrl());
 //                        if (CommonUtils.getNetWorkType(this) == CommonUtils.NETWORKTYPE_MOBILE) {
 //                            if(mNetPlay==0){
 //                                //每次提醒
@@ -825,8 +837,9 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 //                            setPlaySource(mVideoDetail.getVideo().getUrl());
 //                        }
 
-                        //setPlaySource(mVideoDetail.getVideo().getUrl());
-                        //setPlaySource(DEFAULT_URL);
+                            //setPlaySource(mVideoDetail.getVideo().getUrl());
+                            //setPlaySource(DEFAULT_URL);
+                        }
 
 
                     }
@@ -1121,6 +1134,29 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
                 }
                 break;
+            case MSG_GET_VIDEO_AUTH:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        ResAuthInfo resAuthInfo=JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), ResAuthInfo.class);
+
+                        VidAuth vidAuth=new VidAuth();
+                        vidAuth.setPlayAuth(resAuthInfo.getPlay_auth());
+                        vidAuth.setVid(resAuthInfo.getVideo_id());
+                        vidAuth.setRegion("cn-shanghai");
+                        aliyunVodPlayerView.setAuthInfo(vidAuth);
+
+                    }else if (jsonObject != null){
+                       ToastUtils.show(jsonObject.getString("msg"));
+                    }
+
+
+                } catch (Exception e) {
+
+                }
+                break;
         }
         return false;
     }
@@ -1323,22 +1359,13 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
         oks.show(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        if(mNeedResumeAudioPlay){
-//            try{
-                //mAudioPlayer.start();
-                FloatWindowUtil.getInstance().visibleWindow();
-//            }catch (RemoteException e){
-//
-//            }
 
-        }
-        if (aliyunVodPlayerView != null) {
-            aliyunVodPlayerView.onDestroy();
-            aliyunVodPlayerView = null;
-        }
-        super.onDestroy();
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        //解决某些手机上锁屏之后会出现标题栏的问题。
+        updatePlayerViewMode();
     }
 
 

@@ -95,12 +95,17 @@ public class HistoryRadioAdapter extends RecyclerView.Adapter implements View.On
         final HistoryRadio content = mHistorys.get(position);
 
         final RadioViewHolder radioViewHolder = (RadioViewHolder) holder;
-        if (!TextUtils.isEmpty(content.getRadio().getLogo())) {
-            Uri uri = Uri.parse(content.getRadio().getLogo());
-            int width = CommonUtils.dip2px(70);
-            int height = width;
-            ImageLoader.showThumb(uri, radioViewHolder.logo, width, height);
+        if(content.getRadio()!=null){
+            if (!TextUtils.isEmpty(content.getRadio().getLogo())) {
+                Uri uri = Uri.parse(content.getRadio().getLogo());
+                int width = CommonUtils.dip2px(70);
+                int height = width;
+                ImageLoader.showThumb(uri, radioViewHolder.logo, width, height);
+            }
+            radioViewHolder.title.setText(content.getRadio().getName());
+            radioViewHolder.program.setText(content.getRadio().getDes());
         }
+
         if (mEditorMode) {
             radioViewHolder.checkBox.setVisibility(View.VISIBLE);
             if (mItemSelected[position] == 1) {
@@ -111,8 +116,7 @@ public class HistoryRadioAdapter extends RecyclerView.Adapter implements View.On
         } else {
             radioViewHolder.checkBox.setVisibility(View.GONE);
         }
-        radioViewHolder.title.setText(content.getRadio().getName());
-        radioViewHolder.program.setText(content.getRadio().getDes());
+
         radioViewHolder.time.setText(content.getUpdated_at());
         radioViewHolder.root.setOnClickListener(new View.OnClickListener() {
             @Override

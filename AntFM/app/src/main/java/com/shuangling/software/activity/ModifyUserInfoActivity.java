@@ -61,6 +61,7 @@ import com.shuangling.software.oss.OSSAKSKCredentialProvider;
 import com.shuangling.software.oss.OssService;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
+import com.shuangling.software.utils.MyGlideEngine;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -85,6 +86,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -205,7 +208,7 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
             Uri uri = Uri.parse(User.getInstance().getAvatar());
             ImageLoader.showThumb(uri, head, CommonUtils.dip2px(40), CommonUtils.dip2px(40));
         }
-        tempFile = new File(CommonUtils.getStoragePrivateDirectory(Environment.DIRECTORY_PICTURES), "head.jpg");
+        //tempFile = new File(CommonUtils.getStoragePrivateDirectory(Environment.DIRECTORY_PICTURES), "head.jpg");
         getUerInfo();
 
     }
@@ -296,9 +299,9 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
                         User.getInstance().setAvatar(value);
                         SharedPreferencesUtils.saveUser(User.getInstance());
                         //清理缓存
-                        ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                        Uri uri = Uri.parse(User.getInstance().getAvatar());
-                        imagePipeline.evictFromCache(uri);
+//                        ImagePipeline imagePipeline = Fresco.getImagePipeline();
+//                        Uri uri = Uri.parse(User.getInstance().getAvatar());
+//                        imagePipeline.evictFromCache(uri);
 
                         EventBus.getDefault().post(new CommonEvent("updateAvatar"));
                     }else if(key.equals("sex")){
@@ -381,12 +384,19 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
                 Bundle extras = data.getExtras();
                 if (extras != null) {
                     Bitmap bitmap = extras.getParcelable("data");
-
+                    Random rand = new Random();
+                    int randNum = rand.nextInt(1000);
+                    tempFile = new File(CommonUtils.getStoragePrivateDirectory(Environment.DIRECTORY_PICTURES), CommonUtils.getCurrentTimeString()+randNum+".jpg");
                     CommonUtils.saveBitmap(tempFile.getAbsolutePath(), bitmap);
                     //saveBitmapToFile(bitmap);
 //
                     // 2.把图片文件file上传到服务器
-                    mOssService.asyncUploadFile(mOssInfo.getDir()+tempFile.getName(),tempFile.getAbsolutePath(),null,this);
+                    if(mOssInfo!=null){
+                        mOssService.asyncUploadFile(mOssInfo.getDir()+tempFile.getName(),tempFile.getAbsolutePath(),null,this);
+                    }else{
+                        ToastUtils.show("OSS初始化失败");
+                    }
+
                 }
             }
 
@@ -450,6 +460,7 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
 
                 if(mOssService==null){
                     ToastUtils.show("OSS上传服务初始化失败，请稍后再试");
+                    return;
                 }
 
                 RxPermissions rxPermissions = new RxPermissions(ModifyUserInfoActivity.this);
@@ -469,7 +480,7 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
                                             .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                                             .thumbnailScale(1.0f) // 缩略图的比例
                                             .theme(R.style.Matisse_Zhihu)
-                                            .imageEngine(new GlideEngine()) // 使用的图片加载引擎
+                                            .imageEngine(new MyGlideEngine()) // 使用的图片加载引擎
                                             .forResult(CHOOSE_PHOTO); // 设置作为标记的请求码
                                 }else{
                                     ToastUtils.show("未能获取相关权限，功能可能不能正常使用");

@@ -21,6 +21,8 @@ public class ServerInfo {
 
 	public static String emc="http://api-emc.fcgtvb.com";
 
+	public static String vms="http://api-vms.fcgtvb.com";
+
 
 
 	public static String getRecommendColumns="/v1/c_cassifies";    				//推荐栏目

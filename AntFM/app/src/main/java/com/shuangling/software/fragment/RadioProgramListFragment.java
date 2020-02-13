@@ -120,10 +120,14 @@ public class RadioProgramListFragment extends Fragment implements Handler.Callba
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
+                try{
+                    if(refreshLayout.isRefreshing()){
+                        refreshLayout.finishRefresh();
+                    }
+                }catch (Exception e){
 
-                if(refreshLayout.isRefreshing()){
-                    refreshLayout.finishRefresh();
                 }
+
 
                 Message msg = Message.obtain();
                 msg.what = MSG_UPDATE_LIST;
@@ -134,10 +138,14 @@ public class RadioProgramListFragment extends Fragment implements Handler.Callba
 
             @Override
             public void onFailure(Call call, Exception exception) {
+                try{
+                    if(refreshLayout.isRefreshing()){
+                        refreshLayout.finishRefresh();
+                    }
+                }catch (Exception e){
 
-                if(refreshLayout.isRefreshing()){
-                    refreshLayout.finishRefresh();
                 }
+
             }
         });
 

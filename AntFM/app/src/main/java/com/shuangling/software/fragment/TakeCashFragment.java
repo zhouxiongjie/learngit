@@ -30,10 +30,15 @@ import com.shuangling.software.adapter.CashIncomeAdapter;
 import com.shuangling.software.adapter.TakeCashAdapter;
 import com.shuangling.software.entity.Attention;
 import com.shuangling.software.entity.TakeCashInfo;
+import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.ServerInfo;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -87,6 +92,7 @@ public class TakeCashFragment extends Fragment implements Handler.Callback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_content, null);
+        EventBus.getDefault().register(this);
         unbinder = ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         //recyclerView.addItemDecoration(new MyItemDecoration());
@@ -270,4 +276,19 @@ public class TakeCashFragment extends Fragment implements Handler.Callback {
         return false;
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if (event.getEventName().equals("OnMoneyChanged")) {
+            getContent(GetContent.Normal);
+
+        }
+    }
+
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
 }

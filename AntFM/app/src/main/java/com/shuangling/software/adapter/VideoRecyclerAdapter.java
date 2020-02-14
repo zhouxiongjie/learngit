@@ -157,6 +157,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
             final HeadViewHolder viewHolder = (HeadViewHolder) holder;
             if (mVideoDetail != null) {
                 viewHolder.videoTitle.setText(mVideoDetail.getTitle());
+                viewHolder.reads.setText(""+mVideoDetail.getView());
                 viewHolder.playTimes.setText("简介:" + mVideoDetail.getDes());
                 viewHolder.playTimes.setVisibility(View.GONE);
                 viewHolder.showMore.setTag(false);
@@ -346,6 +347,8 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
         ImageView showMore;
         @BindView(R.id.playTimes)
         TextView playTimes;
+        @BindView(R.id.reads)
+        TextView reads;
         @BindView(R.id.praiseSum)
         TextView praiseSum;
         @BindView(R.id.praiseLayout)

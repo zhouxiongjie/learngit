@@ -1,11 +1,14 @@
 package com.shuangling.software.fragment;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.RemoteException;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -18,6 +21,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.LinearInterpolator;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,6 +30,7 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.bumptech.glide.Glide;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.gyf.immersionbar.components.SimpleImmersionFragment;
@@ -147,14 +152,14 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 
 
     public void switchColumn(Column switchColumn) {
-
+        int columnIndex=0;
         for (int i = 0; mColumns!=null&&i < mColumns.size(); i++) {
             if (mColumns.get(i).getId() == switchColumn.getId()) {
-                mColumnSelectIndex = i;
+                columnIndex = i;
                 break;
             }
         }
-        viewPager.setCurrentItem(mColumnSelectIndex);
+        viewPager.setCurrentItem(columnIndex);
 
     }
 
@@ -206,13 +211,13 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                 columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                                 columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
                             } else {
-                                mColumnSelectIndex = i;
+                                //mColumnSelectIndex = i;
                                 columnTextView.setSelected(true);
                                 //indicator.setVisibility(View.VISIBLE);
                                 columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
                                 columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
-                                viewPager.setCurrentItem(mColumnSelectIndex);
+                                viewPager.setCurrentItem(i);
                             }
                         }
                     }
@@ -296,8 +301,8 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 //
 //                    }
 //                }, 500);
-                mColumnSelectIndex = 1;
-                viewPager.setCurrentItem(mColumnSelectIndex);
+                //mColumnSelectIndex = 1;
+                viewPager.setCurrentItem(1);
             }
         }
 
@@ -326,17 +331,51 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                 logo1.setVisibility(View.GONE);
             }
 
-
+            int prePosition=mColumnSelectIndex;
             for (int i = 0; i < columnContent.getChildCount(); i++) {
                 View checkView = columnContent.getChildAt(i);
-                TextView columnTextView = checkView.findViewById(R.id.text);
+                final TextView columnTextView = checkView.findViewById(R.id.text);
                 //SimpleDraweeView indicator = checkView.findViewById(R.id.indicator);
                 boolean ischeck;
                 if (i == position) {
                     ischeck = true;
                     //indicator.setVisibility(View.VISIBLE);
-                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+//                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
                     columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+
+                    ValueAnimator animator = ValueAnimator.ofInt(15, 22).setDuration(300);
+                    animator.setInterpolator(new LinearInterpolator());
+                    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                            int textSize = (int) valueAnimator.getAnimatedValue();
+                            columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+                        }
+                    });
+                    animator.addListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            animation.cancel();
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+                    });
+                    animator.start();
+
+
                     if (checkView.getLeft() > mScreenWidth / 2) {
                         columnScrollView.scrollTo((int) checkView.getLeft() - mScreenWidth / 2, 0);
                     } else {
@@ -365,8 +404,44 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                 } else {
                     ischeck = false;
                     //indicator.setVisibility(View.INVISIBLE);
-                    columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-                    columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+
+                    if(i==prePosition){
+                        ValueAnimator animator = ValueAnimator.ofInt(22, 15).setDuration(300);
+                        animator.setInterpolator(new LinearInterpolator());
+                        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                                int textSize = (int) valueAnimator.getAnimatedValue();
+                                columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+                            }
+                        });
+                        animator.addListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                animation.cancel();
+                                columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+
+                            }
+                        });
+                        animator.start();
+                    }else{
+                        columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                        columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                    }
                 }
                 columnTextView.setSelected(ischeck);
             }
@@ -433,13 +508,13 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                                 columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                                                 columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
                                             } else {
-                                                mColumnSelectIndex = i;
+                                                //mColumnSelectIndex = i;
                                                 columnTextView.setSelected(true);
                                                 //indicator.setVisibility(View.VISIBLE);
                                                 columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
                                                 columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
-                                                viewPager.setCurrentItem(mColumnSelectIndex);
+                                                viewPager.setCurrentItem(i);
                                             }
                                         }
                                     }
@@ -490,13 +565,13 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                                     columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                                                     columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
                                                 } else {
-                                                    mColumnSelectIndex = i;
+                                                    //mColumnSelectIndex = i;
                                                     columnTextView.setSelected(true);
                                                     //indicator.setVisibility(View.VISIBLE);
                                                     columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
                                                     columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
-                                                    viewPager.setCurrentItem(mColumnSelectIndex);
+                                                    viewPager.setCurrentItem(i);
                                                 }
                                             }
                                         }
@@ -778,7 +853,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                                 columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
                                                 columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
                                             } else {
-                                                mColumnSelectIndex = i;
+                                                //mColumnSelectIndex = i;
                                                 columnTextView.setSelected(true);
                                                 //indicator.setVisibility(View.VISIBLE);
 //                                                Station station=MyApplication.getInstance().getStation();
@@ -791,7 +866,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                                 columnTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
                                                 columnTextView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
 
-                                                viewPager.setCurrentItem(mColumnSelectIndex);
+                                                viewPager.setCurrentItem(i);
                                             }
                                         }
                                     }

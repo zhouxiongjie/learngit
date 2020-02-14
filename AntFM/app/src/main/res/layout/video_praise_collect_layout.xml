@@ -62,6 +62,20 @@
 
     </RelativeLayout>
 
+
+    <TextView
+        android:id="@+id/reads"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:drawableLeft="@drawable/ic_view"
+        android:drawablePadding="5dp"
+        tools:text="25"
+        android:textColor="@color/textColorSeven"
+        android:textSize="@dimen/font_size_24px" />
+
     <TextView
         android:id="@+id/playTimes"
         android:layout_width="wrap_content"

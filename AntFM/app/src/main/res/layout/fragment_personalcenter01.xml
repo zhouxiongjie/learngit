@@ -357,7 +357,7 @@
             android:paddingBottom="20dp"
             android:gravity="center"
             android:orientation="vertical"
-            android:visibility="visible">
+            android:visibility="invisible">
 
 
             <com.shuangling.software.customview.FontIconView

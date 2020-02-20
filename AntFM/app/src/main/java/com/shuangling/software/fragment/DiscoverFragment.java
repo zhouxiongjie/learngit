@@ -420,12 +420,12 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
 
         @JavascriptInterface
-        public void shareEvent(final String id, final String title, final String des, final String logo) {
+        public void shareEvent(final String id, final String title, final String des,final String url, final String logo) {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
 
-                    showShare(id, title, des, logo);
+                    showShare(id, title, des,url, logo);
                 }
             });
 
@@ -560,7 +560,7 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
     }
 
 
-    private void showShare(final String id, final String title, final String des, final String logo) {
+    private void showShare(final String id, final String title, final String des,final String url, final String logo) {
 
 
         OnekeyShare oks = new OnekeyShare();
@@ -586,20 +586,21 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
                 if (SinaWeibo.NAME.equals(platform.getName())) {
                     //限制微博分享的文字不能超过20
                     chanel = "2";
-                    paramsToShare.setText(title + ServerInfo.activity + "qaa/game-result/" + id);
+                    //paramsToShare.setText(title + ServerInfo.activity + "qaa/game-result/" + id);
+                    paramsToShare.setText(title + url);
                 } else if (QQ.NAME.equals(platform.getName())) {
                     chanel = "3";
                     paramsToShare.setTitle(title);
                     if (!TextUtils.isEmpty(logo)) {
                         paramsToShare.setImageUrl(logo);
                     }
-                    paramsToShare.setTitleUrl(ServerInfo.activity + "qaa/game-result/" + id);
+                    paramsToShare.setTitleUrl(url);
                     paramsToShare.setText(des);
 
                 } else if (Wechat.NAME.equals(platform.getName())) {
                     paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                     paramsToShare.setTitle(title);
-                    paramsToShare.setUrl(ServerInfo.activity + "qaa/game-result/" + id);
+                    paramsToShare.setUrl(url);
                     if (!TextUtils.isEmpty(logo)) {
                         paramsToShare.setImageUrl(logo);
                     }
@@ -607,19 +608,19 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
                 } else if (WechatMoments.NAME.equals(platform.getName())) {
                     paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                     paramsToShare.setTitle(title);
-                    paramsToShare.setUrl(ServerInfo.activity + "qaa/game-result/" + id);
+                    paramsToShare.setUrl(url);
                     if (!TextUtils.isEmpty(logo)) {
                         paramsToShare.setImageUrl(logo);
                     }
                 } else if (WechatFavorite.NAME.equals(platform.getName())) {
                     paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                     paramsToShare.setTitle(title);
-                    paramsToShare.setUrl(ServerInfo.activity + "qaa/game-result/" + id);
+                    paramsToShare.setUrl(url);
                     if (!TextUtils.isEmpty(logo)) {
                         paramsToShare.setImageUrl(logo);
                     }
                 }
-                shareStatistics(chanel, "" + id, ServerInfo.activity + "qaa/game-result/" + id);
+                shareStatistics(chanel, "" + id, url);
 
             }
         });

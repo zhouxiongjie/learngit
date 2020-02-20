@@ -19,7 +19,6 @@
         android:layout_below="@+id/activity_title"
         ptr:srlEnableScrollContentWhenLoaded="true"
         ptr:srlEnableFooterFollowWhenLoadFinished="true"
-
         ptr:srlEnableLoadMore="true">
         <com.scwang.smartrefresh.layout.header.ClassicsHeader
             android:layout_width="match_parent"

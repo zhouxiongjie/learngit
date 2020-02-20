@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import com.alibaba.fastjson.JSONObject;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -29,6 +30,7 @@ import com.shuangling.software.entity.Collect;
 import com.shuangling.software.entity.CollectRadio;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.ServerInfo;
 
 import org.greenrobot.eventbus.EventBus;
@@ -95,17 +97,19 @@ public class CollectRadioFragment extends Fragment implements Handler.Callback {
         recyclerView.addItemDecoration(divider);
         //refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
         ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
-        refreshLayout.setEnableRefresh(false);
-        refreshLayout.setEnableLoadMore(false);
+        refreshLayout.setEnableRefresh(true);
+        refreshLayout.setEnableLoadMore(true);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
+                mCurrentPage = 1;
                 getContent(GetContent.Refresh);
             }
         });
         refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore(RefreshLayout refreshLayout) {
+                mCurrentPage ++;
                 getContent(GetContent.LoadMore);
             }
         });
@@ -142,7 +146,7 @@ public class CollectRadioFragment extends Fragment implements Handler.Callback {
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("page", "" + mCurrentPage);
-        params.put("page_size", "" + Integer.MAX_VALUE);
+        params.put("page_size", "" + Constant.PAGE_SIZE);
 
         if (mCategory == R.string.radio) {
             params.put("type", "1");
@@ -157,11 +161,11 @@ public class CollectRadioFragment extends Fragment implements Handler.Callback {
             public void onResponse(Call call, String response) throws IOException {
                 try{
                     if (getContent == GetContent.Refresh) {
-                        if (refreshLayout.isRefreshing()) {
+                        if (refreshLayout.getState() == RefreshState.Refreshing) {
                             refreshLayout.finishRefresh();
                         }
                     } else if (getContent == GetContent.LoadMore) {
-                        if (refreshLayout.isLoading()) {
+                        if (refreshLayout.getState() == RefreshState.Loading) {
                             refreshLayout.finishLoadMore();
                         }
                     }
@@ -182,11 +186,11 @@ public class CollectRadioFragment extends Fragment implements Handler.Callback {
             public void onFailure(Call call, Exception exception) {
                 try{
                     if (getContent == GetContent.Refresh) {
-                        if (refreshLayout.isRefreshing()) {
+                        if (refreshLayout.getState() == RefreshState.Refreshing) {
                             refreshLayout.finishRefresh();
                         }
                     } else if (getContent == GetContent.LoadMore) {
-                        if (refreshLayout.isLoading()) {
+                        if (refreshLayout.getState() == RefreshState.Loading) {
                             refreshLayout.finishLoadMore();
                         }
                     }
@@ -214,15 +218,30 @@ public class CollectRadioFragment extends Fragment implements Handler.Callback {
             case MSG_UPDATE_LIST:
                 try {
                     String result = (String) msg.obj;
+                    GetContent getContent = GetContent.values()[msg.arg1];
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        mCollects = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), CollectRadio.class);
+                        List<CollectRadio> collects = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), CollectRadio.class);
 
+                        if (getContent == GetContent.Refresh) {
+                            refreshLayout.setEnableLoadMore(true);
+                            mCollects = collects;
+                        } else if(getContent==GetContent.LoadMore){
+                            if(collects==null||collects.size()==0){
+                                refreshLayout.finishLoadMoreWithNoMoreData();
+                            }
+                            mCollects.addAll(collects);
+
+                        }else{
+                            refreshLayout.setEnableLoadMore(true);
+                            mCollects.addAll(collects);
+                        }
                         if (mCollects.size() == 0) {
                             noData.setVisibility(View.VISIBLE);
                         } else {
                             noData.setVisibility(View.GONE);
                         }
+
 
                         if (mAdapter == null) {
                             mAdapter = new CollectRadioAdapter(getContext(), mCollects);

@@ -34,6 +34,9 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.sdk.android.push.CloudPushService;
+import com.alibaba.sdk.android.push.CommonCallback;
+import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.aliyun.vodplayerview.activity.AliyunPlayerSkinActivity;
 import com.aliyun.vodplayerview.utils.FixedToastUtils;
 import com.amap.api.location.AMapLocation;
@@ -56,6 +59,7 @@ import com.shuangling.software.entity.City;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.UpdateInfo;
+import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.fragment.DiscoverFragment;
 import com.shuangling.software.fragment.PersonalCenterFragment;
@@ -163,9 +167,139 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
         getUpdateInfo();
 
+        Intent it = getIntent();
+        if (null != it) {
+            Uri uri = it.getData();
+            if (null != uri) {
+//                ToastUtils.show("|scheme-"+ uri.getScheme()
+//                        + "|type-" + uri.getQueryParameter("type")
+//                        + "|id-" + uri.getQueryParameter("id"));
+
+                verifyUserInfo();
+
+                String type=uri.getQueryParameter("type");
+                if(type.equals("1")){
+                    //音频
+                    Intent intent = new Intent(this, AudioDetailActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("audioId", Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(intent);
+                }else if(type.equals("2")){
+                    //专辑
+                    Intent intent = new Intent(this, AlbumDetailActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("albumId", Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(intent);
+                }else if(type.equals("3")){
+                    //文章
+                    Intent intent = new Intent(this, ArticleDetailActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("articleId", Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(intent);
+                }else if(type.equals("4")){
+                    //视频
+                    Intent intent = new Intent(this, VideoDetailActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("videoId", Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(intent);
+                }else if(type.equals("5")){
+                    //专题
+                    Intent intent = new Intent(this, SpecialDetailActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("specialId", Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(intent);
+                }else if(type.equals("6")){
+                    //图集
+                    Intent intent = new Intent(this, GalleriaActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("galleriaId", Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(intent);
+                }
+
+
+            }
+        }
+
 
     }
 
+
+    @Override
+    protected void onNewIntent(Intent it) {
+        super.onNewIntent(it);
+
+        if (null != it) {
+            Uri uri = it.getData();
+            if (null != uri) {
+//                ToastUtils.show("|scheme-"+ uri.getScheme()
+//                        + "|type-" + uri.getQueryParameter("type")
+//                        + "|id-" + uri.getQueryParameter("id"));
+
+
+                String type=uri.getQueryParameter("type");
+                if(type.equals("1")){
+                    //音频
+                    Intent intent = new Intent(this, AudioDetailActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("audioId", Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(intent);
+                }else if(type.equals("2")){
+                    //专辑
+                    Intent intent = new Intent(this, AlbumDetailActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("albumId", Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(intent);
+                }else if(type.equals("3")){
+                    //文章
+                    Intent intent = new Intent(this, ArticleDetailActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("articleId", Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(intent);
+                }else if(type.equals("4")){
+                    //视频
+                    Intent intent = new Intent(this, VideoDetailActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("videoId", Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(intent);
+                }else if(type.equals("5")){
+                    //专题
+                    Intent intent = new Intent(this, SpecialDetailActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("specialId", Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(intent);
+                }else if(type.equals("6")){
+                    //图集
+                    Intent intent = new Intent(this, GalleriaActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("galleriaId", Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(intent);
+                }
+
+
+            }
+        }
+    }
+
+    private void verifyUserInfo() {
+        User.setInstance(SharedPreferencesUtils.getUser());
+        final CloudPushService pushService = PushServiceFactory.getCloudPushService();
+        if (SharedPreferencesUtils.getUser() != null) {
+            pushService.bindAccount(SharedPreferencesUtils.getUser().getUsername(), new CommonCallback() {
+                @Override
+                public void onSuccess(String s) {
+                    Log.i("bindAccount-onSuccess", s);
+                }
+
+                @Override
+                public void onFailed(String s, String s1) {
+                    Log.i("bindAccount-onFailed", s);
+                    Log.i("bindAccount-onFailed", s1);
+                }
+            });
+        }
+        EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
+
+    }
 
     public void switchRecommend(Column column) {
 //        settingBackgound(recommend);

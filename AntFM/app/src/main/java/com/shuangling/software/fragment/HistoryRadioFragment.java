@@ -20,6 +20,7 @@ import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -31,6 +32,7 @@ import com.shuangling.software.adapter.HistoryRadioAdapter;
 import com.shuangling.software.entity.HistoryRadio;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.ServerInfo;
 
 import org.greenrobot.eventbus.EventBus;
@@ -64,7 +66,7 @@ public class HistoryRadioFragment extends Fragment implements Handler.Callback {
     LinearLayout noData;
 
     private int mCategory;
-    private List<HistoryRadio> mHistorys;
+    private List<HistoryRadio> mHistorys=new ArrayList<>();
     private HistoryRadioAdapter mAdapter;
     private Handler mHandler;
 
@@ -105,12 +107,14 @@ public class HistoryRadioFragment extends Fragment implements Handler.Callback {
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
+                mCurrentPage = 1;
                 getContent(GetContent.Refresh);
             }
         });
         refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore(RefreshLayout refreshLayout) {
+                mCurrentPage++;
                 getContent(GetContent.LoadMore);
             }
         });
@@ -126,7 +130,7 @@ public class HistoryRadioFragment extends Fragment implements Handler.Callback {
 
         Map<String, String> params = new HashMap<>();
         params.put("page", "" + mCurrentPage);
-        params.put("page_size", "" + Integer.MAX_VALUE);
+        params.put("page_size", "" + Constant.PAGE_SIZE);
 
         if (mCategory == R.string.radio) {
             params.put("type", "1");
@@ -141,11 +145,11 @@ public class HistoryRadioFragment extends Fragment implements Handler.Callback {
             public void onResponse(Call call, String response) throws IOException {
                 try{
                     if (getContent == GetContent.Refresh) {
-                        if (refreshLayout.isRefreshing()) {
+                        if (refreshLayout.getState() == RefreshState.Refreshing) {
                             refreshLayout.finishRefresh();
                         }
                     } else if (getContent == GetContent.LoadMore) {
-                        if (refreshLayout.isLoading()) {
+                        if (refreshLayout.getState() == RefreshState.Loading) {
                             refreshLayout.finishLoadMore();
                         }
                     }
@@ -166,11 +170,11 @@ public class HistoryRadioFragment extends Fragment implements Handler.Callback {
             public void onFailure(Call call, Exception exception) {
                 try{
                     if (getContent == GetContent.Refresh) {
-                        if (refreshLayout.isRefreshing()) {
+                        if (refreshLayout.getState() == RefreshState.Refreshing) {
                             refreshLayout.finishRefresh();
                         }
                     } else if (getContent == GetContent.LoadMore) {
-                        if (refreshLayout.isLoading()) {
+                        if (refreshLayout.getState() == RefreshState.Loading) {
                             refreshLayout.finishLoadMore();
                         }
                     }
@@ -224,9 +228,23 @@ public class HistoryRadioFragment extends Fragment implements Handler.Callback {
             case MSG_UPDATE_LIST:
                 try {
                     String result = (String) msg.obj;
+                    GetContent getContent = GetContent.values()[msg.arg1];
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        mHistorys = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), HistoryRadio.class);
+                        List<HistoryRadio> historys = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), HistoryRadio.class);
+                        if (getContent == GetContent.Refresh) {
+                            refreshLayout.setEnableLoadMore(true);
+                            mHistorys = historys;
+                        } else if(getContent==GetContent.LoadMore){
+                            if(historys==null||historys.size()==0){
+                                refreshLayout.finishLoadMoreWithNoMoreData();
+                            }
+                            mHistorys.addAll(historys);
+
+                        }else{
+                            refreshLayout.setEnableLoadMore(true);
+                            mHistorys.addAll(historys);
+                        }
                         if (mHistorys.size() == 0) {
                             noData.setVisibility(View.VISIBLE);
                         } else {

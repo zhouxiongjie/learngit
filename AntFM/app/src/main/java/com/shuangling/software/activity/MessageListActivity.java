@@ -17,6 +17,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.gyf.immersionbar.ImmersionBar;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -130,11 +131,11 @@ public class MessageListActivity extends AppCompatActivity implements Handler.Ca
 
                 try{
                     if (getContent == GetContent.Refresh) {
-                        if (refreshLayout.isRefreshing()) {
+                        if (refreshLayout.getState() == RefreshState.Refreshing) {
                             refreshLayout.finishRefresh();
                         }
                     } else if (getContent == GetContent.LoadMore) {
-                        if (refreshLayout.isLoading()) {
+                        if (refreshLayout.getState() == RefreshState.Loading) {
                             refreshLayout.finishLoadMore();
                         }
                     }
@@ -155,11 +156,11 @@ public class MessageListActivity extends AppCompatActivity implements Handler.Ca
             public void onFailure(Call call, Exception exception) {
                 try{
                     if (getContent == GetContent.Refresh) {
-                        if (refreshLayout.isRefreshing()) {
+                        if (refreshLayout.getState() == RefreshState.Refreshing) {
                             refreshLayout.finishRefresh();
                         }
                     } else if (getContent == GetContent.LoadMore) {
-                        if (refreshLayout.isLoading()) {
+                        if (refreshLayout.getState() == RefreshState.Loading) {
                             refreshLayout.finishLoadMore();
                         }
                     }

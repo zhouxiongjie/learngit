@@ -10,16 +10,18 @@
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        ptr:srlEnableLoadMore="true">
+        ptr:srlEnableLoadMore="true"
+        ptr:srlEnableScrollContentWhenLoaded="true"
+        ptr:srlEnableFooterFollowWhenLoadFinished="true">
 
         <com.scwang.smartrefresh.layout.header.ClassicsHeader
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             ptr:srlAccentColor="@android:color/black"
-            ptr:srlClassicsSpinnerStyle="Translate"
+            ptr:srlClassicsSpinnerStyle="FixedBehind"
             ptr:srlDrawableProgress="@drawable/smart_refresh_progress_logo"
             ptr:srlDrawableProgressSize="20dp"
-            ptr:srlPrimaryColor="@color/transparent" />
+            ptr:srlPrimaryColor="@color/transparent"/>
 
         <android.support.v7.widget.RecyclerView
 
@@ -32,10 +34,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             ptr:srlAccentColor="@android:color/black"
-            ptr:srlClassicsSpinnerStyle="Translate"
+            ptr:srlClassicsSpinnerStyle="FixedBehind"
             ptr:srlDrawableProgress="@drawable/smart_refresh_progress_logo"
             ptr:srlDrawableProgressSize="20dp"
             ptr:srlPrimaryColor="@color/transparent" />
+
+
+        <!--<com.scwang.smartrefresh.layout.footer.ClassicsFooter-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+             <!--/>-->
+        <!--ptr:srlAccentColor="@android:color/black"-->
+
+        <!--ptr:srlDrawableProgressSize="20dp"-->
+        <!--ptr:srlPrimaryColor="@color/transparent"-->
+        <!--ptr:srlClassicsSpinnerStyle="Translate"-->
+        <!--ptr:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
 
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 

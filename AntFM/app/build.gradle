@@ -26,7 +26,7 @@ android {
 
     MtjCirclePluginConfig {
 
-        appkey = "15eb09e817"
+        appkey = "8a3086f16e"
         // 设置debug 开关，如果需要查看日志则打开开关，为避免影响性能建议上线前关闭（设置为false）
         debug = false
         // 默认启动此插件，如果开发者不需要可以禁用（设置为false）
@@ -75,7 +75,8 @@ android {
             //            buildConfigField "String",           "QQ_ID", qq_id
             //            buildConfigField "String",           "WX_ID", '"wxxxxxxxxxxxxxxxxx"' // 配置微信appid
             manifestPlaceholders = [
-                    GD_KEY: "a2fdac9774a1380d6479f72d020cb92b"
+                    GD_KEY: "a2fdac9774a1380d6479f72d020cb92b",
+                    APP_SCHEME:"cmsapp"
             ]
 
         }
@@ -85,7 +86,8 @@ android {
             signingConfig signingConfigs.jx         //配置签名
             String bdtjAppkey = "ed95bcc12a"
             manifestPlaceholders = [
-                    GD_KEY: "6d951523e28be6cb3fa6cffcb125a21b"
+                    GD_KEY: "6d951523e28be6cb3fa6cffcb125a21b",
+                    APP_SCHEME:"jxapp"
             ]
 
 
@@ -96,7 +98,8 @@ android {
             signingConfig signingConfigs.yjhlq         //配置签名
             String bdtjAppkey = "15eb09e817"
             manifestPlaceholders = [
-                    GD_KEY: "991b888296921f1880e2d3a4f6cb0dfd"
+                    GD_KEY: "991b888296921f1880e2d3a4f6cb0dfd",
+                    APP_SCHEME:"yjhlqapp"
             ]
 
 
@@ -108,7 +111,8 @@ android {
             signingConfig signingConfigs.fcg         //配置签名
             String bdtjAppkey = "8bc0e3d645"
             manifestPlaceholders = [
-                    GD_KEY: "e2b638dd8d5507018ca114460cd5f624"
+                    GD_KEY: "e2b638dd8d5507018ca114460cd5f624",
+                    APP_SCHEME:"fcgapp"
             ]
 
 
@@ -205,7 +209,7 @@ dependencies {
     implementation 'com.facebook.fresco:fresco:0.12.0'
     implementation 'com.android.support:multidex:1.0.1'
     implementation 'com.alibaba:fastjson:1.2.46'
-    implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.5'
+    implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0'
     implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'com.mylhyl:circleDialog:2.6.7'
     implementation 'com.jack.frdialog:FRDialog:1.0.3'
@@ -232,5 +236,6 @@ dependencies {
     // fragment快速实现（可选）
     implementation 'com.gyf.immersionbar:immersionbar-components:3.0.0'
     implementation 'io.sentry:sentry-android:1.7.27'
+    implementation 'com.kcrason:dynamicpagerindicator:1.5.0'
     implementation externalGlide
 }

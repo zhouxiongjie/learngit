@@ -34,6 +34,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.hjq.toast.ToastUtils;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -213,7 +214,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             @Override
             public void onResponse(Call call, String response) throws IOException {
                 try{
-                    if (refreshLayout.isRefreshing()) {
+                    if (refreshLayout.getState() == RefreshState.Refreshing) {
                         refreshLayout.finishRefresh();
                     }
                     JSONObject jsonObject = JSONObject.parseObject(response);
@@ -240,7 +241,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             @Override
             public void onFailure(Call call, Exception exception) {
                 try{
-                    if (refreshLayout.isRefreshing()) {
+                    if (refreshLayout.getState() == RefreshState.Refreshing) {
                         refreshLayout.finishRefresh();
                     }
                 }catch (Exception e){
@@ -265,7 +266,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             public void onResponse(Call call, String response) throws IOException {
 
                 try{
-                    if (refreshLayout.isRefreshing()) {
+                    if (refreshLayout.getState() == RefreshState.Refreshing) {
                         refreshLayout.finishRefresh();
                     }
                 }catch (Exception e){
@@ -285,7 +286,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             public void onFailure(Call call, Exception exception) {
 
                 try{
-                    if (refreshLayout.isRefreshing()) {
+                    if (refreshLayout.getState() == RefreshState.Refreshing) {
                         refreshLayout.finishRefresh();
                     }
                 }catch (Exception e){

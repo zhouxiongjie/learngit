@@ -8,19 +8,19 @@ public class ServerInfo {
 
 
 
-//	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
-//
-//	public static String h5IP="http://www-cms-c.staging.slradio.cn";
-//
-//	public static String h5HttpsIP="https://www-cms-c.staging.slradio.cn";
-//
-//	public static String activity="https://www-asc-c.staging.slradio.cn/";
-//
-//	public static String scs="http://www-scs-c.staging.slradio.cn";
-//
-//    public static String emc="http://api-emc.staging.slradio.cn";
-//
-//	public static String vms="http://api-vms.staging.slradio.cn";
+	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
+
+	public static String h5IP="http://www-cms-c.staging.slradio.cn";
+
+	public static String h5HttpsIP="https://www-cms-c.staging.slradio.cn";
+
+	public static String activity="https://www-asc-c.staging.slradio.cn/";
+
+	public static String scs="http://www-scs-c.staging.slradio.cn";
+
+    public static String emc="http://api-emc.staging.slradio.cn";
+
+	public static String vms="http://api-vms.staging.slradio.cn";
 
 
 //	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
@@ -38,19 +38,19 @@ public class ServerInfo {
 //	public static String vms="http://api-vms.review.slradio.cn";
 
 
-	public static String serviceIP="http://api-cms.on-radio.cn";
-
-	public static String h5IP="http://cms.on-radio.cn";
-
-	public static String h5HttpsIP="http://cms.on-radio.cn";
-
-	public static String activity="http://asc.on-radio.cn/";
-
-	public static String scs="http://scs.on-radio.cn";
-
-	public static String emc="http://api-emc.on-radio.cn";
-
-	public static String vms="http://api-vms.on-radio.cn";
+//	public static String serviceIP="http://api-cms.on-radio.cn";
+//
+//	public static String h5IP="http://cms.on-radio.cn";
+//
+//	public static String h5HttpsIP="http://cms.on-radio.cn";
+//
+//	public static String activity="http://asc.on-radio.cn/";
+//
+//	public static String scs="http://scs.on-radio.cn";
+//
+//	public static String emc="http://api-emc.on-radio.cn";
+//
+//	public static String vms="http://api-vms.on-radio.cn";
 
 
 

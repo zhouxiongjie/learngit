@@ -63,21 +63,37 @@
             android:windowSoftInputMode="adjustPan|stateHidden"
             android:screenOrientation="portrait" >
 
+            <intent-filter>
+                <data
+                    android:scheme="${APP_SCHEME}" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+
         </activity>
 
         <activity
             android:name=".activity.StartupActivity"
             android:screenOrientation="portrait" >
+
         </activity>
 
         <activity
             android:name=".activity.GuidePageActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!--避免桌面没有图标,所以多添加一个 intent-filter-->
+
+            <!--android:host="shuangln.com"-->
+            <!--android:pathPrefix="/openwith"-->
+
         </activity>
 
 

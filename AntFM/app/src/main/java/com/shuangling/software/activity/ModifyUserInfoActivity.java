@@ -335,6 +335,21 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
                         });
 
                     }
+                }else if(jsonObject != null){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtils.show(jsonObject.getString("msg"));
+                        }
+                    });
+
+                }else{
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ToastUtils.show("修改用户信息失败");
+                        }
+                    });
                 }
 
 

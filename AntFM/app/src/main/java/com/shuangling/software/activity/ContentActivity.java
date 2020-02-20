@@ -33,6 +33,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -95,7 +96,7 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
 
     private Column mColumn;
     private String mOrderBy = "1";
-    private List<ColumnContent> mColumnContents;
+    private List<ColumnContent> mColumnContents=new ArrayList<>();
     private ColumnDecorateContentAdapter mAdapter;
     private Handler mHandler;
 
@@ -192,26 +193,27 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        try{
-                            if (getContent == GetContent.Refresh) {
-                                if (refreshLayout.isRefreshing()) {
-                                    refreshLayout.finishRefresh();
-                                }
-                            } else if (getContent == GetContent.LoadMore) {
-                                if (refreshLayout.isLoading()) {
-                                    refreshLayout.finishLoadMore();
-                                }
-                            }
-                        }catch (Exception e){
-
-                        }
-
-                    }
-                });
+//                mHandler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        try{
+//                            if (getContent == GetContent.Refresh) {
+//                                if (refreshLayout.getState() == RefreshState.Refreshing) {
+//                                    refreshLayout.finishRefresh();
+//                                    refreshLayout.resetNoMoreData();
+//                                }
+//                            } else if (getContent == GetContent.LoadMore) {
+//                                if (refreshLayout.getState() == RefreshState.Loading) {
+//                                    refreshLayout.finishLoadMore();
+//                                }
+//                            }
+//                        }catch (Exception e){
+//
+//                        }
+//
+//                    }
+//                });
 
 
                 Message msg = Message.obtain();
@@ -231,11 +233,11 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
 
                         try{
                             if (getContent == GetContent.Refresh) {
-                                if (refreshLayout.isRefreshing()) {
+                                if (refreshLayout.getState() == RefreshState.Refreshing) {
                                     refreshLayout.finishRefresh();
                                 }
                             } else if (getContent == GetContent.LoadMore) {
-                                if (refreshLayout.isLoading()) {
+                                if (refreshLayout.getState() == RefreshState.Loading) {
                                     refreshLayout.finishLoadMore();
                                 }
                             }
@@ -281,7 +283,7 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
 
                         try{
                             if (getContent == GetContent.Refresh) {
-                                if (refreshLayout.isRefreshing()) {
+                                if (refreshLayout.getState() == RefreshState.Refreshing) {
                                     refreshLayout.finishRefresh();
                                 }
                             } else {
@@ -309,7 +311,7 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
 
                         try{
                             if (getContent == GetContent.Refresh) {
-                                if (refreshLayout.isRefreshing()) {
+                                if (refreshLayout.getState() == RefreshState.Refreshing) {
                                     refreshLayout.finishRefresh();
                                 }
                             } else {
@@ -376,13 +378,26 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-
+                        List<ColumnContent> columnContents=JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), ColumnContent.class);
                         if (msg.arg1 == ContentFragment.GetContent.Refresh.ordinal()) {
-                            mColumnContents.addAll(0, JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), ColumnContent.class));
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
+                                refreshLayout.resetNoMoreData();
+                            }
+                            mColumnContents.addAll(0,columnContents );
                         } else if (msg.arg1 == ContentFragment.GetContent.LoadMore.ordinal()) {
-                            mColumnContents.addAll(JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), ColumnContent.class));
+                            if (refreshLayout.getState() == RefreshState.Loading) {
+                                if(columnContents==null||columnContents.size()==0){
+                                    //refreshLayout.setEnableLoadMore(false);
+                                    refreshLayout.finishLoadMoreWithNoMoreData();
+                                }else{
+                                    refreshLayout.finishLoadMore();
+                                }
+                            }
+
+                            mColumnContents.addAll(columnContents);
                         } else {
-                            mColumnContents = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), ColumnContent.class);
+                            mColumnContents = columnContents;
                         }
 
                         if (mColumnContents.size() == 0) {

@@ -69,5 +69,4 @@ ext {
 
     externalVersionCode =228
     externalVersionName ='2.2.8'
-    //225
 }

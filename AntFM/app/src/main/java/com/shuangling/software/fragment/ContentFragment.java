@@ -33,6 +33,7 @@ import com.ethanhua.skeleton.Skeleton;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
@@ -107,7 +108,8 @@ public class ContentFragment extends Fragment implements Handler.Callback {
     private List<ColumnContent> mColumnContents=new ArrayList<>();
     private ColumnDecorateContentAdapter mAdapter;
     private Handler mHandler;
-
+    private boolean addInfoStream;
+    private boolean hasDecorate=false;
     public enum GetContent {
         Refresh,
         LoadMore,
@@ -126,7 +128,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
         mACache = ACache.get(getContext());
         mColumn = (Column) args.getSerializable("Column");
         mHandler = new Handler(this);
-        ClassicsFooter.REFRESH_FOOTER_ALLLOADED="没有更多了";
+        ClassicsFooter.REFRESH_FOOTER_NOTHING="没有更多了";
         super.onCreate(savedInstanceState);
     }
 
@@ -141,7 +143,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
         refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
         ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
-
+        refreshLayout.setRefreshFooter(new ClassicsFooter(getContext()));//设置
         refreshLayout.setEnableLoadMore(false);
 //        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
 //            @Override
@@ -284,7 +286,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                     public void run() {
                         try{
                             if (getContent == GetContent.Refresh) {
-                                if (refreshLayout.isRefreshing()) {
+                                if (refreshLayout.getState() == RefreshState.Refreshing) {
                                     refreshLayout.finishRefresh();
                                 }
                             } else {
@@ -312,7 +314,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
                         try{
                             if (getContent == GetContent.Refresh) {
-                                if (refreshLayout.isRefreshing()) {
+                                if (refreshLayout.getState() == RefreshState.Refreshing) {
                                     refreshLayout.finishRefresh();
                                 }
                             } else {
@@ -368,26 +370,26 @@ public class ContentFragment extends Fragment implements Handler.Callback {
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        try{
-                            if (getContent == GetContent.Refresh) {
-                                if (refreshLayout.isRefreshing()) {
-                                    refreshLayout.finishRefresh();
-                                }
-                            } else if (getContent == GetContent.LoadMore) {
-                                if (refreshLayout.isLoading()) {
-                                    refreshLayout.finishLoadMore();
-                                }
-                            }
-                        }catch (Exception e){
-
-                        }
-
-                    }
-                });
+//                mHandler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        try{
+//                            if (getContent == GetContent.Refresh) {
+//                                if (refreshLayout.getState() == RefreshState.Refreshing) {
+//                                    refreshLayout.finishRefresh();
+//                                }
+//                            } else if (getContent == GetContent.LoadMore) {
+//                                if (refreshLayout.getState() == RefreshState.Loading) {
+//                                    refreshLayout.finishLoadMore();
+//                                }
+//                            }
+//                        }catch (Exception e){
+//
+//                        }
+//
+//                    }
+//                });
 
 
                 Message msg = Message.obtain();
@@ -406,11 +408,11 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                     public void run() {
                         try{
                             if (getContent == GetContent.Refresh) {
-                                if (refreshLayout.isRefreshing()) {
+                                if (refreshLayout.getState() == RefreshState.Refreshing) {
                                     refreshLayout.finishRefresh();
                                 }
                             } else if (getContent == GetContent.LoadMore) {
-                                if (refreshLayout.isLoading()) {
+                                if (refreshLayout.getState() == RefreshState.Loading) {
                                     refreshLayout.finishLoadMore();
                                 }
                             }
@@ -502,18 +504,28 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                         }
 
                         if (msg.arg1 == GetContent.Refresh.ordinal()) {
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
+                                refreshLayout.resetNoMoreData();
+                            }
                             mColumnContents.addAll(0, columnContents);
                         } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
-                            if(columnContents==null||columnContents.size()==0){
-                                //refreshLayout.setEnableLoadMore(false);
-                                refreshLayout.finishLoadMoreWithNoMoreData();
+
+                            if (refreshLayout.getState() == RefreshState.Loading) {
+                                if(columnContents==null||columnContents.size()==0){
+                                    //refreshLayout.setEnableLoadMore(false);
+                                    refreshLayout.finishLoadMoreWithNoMoreData();
+                                }else{
+                                    refreshLayout.finishLoadMore();
+                                }
                             }
+
                             mColumnContents.addAll(columnContents);
                         } else {
                             mColumnContents = columnContents;
                         }
 
-                        if (mColumnContents.size() == 0) {
+                        if (mColumnContents.size() == 0&&hasDecorate==false) {
                             noData.setVisibility(View.VISIBLE);
                         } else {
                             noData.setVisibility(View.GONE);
@@ -572,7 +584,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         JSONArray modules=jsonObject.getJSONObject("data").getJSONArray("modules");
-                        boolean addInfoStream=true;
+                        addInfoStream=true;
                         if(modules!=null){
 
                             List<DecorModule> decorModules = JSONObject.parseArray(modules.toJSONString(), DecorModule.class);
@@ -584,6 +596,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                 }
                             }
                             if(decorModules.size()>0){
+                                hasDecorate=true;
                                 mContentRecyclerView.clear();
                                 mDecorateLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.content_decorate_layout, recyclerView, false);
                                 for (int i = 0; i < decorModules.size(); i++) {

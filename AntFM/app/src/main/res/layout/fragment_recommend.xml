@@ -144,24 +144,62 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/a">
-            
+            <!--<RelativeLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_toLeftOf="@+id/customColumn"-->
+                <!--android:layout_centerVertical="true">-->
+                <!--<HorizontalScrollView-->
+                    <!--android:id="@+id/columnScrollView"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_alignParentTop="true"-->
+                    <!--android:scrollbars="none">-->
+                    <!--<LinearLayout-->
+                        <!--android:id="@+id/columnContent"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:orientation="horizontal"-->
+                        <!--android:gravity="center_vertical"/>-->
+                <!--</HorizontalScrollView>-->
 
-            <HorizontalScrollView
-                android:id="@+id/columnScrollView"
+                <!--<ImageView-->
+                    <!--android:id="@+id/indicator"-->
+                    <!--android:layout_width="4dp"-->
+                    <!--android:layout_height="4dp"-->
+                    <!--android:layout_centerHorizontal="true"-->
+                    <!--android:layout_marginBottom="2dp"-->
+                    <!--android:layout_below="@+id/columnScrollView"-->
+                    <!--android:background="@drawable/indicator_line_bg"/>-->
+
+            <!--</RelativeLayout>-->
+
+            <com.kcrason.dynamicpagerindicatorlibrary.DynamicPagerIndicator
+                android:id="@+id/pagerIndicator"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_toLeftOf="@+id/customColumn"
                 android:layout_centerVertical="true"
-                android:scrollbars="none">
+                app:tabNormalTextColor="@color/white"
+                app:tabSelectedTextColor="@color/white"
+                app:tabTextColorMode="gradient"
+                app:tabTextSizeMode="gradient"
+                app:isTabNormalTextBold="true"
+                app:isTabSelectedTextBold="true"
+                app:tabNormalTextSize="15sp"
+                app:tabSelectedTextSize="22sp"
+                app:indicatorLineEndColor="@color/white"
+                app:indicatorLineStartColor="@color/white"
+                app:pagerIndicatorMode="scrollable"
+                app:indicatorLineWidth="4dp"
+                app:indicatorLineHeight="4dp"
+                app:indicatorLineRadius="2dp"
+                app:indicatorLineMarginTop="2dp"
+                app:indicatorLineMarginBottom="2dp"
+                app:indicatorLineScrollMode="dynamic"
+                />
 
 
-                <LinearLayout
-                    android:id="@+id/columnContent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"/>
-            </HorizontalScrollView>
 
             <ImageView
                 android:id="@+id/customColumn"

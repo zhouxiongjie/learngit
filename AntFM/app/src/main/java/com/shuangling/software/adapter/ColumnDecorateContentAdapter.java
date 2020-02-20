@@ -333,7 +333,10 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                 albumViewHolder.title.setText(content.getTitle());
             }
 
-            albumViewHolder.count.setText("" + content.getAlbums().getCount() + "集");
+
+            if(content.getAlbums()!=null){
+                albumViewHolder.count.setText("" + content.getAlbums().getCount() + "集");
+            }
 
             if (content.getComment() >= 1) {
                 albumViewHolder.commentNum.setText(content.getComment() + "评论");

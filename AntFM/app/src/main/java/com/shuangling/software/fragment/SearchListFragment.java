@@ -18,6 +18,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -160,7 +161,7 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
 
 
                 try{
-                    if (refreshLayout.isLoading()) {
+                    if (refreshLayout.getState() == RefreshState.Loading) {
                         refreshLayout.finishLoadMore();
                     }
                     Message msg = Message.obtain();
@@ -181,7 +182,7 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
 
 
                 try{
-                    if (refreshLayout.isLoading()) {
+                    if (refreshLayout.getState() == RefreshState.Loading) {
                         refreshLayout.finishLoadMore();
                     }
                 }catch (Exception e){

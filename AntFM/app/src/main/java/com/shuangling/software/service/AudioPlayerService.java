@@ -550,6 +550,8 @@ public class AudioPlayerService extends Service {
                 //准备完成触发
                 EventBus.getDefault().post(new PlayerEvent("OnPrepared",mCurrentAudio));
 
+                addPlayTimes(mCurrentAudio.getId());
+
             }
         });
         mAliyunVodPlayer.setOnRenderingStartListener(new IPlayer.OnRenderingStartListener() {
@@ -668,6 +670,24 @@ public class AudioPlayerService extends Service {
                     mAliyunVodPlayer.prepare();
 
                 }
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+            }
+        });
+    }
+
+    private void addPlayTimes(int id) {
+        String url = ServerInfo.serviceIP + ServerInfo.addPlayTimes+id;
+        Map<String, String> params = new HashMap<>();
+        OkHttpUtils.get(url, params, new OkHttpCallback(getApplicationContext()) {
+
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
             }
 
             @Override

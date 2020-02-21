@@ -157,7 +157,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
             final HeadViewHolder viewHolder = (HeadViewHolder) holder;
             if (mVideoDetail != null) {
                 viewHolder.videoTitle.setText(mVideoDetail.getTitle());
-                viewHolder.reads.setText(""+mVideoDetail.getView());
+                viewHolder.reads.setText(CommonUtils.getShowNumber(mVideoDetail.getView())+"次");
                 viewHolder.playTimes.setText("简介:" + mVideoDetail.getDes());
                 viewHolder.playTimes.setVisibility(View.GONE);
                 viewHolder.showMore.setTag(false);
@@ -168,12 +168,12 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
                         extend=!extend;
                         v.setTag(extend);
                         if(extend){
-                            viewHolder.videoTitle.setMaxLines(Integer.MAX_VALUE);
+                            //viewHolder.videoTitle.setMaxLines(Integer.MAX_VALUE);
                             viewHolder.playTimes.setVisibility(View.VISIBLE);
                             viewHolder.showMore.setImageResource(R.drawable.more_up);
                         }else{
                             viewHolder.playTimes.setVisibility(View.GONE);
-                            viewHolder.videoTitle.setMaxLines(1);
+                            //viewHolder.videoTitle.setMaxLines(1);
                             viewHolder.showMore.setImageResource(R.drawable.more_down);
                         }
                     }

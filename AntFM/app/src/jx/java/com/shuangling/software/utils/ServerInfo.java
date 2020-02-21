@@ -217,4 +217,6 @@ public class ServerInfo {
 	public static String getCashDetail="/v1/consumer/transfers/";				//获取提现详情
 
 	public static String getCashRegular="/v1/consumer/transfer_config";			//获取提现设置
+
+	public static String addPlayTimes="/v2/plays/";								//增加播放量
 }

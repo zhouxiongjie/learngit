@@ -1031,4 +1031,17 @@ public class CommonUtils {
     public static String getOssResize(int width,int height){
         return "?x-oss-process=image/resize,m_fill,h_"+height+",w_"+width;
     }
+
+
+    public static String getShowNumber(int total){
+        if(total/10000>0){
+            if(total%10000>=1000){
+                return String .format("%.1f",(float)total/10000)+"万";
+            }else{
+                return total/10000+"万";
+            }
+        }else{
+            return ""+total;
+        }
+    }
 }

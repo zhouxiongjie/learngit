@@ -341,7 +341,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             if (content.getComment() >= 1) {
                 albumViewHolder.commentNum.setText(content.getComment() + "评论");
             } else if (content.getView() >= 10 && content.getComment() < 1) {
-                albumViewHolder.commentNum.setText(content.getView() + "阅读");
+                albumViewHolder.commentNum.setText(CommonUtils.getShowNumber(content.getView()) + "阅读");
             } else {
                 albumViewHolder.commentNum.setText("");
             }
@@ -442,7 +442,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             if (content.getComment() >= 1) {
                 articleViewHolder.commentNum.setText(content.getComment() + "评论");
             } else if (content.getView() >= 10 && content.getComment() < 1) {
-                articleViewHolder.commentNum.setText(content.getView() + "阅读");
+                articleViewHolder.commentNum.setText(CommonUtils.getShowNumber(content.getView()) + "阅读");
             } else {
                 articleViewHolder.commentNum.setText("");
             }
@@ -506,7 +506,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             if (content.getComment() >= 1) {
                 articleViewHolder.commentNum.setText(content.getComment() + "评论");
             } else if (content.getView() >= 10 && content.getComment() < 1) {
-                articleViewHolder.commentNum.setText(content.getView() + "阅读");
+                articleViewHolder.commentNum.setText(CommonUtils.getShowNumber(content.getView()) + "阅读");
             } else {
                 articleViewHolder.commentNum.setText("");
             }
@@ -564,7 +564,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             if (content.getComment() >= 1) {
                 videoViewHolder.commentNum.setText(content.getComment() + "评论");
             } else if (content.getView() >= 10 && content.getComment() < 1) {
-                videoViewHolder.commentNum.setText(content.getView() + "阅读");
+                videoViewHolder.commentNum.setText(CommonUtils.getShowNumber(content.getView()) + "阅读");
             } else {
                 videoViewHolder.commentNum.setText("");
             }
@@ -604,7 +604,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             if (content.getComment() >= 1) {
                 gallerieOneViewHolder.commentNum.setText(content.getComment() + "评论");
             } else if (content.getView() >= 10 && content.getComment() < 1) {
-                gallerieOneViewHolder.commentNum.setText(content.getView() + "阅读");
+                gallerieOneViewHolder.commentNum.setText(CommonUtils.getShowNumber(content.getView()) + "阅读");
             } else {
                 gallerieOneViewHolder.commentNum.setText("");
             }
@@ -664,7 +664,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             if (content.getComment() >= 1) {
                 gallerieViewThreeHolder.commentNum.setText(content.getComment() + "评论");
             } else if (content.getView() >= 10 && content.getComment() < 1) {
-                gallerieViewThreeHolder.commentNum.setText(content.getView() + "阅读");
+                gallerieViewThreeHolder.commentNum.setText(CommonUtils.getShowNumber(content.getView()) + "阅读");
             } else {
                 gallerieViewThreeHolder.commentNum.setText("");
             }
@@ -755,7 +755,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             if (content.getComment() >= 1) {
                 specialViewHolder.commentNum.setText(content.getComment() + "评论");
             } else if (content.getView() >= 10 && content.getComment() < 1) {
-                specialViewHolder.commentNum.setText(content.getView() + "阅读");
+                specialViewHolder.commentNum.setText(CommonUtils.getShowNumber(content.getView()) + "阅读");
             } else {
                 specialViewHolder.commentNum.setText("");
             }

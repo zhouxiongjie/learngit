@@ -41,7 +41,6 @@
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@+id/showMore"
             android:layout_centerVertical="true"
-            android:maxLines="1"
             android:ellipsize="end"
             android:textStyle="bold"
             tools:text="伊金霍洛旗新闻坚持时事政治、地方特色，伊金霍洛旗新闻坚持时事政治、地方特色，大力开展文化运动，呼吁大家爱岗敬业伊金霍洛旗新闻坚持时事政治、地方特色，大力开展文化运动，呼吁大家爱岗敬业"

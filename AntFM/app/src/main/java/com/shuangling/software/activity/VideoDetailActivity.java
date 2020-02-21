@@ -49,6 +49,7 @@ import com.shuangling.software.entity.Comment;
 import com.shuangling.software.entity.ResAuthInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.entity.VideoDetail;
+import com.shuangling.software.event.PlayerEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.service.IAudioPlayer;
@@ -58,6 +59,9 @@ import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.shuangling.software.utils.TimeUtil;
+
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -255,6 +259,18 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
         //aliyunVodPlayerView.setCirclePlay(true);
         aliyunVodPlayerView.setAutoPlay(true);
 //        aliyunVodPlayerView.setReferer(ServerInfo.h5IP);
+        aliyunVodPlayerView.setOnPreparedListener(new IPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared() {
+                //准备完成触发
+
+                if(mVideoDetail.getVideo()!=null){
+                    addPlayTimes(mVideoDetail.getVideo().getPost_id());
+                }
+
+
+            }
+        });
 //
         if(mNetPlay==0){
             //每次提醒
@@ -275,9 +291,26 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
         });
 
 
+    }
 
 
 
+    private void addPlayTimes(int id) {
+        String url = ServerInfo.serviceIP + ServerInfo.addPlayTimes+id;
+        Map<String, String> params = new HashMap<>();
+        OkHttpUtils.get(url, params, new OkHttpCallback(getApplicationContext()) {
+
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+            }
+        });
     }
 
 

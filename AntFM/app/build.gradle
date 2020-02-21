@@ -76,7 +76,7 @@ android {
             //            buildConfigField "String",           "WX_ID", '"wxxxxxxxxxxxxxxxxx"' // 配置微信appid
             manifestPlaceholders = [
                     GD_KEY: "a2fdac9774a1380d6479f72d020cb92b",
-                    APP_SCHEME:"cmsapp"
+                    APP_SCHEME:"ltsjapp"
             ]
 
         }

@@ -141,9 +141,11 @@ public class ContentFragment extends Fragment implements Handler.Callback {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         //添加自定义分割线
 
-        refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
-        ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
-        refreshLayout.setRefreshFooter(new ClassicsFooter(getContext()));//设置
+
+//        refreshLayout.setRefreshHeader(new ClassicsHeader(getContext()));
+//        refreshLayout.setRefreshFooter(new ClassicsFooter(getContext()));//设置
+//        refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
+        //((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
         refreshLayout.setEnableLoadMore(false);
 //        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
 //            @Override
@@ -506,7 +508,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                         if (msg.arg1 == GetContent.Refresh.ordinal()) {
                             if (refreshLayout.getState() == RefreshState.Refreshing) {
                                 refreshLayout.finishRefresh();
-                                refreshLayout.resetNoMoreData();
+                                //refreshLayout.resetNoMoreData();
                             }
                             mColumnContents.addAll(0, columnContents);
                         } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {

@@ -249,6 +249,7 @@ public class TimeUtil {
 
 
             Calendar current = Calendar.getInstance();
+            int currentYear=current.get(Calendar.YEAR);
 
 
             today.set(Calendar.HOUR_OF_DAY, 0);
@@ -274,6 +275,7 @@ public class TimeUtil {
             dateBeforeYesterday.set(Calendar.SECOND, 0);
 
             current.setTime(timeAt);
+            int timeYear=current.get(Calendar.YEAR);
 
             if (minute < 1) {
                 time = "刚刚";
@@ -287,7 +289,12 @@ public class TimeUtil {
                 time = "前天" + time_at.split(" ")[1].substring(0, 5);
             } else {
                 String[] strarr = time_at.split(" ")[0].split("-");
-                time = strarr[1]+"月"+strarr[2]+"日";
+                if(timeYear!=currentYear){
+                    time = strarr[0]+"年"+strarr[1]+"月"+strarr[2]+"日";
+                }else{
+                    time = strarr[1]+"月"+strarr[2]+"日";
+                }
+
 
             }
 

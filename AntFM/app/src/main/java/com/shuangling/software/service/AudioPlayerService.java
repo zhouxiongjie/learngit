@@ -8,6 +8,7 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.alibaba.fastjson.JSONObject;
@@ -682,12 +683,12 @@ public class AudioPlayerService extends Service {
     private void addPlayTimes(int id) {
         String url = ServerInfo.serviceIP + ServerInfo.addPlayTimes+id;
         Map<String, String> params = new HashMap<>();
-        OkHttpUtils.get(url, params, new OkHttpCallback(getApplicationContext()) {
+        OkHttpUtils.put(url, params, new OkHttpCallback(getApplicationContext()) {
 
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-
+                Log.i("test",response);
             }
 
             @Override

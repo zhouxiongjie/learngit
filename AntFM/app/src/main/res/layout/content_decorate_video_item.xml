@@ -147,30 +147,82 @@
 
 
 
-
-        <TextView
-            android:id="@+id/commentNum"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"
-            android:drawablePadding="10dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/textColorThree"
-            android:textSize="@dimen/font_size_24px"
-            tools:text="52" />
+            android:orientation="horizontal">
 
-        <com.shuangling.software.customview.FontIconView
-            android:id="@+id/icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:layout_centerVertical="true"
-            android:text="&#xe6cb;"
-            android:textColor="#A0A0A0"
-            android:layout_toLeftOf="@+id/commentNum"
-            android:textSize="@dimen/font_size_30px" />
+            <LinearLayout
+                android:id="@+id/viewLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <com.shuangling.software.customview.FontIconView
+                    android:id="@+id/viewIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="5dp"
+                    android:text="&#xe66a;"
+                    android:textColor="#A0A0A0"
+                    android:textSize="@dimen/font_size_30px" />
+
+
+                <TextView
+                    android:id="@+id/viewNum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/textColorThree"
+                    android:textSize="@dimen/font_size_24px"
+                    tools:text="52" />
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/commentLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:orientation="horizontal">
+
+                <com.shuangling.software.customview.FontIconView
+                    android:id="@+id/commentIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="5dp"
+                    android:text="&#xe6cb;"
+                    android:textColor="#A0A0A0"
+                    android:textSize="@dimen/font_size_30px" />
+
+
+                <TextView
+                    android:id="@+id/commentNum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_centerVertical="true"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/textColorThree"
+                    android:textSize="@dimen/font_size_24px"
+                    tools:text="52" />
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
 
 
         <TextView

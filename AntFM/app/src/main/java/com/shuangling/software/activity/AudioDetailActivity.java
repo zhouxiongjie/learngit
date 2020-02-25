@@ -2,7 +2,6 @@ package com.shuangling.software.activity;
 
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -16,11 +15,10 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,13 +26,13 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.player.IPlayer;
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
@@ -45,13 +43,14 @@ import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigInput;
 import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
+import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.AudioRecyclerAdapter;
-import com.shuangling.software.adapter.ColumnContentAdapter;
-import com.shuangling.software.adapter.CommentListAdapter;
-import com.shuangling.software.adapter.RecommendContentAdapter;
-import com.shuangling.software.adapter.VideoRecyclerAdapter;
 import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.dialog.AudioListDialog;
@@ -69,6 +68,7 @@ import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.service.IAudioPlayer;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
@@ -105,7 +105,7 @@ import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 
 @EnableDragToClose()
-public class AudioDetailActivity extends AppCompatActivity implements Handler.Callback,View.OnClickListener {
+public class AudioDetailActivity extends AppCompatActivity implements Handler.Callback, View.OnClickListener {
 
     public static final String TAG = "AlbumDetailActivity";
 
@@ -150,6 +150,8 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     FrameLayout commentNumLayout;
     @BindView(R.id.bottom)
     LinearLayout bottom;
+    @BindView(R.id.refreshLayout)
+    SmartRefreshLayout refreshLayout;
 
 
     private int mNetPlay;
@@ -171,6 +173,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     private AudioRecyclerAdapter mAdapter;
 
     private HeadViewHolder mHeadViewHolder;
+    private int currentPage=1;
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
@@ -200,7 +203,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                 e.printStackTrace();
             }
             getAudioDetail(false);
-            getComments();
+            getComments(0);
         }
 
         @Override
@@ -226,11 +229,11 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     protected void onNewIntent(Intent intent) {
 
         mAudioId = intent.getIntExtra("audioId", 0);
-        mNetPlay=SharedPreferencesUtils.getIntValue(SettingActivity.NET_PLAY,0);
-        mNeedTipPlay=SharedPreferencesUtils.getIntValue(SettingActivity.NEED_TIP_PLAY,0);
+        mNetPlay = SharedPreferencesUtils.getIntValue(SettingActivity.NET_PLAY, 0);
+        mNeedTipPlay = SharedPreferencesUtils.getIntValue(SettingActivity.NEED_TIP_PLAY, 0);
         getAudioDetail(false);
 
-        getComments();
+        getComments(0);
         super.onNewIntent(intent);
     }
 
@@ -280,9 +283,9 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     }
 
     private void init() {
-
-        mNetPlay=SharedPreferencesUtils.getIntValue(SettingActivity.NET_PLAY,0);
-        mNeedTipPlay=SharedPreferencesUtils.getIntValue(SettingActivity.NEED_TIP_PLAY,0);
+        refreshLayout.setRefreshFooter(new ClassicsFooter(this));//设置
+        mNetPlay = SharedPreferencesUtils.getIntValue(SettingActivity.NET_PLAY, 0);
+        mNeedTipPlay = SharedPreferencesUtils.getIntValue(SettingActivity.NEED_TIP_PLAY, 0);
         mHandler = new Handler(this);
         EventBus.getDefault().register(this);
 
@@ -299,19 +302,25 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        mAdapter=new AudioRecyclerAdapter(this);
-        DividerItemDecoration divider = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL);
-        divider.setDrawable(ContextCompat.getDrawable(this,R.drawable.recycleview_divider_drawable));
+        mAdapter = new AudioRecyclerAdapter(this);
+        DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        divider.setDrawable(ContextCompat.getDrawable(this, R.drawable.recycleview_divider_drawable));
         recyclerView.addItemDecoration(divider);
         recyclerView.setAdapter(mAdapter);
         ViewGroup headView = (ViewGroup) getLayoutInflater().inflate(R.layout.audio_top_layout, recyclerView, false);
-        mHeadViewHolder=new HeadViewHolder(headView);
+        mHeadViewHolder = new HeadViewHolder(headView);
         mAdapter.addHeaderView(headView);
 
         Intent it = new Intent(this, AudioPlayerService.class);
         bindService(it, mConnection, Context.BIND_AUTO_CREATE);
 
-
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
+                currentPage++;
+                getComments(1);
+            }
+        });
     }
 
 
@@ -420,12 +429,16 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
         });
     }
 
-    private void getComments() {
+    //type  0 正常   1 加载更多
+    private void getComments(final int type) {
+        if(type==0){
+            currentPage=1;
+        }
         String url = ServerInfo.serviceIP + ServerInfo.getComentList;
         Map<String, String> params = new HashMap<>();
         params.put("post_id", "" + mAudioId);
-        params.put("page", "" + 1);
-        params.put("page_size", "" + Integer.MAX_VALUE);
+        params.put("page", "" + currentPage);
+        params.put("page_size", "" + Constant.PAGE_SIZE);
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
 
             @Override
@@ -433,6 +446,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_COMMENTS;
+                msg.arg1=type;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
 
@@ -580,7 +594,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
             mAudioId = audioInfo.getId();
             getAudioDetail(true);
             //getRelatedPosts();
-            getComments();
+            getComments(0);
             //1.改变播放按钮的状态
             //2.获取进度时长并显示
             //2.设置定时器更新进度条
@@ -631,7 +645,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
         super.onDestroy();
     }
 
-    @OnClick({ R.id.writeComment, R.id.commentNumLayout})
+    @OnClick({R.id.writeComment, R.id.commentNumLayout})
     public void onViewClicked(View view) {
         switch (view.getId()) {
 
@@ -683,7 +697,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                 } else {
                     mScrollToTop = true;
                     LinearLayoutManager llm = (LinearLayoutManager) recyclerView.getLayoutManager();
-                    llm.scrollToPositionWithOffset(mPostContents!=null?1+mPostContents.size():1, 0);
+                    llm.scrollToPositionWithOffset(mPostContents != null ? 1 + mPostContents.size() : 1, 0);
                     llm.setStackFromEnd(false);
                 }
                 break;
@@ -721,7 +735,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 
                             //判断网络环境
                             if (CommonUtils.getNetWorkType(this) == CommonUtils.NETWORKTYPE_MOBILE) {
-                                if(mNetPlay==0){
+                                if (mNetPlay == 0) {
                                     //每次提醒
                                     new CircleDialog.Builder()
                                             .setCanceledOnTouchOutside(false)
@@ -731,9 +745,9 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                                             .setNegative("暂停播放", new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
-                                                    try{
+                                                    try {
                                                         mAudioPlayer.stop();
-                                                    }catch (RemoteException e){
+                                                    } catch (RemoteException e) {
 
                                                     }
                                                 }
@@ -741,18 +755,18 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                                             .setPositive("继续播放", new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
-                                                    try{
+                                                    try {
                                                         mAudioPlayer.playAudio(mAudioInfo);
-                                                    }catch (RemoteException e){
+                                                    } catch (RemoteException e) {
 
                                                     }
 
                                                 }
                                             })
                                             .show(getSupportFragmentManager());
-                                }else{
+                                } else {
                                     //提醒一次
-                                    if(mNeedTipPlay==1) {
+                                    if (mNeedTipPlay == 1) {
                                         new CircleDialog.Builder()
                                                 .setCanceledOnTouchOutside(false)
                                                 .setCancelable(false)
@@ -761,9 +775,9 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                                                 .setNegative("暂停播放", new View.OnClickListener() {
                                                     @Override
                                                     public void onClick(View v) {
-                                                        try{
+                                                        try {
                                                             mAudioPlayer.stop();
-                                                        }catch (RemoteException e){
+                                                        } catch (RemoteException e) {
 
                                                         }
                                                     }
@@ -771,26 +785,23 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                                                 .setPositive("继续播放", new View.OnClickListener() {
                                                     @Override
                                                     public void onClick(View v) {
-                                                        try{
+                                                        try {
                                                             mAudioPlayer.playAudio(mAudioInfo);
-                                                        }catch (RemoteException e){
+                                                        } catch (RemoteException e) {
 
                                                         }
 
                                                     }
                                                 })
                                                 .show(getSupportFragmentManager());
-                                    }else{
+                                    } else {
                                         mAudioPlayer.playAudio(mAudioInfo);
                                     }
                                 }
 
-                            }else{
+                            } else {
                                 mAudioPlayer.playAudio(mAudioInfo);
                             }
-
-
-
 
 
                             getAlbumAudios("" + mAudioDetail.getAlbum().get(0).getId());
@@ -896,7 +907,32 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                     mAdapter.setTotalComments(totalNumber);
                     commentNumber.setText("" + totalNumber);
 
-                    mComments = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), Comment.class);
+                    List<Comment> comments = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), Comment.class);
+
+                    if (msg.arg1 == 0) {
+                        mComments=comments;
+                        if(comments==null||comments.size()==0){
+                            refreshLayout.setEnableLoadMore(false);
+                        }else{
+                            refreshLayout.setEnableLoadMore(true);
+                        }
+
+                    } else if (msg.arg1 == 1) {
+
+                        if (refreshLayout.getState() == RefreshState.Loading) {
+                            if(comments==null||comments.size()==0){
+                                //refreshLayout.setEnableLoadMore(false);
+                                refreshLayout.finishLoadMoreWithNoMoreData();
+                            }else{
+                                refreshLayout.finishLoadMore();
+                            }
+                        }
+
+                        mComments.addAll(comments);
+                    }
+
+
+
                     mAdapter.setComments(mComments);
 
                     mAdapter.setOnPraise(new AudioRecyclerAdapter.OnPraise() {
@@ -939,7 +975,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         ToastUtils.show("删除成功");
-                        getComments();
+                        getComments(0);
                     }
 
                 } catch (Exception e) {
@@ -952,7 +988,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                 if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
                     ToastUtils.show("发表成功");
-                    getComments();
+                    getComments(0);
 
                 }
             }
@@ -1015,7 +1051,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.play:
                 try {
                     int sta = mAudioPlayer.getPlayerState();
@@ -1146,20 +1182,20 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 
     @Override
     protected void onPause() {
-        try{
-            if(mAudioPlayer.getPlayerState() == IPlayer.paused||
-                    mAudioPlayer.getPlayerState() == IPlayer.started){
+        try {
+            if (mAudioPlayer.getPlayerState() == IPlayer.paused ||
+                    mAudioPlayer.getPlayerState() == IPlayer.started) {
 
-                if(FloatWindowUtil.getInstance().checkFloatWindowPermission()){
+                if (FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
                     FloatWindowUtil.getInstance().showFloatWindow();
-                }else{
+                } else {
                     //showFloatWindowPermission();
 
                 }
 
 
             }
-        }catch (RemoteException e){
+        } catch (RemoteException e) {
 
         }
         super.onPause();
@@ -1199,12 +1235,12 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     @Override
     protected void onResume() {
 
-        if(!FloatWindowUtil.getInstance().checkFloatWindowPermission()){
-           if(MyApplication.getInstance().remindPermission) {
-               MyApplication.getInstance().remindPermission=false;
-               showFloatWindowPermission();
+        if (!FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
+            if (MyApplication.getInstance().remindPermission) {
+                MyApplication.getInstance().remindPermission = false;
+                showFloatWindowPermission();
 
-           }
+            }
         }
         FloatWindowUtil.getInstance().hideWindow();
         super.onResume();
@@ -1215,8 +1251,8 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_LOGIN && resultCode == Activity.RESULT_OK) {
             getAudioDetail(true);
-            getComments();
-        }else if (requestCode == REQUEST_PERMISSION_CODE) {
+            getComments(0);
+        } else if (requestCode == REQUEST_PERMISSION_CODE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
                 if (FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
@@ -1230,7 +1266,6 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-
 
 
     private void showShare(final String title, final String desc, final String logo, final String url) {
@@ -1256,16 +1291,16 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
             @Override
             public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
                 //点击新浪微博
-                String chanel="1";
+                String chanel = "1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
                     //限制微博分享的文字不能超过20
-                    chanel="2";
+                    chanel = "2";
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setText(title + url);
                 } else if (QQ.NAME.equals(platform.getName())) {
-                    chanel="3";
+                    chanel = "3";
                     paramsToShare.setTitle(title);
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
@@ -1298,7 +1333,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                         paramsToShare.setImageUrl(cover);
                     }
                 }
-                shareStatistics(chanel,""+mAudioDetail.getId(),url);
+                shareStatistics(chanel, "" + mAudioDetail.getId(), url);
             }
         });
         oks.setCallback(new PlatformActionListener() {
@@ -1316,14 +1351,14 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 //                msg.what = SHARE_SUCCESS;
 //                mHandler.sendMessage(msg);
                 String chanel;
-                if (SinaWeibo.NAME.equals(arg0.getName())){
-                    chanel="2";
-                }else if(QQ.NAME.equals(arg0.getName())){
-                    chanel="3";
-                }else{
-                    chanel="1";
+                if (SinaWeibo.NAME.equals(arg0.getName())) {
+                    chanel = "2";
+                } else if (QQ.NAME.equals(arg0.getName())) {
+                    chanel = "3";
+                } else {
+                    chanel = "1";
                 }
-                shareStatistics(chanel,""+mAudioDetail.getId(),url);
+                shareStatistics(chanel, "" + mAudioDetail.getId(), url);
 
             }
 
@@ -1337,12 +1372,12 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     }
 
 
-    public void shareStatistics(String channel,String postId,String shardUrl) {
+    public void shareStatistics(String channel, String postId, String shardUrl) {
 
         String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
         Map<String, String> params = new HashMap<>();
-        if(User.getInstance()!=null){
-            params.put("user_id", ""+User.getInstance().getId());
+        if (User.getInstance() != null) {
+            params.put("user_id", "" + User.getInstance().getId());
         }
         params.put("channel", channel);
         params.put("post_id", postId);
@@ -1353,12 +1388,12 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Log.i("test",response);
+                Log.i("test", response);
             }
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                Log.i("test",exception.toString());
+                Log.i("test", exception.toString());
 
             }
         });

@@ -11,10 +11,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,10 +28,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.player.IPlayer;
 import com.aliyun.player.source.VidAuth;
-import com.aliyun.vodplayerview.constants.PlayParameter;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -40,6 +40,12 @@ import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigInput;
 import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
+import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
+import com.scwang.smartrefresh.layout.header.ClassicsHeader;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.VideoRecyclerAdapter;
@@ -49,23 +55,24 @@ import com.shuangling.software.entity.Comment;
 import com.shuangling.software.entity.ResAuthInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.entity.VideoDetail;
-import com.shuangling.software.event.PlayerEvent;
+import com.shuangling.software.fragment.ContentFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.service.IAudioPlayer;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.shuangling.software.utils.TimeUtil;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -109,9 +116,9 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
     private static final int SHARE_FAILED = 0xb;
 
-    private static final int MSG_DELETE_COMMENT=0xc;
+    private static final int MSG_DELETE_COMMENT = 0xc;
 
-    private static final int MSG_GET_VIDEO_AUTH=0xd;
+    private static final int MSG_GET_VIDEO_AUTH = 0xd;
 
     @BindView(R.id.aliyunVodPlayerView)
     AliyunVodPlayerView aliyunVodPlayerView;
@@ -125,7 +132,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     TextView attention;
     @BindView(R.id.organizationLayout)
     RelativeLayout organizationLayout;
-//    @BindView(R.id.videoTitle)
+    //    @BindView(R.id.videoTitle)
 //    TextView videoTitle;
 //    @BindView(R.id.playTimes)
 //    TextView playTimes;
@@ -143,7 +150,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 //    LinearLayout collectLayout;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-//    @BindView(R.id.commentNum)
+    //    @BindView(R.id.commentNum)
 //    TextView commentNum;
 //    @BindView(R.id.commentLayout)
 //    LinearLayout commentLayout;
@@ -159,11 +166,12 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     FrameLayout commentNumLayout;
     @BindView(R.id.bottom)
     LinearLayout bottom;
-//    @BindView(R.id.scrollView)
+    //    @BindView(R.id.scrollView)
 //    NestedScrollView scrollView;
     @BindView(R.id.activity_title)
     TopTitleBar activityTitle;
-
+    @BindView(R.id.refreshLayout)
+    SmartRefreshLayout refreshLayout;
 
 
     private Handler mHandler;
@@ -172,7 +180,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     private List<ColumnContent> mPostContents;
 //    private RecommendContentAdapter mAdapter;
 
-    private List<Comment> mComments;
+    private List<Comment> mComments=new ArrayList<>();
 //    private CommentListAdapter mCommentListAdapter;
 
     boolean mScrollToTop = false;
@@ -180,23 +188,24 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
     private int mNetPlay;
     private int mNeedTipPlay;
-    private boolean mNeedResumeAudioPlay=false;
+    private boolean mNeedResumeAudioPlay = false;
 
     private VideoRecyclerAdapter mAdapter;
     private boolean mIsInBackground = false;
+    private int currentPage=1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setmOnServiceConnectionListener(new OnServiceConnectionListener() {
             @Override
             public void onServiceConnection(IAudioPlayer audioPlayer) {
-                try{
-                    if(audioPlayer.getPlayerState()==IPlayer.started||audioPlayer.getPlayerState()==IPlayer.paused){
-                      audioPlayer.pause();
-                      mNeedResumeAudioPlay=true;
+                try {
+                    if (audioPlayer.getPlayerState() == IPlayer.started || audioPlayer.getPlayerState() == IPlayer.paused) {
+                        audioPlayer.pause();
+                        mNeedResumeAudioPlay = true;
                         FloatWindowUtil.getInstance().hideWindow();
                     }
-                }catch (RemoteException e){
+                } catch (RemoteException e) {
 
                 }
 
@@ -213,16 +222,17 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     }
 
     private void init() {
-
+        //refreshLayout.setRefreshHeader(new ClassicsHeader(this));
+        refreshLayout.setRefreshFooter(new ClassicsFooter(this));//设置
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        mAdapter=new VideoRecyclerAdapter(this);
-        DividerItemDecoration divider = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL);
-        divider.setDrawable(ContextCompat.getDrawable(this,R.drawable.recycleview_divider_drawable));
+        mAdapter = new VideoRecyclerAdapter(this);
+        DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        divider.setDrawable(ContextCompat.getDrawable(this, R.drawable.recycleview_divider_drawable));
         recyclerView.addItemDecoration(divider);
         recyclerView.setAdapter(mAdapter);
 
-        mNetPlay=SharedPreferencesUtils.getIntValue(SettingActivity.NET_PLAY,0);
-        mNeedTipPlay=SharedPreferencesUtils.getIntValue(SettingActivity.NEED_TIP_PLAY,0);
+        mNetPlay = SharedPreferencesUtils.getIntValue(SettingActivity.NET_PLAY, 0);
+        mNeedTipPlay = SharedPreferencesUtils.getIntValue(SettingActivity.NEED_TIP_PLAY, 0);
         mHandler = new Handler(this);
         mVideoId = getIntent().getIntExtra("videoId", 0);
         activityTitle.setMoreAction(new View.OnClickListener() {
@@ -244,7 +254,14 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
         initAliyunPlayerView();
         getVideoDetail();
         getRelatedPosts();
-        getComments();
+        getComments(0);
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
+                currentPage++;
+                getComments(1);
+            }
+        });
 
     }
 
@@ -264,7 +281,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             public void onPrepared() {
                 //准备完成触发
 
-                if(mVideoDetail.getVideo()!=null){
+                if (mVideoDetail.getVideo() != null) {
                     addPlayTimes(mVideoDetail.getVideo().getPost_id());
                 }
 
@@ -272,14 +289,14 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
         });
 //
-        if(mNetPlay==0){
+        if (mNetPlay == 0) {
             //每次提醒
             aliyunVodPlayerView.setShowFlowTip(true);
-        }else{
+        } else {
             //提醒一次
-            if(mNeedTipPlay==1) {
+            if (mNeedTipPlay == 1) {
                 aliyunVodPlayerView.setShowFlowTip(true);
-            }else{
+            } else {
                 aliyunVodPlayerView.setShowFlowTip(false);
             }
         }
@@ -294,16 +311,15 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     }
 
 
-
     private void addPlayTimes(int id) {
-        String url = ServerInfo.serviceIP + ServerInfo.addPlayTimes+id;
+        String url = ServerInfo.serviceIP + ServerInfo.addPlayTimes + id;
         Map<String, String> params = new HashMap<>();
-        OkHttpUtils.get(url, params, new OkHttpCallback(getApplicationContext()) {
+        OkHttpUtils.put(url, params, new OkHttpCallback(getApplicationContext()) {
 
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-
+                Log.i("test",response);
             }
 
             @Override
@@ -335,7 +351,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
 
     private void getVideoAuth(int sourceId) {
-        String url = ServerInfo.vms + "/v1/sources/" +sourceId+ "/playAuth";
+        String url = ServerInfo.vms + "/v1/sources/" + sourceId + "/playAuth";
         Map<String, String> params = new HashMap<>();
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
             @Override
@@ -352,7 +368,6 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
         });
     }
-
 
 
     private void getRelatedPosts() {
@@ -379,13 +394,16 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
         });
     }
-
-    private void getComments() {
+    //type  0 正常   1 加载更多
+    private void getComments(final int type) {
+        if(type==0){
+            currentPage=1;
+        }
         String url = ServerInfo.serviceIP + ServerInfo.getComentList;
         Map<String, String> params = new HashMap<>();
         params.put("post_id", "" + mVideoId);
-        params.put("page", "" + 1);
-        params.put("page_size", "" + Integer.MAX_VALUE);
+        params.put("page", "" + currentPage);
+        params.put("page_size", "" + Constant.PAGE_SIZE);
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
 
             @Override
@@ -393,6 +411,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_COMMENTS;
+                msg.arg1=type;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
 
@@ -412,8 +431,8 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
 
         String url = ServerInfo.serviceIP + ServerInfo.getComentList;
-        Map<String,String> params=new HashMap<>();
-        params.put("id",""+comment.getId());
+        Map<String, String> params = new HashMap<>();
+        params.put("id", "" + comment.getId());
 
         OkHttpUtils.delete(url, params, new OkHttpCallback(this) {
 
@@ -571,7 +590,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     }
 
 
-    private void praise(String commentId,final View view) {
+    private void praise(String commentId, final View view) {
         String url = ServerInfo.serviceIP + ServerInfo.praise;
         Map<String, String> params = new HashMap<>();
         params.put("id", commentId);
@@ -731,8 +750,6 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     }
 
 
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -745,7 +762,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
     @Override
     public void onBackPressed() {
-        if(mNeedResumeAudioPlay){
+        if (mNeedResumeAudioPlay) {
             FloatWindowUtil.getInstance().visibleWindow();
         }
         if (aliyunVodPlayerView != null) {
@@ -771,7 +788,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         mVideoDetail = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), VideoDetail.class);
-                        if(mVideoDetail.getVideo()!=null) {
+                        if (mVideoDetail.getVideo() != null) {
                             getVideoAuth(mVideoDetail.getVideo().getSource_id());
 
 
@@ -896,7 +913,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                                 mVideoId = content.getId();
                                 getVideoDetail();
                                 getRelatedPosts();
-                                getComments();
+                                getComments(0);
                             }
                         });
 
@@ -992,6 +1009,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
+
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
                         int totalNumber = jsonObject.getJSONObject("data").getInteger("total");
@@ -999,19 +1017,41 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                         mAdapter.setTotalComments(totalNumber);
                         commentNumber.setText("" + totalNumber);
 
-                        mComments = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), Comment.class);
+                        List<Comment> comments = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), Comment.class);
+
+                        if (msg.arg1 == 0) {
+                            mComments=comments;
+                            if(comments==null||comments.size()==0){
+                                refreshLayout.setEnableLoadMore(false);
+                            }else{
+                                refreshLayout.setEnableLoadMore(true);
+                            }
+
+                        } else if (msg.arg1 == 1) {
+
+                            if (refreshLayout.getState() == RefreshState.Loading) {
+                                if(comments==null||comments.size()==0){
+                                    //refreshLayout.setEnableLoadMore(false);
+                                    refreshLayout.finishLoadMoreWithNoMoreData();
+                                }else{
+                                    refreshLayout.finishLoadMore();
+                                }
+                            }
+
+                            mComments.addAll(comments);
+                        }
 
                         mAdapter.setComments(mComments);
 
                         mAdapter.setOnPraise(new VideoRecyclerAdapter.OnPraise() {
                             @Override
-                            public void praiseItem(Comment comment,View view) {
+                            public void praiseItem(Comment comment, View view) {
                                 if (User.getInstance() != null) {
-                                        praise("" + comment.getId(),view);
-                                    } else {
-                                        Intent it = new Intent(VideoDetailActivity.this, LoginActivity.class);
-                                        startActivityForResult(it, REQUEST_LOGIN);
-                                    }
+                                    praise("" + comment.getId(), view);
+                                } else {
+                                    Intent it = new Intent(VideoDetailActivity.this, LoginActivity.class);
+                                    startActivityForResult(it, REQUEST_LOGIN);
+                                }
                             }
 
 
@@ -1045,11 +1085,11 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             case MSG_DELETE_COMMENT:
                 try {
 
-                    String result = (String)msg.obj;
+                    String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         ToastUtils.show("删除成功");
-                        getComments();
+                        getComments(0);
                     }
 
                 } catch (Exception e) {
@@ -1110,14 +1150,14 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         TextView textView = (TextView) msg.obj;
-                        if(jsonObject.getInteger("data")==1){
+                        if (jsonObject.getInteger("data") == 1) {
                             //取消点赞
                             textView.setActivated(true);
-                            textView.setText(""+(Integer.parseInt(textView.getText().toString())-1));
-                        }else{
+                            textView.setText("" + (Integer.parseInt(textView.getText().toString()) - 1));
+                        } else {
                             //点赞成功
                             textView.setActivated(false);
-                            textView.setText(""+(Integer.parseInt(textView.getText().toString())+1));
+                            textView.setText("" + (Integer.parseInt(textView.getText().toString()) + 1));
 
                         }
                         //getComments();
@@ -1134,7 +1174,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         ToastUtils.show("发表成功");
-                        getComments();
+                        getComments(0);
 
                     }
                 } catch (Exception e) {
@@ -1151,12 +1191,12 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                         if (like) {
                             //praiseIcon.setTextColor(CommonUtils.getThemeColor(this));
                             mVideoDetail.setIs_likes(1);
-                            mVideoDetail.setLike(mVideoDetail.getLike()+1);
+                            mVideoDetail.setLike(mVideoDetail.getLike() + 1);
 
                         } else {
                             //praiseIcon.setTextColor(getResources().getColor(R.color.textColorEleven));
                             mVideoDetail.setIs_likes(0);
-                            mVideoDetail.setLike(mVideoDetail.getLike()-1);
+                            mVideoDetail.setLike(mVideoDetail.getLike() - 1);
                         }
                         mAdapter.setVideoDetail(mVideoDetail);
 
@@ -1173,16 +1213,16 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
-                        ResAuthInfo resAuthInfo=JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), ResAuthInfo.class);
+                        ResAuthInfo resAuthInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), ResAuthInfo.class);
 
-                        VidAuth vidAuth=new VidAuth();
+                        VidAuth vidAuth = new VidAuth();
                         vidAuth.setPlayAuth(resAuthInfo.getPlay_auth());
                         vidAuth.setVid(resAuthInfo.getVideo_id());
                         vidAuth.setRegion("cn-shanghai");
                         aliyunVodPlayerView.setAuthInfo(vidAuth);
 
-                    }else if (jsonObject != null){
-                       ToastUtils.show(jsonObject.getString("msg"));
+                    } else if (jsonObject != null) {
+                        ToastUtils.show(jsonObject.getString("msg"));
                     }
 
 
@@ -1199,7 +1239,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_LOGIN && resultCode == RESULT_OK) {
             updateStatus();
-            getComments();
+            getComments(0);
         }
 
     }
@@ -1290,7 +1330,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                     //scrollView.smoothScrollTo(0, commentLayout.getTop());
 //                    recyclerView.smoothScrollToPosition(mPostContents!=null?2+mPostContents.size():2);
                     LinearLayoutManager llm = (LinearLayoutManager) recyclerView.getLayoutManager();
-                    llm.scrollToPositionWithOffset(mPostContents!=null?1+mPostContents.size():1, 0);
+                    llm.scrollToPositionWithOffset(mPostContents != null ? 1 + mPostContents.size() : 1, 0);
                     llm.setStackFromEnd(false);
                 }
                 break;
@@ -1300,10 +1340,10 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
     private void showShare(final String title, final String desc, final String logo, final String url) {
         final String cover;
-        if(logo.startsWith("http://")){
-            cover=logo.replace("http://","https://");
-        }else{
-            cover=logo;
+        if (logo.startsWith("http://")) {
+            cover = logo.replace("http://", "https://");
+        } else {
+            cover = logo;
         }
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
@@ -1321,16 +1361,16 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             @Override
             public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
                 //点击新浪微博
-                String chanel="1";
+                String chanel = "1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
                     //限制微博分享的文字不能超过20
-                    chanel="2";
+                    chanel = "2";
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setText(title + url);
                 } else if (QQ.NAME.equals(platform.getName())) {
-                    chanel="3";
+                    chanel = "3";
                     paramsToShare.setTitle(title);
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
@@ -1364,7 +1404,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                     }
                 }
 
-                shareStatistics(chanel,""+mVideoDetail.getId(),url);
+                shareStatistics(chanel, "" + mVideoDetail.getId(), url);
             }
         });
         oks.setCallback(new PlatformActionListener() {
@@ -1375,6 +1415,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                 msg.obj = arg2.getMessage();
                 mHandler.sendMessage(msg);
             }
+
             @Override
             public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
                 Message msg = Message.obtain();
@@ -1383,6 +1424,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
 
             }
+
             @Override
             public void onCancel(Platform arg0, int arg1) {
 
@@ -1393,7 +1435,6 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     }
 
 
-
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
@@ -1402,12 +1443,12 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     }
 
 
-    public void shareStatistics(String channel,String postId,String shardUrl) {
+    public void shareStatistics(String channel, String postId, String shardUrl) {
 
         String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
         Map<String, String> params = new HashMap<>();
-        if(User.getInstance()!=null){
-            params.put("user_id", ""+User.getInstance().getId());
+        if (User.getInstance() != null) {
+            params.put("user_id", "" + User.getInstance().getId());
         }
         params.put("channel", channel);
         params.put("post_id", postId);
@@ -1418,12 +1459,12 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Log.i("test",response);
+                Log.i("test", response);
             }
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                Log.i("test",exception.toString());
+                Log.i("test", exception.toString());
 
             }
         });

@@ -128,6 +128,12 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name=".activity.NewLoginActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" >
+        </activity>
+
 
         <activity
             android:name=".activity.ModifyUserInfoActivity"
@@ -145,6 +151,12 @@
             android:name=".activity.VerifyCodeLoginActivity"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name=".activity.NewVerifyCodeLoginActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+
         <activity
             android:name=".activity.AnchorDetailActivity"
             android:screenOrientation="portrait" >

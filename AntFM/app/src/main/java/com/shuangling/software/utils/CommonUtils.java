@@ -1044,4 +1044,22 @@ public class CommonUtils {
             return ""+total;
         }
     }
+
+
+    public static void setReadsAndComment(TextView tv,int coment,int view){
+        if (coment >= 1) {
+            tv.setVisibility(View.VISIBLE);
+            if(view >= 10){
+                tv.setText(CommonUtils.getShowNumber(view) + "阅读   "+CommonUtils.getShowNumber(coment) + "评论");
+            }else{
+                tv.setText(coment + "评论");
+            }
+        } else if (view >= 10 && coment < 1) {
+            tv.setVisibility(View.VISIBLE);
+            tv.setText(CommonUtils.getShowNumber(view) + "阅读");
+        } else {
+            tv.setVisibility(View.GONE);
+            tv.setText("");
+        }
+    }
 }

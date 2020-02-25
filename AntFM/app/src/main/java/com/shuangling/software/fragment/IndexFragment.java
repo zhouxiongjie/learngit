@@ -35,6 +35,7 @@ import com.hjq.toast.ToastUtils;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.RefreshState;
+import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -164,7 +165,10 @@ public class IndexFragment extends Fragment implements Handler.Callback {
         unbinder = ButterKnife.bind(this, view);
 
         //refreshLayout.setPrimaryColorsId(R.color.transparent, android.R.color.black);
+        refreshLayout.setRefreshHeader(new ClassicsHeader(getContext()));
+        refreshLayout.setRefreshFooter(new ClassicsFooter(getContext()));//设置
         ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
+
         //refreshLayout.setEnableLoadMore(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override

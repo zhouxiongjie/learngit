@@ -34,6 +34,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.RefreshState;
+import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -147,6 +148,8 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
         divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
         recyclerView.addItemDecoration(divider);
         refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
+        refreshLayout.setRefreshHeader(new ClassicsHeader(getContext()));
+        refreshLayout.setRefreshFooter(new ClassicsFooter(getContext()));//设置
         ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
 
 //        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
@@ -397,26 +400,26 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        try{
-                            if (getContent == GetContent.Refresh) {
-                                if (refreshLayout.getState() == RefreshState.Refreshing) {
-                                    refreshLayout.finishRefresh();
-                                }
-                            } else if (getContent == GetContent.LoadMore) {
-                                if (refreshLayout.getState() == RefreshState.Loading) {
-                                    refreshLayout.finishLoadMore();
-                                }
-                            }
-                        }catch (Exception e){
-
-                        }
-
-                    }
-                });
+//                mHandler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        try{
+//                            if (getContent == GetContent.Refresh) {
+//                                if (refreshLayout.getState() == RefreshState.Refreshing) {
+//                                    refreshLayout.finishRefresh();
+//                                }
+//                            } else if (getContent == GetContent.LoadMore) {
+//                                if (refreshLayout.getState() == RefreshState.Loading) {
+//                                    refreshLayout.finishLoadMore();
+//                                }
+//                            }
+//                        }catch (Exception e){
+//
+//                        }
+//
+//                    }
+//                });
 
 
                 Message msg = Message.obtain();
@@ -522,6 +525,27 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                         }
 
                         mColumnContents.addAll(contents);
+
+                        if (msg.arg1 == GetContent.Refresh.ordinal()) {
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
+                                //refreshLayout.resetNoMoreData();
+                            }
+
+                        } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
+
+                            if (refreshLayout.getState() == RefreshState.Loading) {
+                                if(contents==null||contents.size()==0){
+                                    //refreshLayout.setEnableLoadMore(false);
+                                    refreshLayout.finishLoadMoreWithNoMoreData();
+                                }else{
+                                    refreshLayout.finishLoadMore();
+                                }
+                            }
+
+                        }
+
+
 
                         if (msg.arg1 == GetContent.LoadMore.ordinal()) {
                             if(contents==null||contents.size()==0){

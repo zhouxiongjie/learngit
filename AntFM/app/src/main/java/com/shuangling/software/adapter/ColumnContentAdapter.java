@@ -290,42 +290,42 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 albumViewHolder.title.getViewTreeObserver().removeOnPreDrawListener(listener);
             }
 
-            ViewTreeObserver.OnPreDrawListener listener = new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    Log.i("test", "albumViewHolder onPreDraw");
-                    Log.i("test", content.getTitle());
-                    ViewTreeObserver obs = albumViewHolder.title.getViewTreeObserver();
-                    obs.removeOnPreDrawListener(this);
-                    albumViewHolder.title.setTag(null);
-
-                    if (albumViewHolder.title.getLineCount() > 2) {
-                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                        layoutParams.topMargin = CommonUtils.dip2px(5);
-                        layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
-                        albumViewHolder.layout.setLayoutParams(layoutParams);
-                    } else {
-
-
-                        if (albumViewHolder.layout.getWidth() > albumViewHolder.title.getWidth()) {
-                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                            layoutParams.topMargin = CommonUtils.dip2px(5);
-                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
-                            albumViewHolder.layout.setLayoutParams(layoutParams);
-
-                        } else {
-                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                            layoutParams.topMargin = CommonUtils.dip2px(5);
-                            layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
-                            albumViewHolder.layout.setLayoutParams(layoutParams);
-                        }
-
-                    }
-                    return true;
-                }
-            };
-            albumViewHolder.title.setTag(listener);
-            albumViewHolder.title.getViewTreeObserver().addOnPreDrawListener(listener);
+//            ViewTreeObserver.OnPreDrawListener listener = new ViewTreeObserver.OnPreDrawListener() {
+//                @Override
+//                public boolean onPreDraw() {
+//                    Log.i("test", "albumViewHolder onPreDraw");
+//                    Log.i("test", content.getTitle());
+//                    ViewTreeObserver obs = albumViewHolder.title.getViewTreeObserver();
+//                    obs.removeOnPreDrawListener(this);
+//                    albumViewHolder.title.setTag(null);
+//
+//                    if (albumViewHolder.title.getLineCount() > 2) {
+//                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                        layoutParams.topMargin = CommonUtils.dip2px(5);
+//                        layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+//                        albumViewHolder.layout.setLayoutParams(layoutParams);
+//                    } else {
+//
+//
+//                        if (albumViewHolder.layout.getWidth() > albumViewHolder.title.getWidth()) {
+//                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                            layoutParams.topMargin = CommonUtils.dip2px(5);
+//                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+//                            albumViewHolder.layout.setLayoutParams(layoutParams);
+//
+//                        } else {
+//                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                            layoutParams.topMargin = CommonUtils.dip2px(5);
+//                            layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
+//                            albumViewHolder.layout.setLayoutParams(layoutParams);
+//                        }
+//
+//                    }
+//                    return true;
+//                }
+//            };
+//            albumViewHolder.title.setTag(listener);
+//            albumViewHolder.title.getViewTreeObserver().addOnPreDrawListener(listener);
             albumViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             if (content.getAlbums().getStatus() == 1) {
                 //已完结
@@ -337,7 +337,46 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             albumViewHolder.count.setText("" + content.getAlbums().getCount() + "集");
             CommonUtils.setReadsAndComment(albumViewHolder.commentNum,content.getComment(),content.getView());
 
+            if (albumViewHolder.logo.getVisibility() == View.GONE) {
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                layoutParams.topMargin = CommonUtils.dip2px(10);
+                layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
 
+                albumViewHolder.layout.setLayoutParams(layoutParams);
+            }else{
+                albumViewHolder.title.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        int titleWidth = albumViewHolder.title.getWidth();
+                        int layoutWidth = albumViewHolder.layout.getWidth();
+                        int lineCount=albumViewHolder.title.getLineCount();
+
+
+                        if (lineCount> 2) {
+//                            Log.i("test","getLineCount>2");
+                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                            layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                            albumViewHolder.layout.setLayoutParams(layoutParams);
+                        } else {
+                            if (layoutWidth > titleWidth) {
+                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                                layoutParams.topMargin = CommonUtils.dip2px(5);
+                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                                albumViewHolder.layout.setLayoutParams(layoutParams);
+
+                            } else {
+                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                                layoutParams.topMargin = CommonUtils.dip2px(5);
+                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
+                                albumViewHolder.layout.setLayoutParams(layoutParams);
+                            }
+
+                        }
+
+                    }
+                });
+            }
             albumViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -393,52 +432,52 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             }
 
 
-            articleViewHolder.title.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    Log.i("test", "articleViewHolder onPreDraw");
-                    Log.i("test", content.getTitle());
-                    ViewTreeObserver obs = articleViewHolder.title.getViewTreeObserver();
-                    obs.removeOnPreDrawListener(this);
-
-                    if (articleViewHolder.logo.getVisibility() == View.GONE) {
-//                            Log.i("test","articleViewHolder.logo=GONE");
-                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                        layoutParams.topMargin = CommonUtils.dip2px(10);
-                        layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
-                        articleViewHolder.layout.setLayoutParams(layoutParams);
-
-                    } else {
-                        if (articleViewHolder.title.getLineCount() > 2) {
-//                            Log.i("test","getLineCount>2");
-                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                            layoutParams.topMargin = CommonUtils.dip2px(5);
-                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
-                            articleViewHolder.layout.setLayoutParams(layoutParams);
-                        } else {
-
-                            if (articleViewHolder.layout.getWidth() > articleViewHolder.title.getWidth()) {
-//                                Log.i("test","layout.getWidth()>title.getWidth()");
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
-                                articleViewHolder.layout.setLayoutParams(layoutParams);
-
-                            } else {
-//                                Log.i("test","layout.getWidth()<title.getWidth()");
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
-                                articleViewHolder.layout.setLayoutParams(layoutParams);
-                            }
-
-                        }
-                    }
-
-
-                    return true;
-                }
-            });
+//            articleViewHolder.title.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+//                @Override
+//                public boolean onPreDraw() {
+//                    Log.i("test", "articleViewHolder onPreDraw");
+//                    Log.i("test", content.getTitle());
+//                    ViewTreeObserver obs = articleViewHolder.title.getViewTreeObserver();
+//                    obs.removeOnPreDrawListener(this);
+//
+//                    if (articleViewHolder.logo.getVisibility() == View.GONE) {
+////                            Log.i("test","articleViewHolder.logo=GONE");
+//                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                        layoutParams.topMargin = CommonUtils.dip2px(10);
+//                        layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
+//                        articleViewHolder.layout.setLayoutParams(layoutParams);
+//
+//                    } else {
+//                        if (articleViewHolder.title.getLineCount() > 2) {
+////                            Log.i("test","getLineCount>2");
+//                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                            layoutParams.topMargin = CommonUtils.dip2px(5);
+//                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+//                            articleViewHolder.layout.setLayoutParams(layoutParams);
+//                        } else {
+//
+//                            if (articleViewHolder.layout.getWidth() > articleViewHolder.title.getWidth()) {
+////                                Log.i("test","layout.getWidth()>title.getWidth()");
+//                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                                layoutParams.topMargin = CommonUtils.dip2px(5);
+//                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+//                                articleViewHolder.layout.setLayoutParams(layoutParams);
+//
+//                            } else {
+////                                Log.i("test","layout.getWidth()<title.getWidth()");
+//                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                                layoutParams.topMargin = CommonUtils.dip2px(5);
+//                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
+//                                articleViewHolder.layout.setLayoutParams(layoutParams);
+//                            }
+//
+//                        }
+//                    }
+//
+//
+//                    return true;
+//                }
+//            });
 
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
@@ -447,6 +486,47 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
 
             articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             CommonUtils.setReadsAndComment(articleViewHolder.commentNum,content.getComment(),content.getView());
+
+
+            if (articleViewHolder.logo.getVisibility() == View.GONE) {
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                layoutParams.topMargin = CommonUtils.dip2px(10);
+                layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
+                articleViewHolder.layout.setLayoutParams(layoutParams);
+            }else{
+                articleViewHolder.title.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        int titleWidth = articleViewHolder.title.getWidth();
+                        int layoutWidth = articleViewHolder.layout.getWidth();
+                        int lineCount=articleViewHolder.title.getLineCount();
+
+
+                        if (lineCount> 2) {
+//                            Log.i("test","getLineCount>2");
+                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                            layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                            articleViewHolder.layout.setLayoutParams(layoutParams);
+                        } else {
+                            if (layoutWidth > titleWidth) {
+                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                                layoutParams.topMargin = CommonUtils.dip2px(5);
+                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                                articleViewHolder.layout.setLayoutParams(layoutParams);
+
+                            } else {
+                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                                layoutParams.topMargin = CommonUtils.dip2px(5);
+                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
+                                articleViewHolder.layout.setLayoutParams(layoutParams);
+                            }
+
+                        }
+
+                    }
+                });
+            }
 
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -751,52 +831,52 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                 ImageLoader.showThumb(specialViewHolder.logo, R.drawable.article_placeholder);
             }
 
-            specialViewHolder.title.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    Log.i("test", "specialViewHolder onPreDraw");
-                    Log.i("test", content.getTitle());
-                    ViewTreeObserver obs = specialViewHolder.title.getViewTreeObserver();
-                    obs.removeOnPreDrawListener(this);
-
-                    if (specialViewHolder.logo.getVisibility() == View.GONE) {
-
-                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                        layoutParams.topMargin = CommonUtils.dip2px(10);
-                        layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
-                        specialViewHolder.layout.setLayoutParams(layoutParams);
-
-                    } else {
-                        if (specialViewHolder.title.getLineCount() > 2) {
-                            Log.i("test", "getLineCount>2");
-                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                            layoutParams.topMargin = CommonUtils.dip2px(5);
-                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
-                            specialViewHolder.layout.setLayoutParams(layoutParams);
-                        } else {
-
-                            if (specialViewHolder.layout.getWidth() > specialViewHolder.title.getWidth()) {
-                                Log.i("test", "layout.getWidth()>title.getWidth()");
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
-                                specialViewHolder.layout.setLayoutParams(layoutParams);
-
-                            } else {
-                                Log.i("test", "layout.getWidth()<title.getWidth()");
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
-                                specialViewHolder.layout.setLayoutParams(layoutParams);
-                            }
-
-                        }
-                    }
-
-
-                    return true;
-                }
-            });
+//            specialViewHolder.title.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+//                @Override
+//                public boolean onPreDraw() {
+//                    Log.i("test", "specialViewHolder onPreDraw");
+//                    Log.i("test", content.getTitle());
+//                    ViewTreeObserver obs = specialViewHolder.title.getViewTreeObserver();
+//                    obs.removeOnPreDrawListener(this);
+//
+//                    if (specialViewHolder.logo.getVisibility() == View.GONE) {
+//
+//                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                        layoutParams.topMargin = CommonUtils.dip2px(10);
+//                        layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
+//                        specialViewHolder.layout.setLayoutParams(layoutParams);
+//
+//                    } else {
+//                        if (specialViewHolder.title.getLineCount() > 2) {
+//                            Log.i("test", "getLineCount>2");
+//                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                            layoutParams.topMargin = CommonUtils.dip2px(5);
+//                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+//                            specialViewHolder.layout.setLayoutParams(layoutParams);
+//                        } else {
+//
+//                            if (specialViewHolder.layout.getWidth() > specialViewHolder.title.getWidth()) {
+//                                Log.i("test", "layout.getWidth()>title.getWidth()");
+//                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                                layoutParams.topMargin = CommonUtils.dip2px(5);
+//                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+//                                specialViewHolder.layout.setLayoutParams(layoutParams);
+//
+//                            } else {
+//                                Log.i("test", "layout.getWidth()<title.getWidth()");
+//                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                                layoutParams.topMargin = CommonUtils.dip2px(5);
+//                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
+//                                specialViewHolder.layout.setLayoutParams(layoutParams);
+//                            }
+//
+//                        }
+//                    }
+//
+//
+//                    return true;
+//                }
+//            });
             specialViewHolder.title.setText(content.getTitle());
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 specialViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
@@ -804,7 +884,46 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             specialViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
 
             CommonUtils.setReadsAndComment(specialViewHolder.commentNum,content.getComment(),content.getView());
+            if (specialViewHolder.logo.getVisibility() == View.GONE) {
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                layoutParams.topMargin = CommonUtils.dip2px(10);
+                layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
 
+                specialViewHolder.layout.setLayoutParams(layoutParams);
+            }else{
+                specialViewHolder.title.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        int titleWidth = specialViewHolder.title.getWidth();
+                        int layoutWidth = specialViewHolder.layout.getWidth();
+                        int lineCount=specialViewHolder.title.getLineCount();
+
+
+                        if (lineCount> 2) {
+//                            Log.i("test","getLineCount>2");
+                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                            layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                            specialViewHolder.layout.setLayoutParams(layoutParams);
+                        } else {
+                            if (layoutWidth > titleWidth) {
+                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                                layoutParams.topMargin = CommonUtils.dip2px(5);
+                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                                specialViewHolder.layout.setLayoutParams(layoutParams);
+
+                            } else {
+                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                                layoutParams.topMargin = CommonUtils.dip2px(5);
+                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
+                                specialViewHolder.layout.setLayoutParams(layoutParams);
+                            }
+
+                        }
+
+                    }
+                });
+            }
             specialViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

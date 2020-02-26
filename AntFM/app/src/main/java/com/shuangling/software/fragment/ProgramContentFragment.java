@@ -96,8 +96,8 @@ public class ProgramContentFragment extends Fragment implements Handler.Callback
         DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
         recyclerView.addItemDecoration(divider);
-        refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
-        ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
+        //refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
+        //((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
         refreshLayout.setEnableRefresh(false);
 
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {

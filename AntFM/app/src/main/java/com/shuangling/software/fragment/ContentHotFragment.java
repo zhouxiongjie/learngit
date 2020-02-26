@@ -147,10 +147,10 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
         DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
         recyclerView.addItemDecoration(divider);
-        refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
-        refreshLayout.setRefreshHeader(new ClassicsHeader(getContext()));
-        refreshLayout.setRefreshFooter(new ClassicsFooter(getContext()));//设置
-        ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
+        //refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
+        //refreshLayout.setRefreshHeader(new ClassicsHeader(getContext()));
+        //refreshLayout.setRefreshFooter(new ClassicsFooter(getContext()));//设置
+        //((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
 
 //        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
 //            @Override
@@ -547,12 +547,6 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
 
 
 
-                        if (msg.arg1 == GetContent.LoadMore.ordinal()) {
-                            if(contents==null||contents.size()==0){
-                                refreshLayout.finishLoadMoreWithNoMoreData();
-                            }
-
-                        }
 
 
                         if (mColumnContents.size() == 0) {
@@ -561,14 +555,14 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                             noData.setVisibility(View.GONE);
                         }
                         //加入缓存 前50条数据
-                        if (mColumnContents.size()>0&&mColumnContents.size() <= 50) {
-                            mACache.put(ServerInfo.serviceIP + ServerInfo.topPost, JSON.toJSONString(mColumnContents));
-                            mACache.put(ServerInfo.serviceIP + ServerInfo.topPost + "/page", "" + page);
-                        } else {
-                            List<ColumnContent> arr = mColumnContents.subList(0, 50);
-//                            mACache.put(ServerInfo.serviceIP + ServerInfo.topPost,JSON.toJSONString(arr));
-//                            mACache.put(ServerInfo.serviceIP + ServerInfo.topPost+"/page",""+page);
-                        }
+//                        if (mColumnContents.size()>0&&mColumnContents.size() <= 50) {
+//                            mACache.put(ServerInfo.serviceIP + ServerInfo.topPost, JSON.toJSONString(mColumnContents));
+//                            mACache.put(ServerInfo.serviceIP + ServerInfo.topPost + "/page", "" + page);
+//                        } else {
+//                            List<ColumnContent> arr = mColumnContents.subList(0, 50);
+////                            mACache.put(ServerInfo.serviceIP + ServerInfo.topPost,JSON.toJSONString(arr));
+////                            mACache.put(ServerInfo.serviceIP + ServerInfo.topPost+"/page",""+page);
+//                        }
 
 //                        if(contents.size()<Constant.PAGE_SIZE){
 //                            refreshLayout.setEnableLoadMore(false);
@@ -603,6 +597,20 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
 
                         }
 
+                    }else{
+                        if (msg.arg1 == GetContent.Refresh.ordinal()) {
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
+                                //refreshLayout.resetNoMoreData();
+                            }
+
+                        } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
+
+                            if (refreshLayout.getState() == RefreshState.Loading) {
+                                refreshLayout.finishLoadMore();
+                            }
+
+                        }
                     }
 
                 } catch (Exception e) {

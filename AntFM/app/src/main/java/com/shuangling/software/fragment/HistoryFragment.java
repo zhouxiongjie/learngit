@@ -99,7 +99,7 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
         divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
         recyclerView.addItemDecoration(divider);
         //refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
-        ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
+        //((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
         refreshLayout.setEnableRefresh(true);
         refreshLayout.setEnableLoadMore(true);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
@@ -149,19 +149,29 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                try{
-                    if (getContent == GetContent.Refresh) {
-                        if (refreshLayout.getState() == RefreshState.Refreshing) {
-                            refreshLayout.finishRefresh();
-                        }
-                    } else if (getContent == GetContent.LoadMore) {
-                        if (refreshLayout.getState() == RefreshState.Loading) {
-                            refreshLayout.finishLoadMore();
-                        }
-                    }
-                }catch (Exception e){
 
-                }
+
+
+//                mHandler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        try{
+//                            if (getContent == GetContent.Refresh) {
+//                                if (refreshLayout.getState() == RefreshState.Refreshing) {
+//                                    refreshLayout.finishRefresh();
+//                                }
+//                            } else if (getContent == GetContent.LoadMore) {
+//                                if (refreshLayout.getState() == RefreshState.Loading) {
+//                                    refreshLayout.finishLoadMore();
+//                                }
+//                            }
+//                        }catch (Exception e){
+//
+//                        }
+//
+//                    }
+//                });
 
 
                 Message msg = Message.obtain();
@@ -174,19 +184,28 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                try{
-                    if (getContent == GetContent.Refresh) {
-                        if (refreshLayout.getState() == RefreshState.Refreshing) {
-                            refreshLayout.finishRefresh();
-                        }
-                    } else if (getContent == GetContent.LoadMore) {
-                        if (refreshLayout.getState() == RefreshState.Loading) {
-                            refreshLayout.finishLoadMore();
-                        }
-                    }
-                }catch (Exception e){
 
-                }
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        try{
+                            if (getContent == GetContent.Refresh) {
+                                if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                    refreshLayout.finishRefresh();
+                                }
+                            } else if (getContent == GetContent.LoadMore) {
+                                if (refreshLayout.getState() == RefreshState.Loading) {
+                                    refreshLayout.finishLoadMore();
+                                }
+                            }
+                        }catch (Exception e){
+
+                        }
+
+                    }
+                });
 
             }
         });
@@ -246,25 +265,34 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
             case MSG_UPDATE_LIST:
                 try {
                     String result = (String) msg.obj;
-                    GetContent getContent = GetContent.values()[msg.arg1];
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         List<History> histories = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), History.class);
 
 
-                        if (getContent == GetContent.Refresh) {
-                            refreshLayout.setEnableLoadMore(true);
+                        if (msg.arg1 == GetContent.Refresh.ordinal()) {
                             mHistorys = histories;
-                        } else if(getContent==GetContent.LoadMore){
-                            if(histories==null||histories.size()==0){
-                                refreshLayout.finishLoadMoreWithNoMoreData();
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
                             }
-                            mHistorys.addAll(histories);
 
-                        }else{
-                            refreshLayout.setEnableLoadMore(true);
+                        } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
                             mHistorys.addAll(histories);
+                            if (refreshLayout.getState() == RefreshState.Loading) {
+                                if(histories==null||histories.size()==0){
+                                    //refreshLayout.setEnableLoadMore(false);
+                                    refreshLayout.finishLoadMoreWithNoMoreData();
+                                }else{
+                                    refreshLayout.finishLoadMore();
+                                }
+
+                            }
+
+                        } else {
+                            mHistorys=histories;
                         }
+
+
                         if (mHistorys.size() == 0) {
                             noData.setVisibility(View.VISIBLE);
                         } else {
@@ -287,6 +315,16 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
                         } else {
                             mAdapter.setData(mHistorys);
                             mAdapter.notifyDataSetChanged();
+                        }
+                    }else{
+                        if (msg.arg1 == GetContent.Refresh.ordinal()) {
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
+                            }
+                        } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
+                            if (refreshLayout.getState() == RefreshState.Loading) {
+                                refreshLayout.finishLoadMore();
+                            }
                         }
                     }
                 } catch (Exception e) {

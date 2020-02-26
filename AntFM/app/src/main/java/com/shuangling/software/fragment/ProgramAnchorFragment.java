@@ -99,8 +99,8 @@ public class ProgramAnchorFragment extends Fragment implements Handler.Callback 
         recyclerView.addItemDecoration(divider);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
-        ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
+        //refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
+        //((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
         refreshLayout.setEnableRefresh(false);
 
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {

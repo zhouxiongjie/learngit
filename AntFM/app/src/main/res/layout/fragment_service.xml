@@ -26,14 +26,14 @@
         app:srlEnableLoadMore="false"
         app:srlEnableRefresh="false">
 
-        <com.scwang.smartrefresh.layout.header.ClassicsHeader
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:srlAccentColor="@android:color/black"
-            app:srlClassicsSpinnerStyle="Translate"
-            app:srlDrawableProgress="@drawable/smart_refresh_progress_logo"
-            app:srlDrawableProgressSize="20dp"
-            app:srlPrimaryColor="@color/transparent" />
+        <!--<com.scwang.smartrefresh.layout.header.ClassicsHeader-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:srlAccentColor="@android:color/black"-->
+            <!--app:srlClassicsSpinnerStyle="Translate"-->
+            <!--app:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
+            <!--app:srlDrawableProgressSize="20dp"-->
+            <!--app:srlPrimaryColor="@color/transparent" />-->
 
         <ExpandableListView
             android:id="@+id/expandablelistview"
@@ -44,14 +44,14 @@
             android:groupIndicator="@null"
             android:scrollbars="none"/>
 
-        <com.scwang.smartrefresh.layout.footer.ClassicsFooter
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:srlAccentColor="@android:color/black"
-            app:srlClassicsSpinnerStyle="Translate"
-            app:srlDrawableProgress="@drawable/smart_refresh_progress_logo"
-            app:srlDrawableProgressSize="20dp"
-            app:srlPrimaryColor="@color/transparent" />
+        <!--<com.scwang.smartrefresh.layout.footer.ClassicsFooter-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:srlAccentColor="@android:color/black"-->
+            <!--app:srlClassicsSpinnerStyle="Translate"-->
+            <!--app:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
+            <!--app:srlDrawableProgressSize="20dp"-->
+            <!--app:srlPrimaryColor="@color/transparent" />-->
 
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 

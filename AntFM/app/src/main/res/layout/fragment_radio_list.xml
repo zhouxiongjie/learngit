@@ -43,14 +43,14 @@
             fresco:srlEnableLoadMore="false"
             fresco:srlEnableRefresh="false">
 
-            <com.scwang.smartrefresh.layout.header.ClassicsHeader
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                fresco:srlAccentColor="@android:color/black"
-                fresco:srlClassicsSpinnerStyle="Translate"
-                fresco:srlDrawableProgress="@drawable/smart_refresh_progress_logo"
-                fresco:srlDrawableProgressSize="20dp"
-                fresco:srlPrimaryColor="@color/transparent" />
+            <!--<com.scwang.smartrefresh.layout.header.ClassicsHeader-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--fresco:srlAccentColor="@android:color/black"-->
+                <!--fresco:srlClassicsSpinnerStyle="Translate"-->
+                <!--fresco:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
+                <!--fresco:srlDrawableProgressSize="20dp"-->
+                <!--fresco:srlPrimaryColor="@color/transparent" />-->
 
 
             <ExpandableListView
@@ -68,14 +68,14 @@
 
             </ExpandableListView>
 
-            <com.scwang.smartrefresh.layout.footer.ClassicsFooter
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                fresco:srlAccentColor="@android:color/black"
-                fresco:srlClassicsSpinnerStyle="Translate"
-                fresco:srlDrawableProgress="@drawable/smart_refresh_progress_logo"
-                fresco:srlDrawableProgressSize="20dp"
-                fresco:srlPrimaryColor="@color/transparent" />
+            <!--<com.scwang.smartrefresh.layout.footer.ClassicsFooter-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--fresco:srlAccentColor="@android:color/black"-->
+                <!--fresco:srlClassicsSpinnerStyle="Translate"-->
+                <!--fresco:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
+                <!--fresco:srlDrawableProgressSize="20dp"-->
+                <!--fresco:srlPrimaryColor="@color/transparent" />-->
 
 
         </com.scwang.smartrefresh.layout.SmartRefreshLayout>

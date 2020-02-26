@@ -130,7 +130,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text="活动"
-            android:textColor="@color/textColorFour"
+            android:textColor="?attr/themeColor"
             android:textSize="@dimen/font_size_18px"
             android:visibility="visible"/>
 

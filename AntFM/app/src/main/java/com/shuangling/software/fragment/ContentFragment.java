@@ -505,14 +505,15 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                             }
                         }
 
+
                         if (msg.arg1 == GetContent.Refresh.ordinal()) {
+                            mColumnContents.addAll(0, columnContents);
                             if (refreshLayout.getState() == RefreshState.Refreshing) {
                                 refreshLayout.finishRefresh();
-                                //refreshLayout.resetNoMoreData();
                             }
-                            mColumnContents.addAll(0, columnContents);
-                        } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
 
+                        } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
+                            mColumnContents.addAll(columnContents);
                             if (refreshLayout.getState() == RefreshState.Loading) {
                                 if(columnContents==null||columnContents.size()==0){
                                     //refreshLayout.setEnableLoadMore(false);
@@ -520,9 +521,10 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                 }else{
                                     refreshLayout.finishLoadMore();
                                 }
+
                             }
 
-                            mColumnContents.addAll(columnContents);
+
                         } else {
                             mColumnContents = columnContents;
                         }
@@ -533,13 +535,12 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                             noData.setVisibility(View.GONE);
                         }
                         //加入缓存 前10条数据
-                        if (mColumnContents.size()>0&&mColumnContents.size() <= 10) {
-                            mACache.put(ServerInfo.serviceIP + ServerInfo.getColumnContent + mColumn.getId(), JSON.toJSONString(mColumnContents));
-                        } else if(mColumnContents.size() > 10) {
-                            List<ColumnContent> arr = mColumnContents.subList(0, 10);
-                            mACache.put(ServerInfo.serviceIP + ServerInfo.getColumnContent + mColumn.getId(), JSON.toJSONString(arr));
-                        }
-
+//                        if (mColumnContents.size()>0&&mColumnContents.size() <= 10) {
+//                            mACache.put(ServerInfo.serviceIP + ServerInfo.getColumnContent + mColumn.getId(), JSON.toJSONString(mColumnContents));
+//                        } else if(mColumnContents.size() > 10) {
+//                            List<ColumnContent> arr = mColumnContents.subList(0, 10);
+//                            mACache.put(ServerInfo.serviceIP + ServerInfo.getColumnContent + mColumn.getId(), JSON.toJSONString(arr));
+//                        }
 
                         if (mAdapter == null) {
                             mAdapter = new ColumnDecorateContentAdapter(getContext(), mColumnContents);
@@ -571,7 +572,16 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
                         }
 
-
+                    }else{
+                        if (msg.arg1 == GetContent.Refresh.ordinal()) {
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
+                            }
+                        } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
+                            if (refreshLayout.getState() == RefreshState.Loading) {
+                                refreshLayout.finishLoadMore();
+                            }
+                        }
                     }
 
 

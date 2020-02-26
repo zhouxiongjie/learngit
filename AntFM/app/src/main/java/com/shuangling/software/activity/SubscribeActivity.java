@@ -85,7 +85,7 @@ public class SubscribeActivity extends AppCompatActivity implements Handler.Call
         DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         divider.setDrawable(ContextCompat.getDrawable(this, R.drawable.recycleview_divider_drawable));
         recyclerView.addItemDecoration(divider);
-        ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
+        //((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
         refreshLayout.setEnableRefresh(false);
         refreshLayout.setEnableLoadMore(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {

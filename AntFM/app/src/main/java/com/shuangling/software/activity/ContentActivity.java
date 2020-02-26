@@ -134,8 +134,8 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
         DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         divider.setDrawable(ContextCompat.getDrawable(this, R.drawable.recycleview_divider_drawable));
         recyclerView.addItemDecoration(divider);
-        refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
-        ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
+       // refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
+        //((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
         refreshLayout.setEnableAutoLoadMore(false);
 //        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
 //            @Override
@@ -379,13 +379,15 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         List<ColumnContent> columnContents=JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), ColumnContent.class);
-                        if (msg.arg1 == ContentFragment.GetContent.Refresh.ordinal()) {
+
+                        if (msg.arg1 == GetContent.Refresh.ordinal()) {
+                            mColumnContents.addAll(0, columnContents);
                             if (refreshLayout.getState() == RefreshState.Refreshing) {
                                 refreshLayout.finishRefresh();
-                                refreshLayout.resetNoMoreData();
                             }
-                            mColumnContents.addAll(0,columnContents );
-                        } else if (msg.arg1 == ContentFragment.GetContent.LoadMore.ordinal()) {
+
+                        } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
+                            mColumnContents.addAll(columnContents);
                             if (refreshLayout.getState() == RefreshState.Loading) {
                                 if(columnContents==null||columnContents.size()==0){
                                     //refreshLayout.setEnableLoadMore(false);
@@ -393,12 +395,16 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
                                 }else{
                                     refreshLayout.finishLoadMore();
                                 }
+
                             }
 
-                            mColumnContents.addAll(columnContents);
+
                         } else {
                             mColumnContents = columnContents;
                         }
+
+
+
 
                         if (mColumnContents.size() == 0) {
                             noData.setVisibility(View.VISIBLE);
@@ -436,6 +442,16 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
                         }
 
 
+                    }else{
+                        if (msg.arg1 == GetContent.Refresh.ordinal()) {
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
+                            }
+                        } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
+                            if (refreshLayout.getState() == RefreshState.Loading) {
+                                refreshLayout.finishLoadMore();
+                            }
+                        }
                     }
 
 

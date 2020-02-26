@@ -60,8 +60,9 @@ public class MyApplication extends MultiDexApplication {
         SmartRefreshLayout.setDefaultRefreshHeaderCreator(new DefaultRefreshHeaderCreator() {
             @Override
             public RefreshHeader createRefreshHeader(Context context, RefreshLayout layout) {
-                layout.setPrimaryColorsId(R.color.white,R.color.black);//全局设置主题颜色
-                return new ClassicsHeader(context).setEnableLastTime(false);//.setTimeFormat(new DynamicTimeFormat("更新于 %s"));//指定为经典Header，默认是 贝塞尔雷达Header
+                layout.setPrimaryColorsId(R.color.white,R.color.textColorThree);//全局设置主题颜色
+
+                return new ClassicsHeader(context).setEnableLastTime(false).setFinishDuration(0);//.setTimeFormat(new DynamicTimeFormat("更新于 %s"));//指定为经典Header，默认是 贝塞尔雷达Header
             }
         });
         //设置全局的Footer构建器
@@ -69,8 +70,9 @@ public class MyApplication extends MultiDexApplication {
             @Override
             public RefreshFooter createRefreshFooter(Context context, RefreshLayout layout) {
                 //指定为经典Footer，默认是 BallPulseFooter
-                layout.setPrimaryColorsId(R.color.white,R.color.black);
-                return new ClassicsFooter(context);
+                layout.setPrimaryColorsId(R.color.white,R.color.textColorThree);
+                layout.setEnableScrollContentWhenLoaded(true);
+                return new ClassicsFooter(context).setFinishDuration(0);
             }
         });
     }

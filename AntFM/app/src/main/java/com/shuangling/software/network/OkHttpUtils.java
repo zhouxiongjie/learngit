@@ -503,9 +503,7 @@ public class OkHttpUtils {
 					String resp=response.body().string();
 					JSONObject jsonObject = JSONObject.parseObject(resp);
 					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
-
 						getRefreshTokenLogin(url,params,callback);
-
 					}else{
 						callback.onResponse(call,resp);
 					}

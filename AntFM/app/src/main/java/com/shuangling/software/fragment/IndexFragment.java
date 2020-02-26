@@ -165,9 +165,9 @@ public class IndexFragment extends Fragment implements Handler.Callback {
         unbinder = ButterKnife.bind(this, view);
 
         //refreshLayout.setPrimaryColorsId(R.color.transparent, android.R.color.black);
-        refreshLayout.setRefreshHeader(new ClassicsHeader(getContext()));
-        refreshLayout.setRefreshFooter(new ClassicsFooter(getContext()));//设置
-        ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
+        //refreshLayout.setRefreshHeader(new ClassicsHeader(getContext()));
+        //refreshLayout.setRefreshFooter(new ClassicsFooter(getContext()));//设置
+        //((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
 
         //refreshLayout.setEnableLoadMore(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
@@ -218,9 +218,15 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             @Override
             public void onResponse(Call call, String response) throws IOException {
                 try{
-                    if (refreshLayout.getState() == RefreshState.Refreshing) {
-                        refreshLayout.finishRefresh();
-                    }
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
+                            }
+                        }
+                    });
+
                     JSONObject jsonObject = JSONObject.parseObject(response);
 
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
@@ -244,13 +250,15 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                try{
-                    if (refreshLayout.getState() == RefreshState.Refreshing) {
-                        refreshLayout.finishRefresh();
-                    }
-                }catch (Exception e){
 
-                }
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (refreshLayout.getState() == RefreshState.Refreshing) {
+                            refreshLayout.finishRefresh();
+                        }
+                    }
+                });
 
                 EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
 

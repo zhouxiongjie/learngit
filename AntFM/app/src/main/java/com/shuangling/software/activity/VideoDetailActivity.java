@@ -1031,8 +1031,8 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 
                             if (refreshLayout.getState() == RefreshState.Loading) {
                                 if(comments==null||comments.size()==0){
-                                    //refreshLayout.setEnableLoadMore(false);
-                                    refreshLayout.finishLoadMoreWithNoMoreData();
+                                    refreshLayout.setEnableLoadMore(false);
+                                    //refreshLayout.finishLoadMoreWithNoMoreData();
                                 }else{
                                     refreshLayout.finishLoadMore();
                                 }

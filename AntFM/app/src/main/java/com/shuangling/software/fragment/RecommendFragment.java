@@ -268,6 +268,9 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 //                return false;
 //            }
 //        });
+        if(MainActivity.sCurrentCity!=null){
+            weather();
+        }
         return rootView;
 
     }
@@ -306,6 +309,8 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 //                }, 500);
                 //mColumnSelectIndex = 1;
                 viewPager.setCurrentItem(1);
+            }else{
+                mPageListener.onPageSelected(0);
             }
         }
 
@@ -320,12 +325,6 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 
         @Override
         public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-            if(arg0==mColumnSelectIndex){
-
-            }else{
-
-            }
 
 
         }

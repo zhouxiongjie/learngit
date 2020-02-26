@@ -166,7 +166,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="5dp"
-                    android:text="&#xe66a;"
+                    android:text="&#xe679;"
                     android:textColor="#A0A0A0"
                     android:textSize="@dimen/font_size_30px" />
 
@@ -200,7 +200,7 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="5dp"
-                    android:text="&#xe6cb;"
+                    android:text="&#xe66a;"
                     android:textColor="#A0A0A0"
                     android:textSize="@dimen/font_size_30px" />
 

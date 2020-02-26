@@ -98,7 +98,7 @@ public class CollectFragment extends Fragment implements Handler.Callback {
         divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
         recyclerView.addItemDecoration(divider);
         //refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
-        ((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
+        //((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
         refreshLayout.setEnableRefresh(true);
         refreshLayout.setEnableLoadMore(true);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
@@ -146,19 +146,28 @@ public class CollectFragment extends Fragment implements Handler.Callback {
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                try{
-                    if (getContent == GetContent.Refresh) {
-                        if (refreshLayout.getState() == RefreshState.Refreshing) {
-                            refreshLayout.finishRefresh();
-                        }
-                    } else if (getContent == GetContent.LoadMore) {
-                        if (refreshLayout.getState() == RefreshState.Loading) {
-                            refreshLayout.finishLoadMore();
-                        }
-                    }
-                }catch (Exception e){
 
-                }
+
+
+//                mHandler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        try{
+//                            if (getContent == GetContent.Refresh) {
+//                                if (refreshLayout.getState() == RefreshState.Refreshing) {
+//                                    refreshLayout.finishRefresh();
+//                                }
+//                            } else if (getContent == GetContent.LoadMore) {
+//                                if (refreshLayout.getState() == RefreshState.Loading) {
+//                                    refreshLayout.finishLoadMore();
+//                                }
+//                            }
+//                        }catch (Exception e){
+//
+//                        }
+//                    }
+//                });
 
 
                 Message msg = Message.obtain();
@@ -172,19 +181,28 @@ public class CollectFragment extends Fragment implements Handler.Callback {
             @Override
             public void onFailure(Call call, Exception exception) {
 
-                try{
-                    if (getContent == GetContent.Refresh) {
-                        if (refreshLayout.getState() == RefreshState.Refreshing) {
-                            refreshLayout.finishRefresh();
-                        }
-                    } else if (getContent == GetContent.LoadMore) {
-                        if (refreshLayout.getState() == RefreshState.Loading) {
-                            refreshLayout.finishLoadMore();
+
+
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        try{
+                            if (getContent == GetContent.Refresh) {
+                                if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                    refreshLayout.finishRefresh();
+                                }
+                            } else if (getContent == GetContent.LoadMore) {
+                                if (refreshLayout.getState() == RefreshState.Loading) {
+                                    refreshLayout.finishLoadMore();
+                                }
+                            }
+                        }catch (Exception e){
+
                         }
                     }
-                }catch (Exception e){
-
-                }
+                });
 
 
             }
@@ -245,24 +263,34 @@ public class CollectFragment extends Fragment implements Handler.Callback {
             case MSG_UPDATE_LIST:
                 try {
                     String result = (String) msg.obj;
-                    GetContent getContent = GetContent.values()[msg.arg1];
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         List<Collect> collects = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), Collect.class);
 
-                        if (getContent == GetContent.Refresh) {
-                            refreshLayout.setEnableLoadMore(true);
-                            mCollects = collects;
-                        } else if(getContent==GetContent.LoadMore){
-                            if(collects==null||collects.size()==0){
-                                refreshLayout.finishLoadMoreWithNoMoreData();
-                            }
-                            mCollects.addAll(collects);
 
-                        }else{
-                            refreshLayout.setEnableLoadMore(true);
+                        if (msg.arg1 == GetContent.Refresh.ordinal()) {
+                            mCollects = collects;
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
+                            }
+
+                        } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
                             mCollects.addAll(collects);
+                            if (refreshLayout.getState() == RefreshState.Loading) {
+                                if(collects==null||collects.size()==0){
+                                    //refreshLayout.setEnableLoadMore(false);
+                                    refreshLayout.finishLoadMoreWithNoMoreData();
+                                }else{
+                                    refreshLayout.finishLoadMore();
+                                }
+
+                            }
+
+                        } else {
+                            mCollects=collects;
                         }
+
+
                         if (mCollects.size() == 0) {
                             noData.setVisibility(View.VISIBLE);
                         } else {
@@ -285,6 +313,16 @@ public class CollectFragment extends Fragment implements Handler.Callback {
                         } else {
                             mAdapter.setData(mCollects);
                             mAdapter.notifyDataSetChanged();
+                        }
+                    }else{
+                        if (msg.arg1 == GetContent.Refresh.ordinal()) {
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
+                            }
+                        } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
+                            if (refreshLayout.getState() == RefreshState.Loading) {
+                                refreshLayout.finishLoadMore();
+                            }
                         }
                     }
                 } catch (Exception e) {

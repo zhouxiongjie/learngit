@@ -1,6 +1,0 @@
-<selector
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/ic_praise" android:state_activated="true"/>
-    <item android:drawable="@drawable/ic_praise_light" android:state_activated="false"/>
-    <item android:drawable="@drawable/ic_praise"/>
-</selector>

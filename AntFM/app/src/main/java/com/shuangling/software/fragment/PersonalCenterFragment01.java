@@ -39,6 +39,7 @@ import com.shuangling.software.activity.LoginActivity;
 import com.shuangling.software.activity.MessageListActivity;
 import com.shuangling.software.activity.ModifyUserInfoActivity;
 import com.shuangling.software.activity.MyWalletsActivity;
+import com.shuangling.software.activity.NewLoginActivity;
 import com.shuangling.software.activity.SettingActivity;
 import com.shuangling.software.activity.SubscribeActivity;
 import com.shuangling.software.activity.WebViewActivity;
@@ -187,7 +188,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), ModifyUserInfoActivity.class));
                 } else {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
                 break;

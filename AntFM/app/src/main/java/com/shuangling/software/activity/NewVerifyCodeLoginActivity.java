@@ -102,6 +102,8 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
             @Override
             public void inputComplete() {
                 ToastUtils.show("inputComplete: " + verifyCodeView.getEditContent());
+
+
             }
 
             @Override

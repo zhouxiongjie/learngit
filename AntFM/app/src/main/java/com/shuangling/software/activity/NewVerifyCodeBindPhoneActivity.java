@@ -67,6 +67,8 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
     private String weixinNickname;
     private String weixinHeadimgurl;
 
+    private boolean hasLogined;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
@@ -81,6 +83,7 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
     }
 
     private void init() {
+        hasLogined=getIntent().getBooleanExtra("hasLogined",false);
         weixinUnionid = getIntent().getStringExtra("unionid");
         weixinOpenid = getIntent().getStringExtra("openid");
         weixinNickname = getIntent().getStringExtra("nickname");
@@ -174,8 +177,12 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
 
                         //EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
 
+                        if(hasLogined==false){
+                            weixinLogin(weixinNickname, weixinHeadimgurl, weixinOpenid, weixinUnionid);
+                        }else{
+                            AppManager.finishAllActivity();
+                        }
 
-                        weixinLogin(weixinNickname, weixinHeadimgurl, weixinOpenid, weixinUnionid);
                         //AppManager.finishAllActivity();
                     } else if (support == 0) {
                         mDialogFragment.dismiss();
@@ -216,6 +223,7 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
+                        user.setLogin_type(1);
                         User.setInstance(user);
                         SharedPreferencesUtils.saveUser(user);
                         final CloudPushService pushService = PushServiceFactory.getCloudPushService();

@@ -99,6 +99,8 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
     private String weixinNickname;
     private String weixinHeadimgurl;
 
+    private boolean hasLogined;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
@@ -107,9 +109,30 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
         CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         mHandler = new Handler(this);
-        AppManager.addActivity(this);
-        init();
+        hasLogined=getIntent().getBooleanExtra("hasLogined",false);
+        if(hasLogined){
+            activityTitle.setCanBack(true);
+            AppManager.clearActivity();
+            AppManager.addActivity(this);
+            activityTitle.setMoreText("");
+            activityTitle.setMoreAction(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
+                }
+            });
+        }else{
+            activityTitle.setCanBack(false);
+            AppManager.addActivity(this);
+            activityTitle.setMoreText("跳过");
+            activityTitle.setMoreAction(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    weixinLogin(weixinNickname,weixinHeadimgurl,weixinOpenid,weixinUnionid);
+                }
+            });
+        }
+        init();
     }
 
 
@@ -119,12 +142,7 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
         weixinNickname=getIntent().getStringExtra("nickname");
         weixinHeadimgurl=getIntent().getStringExtra("headimgurl");
 
-        activityTitle.setMoreAction(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                weixinLogin(weixinNickname,weixinHeadimgurl,weixinOpenid,weixinUnionid);
-            }
-        });
+
 
         phoneNum.addTextChangedListener(new TextWatcher() {
             @Override
@@ -174,6 +192,7 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
                         Intent it=new Intent(this,NewVerifyCodeBindPhoneActivity.class);
+                        it.putExtra("hasLogined",hasLogined);
                         it.putExtra("PhoneNumber",mPhoneNumber);
                         it.putExtra("nickname",weixinNickname);
                         it.putExtra("headimgurl",weixinHeadimgurl);
@@ -198,6 +217,7 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
+                        user.setLogin_type(1);
                         User.setInstance(user);
                         SharedPreferencesUtils.saveUser(user);
                         final CloudPushService pushService = PushServiceFactory.getCloudPushService();

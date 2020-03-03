@@ -80,7 +80,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
     private Handler mHandler;
     private Article mArticle;
     private ViewSkeletonScreen mViewSkeletonScreen;
-
+    private String mJumpUrl;
 //    private Runnable runnable=new Runnable() {
 //        @Override
 //        public void run() {
@@ -313,27 +313,56 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
         }
 
         @JavascriptInterface
-        public void loginEvent(String str) {
+        public void loginEvent(final String bindPhone) {
+            mJumpUrl=null;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Intent it = new Intent(ArticleDetailActivity.this, LoginActivity.class);
+                    Intent it = new Intent(ArticleDetailActivity.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
                     startActivityForResult(it, LOGIN_RESULT);
                 }
             });
+
+
+        }
+
+
+
+        @JavascriptInterface
+        public void loginEvent(final String bindPhone,String url) {
+            mJumpUrl=url;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Intent it = new Intent(ArticleDetailActivity.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
+                    startActivityForResult(it, LOGIN_RESULT);
+                }
+            });
+
         }
 
         @JavascriptInterface
-        public void loginEvent(Object[] str) {
+        public void bindPhoneEvent(final String url) {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Intent it = new Intent(ArticleDetailActivity.this, LoginActivity.class);
+                    //showShare();
+                    Intent it = new Intent(ArticleDetailActivity.this, BindPhoneActivity.class);
+                    it.putExtra("hasLogined",true);
                     startActivityForResult(it, LOGIN_RESULT);
+
                 }
             });
-
-
         }
 
 
@@ -449,7 +478,7 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == LOGIN_RESULT && resultCode == Activity.RESULT_OK) {
+        if (requestCode == LOGIN_RESULT ) {
             String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
             int size = 1;
             int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 1);
@@ -459,9 +488,16 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
             if (User.getInstance() == null) {
                 url = url + "?app=android&size=" + size;
             } else {
-                url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size;
+                if(!TextUtils.isEmpty(mJumpUrl)){
+                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size;
+                }else{
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size;
+                }
+                webView.loadUrl(url);
+
+                //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size;
             }
-            webView.loadUrl(url);
+
 
         }
     }

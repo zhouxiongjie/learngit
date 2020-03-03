@@ -188,7 +188,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), ModifyUserInfoActivity.class));
                 } else {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
                 break;
@@ -196,7 +196,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 break;
             case R.id.login:
                 if (User.getInstance() == null) {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
 

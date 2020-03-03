@@ -593,6 +593,7 @@ public class OkHttpUtils {
 					if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 						User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
 						user.setRefresh_token(User.getInstance().getRefresh_token());
+						user.setLogin_type(User.getInstance().getLogin_type());
 						User.setInstance(user);
 						SharedPreferencesUtils.saveUser(user);
 						post(url, params, files, callback);
@@ -651,6 +652,7 @@ public class OkHttpUtils {
 					if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 						User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
 						user.setRefresh_token(User.getInstance().getRefresh_token());
+						user.setLogin_type(User.getInstance().getLogin_type());
 						User.setInstance(user);
 						SharedPreferencesUtils.saveUser(user);
 						postWithFile(url,textMap,fileMap,callback);
@@ -707,6 +709,7 @@ public class OkHttpUtils {
 					if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 						User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
 						user.setRefresh_token(User.getInstance().getRefresh_token());
+						user.setLogin_type(User.getInstance().getLogin_type());
 						User.setInstance(user);
 						SharedPreferencesUtils.saveUser(user);
 						post(url,params,callback);
@@ -763,6 +766,7 @@ public class OkHttpUtils {
 					if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 						User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
 						user.setRefresh_token(User.getInstance().getRefresh_token());
+						user.setLogin_type(User.getInstance().getLogin_type());
 						User.setInstance(user);
 						SharedPreferencesUtils.saveUser(user);
 						put(url,params,callback);
@@ -821,6 +825,7 @@ public class OkHttpUtils {
 					if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 						User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
 						user.setRefresh_token(User.getInstance().getRefresh_token());
+						user.setLogin_type(User.getInstance().getLogin_type());
 						User.setInstance(user);
 						SharedPreferencesUtils.saveUser(user);
 						delete(url,params,callback);
@@ -879,6 +884,7 @@ public class OkHttpUtils {
 					if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 						User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
 						user.setRefresh_token(User.getInstance().getRefresh_token());
+						user.setLogin_type(User.getInstance().getLogin_type());
 						User.setInstance(user);
 						SharedPreferencesUtils.saveUser(user);
 						get(url,params,callback);

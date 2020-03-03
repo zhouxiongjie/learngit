@@ -42,6 +42,11 @@ public class User {
     private String Authorization;
     private String refresh_token;
 
+
+
+    //0手机登录 1微信登录   2QQ登录   3微博登录
+    private int login_type;
+
     public static User getInstance(){
 //        if(sUser==null){
 //            synchronized (User.class){
@@ -57,6 +62,14 @@ public class User {
         sUser=user;
     }
 
+
+    public int getLogin_type() {
+        return login_type;
+    }
+
+    public void setLogin_type(int login_type) {
+        this.login_type = login_type;
+    }
 
     public int getId() {
         return id;

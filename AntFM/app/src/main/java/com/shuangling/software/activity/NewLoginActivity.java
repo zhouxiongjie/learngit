@@ -288,6 +288,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
+                        user.setLogin_type(1);
                         User.setInstance(user);
                         SharedPreferencesUtils.saveUser(user);
                         final CloudPushService pushService = PushServiceFactory.getCloudPushService();

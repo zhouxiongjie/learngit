@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -279,6 +280,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
 
         @JavascriptInterface
         public void loginEvent(final String bindPhone) {
+            mJumpUrl=null;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -313,7 +315,20 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
                 }
             });
 
+        }
 
+        @JavascriptInterface
+        public void bindPhoneEvent(final String url) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    //showShare();
+                    Intent it = new Intent(GalleriaActivity.this, BindPhoneActivity.class);
+                    it.putExtra("hasLogined",true);
+                    startActivityForResult(it, LOGIN_RESULT);
+
+                }
+            });
         }
 
 
@@ -324,13 +339,12 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-
                     showShare();
                 }
             });
-
-
         }
+
+
 
 
         @JavascriptInterface
@@ -343,7 +357,6 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
                         Intent it = new Intent(GalleriaActivity.this, AudioDetailActivity.class);
                         it.putExtra("audioId", Integer.parseInt(id));
                         startActivity(it);
-
                     } else if (type.equals("2")) {
                         Intent it = new Intent(GalleriaActivity.this, AlbumDetailActivity.class);
                         it.putExtra("albumId", Integer.parseInt(id));
@@ -365,12 +378,12 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
                         it.putExtra("galleriaId", Integer.parseInt(id));
                         startActivity(it);
                     }
-
                 }
             });
-
-
         }
+
+
+
 
 
         @JavascriptInterface
@@ -418,10 +431,15 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
             String url = ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId;
             if (User.getInstance() == null) {
                 url = url + "?app=android";
-            } else {
-                url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+            } else  {
+                if(!TextUtils.isEmpty(mJumpUrl)){
+                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }else{
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }
+                webView.loadUrl(url);
             }
-            webView.loadUrl(url);
+
 
         }
     }

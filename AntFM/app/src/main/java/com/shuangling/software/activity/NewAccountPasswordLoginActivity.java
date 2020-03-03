@@ -161,6 +161,7 @@ public class NewAccountPasswordLoginActivity extends AppCompatActivity implement
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
+                        user.setLogin_type(0);
                         User.setInstance(user);
                         SharedPreferencesUtils.saveUser(user);
                         final CloudPushService pushService = PushServiceFactory.getCloudPushService();

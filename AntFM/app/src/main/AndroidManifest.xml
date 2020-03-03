@@ -148,6 +148,11 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name=".activity.NewForgetPasswordActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
             android:name=".activity.VerifyCodeLoginActivity"
             android:screenOrientation="portrait" >
         </activity>
@@ -157,7 +162,31 @@
             android:windowSoftInputMode="stateVisible|adjustResize">
         </activity>
 
+        <activity
+            android:name=".activity.NewVerifyCodeBindPhoneActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustResize">
+        </activity>
 
+        <activity
+            android:name=".activity.BindPhoneActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustResize">
+        </activity>
+
+
+        <activity
+            android:name=".activity.NewAccountPasswordLoginActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustResize">
+        </activity>
+
+
+        <activity
+            android:name=".activity.SettingUserInfoActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustResize">
+        </activity>
         <activity
             android:name=".activity.AnchorDetailActivity"
             android:screenOrientation="portrait" >

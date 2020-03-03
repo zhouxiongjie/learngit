@@ -76,6 +76,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
     private static final int MSG_GET_VERIFY_CODE = 4;
     private static final int LOGIN_VERIFY_REQUEST = 5;
     private static final int MSG_VERIFY_CODE_LOGIN_CALLBACK = 6;
+    private static final int MSG_IS_USER_EXIST = 0X07;
 
     @BindView(R.id.activtyTitle)
     TopTitleBar activtyTitle;
@@ -96,7 +97,14 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
 
     private String mPhoneNumber;
     private DialogFragment mDialogFragment;
+    //private boolean mUserExist;
+    //微信信息
+    private String weixinUnionid;
+    private String weixinOpenid;
+    private String weixinNickname;
+    private String weixinHeadimgurl;
 
+    private boolean bindPhone;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
@@ -114,7 +122,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
     }
 
     private void init() {
-
+        bindPhone=getIntent().getBooleanExtra("bindPhone",false);
         if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getH5_logo())) {
             Uri uri = Uri.parse(MyApplication.getInstance().getStation().getH5_logo());
             ImageLoader.showThumb(uri, head, CommonUtils.dip2px(75), CommonUtils.dip2px(75));
@@ -172,6 +180,9 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
             case R.id.weiBo:
                 Platform sina = ShareSDK.getPlatform(SinaWeibo.NAME);
                 authorize(sina);
+                break;
+            case R.id.passwordLogin:
+                startActivity(new Intent(this,NewAccountPasswordLoginActivity.class));
                 break;
         }
     }
@@ -247,6 +258,10 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                 String userIcon = platDB.getUserIcon();
                 String userId = platDB.getUserId();
                 String userName = platDB.getUserName();
+                weixinUnionid=platDB.get("unionid");
+                weixinOpenid=platDB.get("openid");
+                weixinNickname=platDB.get("nickname");
+                weixinHeadimgurl=platDB.get("icon");
                 String type;
                 if (platform.getName().equals(QQ.NAME)) {
                     type = "QQ";
@@ -255,6 +270,13 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                 } else {
                     type = "WX";
                 }
+
+                long id=Thread.currentThread().getId();
+                isUserExist(weixinUnionid);
+
+
+
+
 
 
             }
@@ -281,10 +303,18 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                                 Log.i("bindAccount-onFailed", s1);
                             }
                         });
-                        ToastUtils.show("登录成功");
-                        setResult(Activity.RESULT_OK);
-                        EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
-                        finish();
+
+
+
+                            ToastUtils.show("登录成功");
+                            setResult(RESULT_OK);
+                            EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
+                            AppManager.finishAllActivity();
+                            //finish();
+
+
+
+
                     } else {
                         ToastUtils.show(jsonObject.getString("msg"));
                     }
@@ -374,13 +404,118 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
 
             }
             break;
+            case MSG_IS_USER_EXIST:
+                try {
+
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000&&bindPhone==false) {
+                        //mUserExist=true;
+                        weixinLogin(weixinNickname,weixinHeadimgurl,weixinOpenid,weixinUnionid);
+
+                    } else if((jsonObject != null && jsonObject.getIntValue("code") == 202004)||bindPhone==true){
+                        //mUserExist=false;
+                        //weixinLogin(weixinNickname,weixinHeadimgurl,weixinOpenid,weixinUnionid);
+                        Intent it =new Intent(this,BindPhoneActivity.class);
+                        it.putExtra("nickname",weixinNickname);
+                        it.putExtra("headimgurl",weixinHeadimgurl);
+                        it.putExtra("openid",weixinOpenid);
+                        it.putExtra("unionid",weixinUnionid);
+                        startActivity(it);
+
+                    }else{
+                        mDialogFragment.dismiss();
+                        ToastUtils.show("登录失败，请稍后再试");
+                    }
+                } catch (Exception e) {
+
+                    mDialogFragment.dismiss();
+                    ToastUtils.show("登录失败，请稍后再试");
+
+
+
+
+                }
+                break;
         }
         return false;
     }
 
+    private void isUserExist(String unionid) {
+        mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
+        String url = ServerInfo.serviceIP + ServerInfo.isUserExist;
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("type", "0");
+        params.put("unionid", unionid);
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = mHandler.obtainMessage(MSG_IS_USER_EXIST);
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("登录失败，请稍后再试");
+                        }catch (Exception e){
+
+                        }
+
+
+                    }
+                });
+
+
+            }
+        });
+    }
+
+    private void weixinLogin(String nickname, String headimgurl,String openid, String unionid) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.wechatLogin;
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("type", "2");
+        params.put("nickname", nickname);
+        params.put("headimgurl", headimgurl);
+        params.put("openid", openid);
+        params.put("unionid", unionid);
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = mHandler.obtainMessage(MSG_LOGIN_CALLBACK);
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mDialogFragment.dismiss();
+                        ToastUtils.show("登陆异常");
+                    }
+                });
 
 
 
+            }
+        });
+    }
 
 
 
@@ -502,4 +637,9 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
     }
 
 
+    @Override
+    protected void onDestroy() {
+        AppManager.removeActivity(this);
+        super.onDestroy();
+    }
 }

@@ -323,6 +323,20 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
             });
         }
 
+        @JavascriptInterface
+        public void loginEvent(Object[] str) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Intent it = new Intent(ArticleDetailActivity.this, LoginActivity.class);
+                    startActivityForResult(it, LOGIN_RESULT);
+                }
+            });
+
+
+        }
+
+
 
         @JavascriptInterface
         public void shareEvent(String str) {

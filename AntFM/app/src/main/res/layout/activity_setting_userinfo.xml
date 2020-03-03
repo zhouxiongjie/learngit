@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:text="设置个人信息"
+        android:textColor="#333333"
+        android:textSize="@dimen/font_size_38px" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:text="给你的新账号设置头像和名字吧"
+        android:textColor="#707070"
+        android:textSize="@dimen/font_size_26px" />
+
+    <RelativeLayout
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center_horizontal">
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/head"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            fresco:actualImageScaleType="centerCrop"
+            fresco:failureImage="@drawable/defalut_head"
+            fresco:failureImageScaleType="centerCrop"
+            fresco:placeholderImage="@drawable/defalut_head"
+            fresco:placeholderImageScaleType="centerCrop"
+            fresco:roundAsCircle="true"
+            fresco:roundingBorderColor="@color/textColorSeven"
+            fresco:roundingBorderWidth="0dp"
+            />
+
+        <!--<TextView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="60dp"-->
+            <!--android:text="编辑头像"-->
+            <!--android:textSize="@dimen/font_size_28px"-->
+            <!--android:textColor="#FFFFFF"-->
+            <!--android:gravity="center"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:background="@drawable/edit_head_bg"/>-->
+
+        <!--<com.facebook.drawee.view.SimpleDraweeView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--fresco:actualImageScaleType="centerCrop"-->
+            <!--fresco:placeholderImage="@color/transparent"-->
+            <!--fresco:placeholderImageScaleType="centerCrop"-->
+            <!--fresco:roundAsCircle="true"-->
+            <!--fresco:roundingBorderColor="@color/textColorSeven"-->
+            <!--fresco:roundingBorderWidth="0dp"-->
+
+            <!--/>-->
+    </RelativeLayout>
+
+
+
+
+
+    <EditText
+        android:id="@+id/nickName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/gray_bottom_line"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:textSize="@dimen/font_size_28px"
+        android:textColor="@color/black"
+        android:textColorHint="#C4C4C4"
+        android:hint="请设置昵称"
+        android:inputType="textPassword" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/gray_bottom_line">
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:textSize="@dimen/font_size_28px"
+            android:textColor="@color/black"
+            android:textColorHint="#C4C4C4"
+            android:background="@null"
+            android:hint="请设置密码"
+            android:inputType="textPassword" />
+
+
+
+        <com.shuangling.software.customview.FontIconView
+            android:id="@+id/eye"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text="&#xe676;"
+            android:textColor="#B3B3B3"
+            android:textSize="@dimen/font_size_36px" />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="需由6-20位数字、字母或符号组成，至少两种"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="20dp"
+        android:textColor="#B2B2B2"
+        android:textSize="@dimen/font_size_28px"
+         />
+
+    <Button
+        android:id="@+id/confirm"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:enabled="false"
+        android:text="确认"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_size_32px"
+        android:background="@drawable/login_button_bg"/>
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/bottom"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_below="@+id/top"-->
+    <!--android:orientation="vertical">-->
+
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/headLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:padding="10dp">-->
+
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:text="头像"-->
+    <!--android:textColor="@color/textColorTwo"-->
+    <!--android:textSize="@dimen/font_size_30px" />-->
+
+    <!--<com.facebook.drawee.view.SimpleDraweeView-->
+    <!--android:id="@+id/head"-->
+    <!--android:layout_width="40dp"-->
+    <!--android:layout_height="40dp"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:layout_marginRight="20dp"-->
+    <!--android:layout_toLeftOf="@+id/headRightIcon"-->
+    <!--fresco:actualImageScaleType="centerCrop"-->
+    <!--fresco:failureImage="@drawable/ic_user1"-->
+    <!--fresco:failureImageScaleType="centerCrop"-->
+    <!--fresco:placeholderImage="@drawable/ic_user1"-->
+    <!--fresco:placeholderImageScaleType="centerCrop"-->
+    <!--fresco:roundAsCircle="true"-->
+    <!--fresco:roundingBorderColor="@color/textColorSeven"-->
+    <!--fresco:roundingBorderWidth="0dp" />-->
+
+    <!--<ImageView-->
+    <!--android:id="@+id/headRightIcon"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:background="@drawable/ic_right" />-->
+    <!--</RelativeLayout>-->
+
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="1dp"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:background="@color/divideColorOne" />-->
+
+
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/nickNameLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:minHeight="55dp"-->
+    <!--android:padding="10dp">-->
+
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:text="昵称"-->
+    <!--android:textColor="@color/textColorTwo"-->
+    <!--android:textSize="@dimen/font_size_30px"/>-->
+    <!--<TextView-->
+    <!--android:id="@+id/nickName"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+
+    <!--android:layout_centerVertical="true"-->
+    <!--android:textColor="#B2B2B2"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:drawableRight="@drawable/ic_right"-->
+    <!--android:drawablePadding="20dp"-->
+    <!--android:textSize="@dimen/font_size_26px"-->
+    <!--tools:text="不是馒头"/>-->
+
+
+    <!--</RelativeLayout>-->
+
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="1dp"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:background="@color/divideColorOne" />-->
+
+
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/sexLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:minHeight="55dp"-->
+    <!--android:padding="10dp">-->
+
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:text="性别"-->
+    <!--android:textColor="@color/textColorTwo"-->
+    <!--android:textSize="@dimen/font_size_30px" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/sex"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:drawableRight="@drawable/ic_right"-->
+    <!--android:drawablePadding="20dp"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:textColor="#B2B2B2"-->
+    <!--android:textSize="@dimen/font_size_26px"-->
+    <!--tools:text="男"/>-->
+
+
+    <!--</RelativeLayout>-->
+
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="1dp"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:background="@color/divideColorOne" />-->
+
+
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/birthdayLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:minHeight="55dp"-->
+    <!--android:padding="10dp">-->
+
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:text="生日"-->
+    <!--android:textColor="@color/textColorTwo"-->
+    <!--android:textSize="@dimen/font_size_30px" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/birthday"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:drawableRight="@drawable/ic_right"-->
+    <!--android:drawablePadding="20dp"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:textColor="#B2B2B2"-->
+    <!--android:textSize="@dimen/font_size_26px"-->
+    <!--tools:text="未填写"/>-->
+
+
+    <!--</RelativeLayout>-->
+
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="1dp"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:background="@color/divideColorOne" />-->
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/zoneLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:minHeight="55dp"-->
+    <!--android:padding="10dp">-->
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:text="地区"-->
+    <!--android:textColor="@color/textColorTwo"-->
+    <!--android:textSize="@dimen/font_size_30px" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/zone"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:drawableRight="@drawable/ic_right"-->
+    <!--android:drawablePadding="20dp"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:textColor="#B2B2B2"-->
+    <!--android:textSize="@dimen/font_size_26px"-->
+    <!--tools:text="未填写"/>-->
+    <!---->
+    <!--</RelativeLayout>-->
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="1dp"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:background="@color/divideColorOne" />-->
+    <!---->
+    <!--<TextView-->
+    <!--android:id="@+id/quit"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_margin="10dp"-->
+    <!--android:gravity="center"-->
+    <!--android:padding="15dp"-->
+    <!--android:text="退出登录"-->
+    <!--android:textColor="#EA3632"-->
+    <!--android:background="#F5F6F7"/>-->
+
+    <!--</LinearLayout>-->
+
+</LinearLayout>

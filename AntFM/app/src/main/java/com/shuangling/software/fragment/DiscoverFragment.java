@@ -418,6 +418,22 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
         }
 
+        @JavascriptInterface
+        public void loginEvent(Object[] str) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    startActivityForResult(it, LOGIN_RESULT);
+                }
+            });
+
+
+        }
+
+
+
+
 
         @JavascriptInterface
         public void shareEvent(final String id, final String title, final String des,final String url, final String logo) {

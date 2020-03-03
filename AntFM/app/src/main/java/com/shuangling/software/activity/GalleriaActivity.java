@@ -70,6 +70,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
 
     private Handler mHandler;
     private Galleria mGalleria;
+    private String mJumpUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -277,17 +278,45 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
         }
 
         @JavascriptInterface
-        public void loginEvent(String str) {
+        public void loginEvent(final String bindPhone) {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Intent it = new Intent(GalleriaActivity.this, LoginActivity.class);
+                    Intent it = new Intent(GalleriaActivity.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
                     startActivityForResult(it, LOGIN_RESULT);
                 }
             });
 
 
         }
+
+
+
+        @JavascriptInterface
+        public void loginEvent(final String bindPhone,String url) {
+            mJumpUrl=url;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Intent it = new Intent(GalleriaActivity.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
+                    startActivityForResult(it, LOGIN_RESULT);
+                }
+            });
+
+
+        }
+
+
 
 
         @JavascriptInterface
@@ -385,7 +414,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == LOGIN_RESULT && resultCode == Activity.RESULT_OK) {
+        if (requestCode == LOGIN_RESULT) {
             String url = ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId;
             if (User.getInstance() == null) {
                 url = url + "?app=android";

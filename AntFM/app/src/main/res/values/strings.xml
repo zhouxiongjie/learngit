@@ -33,6 +33,9 @@
     <string name="float_icon_pause">&#xe618;</string>
     <string name="float_icon_play">&#xe610;</string>
 
+    <string name="password_visible">&#xe678;</string>
+    <string name="password_invisible">&#xe676;</string>
+
     <!--底部菜单图标-->
     <string name="menus_index">&#xe614;</string>
     <string name="menus_personal_center">&#xe61e;</string>

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <com.shuangling.software.customview.TopTitleBar
+        android:id="@+id/activity_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:canBack="false"
+        app:moreText="跳过"
+        app:titleText="关联手机号"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:text="绑定新手机号"
+        android:textColor="#333333"
+        android:textSize="@dimen/font_size_36px" />
+
+
+    <EditText
+        android:id="@+id/phoneNum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/gray_bottom_line"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:textSize="@dimen/font_size_32px"
+        android:textColor="@color/black"
+        android:textColorHint="#C7C7CC"
+        android:hint="请输入手机号码"
+        android:inputType="phone" />
+
+
+    <Button
+        android:id="@+id/sendCode"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:enabled="false"
+        android:text="发送验证码"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_size_32px"
+        android:background="@drawable/login_button_bg"/>
+
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/bottom"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_below="@+id/top"-->
+    <!--android:orientation="vertical">-->
+
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/headLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:padding="10dp">-->
+
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:text="头像"-->
+    <!--android:textColor="@color/textColorTwo"-->
+    <!--android:textSize="@dimen/font_size_30px" />-->
+
+    <!--<com.facebook.drawee.view.SimpleDraweeView-->
+    <!--android:id="@+id/head"-->
+    <!--android:layout_width="40dp"-->
+    <!--android:layout_height="40dp"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:layout_marginRight="20dp"-->
+    <!--android:layout_toLeftOf="@+id/headRightIcon"-->
+    <!--fresco:actualImageScaleType="centerCrop"-->
+    <!--fresco:failureImage="@drawable/ic_user1"-->
+    <!--fresco:failureImageScaleType="centerCrop"-->
+    <!--fresco:placeholderImage="@drawable/ic_user1"-->
+    <!--fresco:placeholderImageScaleType="centerCrop"-->
+    <!--fresco:roundAsCircle="true"-->
+    <!--fresco:roundingBorderColor="@color/textColorSeven"-->
+    <!--fresco:roundingBorderWidth="0dp" />-->
+
+    <!--<ImageView-->
+    <!--android:id="@+id/headRightIcon"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:background="@drawable/ic_right" />-->
+    <!--</RelativeLayout>-->
+
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="1dp"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:background="@color/divideColorOne" />-->
+
+
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/nickNameLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:minHeight="55dp"-->
+    <!--android:padding="10dp">-->
+
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:text="昵称"-->
+    <!--android:textColor="@color/textColorTwo"-->
+    <!--android:textSize="@dimen/font_size_30px"/>-->
+    <!--<TextView-->
+    <!--android:id="@+id/nickName"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+
+    <!--android:layout_centerVertical="true"-->
+    <!--android:textColor="#B2B2B2"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:drawableRight="@drawable/ic_right"-->
+    <!--android:drawablePadding="20dp"-->
+    <!--android:textSize="@dimen/font_size_26px"-->
+    <!--tools:text="不是馒头"/>-->
+
+
+    <!--</RelativeLayout>-->
+
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="1dp"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:background="@color/divideColorOne" />-->
+
+
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/sexLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:minHeight="55dp"-->
+    <!--android:padding="10dp">-->
+
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:text="性别"-->
+    <!--android:textColor="@color/textColorTwo"-->
+    <!--android:textSize="@dimen/font_size_30px" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/sex"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:drawableRight="@drawable/ic_right"-->
+    <!--android:drawablePadding="20dp"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:textColor="#B2B2B2"-->
+    <!--android:textSize="@dimen/font_size_26px"-->
+    <!--tools:text="男"/>-->
+
+
+    <!--</RelativeLayout>-->
+
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="1dp"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:background="@color/divideColorOne" />-->
+
+
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/birthdayLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:minHeight="55dp"-->
+    <!--android:padding="10dp">-->
+
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:text="生日"-->
+    <!--android:textColor="@color/textColorTwo"-->
+    <!--android:textSize="@dimen/font_size_30px" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/birthday"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:drawableRight="@drawable/ic_right"-->
+    <!--android:drawablePadding="20dp"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:textColor="#B2B2B2"-->
+    <!--android:textSize="@dimen/font_size_26px"-->
+    <!--tools:text="未填写"/>-->
+
+
+    <!--</RelativeLayout>-->
+
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="1dp"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:background="@color/divideColorOne" />-->
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/zoneLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:minHeight="55dp"-->
+    <!--android:padding="10dp">-->
+
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentLeft="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:text="地区"-->
+    <!--android:textColor="@color/textColorTwo"-->
+    <!--android:textSize="@dimen/font_size_30px" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/zone"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:drawableRight="@drawable/ic_right"-->
+    <!--android:drawablePadding="20dp"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:textColor="#B2B2B2"-->
+    <!--android:textSize="@dimen/font_size_26px"-->
+    <!--tools:text="未填写"/>-->
+    <!---->
+    <!--</RelativeLayout>-->
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="1dp"-->
+    <!--android:layout_marginLeft="10dp"-->
+    <!--android:layout_marginRight="10dp"-->
+    <!--android:background="@color/divideColorOne" />-->
+    <!---->
+    <!--<TextView-->
+    <!--android:id="@+id/quit"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_margin="10dp"-->
+    <!--android:gravity="center"-->
+    <!--android:padding="15dp"-->
+    <!--android:text="退出登录"-->
+    <!--android:textColor="#EA3632"-->
+    <!--android:background="#F5F6F7"/>-->
+
+    <!--</LinearLayout>-->
+
+</LinearLayout>

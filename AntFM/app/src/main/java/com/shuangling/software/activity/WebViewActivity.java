@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
@@ -415,13 +416,26 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
         }
 
 
+//        @JavascriptInterface
+//        public void shareEvent(final String str) {
+//            mHandler.post(new Runnable() {
+//                @Override
+//                public void run() {
+//
+//                    showShare(str);
+//                }
+//            });
+//
+//
+//        }
+
         @JavascriptInterface
-        public void shareEvent(final String str) {
+        public void shareEvent(final String id, final String title, final String des,final String url, final String logo) {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
 
-                    showShare(str);
+                    showShare(id, title, des,url, logo);
                 }
             });
 
@@ -663,6 +677,101 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
         // 启动分享GUI
         oks.show(this);
 
+
+    }
+
+
+
+    private void showShare(final String id, final String title, final String des,final String url, final String logo) {
+
+
+        OnekeyShare oks = new OnekeyShare();
+        //关闭sso授权
+        oks.disableSSOWhenAuthorize();
+        final Platform qq = ShareSDK.getPlatform(QQ.NAME);
+        if (!qq.isClientValid()) {
+            oks.addHiddenPlatform(QQ.NAME);
+        }
+
+        final Platform sina = ShareSDK.getPlatform(SinaWeibo.NAME);
+        if (!sina.isClientValid()) {
+            oks.addHiddenPlatform(SinaWeibo.NAME);
+        }
+
+
+        oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+            //自定义分享的回调想要函数
+            @Override
+            public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
+                String chanel = "1";
+                //点击新浪微博
+                if (SinaWeibo.NAME.equals(platform.getName())) {
+                    //限制微博分享的文字不能超过20
+                    chanel = "2";
+                    //paramsToShare.setText(title + ServerInfo.activity + "qaa/game-result/" + id);
+                    paramsToShare.setText(title + url);
+                } else if (QQ.NAME.equals(platform.getName())) {
+                    chanel = "3";
+                    paramsToShare.setTitle(title);
+                    if (!TextUtils.isEmpty(logo)) {
+                        paramsToShare.setImageUrl(logo);
+                    }
+                    paramsToShare.setTitleUrl(url);
+                    paramsToShare.setText(des);
+
+                } else if (Wechat.NAME.equals(platform.getName())) {
+                    paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
+                    paramsToShare.setTitle(title);
+                    paramsToShare.setUrl(url);
+                    if (!TextUtils.isEmpty(logo)) {
+                        paramsToShare.setImageUrl(logo);
+                    }
+                    paramsToShare.setText(des);
+                } else if (WechatMoments.NAME.equals(platform.getName())) {
+                    paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
+                    paramsToShare.setTitle(title);
+                    paramsToShare.setUrl(url);
+                    if (!TextUtils.isEmpty(logo)) {
+                        paramsToShare.setImageUrl(logo);
+                    }
+                } else if (WechatFavorite.NAME.equals(platform.getName())) {
+                    paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
+                    paramsToShare.setTitle(title);
+                    paramsToShare.setUrl(url);
+                    if (!TextUtils.isEmpty(logo)) {
+                        paramsToShare.setImageUrl(logo);
+                    }
+                }
+                shareStatistics(chanel, "" + id, url);
+
+            }
+        });
+        oks.setCallback(new PlatformActionListener() {
+
+            @Override
+            public void onError(Platform arg0, int arg1, Throwable arg2) {
+                Message msg = Message.obtain();
+                msg.what = SHARE_FAILED;
+                msg.obj = arg2.getMessage();
+                mHandler.sendMessage(msg);
+            }
+
+            @Override
+            public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
+
+                Message msg = Message.obtain();
+                msg.what = SHARE_SUCCESS;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onCancel(Platform arg0, int arg1) {
+
+            }
+        });
+        // 启动分享GUI
+        oks.show(this);
 
     }
 

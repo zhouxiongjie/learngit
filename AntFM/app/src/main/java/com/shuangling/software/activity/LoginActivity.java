@@ -668,9 +668,10 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
                     @Override
                     public void run() {
                         mDialogFragment.dismiss();
+                        ToastUtils.show("登陆异常");
                     }
                 });
-                ToastUtils.show("登陆异常");
+
 
 
             }

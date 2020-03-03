@@ -1,6 +1,5 @@
 package com.shuangling.software.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -10,13 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.hjq.toast.ToastUtils;
+import com.mylhyl.circledialog.CircleDialog;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
@@ -43,12 +42,11 @@ import butterknife.OnClick;
 import okhttp3.Call;
 
 @EnableDragToClose()
-public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Handler.Callback {
+public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements Handler.Callback {
 
     private static final int MSG_GET_VERIFY_CODE = 0X00;
-    private static final int MSG_LOGIN_CALLBACK = 0X01;
-    private static final int MSG_VERIFY_PHONE = 0X02;
-    private static final int MSG_IS_USER_EXIST = 0X03;
+    private static final int MSG_WEIXIN_LOGIN_CALLBACK = 0X01;
+    private static final int MSG_BIND_PHONE = 0X02;
     @BindView(R.id.activity_title)
     TopTitleBar activityTitle;
     @BindView(R.id.phoneNum)
@@ -63,9 +61,11 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
 
     private CountDownTimer mCountDownTimer;
     private String mPhoneNumber;
-    private boolean mUserExist=false;
     private DialogFragment mDialogFragment;
-
+    private String weixinUnionid;
+    private String weixinOpenid;
+    private String weixinNickname;
+    private String weixinHeadimgurl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +81,10 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
     }
 
     private void init() {
-
+        weixinUnionid = getIntent().getStringExtra("unionid");
+        weixinOpenid = getIntent().getStringExtra("openid");
+        weixinNickname = getIntent().getStringExtra("nickname");
+        weixinHeadimgurl = getIntent().getStringExtra("headimgurl");
         mPhoneNumber = getIntent().getStringExtra("PhoneNumber");
         phoneNum.setText(mPhoneNumber);
         mCountDownTimer = new CountDownTimer(60 * 1000, 500) {
@@ -113,8 +116,8 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
 //
 //                }
 
-                isUserExist();
 
+                bindPhone(mPhoneNumber, verifyCodeView.getEditContent(), 0);
 
 
             }
@@ -162,12 +165,56 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
                 }
             }
             break;
-            case MSG_LOGIN_CALLBACK: {
+            case MSG_BIND_PHONE:
                 try {
                     String result = (String) msg.obj;
+                    int support = msg.arg1;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
+                        //EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
+
+
+                        weixinLogin(weixinNickname, weixinHeadimgurl, weixinOpenid, weixinUnionid);
+                        //AppManager.finishAllActivity();
+                    } else if (support == 0) {
+                        mDialogFragment.dismiss();
+                        new CircleDialog.Builder()
+                                .setTitle("提示框")
+                                .setText("该手机号已绑定其他同类第三方账号,是否进行解绑并重新绑定此账号？")
+                                .setPositive("确定", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        bindPhone(mPhoneNumber, verifyCodeView.getEditContent(), 1);
+                                    }
+                                })
+                                .setNegative("取消", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        ToastUtils.show("取消绑定");
+                                    }
+                                })
+                                .setCanceledOnTouchOutside(false)
+                                .setCancelable(false)
+                                .show(getSupportFragmentManager());
+
+
+                        ToastUtils.show("登录失败，请稍后再试");
+                    }
+                } catch (Exception e) {
+
+                    mDialogFragment.dismiss();
+                    ToastUtils.show("登录失败，请稍后再试");
+
+
+                }
+                break;
+            case MSG_WEIXIN_LOGIN_CALLBACK:
+                try {
+                    mDialogFragment.dismiss();
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
                         User.setInstance(user);
                         SharedPreferencesUtils.saveUser(user);
@@ -185,67 +232,58 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
                             }
                         });
 
-                        if(mUserExist){
 
-                            ToastUtils.show("登录成功");
-                            setResult(RESULT_OK);
-                            EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
-                            AppManager.finishAllActivity();
-                            //finish();
-                        }else{
-                            Intent it =new Intent(this,SettingUserInfoActivity.class);
-                            startActivity(it);
-                        }
+                        ToastUtils.show("登录成功");
+                        setResult(RESULT_OK);
+                        EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
+                        AppManager.finishAllActivity();
+                        //finish();
+
+
                     } else {
                         ToastUtils.show(jsonObject.getString("msg"));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
-            }
-            break;
-            case MSG_VERIFY_PHONE: {
-                try {
-                    String result = (String) msg.obj;
-                    JSONObject jsonObject = JSONObject.parseObject(result);
-                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        startActivity(new Intent(this, NewPhoneBindActivity.class));
-                        finish();
-                    } else {
-                        ToastUtils.show(jsonObject.getString("msg"));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            break;
-            case MSG_IS_USER_EXIST:
-                try {
-                    String result = (String) msg.obj;
-                    JSONObject jsonObject = JSONObject.parseObject(result);
-                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        mUserExist=true;
-                        verifyCodeLogin(verifyCodeView.getEditContent());
-
-                    } else if(jsonObject != null && jsonObject.getIntValue("code") == 202004){
-                        mUserExist=false;
-                        verifyCodeLogin(verifyCodeView.getEditContent());
-                    }else{
-                        mDialogFragment.dismiss();
-                        ToastUtils.show("登录失败，请稍后再试");
-                    }
-                } catch (Exception e) {
-
-                    mDialogFragment.dismiss();
-                    ToastUtils.show("登录失败，请稍后再试");
-
-
-
-
                 }
                 break;
         }
         return false;
+    }
+
+    private void weixinLogin(String nickname, String headimgurl, String openid, String unionid) {
+
+        String url = ServerInfo.serviceIP + ServerInfo.wechatLogin;
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("type", "2");
+        params.put("nickname", nickname);
+        params.put("headimgurl", headimgurl);
+        params.put("openid", openid);
+        params.put("unionid", unionid);
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = mHandler.obtainMessage(MSG_WEIXIN_LOGIN_CALLBACK);
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mDialogFragment.dismiss();
+                        ToastUtils.show("登陆异常");
+                    }
+                });
+
+
+            }
+        });
     }
 
 
@@ -253,7 +291,7 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
 
         String url = ServerInfo.serviceIP + ServerInfo.getVerifyCode;
         Map<String, String> params = new HashMap<String, String>();
-        params.put("module", "login");
+        params.put("module", "bind_phone");
         params.put("phone", mPhoneNumber);
 
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
@@ -278,63 +316,27 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
     }
 
 
-
-    private void isUserExist() {
+    private void bindPhone(String phone, String verificationCode, final int support) {
         mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
-        String url = ServerInfo.serviceIP + ServerInfo.isUserExist;
+        String url = ServerInfo.serviceIP + ServerInfo.weixinBindPhone;
         Map<String, String> params = new HashMap<String, String>();
-        params.put("type", "9");
-        params.put("unionid", mPhoneNumber);
-
-        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-
-            @Override
-            public void onResponse(Call call, String response) throws IOException {
-
-                Message msg = mHandler.obtainMessage(MSG_IS_USER_EXIST);
-                msg.obj = response;
-                mHandler.sendMessage(msg);
-
-            }
-
-            @Override
-            public void onFailure(Call call, Exception exception) {
-
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        try{
-                            mDialogFragment.dismiss();
-                            ToastUtils.show("登录失败，请稍后再试");
-                        }catch (Exception e){
-
-                        }
-
-
-                    }
-                });
-
-
-            }
-        });
-    }
-
-
-    private void verifyCodeLogin(String verifyCode) {
-
-        String url = ServerInfo.serviceIP + ServerInfo.login;
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("type", "1");
-        params.put("phone", mPhoneNumber);
-        params.put("verification_code", verifyCode);
+        params.put("type", "2");
+        params.put("nickname", weixinNickname);
+        params.put("headimgurl", weixinHeadimgurl);
+        params.put("openid", weixinOpenid);
+        params.put("unionid", weixinUnionid);
+        params.put("phone", phone);
+        params.put("verification_code", verificationCode);
+        params.put("support", "" + support);
 
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
-                Message msg = mHandler.obtainMessage(MSG_LOGIN_CALLBACK);
+                Message msg = mHandler.obtainMessage(MSG_BIND_PHONE);
                 msg.obj = response;
+                msg.arg1 = support;
                 mHandler.sendMessage(msg);
 
             }
@@ -345,10 +347,10 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        try{
+                        try {
                             mDialogFragment.dismiss();
-                            ToastUtils.show("登录失败，请稍后再试");
-                        }catch (Exception e){
+                            ToastUtils.show("绑定手机失败，请稍后再试");
+                        } catch (Exception e) {
 
                         }
 

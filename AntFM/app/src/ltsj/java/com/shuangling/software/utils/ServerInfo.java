@@ -8,34 +8,34 @@ public class ServerInfo {
 
 
 
-	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
-
-	public static String h5IP="http://www-cms-c.staging.slradio.cn";
-
-	public static String h5HttpsIP="https://www-cms-c.staging.slradio.cn";
-
-	public static String activity="https://www-asc-c.staging.slradio.cn/";
-
-	public static String scs="http://www-scs-c.staging.slradio.cn";
-
-    public static String emc="http://api-emc.staging.slradio.cn";
-
-	public static String vms="http://api-vms.staging.slradio.cn";
-
-
-//	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
+//	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
 //
-//	public static String h5IP="http://www-cms-c.review.slradio.cn";
+//	public static String h5IP="http://www-cms-c.staging.slradio.cn";
 //
-//	public static String h5HttpsIP="https://www-cms-c.review.slradio.cn";
+//	public static String h5HttpsIP="https://www-cms-c.staging.slradio.cn";
 //
-//	public static String activity="https://www-asc-c.review.slradio.cn/";
+//	public static String activity="https://www-asc-c.staging.slradio.cn/";
 //
-//	public static String scs="http://www-scs-c.review.slradio.cn";
+//	public static String scs="http://www-scs-c.staging.slradio.cn";
 //
-//	public static String emc="http://api-emc.review.slradio.cn";
+//    public static String emc="http://api-emc.staging.slradio.cn";
 //
-//	public static String vms="http://api-vms.review.slradio.cn";
+//	public static String vms="http://api-vms.staging.slradio.cn";
+
+
+	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
+
+	public static String h5IP="http://www-cms-c.review.slradio.cn";
+
+	public static String h5HttpsIP="https://www-cms-c.review.slradio.cn";
+
+	public static String activity="https://www-asc-c.review.slradio.cn/";
+
+	public static String scs="http://www-scs-c.review.slradio.cn";
+
+	public static String emc="http://api-emc.review.slradio.cn";
+
+	public static String vms="http://api-vms.review.slradio.cn";
 
 
 //	public static String serviceIP="http://api-cms.on-radio.cn";
@@ -238,5 +238,15 @@ public class ServerInfo {
 	public static String getCashRegular="/v1/consumer/transfer_config";			//获取提现设置
 
 	public static String addPlayTimes="/v2/plays/";								//增加播放量
+
+	public static String isUserExist="/v2/consumer/query_user";					//查询用户是否存在
+
+	public static String settingPwd="/v2/consumer/init_password";				//初始化用户密码
+
+	public static String wechatLogin="/v2/consumer/login_by_wechat";			//微信登录
+
+	public static String bindPhone="/v2/consumer/bind_phone";					//绑定手机号码
+
+    public static String weixinBindPhone="/v2/consumer/wechat_bind_phone";		//微信绑定手机号码
 
 }

@@ -15,7 +15,7 @@
         <shape android:shape="rectangle">
             <corners android:radius="25dp" />
             <padding android:bottom="5dp" android:left="5dp" android:right="5dp" android:top="5dp" />
-            <solid android:color="#DCDCDC" />
+            <solid android:color="?attr/translucentThemeColor" />
             <stroke android:width="0dp" android:color="#DCDCDC" />
         </shape>
     </item>

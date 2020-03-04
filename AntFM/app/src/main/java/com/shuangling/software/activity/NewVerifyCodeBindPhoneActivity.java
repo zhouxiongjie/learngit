@@ -188,7 +188,7 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
                         mDialogFragment.dismiss();
                         new CircleDialog.Builder()
                                 .setTitle("提示框")
-                                .setText("该手机号已绑定其他同类第三方账号,是否进行解绑并重新绑定此账号？")
+                                .setText("该手机号已绑定其他账号，是否重新绑定此账号？")
                                 .setPositive("确定", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {

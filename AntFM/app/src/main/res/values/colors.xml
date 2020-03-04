@@ -5,12 +5,19 @@
     <color name="colorAccent">#D81B60</color>
 
 
+
+
     <color name="themeBlue">#158CFF</color>
     <color name="themePurple">#7A67FF</color>
     <color name="themeRed">#EF2013</color>
     <color name="themeGreen">#1EC392</color>
     <color name="themeOrange">#FF7548</color>
 
+    <color name="translucentThemeBlue">#5a158CFF</color>
+    <color name="translucentThemePurple">#5a7A67FF</color>
+    <color name="translucentThemeRed">#5aEF2013</color>
+    <color name="translucentThemeGreen">#5a1EC392</color>
+    <color name="translucentThemeOrange">#5aFF7548</color>
 
 <!--基础颜色-->
     <color name="white">#ffffff</color><!--白色 -->

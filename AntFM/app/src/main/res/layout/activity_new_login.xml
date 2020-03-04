@@ -25,7 +25,6 @@
         app:layout_constraintTop_toBottomOf="@+id/activtyTitle"
         app:placeholderImage="@mipmap/ic_launcher"
         app:placeholderImageScaleType="centerCrop"
-        app:roundAsCircle="true"
         app:roundingBorderColor="@color/white"
         app:roundingBorderWidth="0dp"
         app:viewAspectRatio="1" />
@@ -39,6 +38,7 @@
         app:layout_constraintTop_toBottomOf="@+id/head"
         android:layout_marginTop="20dp"
         android:textStyle="bold"
+        android:textColor="#333333"
         android:textSize="@dimen/font_size_42px"
         android:text="登录/注册"/>
 
@@ -90,7 +90,7 @@
         android:layout_marginEnd="20dp"
         android:padding="10dp"
         android:text="使用密码登录"
-        android:textColor="#0478FF"
+        android:textColor="?attr/themeColor"
         android:textSize="@dimen/font_size_26px"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sendCode" />
@@ -123,10 +123,11 @@
             android:textSize="@dimen/font_size_26px"
             />
         <TextView
+            android:id="@+id/useProtocol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="《使用协议》"
-            android:textColor="#0478FF"
+            android:textColor="?attr/themeColor"
             android:textSize="@dimen/font_size_26px"
             />
         <TextView
@@ -137,10 +138,11 @@
             android:textSize="@dimen/font_size_26px"
             />
         <TextView
+            android:id="@+id/secretProtocol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="《隐私协议》"
-            android:textColor="#0478FF"
+            android:textColor="?attr/themeColor"
             android:textSize="@dimen/font_size_26px"
             />
     </LinearLayout>

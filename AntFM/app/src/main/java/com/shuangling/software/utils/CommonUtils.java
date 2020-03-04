@@ -937,10 +937,10 @@ public class CommonUtils {
      public static DialogFragment showLoadingDialog(FragmentManager manager){
         DialogFragment dialogFragment=new CircleDialog.Builder()
                 .setWidth(0.4f)
-                .setBodyView(R.layout.share_page_loading, new OnCreateBodyViewListener() {
+                .setBodyView(R.layout.share_page_loading01, new OnCreateBodyViewListener() {
                     @Override
                     public void onCreateBodyView(View view) {
-                        CircleDrawable bgCircleDrawable = new CircleDrawable(0xffffffff
+                        CircleDrawable bgCircleDrawable = new CircleDrawable(0x88000000
                                 , CircleDimen.DIALOG_RADIUS, CircleDimen.DIALOG_RADIUS, CircleDimen.DIALOG_RADIUS, CircleDimen.DIALOG_RADIUS);
                         view.setBackground(bgCircleDrawable);
                     }

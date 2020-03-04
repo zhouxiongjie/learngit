@@ -67,6 +67,8 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
     private Handler mHandler;
     private Special mSpecial;
     private int mSpecialId;
+
+    private String mJumpUrl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
@@ -267,16 +269,56 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
         }
 
         @JavascriptInterface
-        public void loginEvent(String str) {
+        public void loginEvent(final String bindPhone) {
+            mJumpUrl=null;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Intent it = new Intent(SpecialDetailActivity.this, LoginActivity.class);
+                    Intent it = new Intent(SpecialDetailActivity.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
                     startActivityForResult(it, LOGIN_RESULT);
                 }
             });
 
 
+        }
+
+
+
+        @JavascriptInterface
+        public void loginEvent(final String bindPhone,String url) {
+            mJumpUrl=url;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Intent it = new Intent(SpecialDetailActivity.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
+                    startActivityForResult(it, LOGIN_RESULT);
+                }
+            });
+
+        }
+
+        @JavascriptInterface
+        public void bindPhoneEvent(final String url) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    //showShare();
+                    Intent it = new Intent(SpecialDetailActivity.this, BindPhoneActivity.class);
+                    it.putExtra("hasLogined",true);
+                    startActivityForResult(it, LOGIN_RESULT);
+
+                }
+            });
         }
 
 
@@ -374,14 +416,21 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == LOGIN_RESULT && resultCode == Activity.RESULT_OK) {
+        if (requestCode == LOGIN_RESULT ) {
             String url = ServerInfo.h5IP + ServerInfo.getSpecialPage + mSpecialId;
             if (User.getInstance() == null) {
                 url = url + "?app=android";
             } else {
-                url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+
+                if(!TextUtils.isEmpty(mJumpUrl)){
+                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }else{
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }
+                webView.loadUrl(url);
             }
-            webView.loadUrl(url);
+            //webView.loadUrl(url);
 
         }
     }

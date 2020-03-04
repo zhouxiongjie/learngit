@@ -4,21 +4,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -90,6 +85,10 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
     ImageView weiXin;
     @BindView(R.id.head)
     SimpleDraweeView head;
+    @BindView(R.id.useProtocol)
+    TextView useProtocol;
+    @BindView(R.id.secretProtocol)
+    TextView secretProtocol;
 
 
     private List<View> mLoginViews = new ArrayList<View>();
@@ -105,6 +104,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
     private String weixinHeadimgurl;
 
     private boolean bindPhone;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
@@ -122,7 +122,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
     }
 
     private void init() {
-        bindPhone=getIntent().getBooleanExtra("bindPhone",false);
+        bindPhone = getIntent().getBooleanExtra("bindPhone", false);
         if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getH5_logo())) {
             Uri uri = Uri.parse(MyApplication.getInstance().getStation().getH5_logo());
             ImageLoader.showThumb(uri, head, CommonUtils.dip2px(75), CommonUtils.dip2px(75));
@@ -152,7 +152,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                 mPhoneNumber = s.toString();
                 if (CommonUtils.isMobileNO(mPhoneNumber)) {
                     sendCode.setEnabled(true);
-                }else {
+                } else {
                     sendCode.setEnabled(false);
                 }
             }
@@ -160,7 +160,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
 
     }
 
-    @OnClick({R.id.sendCode,R.id.passwordLogin,R.id.weiXin, R.id.qq, R.id.weiBo})
+    @OnClick({R.id.sendCode, R.id.passwordLogin, R.id.weiXin, R.id.qq, R.id.weiBo,R.id.useProtocol,R.id.secretProtocol})
     public void onViewClicked(View view) {
         switch (view.getId()) {
 
@@ -182,7 +182,22 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                 authorize(sina);
                 break;
             case R.id.passwordLogin:
-                startActivity(new Intent(this,NewAccountPasswordLoginActivity.class));
+                startActivity(new Intent(this, NewAccountPasswordLoginActivity.class));
+                break;
+            case R.id.useProtocol:
+                {
+                    Intent it = new Intent(this, WebViewActivity.class);
+                    it.putExtra("url", ServerInfo.h5HttpsIP+"/qulity-info?type=2");
+                    startActivity(it);
+                }
+
+                break;
+            case R.id.secretProtocol:
+                {
+                    Intent it = new Intent(this, WebViewActivity.class);
+                    it.putExtra("url", ServerInfo.h5HttpsIP+"/qulity-info?type=1");
+                    startActivity(it);
+                }
                 break;
         }
     }
@@ -258,10 +273,10 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                 String userIcon = platDB.getUserIcon();
                 String userId = platDB.getUserId();
                 String userName = platDB.getUserName();
-                weixinUnionid=platDB.get("unionid");
-                weixinOpenid=platDB.get("openid");
-                weixinNickname=platDB.get("nickname");
-                weixinHeadimgurl=platDB.get("icon");
+                weixinUnionid = platDB.get("unionid");
+                weixinOpenid = platDB.get("openid");
+                weixinNickname = platDB.get("nickname");
+                weixinHeadimgurl = platDB.get("icon");
                 String type;
                 if (platform.getName().equals(QQ.NAME)) {
                     type = "QQ";
@@ -271,12 +286,8 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                     type = "WX";
                 }
 
-                long id=Thread.currentThread().getId();
+                long id = Thread.currentThread().getId();
                 isUserExist(weixinUnionid);
-
-
-
-
 
 
             }
@@ -306,14 +317,11 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                         });
 
 
-
-                            ToastUtils.show("登录成功");
-                            setResult(RESULT_OK);
-                            EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
-                            AppManager.finishAllActivity();
-                            //finish();
-
-
+                        ToastUtils.show("登录成功");
+                        setResult(RESULT_OK);
+                        EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
+                        AppManager.finishAllActivity();
+                        //finish();
 
 
                     } else {
@@ -375,8 +383,8 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
 
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
-                        Intent it=new Intent(this,NewVerifyCodeLoginActivity.class);
-                        it.putExtra("PhoneNumber",mPhoneNumber);
+                        Intent it = new Intent(this, NewVerifyCodeLoginActivity.class);
+                        it.putExtra("PhoneNumber", mPhoneNumber);
                         startActivity(it);
 
 
@@ -410,21 +418,21 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
 
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
-                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000&&bindPhone==false) {
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000 && bindPhone == false) {
                         //mUserExist=true;
-                        weixinLogin(weixinNickname,weixinHeadimgurl,weixinOpenid,weixinUnionid);
+                        weixinLogin(weixinNickname, weixinHeadimgurl, weixinOpenid, weixinUnionid);
 
-                    } else if((jsonObject != null && jsonObject.getIntValue("code") == 202004)||bindPhone==true){
+                    } else if ((jsonObject != null && jsonObject.getIntValue("code") == 202004) || bindPhone == true) {
                         //mUserExist=false;
                         //weixinLogin(weixinNickname,weixinHeadimgurl,weixinOpenid,weixinUnionid);
-                        Intent it =new Intent(this,BindPhoneActivity.class);
-                        it.putExtra("nickname",weixinNickname);
-                        it.putExtra("headimgurl",weixinHeadimgurl);
-                        it.putExtra("openid",weixinOpenid);
-                        it.putExtra("unionid",weixinUnionid);
+                        Intent it = new Intent(this, BindPhoneActivity.class);
+                        it.putExtra("nickname", weixinNickname);
+                        it.putExtra("headimgurl", weixinHeadimgurl);
+                        it.putExtra("openid", weixinOpenid);
+                        it.putExtra("unionid", weixinUnionid);
                         startActivity(it);
 
-                    }else{
+                    } else {
                         mDialogFragment.dismiss();
                         ToastUtils.show("登录失败，请稍后再试");
                     }
@@ -432,8 +440,6 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
 
                     mDialogFragment.dismiss();
                     ToastUtils.show("登录失败，请稍后再试");
-
-
 
 
                 }
@@ -466,10 +472,10 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        try{
+                        try {
                             mDialogFragment.dismiss();
                             ToastUtils.show("登录失败，请稍后再试");
-                        }catch (Exception e){
+                        } catch (Exception e) {
 
                         }
 
@@ -482,7 +488,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
         });
     }
 
-    private void weixinLogin(String nickname, String headimgurl,String openid, String unionid) {
+    private void weixinLogin(String nickname, String headimgurl, String openid, String unionid) {
 
         String url = ServerInfo.serviceIP + ServerInfo.wechatLogin;
         Map<String, String> params = new HashMap<String, String>();
@@ -508,16 +514,14 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                     @Override
                     public void run() {
                         mDialogFragment.dismiss();
-                        ToastUtils.show("登陆异常");
+                        ToastUtils.show("登录异常");
                     }
                 });
-
 
 
             }
         });
     }
-
 
 
     private void verifyCodeLogin(String phone, String verifyCode) {
@@ -542,7 +546,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
             @Override
             public void onFailure(Call call, Exception exception) {
 
-                ToastUtils.show("登陆异常");
+                ToastUtils.show("登录异常");
 
 
             }
@@ -578,7 +582,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                         mDialogFragment.dismiss();
                     }
                 });
-                ToastUtils.show("登陆异常");
+                ToastUtils.show("登录异常");
 
 
             }

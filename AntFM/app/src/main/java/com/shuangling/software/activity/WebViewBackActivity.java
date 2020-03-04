@@ -80,7 +80,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
     private String mUrl;
     private String mTitle;
     private int mActivityId;
-
+    private String mJumpUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -301,16 +301,56 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
         }
 
         @JavascriptInterface
-        public void loginEvent(String str) {
+        public void loginEvent(final String bindPhone) {
+            mJumpUrl=null;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Intent it = new Intent(WebViewBackActivity.this, LoginActivity.class);
+                    Intent it = new Intent(WebViewBackActivity.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
                     startActivityForResult(it, LOGIN_RESULT);
                 }
             });
 
 
+        }
+
+
+
+        @JavascriptInterface
+        public void loginEvent(final String bindPhone,String url) {
+            mJumpUrl=url;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Intent it = new Intent(WebViewBackActivity.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
+                    startActivityForResult(it, LOGIN_RESULT);
+                }
+            });
+
+        }
+
+        @JavascriptInterface
+        public void bindPhoneEvent(final String url) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    //showShare();
+                    Intent it = new Intent(WebViewBackActivity.this, BindPhoneActivity.class);
+                    it.putExtra("hasLogined",true);
+                    startActivityForResult(it, LOGIN_RESULT);
+
+                }
+            });
         }
 
 
@@ -659,5 +699,32 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
     protected void onDestroy() {
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == LOGIN_RESULT) {
+            String url = webView.getUrl();
+            if (url.indexOf("?") > 0) {
+                url = url.substring(0, url.indexOf("?"));
+            }
+            if (User.getInstance() == null) {
+                url = url + "?app=android";
+            } else {
+
+                if(!TextUtils.isEmpty(mJumpUrl)){
+                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }else{
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }
+
+                //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                webView.loadUrl(url);
+            }
+
+
+        }
     }
 }

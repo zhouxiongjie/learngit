@@ -164,6 +164,8 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
             break;
             case MSG_LOGIN_CALLBACK: {
                 try {
+
+                    mDialogFragment.dismiss();
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {

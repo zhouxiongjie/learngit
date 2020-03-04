@@ -1,80 +1,54 @@
 package com.shuangling.software.activity;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.sdk.android.oss.ClientConfiguration;
-import com.alibaba.sdk.android.oss.ClientException;
-import com.alibaba.sdk.android.oss.OSS;
-import com.alibaba.sdk.android.oss.OSSClient;
-import com.alibaba.sdk.android.oss.ServiceException;
-import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
-import com.alibaba.sdk.android.oss.common.OSSLog;
-import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
-import com.alibaba.sdk.android.oss.model.PutObjectRequest;
-import com.alibaba.sdk.android.oss.model.PutObjectResult;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
-import com.shuangling.software.entity.OssInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
-import com.shuangling.software.oss.OSSAKSKCredentialProvider;
-import com.shuangling.software.oss.OssService;
 import com.shuangling.software.utils.AppManager;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
-import com.shuangling.software.utils.MyGlideEngine;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.youngfeng.snake.annotations.EnableDragToClose;
-import com.zhihu.matisse.Matisse;
-import com.zhihu.matisse.MimeType;
-import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
 @EnableDragToClose()
-public class BindPhoneActivity extends AppCompatActivity implements Handler.Callback{
+public class BindPhoneActivity extends AppCompatActivity implements Handler.Callback {
 
     public static final String TAG = BindPhoneActivity.class.getName();
 
@@ -87,7 +61,10 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
     EditText phoneNum;
     @BindView(R.id.sendCode)
     Button sendCode;
-
+    @BindView(R.id.head)
+    SimpleDraweeView head;
+    @BindView(R.id.nickname)
+    TextView nickname;
 
 
     private Handler mHandler;
@@ -109,8 +86,8 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
         CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         mHandler = new Handler(this);
-        hasLogined=getIntent().getBooleanExtra("hasLogined",false);
-        if(hasLogined){
+        hasLogined = getIntent().getBooleanExtra("hasLogined", false);
+        if (hasLogined) {
             activityTitle.setCanBack(true);
             AppManager.clearActivity();
             AppManager.addActivity(this);
@@ -121,14 +98,14 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
 
                 }
             });
-        }else{
+        } else {
             activityTitle.setCanBack(false);
             AppManager.addActivity(this);
             activityTitle.setMoreText("跳过");
             activityTitle.setMoreAction(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    weixinLogin(weixinNickname,weixinHeadimgurl,weixinOpenid,weixinUnionid);
+                    weixinLogin(weixinNickname, weixinHeadimgurl, weixinOpenid, weixinUnionid);
                 }
             });
         }
@@ -137,11 +114,16 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
 
 
     private void init() {
-        weixinUnionid=getIntent().getStringExtra("unionid");
-        weixinOpenid=getIntent().getStringExtra("openid");
-        weixinNickname=getIntent().getStringExtra("nickname");
-        weixinHeadimgurl=getIntent().getStringExtra("headimgurl");
+        weixinUnionid = getIntent().getStringExtra("unionid");
+        weixinOpenid = getIntent().getStringExtra("openid");
+        weixinNickname = getIntent().getStringExtra("nickname");
+        weixinHeadimgurl = getIntent().getStringExtra("headimgurl");
 
+        nickname.setText(weixinNickname);
+        if (!TextUtils.isEmpty(weixinHeadimgurl)) {
+            Uri uri = Uri.parse(weixinHeadimgurl);
+            ImageLoader.showThumb(uri, head, CommonUtils.dip2px(60), CommonUtils.dip2px(60));
+        }
 
 
         phoneNum.addTextChangedListener(new TextWatcher() {
@@ -160,16 +142,13 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
                 mPhoneNumber = s.toString();
                 if (CommonUtils.isMobileNO(mPhoneNumber)) {
                     sendCode.setEnabled(true);
-                }else {
+                } else {
                     sendCode.setEnabled(false);
                 }
             }
         });
 
     }
-
-
-
 
 
     @Override
@@ -191,13 +170,13 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
 
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
-                        Intent it=new Intent(this,NewVerifyCodeBindPhoneActivity.class);
-                        it.putExtra("hasLogined",hasLogined);
-                        it.putExtra("PhoneNumber",mPhoneNumber);
-                        it.putExtra("nickname",weixinNickname);
-                        it.putExtra("headimgurl",weixinHeadimgurl);
-                        it.putExtra("openid",weixinOpenid);
-                        it.putExtra("unionid",weixinUnionid);
+                        Intent it = new Intent(this, NewVerifyCodeBindPhoneActivity.class);
+                        it.putExtra("hasLogined", hasLogined);
+                        it.putExtra("PhoneNumber", mPhoneNumber);
+                        it.putExtra("nickname", weixinNickname);
+                        it.putExtra("headimgurl", weixinHeadimgurl);
+                        it.putExtra("openid", weixinOpenid);
+                        it.putExtra("unionid", weixinUnionid);
                         startActivity(it);
 
                     } else if (jsonObject != null) {
@@ -235,14 +214,11 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
                         });
 
 
-
                         ToastUtils.show("登录成功");
                         setResult(RESULT_OK);
                         EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
                         AppManager.finishAllActivity();
                         //finish();
-
-
 
 
                     } else {
@@ -266,11 +242,12 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
         switch (view.getId()) {
             case R.id.sendCode:
                 getVerifyCode(mPhoneNumber);
-            break;
+                break;
 
         }
     }
-    private void weixinLogin(String nickname, String headimgurl,String openid, String unionid) {
+
+    private void weixinLogin(String nickname, String headimgurl, String openid, String unionid) {
         mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
         String url = ServerInfo.serviceIP + ServerInfo.wechatLogin;
         Map<String, String> params = new HashMap<String, String>();
@@ -299,7 +276,6 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
                         ToastUtils.show("登陆异常");
                     }
                 });
-
 
 
             }
@@ -343,7 +319,7 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
 
     @Override
     public void onBackPressed() {
-        return;
+        super.onBackPressed();
     }
 
     @Override

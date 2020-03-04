@@ -18,6 +18,7 @@
         <item name="colorAccent">@color/themeBlue</item>
         <item name="android:navigationBarColor">@color/themeBlue</item>
         <item name="themeColor">@color/themeBlue</item>
+        <item name="translucentThemeColor">@color/translucentThemeBlue</item>
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
     </style>
     <!--主题紫-->
@@ -27,6 +28,7 @@
         <item name="colorAccent">@color/themePurple</item>
         <item name="android:navigationBarColor">@color/themePurple</item>
         <item name="themeColor">@color/themePurple</item>
+        <item name="translucentThemeColor">@color/translucentThemePurple</item>
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
     </style>
     <!--主题红-->
@@ -37,6 +39,7 @@
         <item name="colorAccent">@color/themeRed</item>
         <item name="android:navigationBarColor">@color/themeRed</item>
         <item name="themeColor">@color/themeRed</item>
+        <item name="translucentThemeColor">@color/translucentThemeRed</item>
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
     </style>
     <!--主题绿-->
@@ -47,6 +50,7 @@
         <item name="colorAccent">@color/themeGreen</item>
         <item name="android:navigationBarColor">@color/themeGreen</item>
         <item name="themeColor">@color/themeGreen</item>
+        <item name="translucentThemeColor">@color/translucentThemeGreen</item>
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
     </style>
     <!--主题橙-->
@@ -57,6 +61,7 @@
         <item name="colorAccent">@color/themeOrange</item>
         <item name="android:navigationBarColor">@color/themeOrange</item>
         <item name="themeColor">@color/themeOrange</item>
+        <item name="translucentThemeColor">@color/translucentThemeOrange</item>
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
     </style>
 

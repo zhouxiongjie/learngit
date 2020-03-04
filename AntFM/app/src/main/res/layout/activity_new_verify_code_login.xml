@@ -63,7 +63,7 @@
                 android:layout_centerVertical="true"
                 android:background="@null"
                 tools:text="重新发送(60)"
-                android:textColor="#1CA0FF"
+                android:textColor="?attr/themeColor"
                 android:textSize="@dimen/font_size_30px" />
         </LinearLayout>
 

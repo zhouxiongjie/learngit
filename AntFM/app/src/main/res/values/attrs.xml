@@ -4,6 +4,8 @@
 
     <attr name="themeColor" format="reference"/>
 
+    <attr name="translucentThemeColor" format="reference"/>
+
     <declare-styleable name="TopTitleBar">
         <!-- 标题文案 -->
         <attr name="titleText" format="string"/>

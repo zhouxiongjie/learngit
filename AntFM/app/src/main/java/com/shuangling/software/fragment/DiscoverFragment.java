@@ -34,9 +34,11 @@ import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
 import com.shuangling.software.activity.AudioDetailActivity;
+import com.shuangling.software.activity.BindPhoneActivity;
 import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.LoginActivity;
 import com.shuangling.software.activity.MainActivity;
+import com.shuangling.software.activity.NewLoginActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.activity.WebViewActivity;
@@ -111,7 +113,7 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
     Unbinder unbinder;
     private Handler mHandler;
-
+    private String mJumpUrl;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -406,11 +408,17 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
         }
 
         @JavascriptInterface
-        public void loginEvent(String str) {
+        public void loginEvent(final String bindPhone) {
+            mJumpUrl=null;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
                     startActivityForResult(it, LOGIN_RESULT);
                 }
             });
@@ -418,17 +426,38 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
         }
 
+
+
         @JavascriptInterface
-        public void loginEvent(Object[] str) {
+        public void loginEvent(final String bindPhone,String url) {
+            mJumpUrl=url;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
                     startActivityForResult(it, LOGIN_RESULT);
                 }
             });
 
+        }
 
+        @JavascriptInterface
+        public void bindPhoneEvent(final String url) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    //showShare();
+                    Intent it = new Intent(getContext(), BindPhoneActivity.class);
+                    it.putExtra("hasLogined",true);
+                    startActivityForResult(it, LOGIN_RESULT);
+
+                }
+            });
         }
 
 
@@ -540,18 +569,25 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == LOGIN_RESULT && resultCode == Activity.RESULT_OK) {
+        if (requestCode == LOGIN_RESULT) {
             String url = webView.getUrl();
             if (url.indexOf("?") > 0) {
                 url = url.substring(0, url.indexOf("?"));
-                if (User.getInstance() == null) {
-                    url = url + "?app=android";
-                } else {
+            }
+            if (User.getInstance() == null) {
+                url = url + "?app=android";
+            } else {
+
+                if(!TextUtils.isEmpty(mJumpUrl)){
+                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }else{
                     url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
                 }
 
+                //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                webView.loadUrl(url);
             }
-            webView.loadUrl(url);
+
 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (requestCode == REQUEST_SELECT_FILE && resultCode == Activity.RESULT_OK && data != null) {

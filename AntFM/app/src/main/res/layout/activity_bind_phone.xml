@@ -20,10 +20,37 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
-        android:text="绑定新手机号"
+        android:text="绑定手机号"
         android:textColor="#333333"
         android:textSize="@dimen/font_size_36px" />
 
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/head"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="20dp"
+        app:actualImageScaleType="centerCrop"
+        app:failureImage="@mipmap/ic_launcher"
+        app:failureImageScaleType="centerCrop"
+        android:layout_gravity="center_horizontal"
+        app:placeholderImage="@mipmap/ic_launcher"
+        app:placeholderImageScaleType="centerCrop"
+        app:roundingBorderColor="@color/white"
+        app:roundingBorderWidth="0dp"
+        app:roundedCornerRadius="5dp"
+        app:viewAspectRatio="1" />
+
+
+    <TextView
+        android:id="@+id/nickname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        tools:text="路灯下的姑娘"
+        android:textColor="#333333"
+        android:textSize="@dimen/font_size_28px" />
 
     <EditText
         android:id="@+id/phoneNum"
@@ -42,6 +69,8 @@
         android:inputType="phone" />
 
 
+
+
     <Button
         android:id="@+id/sendCode"
         android:layout_width="match_parent"
@@ -55,7 +84,15 @@
         android:textColor="@color/white"
         android:textSize="@dimen/font_size_32px"
         android:background="@drawable/login_button_bg"/>
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:text="根据国家法律法规，评论、报料等相关操作需绑定手 机号。"
+        android:textColor="#A0A0A0"
+        android:textSize="@dimen/font_size_26px" />
 
     <!--<LinearLayout-->
     <!--android:id="@+id/bottom"-->

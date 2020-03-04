@@ -184,6 +184,8 @@
     <color name="dark_skeleton_color">#24000000</color>
     <color name="light_skeleton_color">#0f000000</color>
 
+    <color name="text_sky_blue">#0C82FF</color>
+    <color name="text_gray">#C4C4C4</color>
 
 </resources>
 

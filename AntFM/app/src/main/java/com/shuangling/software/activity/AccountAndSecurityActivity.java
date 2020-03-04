@@ -100,7 +100,7 @@ public class AccountAndSecurityActivity extends AppCompatActivity implements Pla
 
         if ((platformList != null && platformList.size() > 0) || wechatBind){
             wechatBindText.setText("已绑定");
-            wechatBindText.setTextColor(getResources().getColor(R.color.alivc_text_gray));
+            wechatBindText.setTextColor(getResources().getColor(R.color.text_gray));
         }else {
             wechatBindText.setText("尚未绑定");
         }

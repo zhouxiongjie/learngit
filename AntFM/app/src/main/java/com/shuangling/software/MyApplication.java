@@ -13,6 +13,8 @@ import android.os.StrictMode;
 import android.support.multidex.MultiDexApplication;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
@@ -91,6 +93,9 @@ public class MyApplication extends MultiDexApplication {
     private String backgroundImage;
     private boolean needResume=false;
 
+    public String useProtocolTitle;
+    public String secretProtocolTitle;
+
     public boolean remindPermission=true;
     public boolean findNewVerison=false;
 
@@ -117,6 +122,8 @@ public class MyApplication extends MultiDexApplication {
 //        Fresco.initialize(this);
         Sentry.init("http://a31a66f6b5ee4bd4ad7ef75899bfd28f@47.94.104.239:9000/7", new AndroidSentryClientFactory(this));
         Thread.setDefaultUncaughtExceptionHandler(new CrashHandler());
+
+
 
         initFresco();
 
@@ -202,6 +209,7 @@ public class MyApplication extends MultiDexApplication {
 
         initStation();
 
+        getUseProtocol();
 	}
 
 
@@ -434,5 +442,63 @@ public class MyApplication extends MultiDexApplication {
         });
     }
 
+
+
+    private void getUseProtocol() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.useProtocol;
+        Map<String, String> params = new HashMap<String, String>();
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                try {
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        if(jsonObject.getJSONObject("data")!=null){
+                            useProtocolTitle = jsonObject.getJSONObject("data").getString("title");
+                        }
+                    }
+                } catch (Exception e) {
+
+                }
+                getSecretProtocol();
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                getSecretProtocol();
+            }
+        });
+    }
+
+
+    private void getSecretProtocol() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.clauses;
+        Map<String, String> params = new HashMap<String, String>();
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                try {
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        if(jsonObject.getJSONObject("data")!=null){
+                            secretProtocolTitle = jsonObject.getJSONObject("data").getString("title");
+                        }
+                    }
+                } catch (Exception e) {
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+            }
+        });
+    }
 
 }

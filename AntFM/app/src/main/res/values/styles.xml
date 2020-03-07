@@ -16,7 +16,7 @@
         <item name="colorPrimary">@color/themeBlue</item>
         <item name="colorPrimaryDark">@color/themeBlue</item>
         <item name="colorAccent">@color/themeBlue</item>
-        <item name="android:navigationBarColor">@color/themeBlue</item>
+        <!--<item name="android:navigationBarColor">@color/themeBlue</item>-->
         <item name="themeColor">@color/themeBlue</item>
         <item name="translucentThemeColor">@color/translucentThemeBlue</item>
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
@@ -26,7 +26,7 @@
         <item name="colorPrimary">@color/themePurple</item>
         <item name="colorPrimaryDark">@color/themePurple</item>
         <item name="colorAccent">@color/themePurple</item>
-        <item name="android:navigationBarColor">@color/themePurple</item>
+        <!--<item name="android:navigationBarColor">@color/themePurple</item>-->
         <item name="themeColor">@color/themePurple</item>
         <item name="translucentThemeColor">@color/translucentThemePurple</item>
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
@@ -37,7 +37,7 @@
         <item name="colorPrimary">@color/themeRed</item>
         <item name="colorPrimaryDark">@color/themeRed</item>
         <item name="colorAccent">@color/themeRed</item>
-        <item name="android:navigationBarColor">@color/themeRed</item>
+        <!--<item name="android:navigationBarColor">@color/themeRed</item>-->
         <item name="themeColor">@color/themeRed</item>
         <item name="translucentThemeColor">@color/translucentThemeRed</item>
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
@@ -48,7 +48,7 @@
         <item name="colorPrimary">@color/themeGreen</item>
         <item name="colorPrimaryDark">@color/themeGreen</item>
         <item name="colorAccent">@color/themeGreen</item>
-        <item name="android:navigationBarColor">@color/themeGreen</item>
+        <!--<item name="android:navigationBarColor">@color/themeGreen</item>-->
         <item name="themeColor">@color/themeGreen</item>
         <item name="translucentThemeColor">@color/translucentThemeGreen</item>
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
@@ -59,7 +59,7 @@
         <item name="colorPrimary">@color/themeOrange</item>
         <item name="colorPrimaryDark">@color/themeOrange</item>
         <item name="colorAccent">@color/themeOrange</item>
-        <item name="android:navigationBarColor">@color/themeOrange</item>
+        <!--<item name="android:navigationBarColor">@color/themeOrange</item>-->
         <item name="themeColor">@color/themeOrange</item>
         <item name="translucentThemeColor">@color/translucentThemeOrange</item>
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>

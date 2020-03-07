@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_account_setting_bg"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textSize="@dimen/font_size_26px"
+            android:textColor="#080808"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:text="个人信息保护指引"/>
+
+
+        <TextView
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:text="1.我们会遵循用户协议和隐私政策收集、使用信息，但不会仅因同意用户协议和隐私政策而采用强制捆绑的方式收集信息；\n2.在仅浏览时，为保障服务所必需，我们会收集设备信息与日志信息用于推送\n3.GPS、摄像头、麦克风、相册权限均不会默认开启，只有经过明示授权才会在为实现功能或服务时使用，不会在功能或服务不需要时而通过您授权的权限收集信息。"
+            android:textColor="#080808"
+            android:lineSpacingExtra="5dp"
+            android:textSize="@dimen/font_size_26px"
+            android:layout_marginTop="10dp"/>
+
+
+        <LinearLayout
+            android:id="@+id/protocol"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:visibility="visible"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="你可以查看完整版"
+                android:layout_gravity="center_vertical"
+                android:textColor="#080808"
+                android:textSize="@dimen/font_size_26px" />
+            <TextView
+                android:id="@+id/useProtocol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="《使用协议》"
+                android:layout_gravity="center_vertical"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_26px"
+                />
+            <TextView
+                android:id="@+id/and"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="和"
+                android:layout_gravity="center_vertical"
+                android:textColor="#080808"
+                android:textSize="@dimen/font_size_26px"
+                />
+            <TextView
+                android:id="@+id/secretProtocol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="《隐私协议》"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_26px"
+                />
+        </LinearLayout>
+
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginTop="10dp"
+            android:background="@color/divideColorOne"/>
+
+
+        <TextView
+            android:id="@+id/ok"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:padding="10dp"
+            android:gravity="center"
+            android:text="我知道了"
+            android:textColor="?attr/themeColor"
+            android:lineSpacingExtra="5dp"
+            android:textSize="@dimen/font_size_28px"
+            android:layout_marginTop="10dp"/>
+
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

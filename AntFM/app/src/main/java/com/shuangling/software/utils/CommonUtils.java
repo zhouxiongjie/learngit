@@ -415,7 +415,7 @@ public class CommonUtils {
             return number.matches(telRegex);
     }
 
-    public static boolean isValidPassword(String password) {
+    public static boolean isValidPassword01(String password) {
         //6-22位的数字字母组合
         String telRegex = "^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,22}$";
         if (TextUtils.isEmpty(password))
@@ -424,6 +424,18 @@ public class CommonUtils {
             return password.matches(telRegex);
         }
     }
+
+
+    public static boolean isValidPassword(String password) {
+        //需由6-20位数字、字母或符号组成，至少两种
+        String telRegex = "^(?![0-9]+$)(?![a-zA-Z]+$)(?![\\W]+$)[0-9A-Za-z\\W]{6,20}$";
+        if (TextUtils.isEmpty(password))
+            return false;
+        else {
+            return password.matches(telRegex);
+        }
+    }
+
 
     public static boolean isEmail(String email) {
         String str = "^([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)$";
@@ -824,6 +836,16 @@ public class CommonUtils {
         if (activity.getCurrentFocus() != null && imm.isActive()) {
             imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(),
                     InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+
+    public static void showKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) view.getContext()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            view.requestFocus();
+            imm.showSoftInput(view, 0);
         }
     }
 

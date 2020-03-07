@@ -12,6 +12,8 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -215,6 +217,24 @@ public class NewForgetPasswordActivity extends AppCompatActivity implements Hand
                         //modifyPasswordLayout.setVisibility(View.VISIBLE);
                         verifyCodeLayout.setVisibility(View.GONE);
                         phoneNum01.setText(phoneNum.getText().toString());
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                //verifyCodeView.getEditText().performClick();
+                                CommonUtils.showKeyboard(verifyCodeView.getEditText());
+                            }
+                        });
+
+
+//                        verifyCodeView.getEditText().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//                                                                                                         @Override
+//                                                                                                         public void onGlobalLayout() {
+//                                                                                                             ViewTreeObserver obs = verifyCodeView.getEditText().getViewTreeObserver();
+//                                                                                                             obs.removeOnGlobalLayoutListener(this);
+//                                                                                                             CommonUtils.showKeyboard(verifyCodeView.getEditText());
+//                                                                                                         }
+//                                                                                                     });
+
 
                         //1.倒计时
                         //2.设置提醒文本
@@ -269,6 +289,7 @@ public class NewForgetPasswordActivity extends AppCompatActivity implements Hand
 
                         inputVerifyCodeLayout.setVisibility(View.GONE);
                         modifyPasswordLayout.setVisibility(View.VISIBLE);
+
                         //verifyCodeLayout.setVisibility(View.GONE);
 
                     } else if (jsonObject != null) {
@@ -420,12 +441,24 @@ public class NewForgetPasswordActivity extends AppCompatActivity implements Hand
         if (mCountDownTimer != null) {
             mCountDownTimer.cancel();
         }
-        if (modifyPasswordLayout.getVisibility() == View.GONE) {
+        if(verifyCodeLayout.getVisibility()==View.VISIBLE){
             super.onBackPressed();
-        } else {
-            modifyPasswordLayout.setVisibility(View.GONE);
+        }else if(inputVerifyCodeLayout.getVisibility()==View.VISIBLE){
+            inputVerifyCodeLayout.setVisibility(View.GONE);
             verifyCodeLayout.setVisibility(View.VISIBLE);
+            verifyCodeView.getEditText().setText("");
+        }else{
+            modifyPasswordLayout.setVisibility(View.GONE);
+            inputVerifyCodeLayout.setVisibility(View.VISIBLE);
         }
+
+
+//        if (modifyPasswordLayout.getVisibility() == View.GONE) {
+//            super.onBackPressed();
+//        } else {
+//            modifyPasswordLayout.setVisibility(View.GONE);
+//            verifyCodeLayout.setVisibility(View.VISIBLE);
+//        }
     }
 
 

@@ -30,6 +30,8 @@ import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
+import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +41,7 @@ import butterknife.ButterKnife;
 import okhttp3.Call;
 import okhttp3.Response;
 
-
+@EnableDragToClose()
 public class MessageListActivity extends AppCompatActivity implements Handler.Callback {
 
     public static final int MSG_UPDATE_LIST = 0x1;

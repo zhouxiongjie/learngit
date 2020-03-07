@@ -95,4 +95,9 @@ public class VerifyCodeView extends RelativeLayout {
         return inputContent;
     }
 
+
+    public EditText getEditText(){
+        return editText;
+    }
+
 }

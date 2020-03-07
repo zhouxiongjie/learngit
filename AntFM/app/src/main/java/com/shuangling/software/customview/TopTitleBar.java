@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.shuangling.software.R;
 
+
 /**
  * 标题控件
  */
@@ -68,6 +69,11 @@ public class TopTitleBar extends RelativeLayout {
     }
 
 
+    public TextView getTitleTextView(){
+        return findViewById(R.id.title);
+    };
+
+
     public void setCanBack(boolean canBack) {
         this.canBack = canBack;
         backBtn.setVisibility(canBack ? VISIBLE : INVISIBLE);
@@ -92,12 +98,6 @@ public class TopTitleBar extends RelativeLayout {
         this.titleText = titleText;
         TextView tvTitle =  findViewById(R.id.title);
         tvTitle.setText(titleText);
-    }
-
-
-    public TextView getTitleTextView(){
-        TextView tvTitle =  findViewById(R.id.title);
-        return tvTitle;
     }
 
     /**
@@ -139,6 +139,11 @@ public class TopTitleBar extends RelativeLayout {
     public String  getMoreText(){
         return tvMore.getText().toString();
     }
+
+    public TextView  getMoreTextView(){
+        return tvMore;
+    }
+
     /**
      * 设置返回按钮事件
      *
@@ -146,8 +151,8 @@ public class TopTitleBar extends RelativeLayout {
      */
     public void setBackListener(OnClickListener listener){
 //        if (canBack){
-            LinearLayout backBtn = findViewById(R.id.title_back);
-            backBtn.setOnClickListener(listener);
+        LinearLayout backBtn = findViewById(R.id.title_back);
+        backBtn.setOnClickListener(listener);
 //        }
     }
 

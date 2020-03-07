@@ -384,7 +384,7 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
                             @Override
                             public void onClick(View v) {
                                 if (User.getInstance() == null) {
-                                    startActivityForResult(new Intent(AnchorDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                    startActivityForResult(new Intent(AnchorDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                                 } else {
                                     attention(mAnchor.getIs_follow() == 0);
                                 }
@@ -478,7 +478,7 @@ public class AnchorDetailActivity extends BaseActivity implements Handler.Callba
                                     @Override
                                     public void onClick(View v) {
                                         if (User.getInstance() == null) {
-                                            startActivityForResult(new Intent(AnchorDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                            startActivityForResult(new Intent(AnchorDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                                         } else {
                                             attention(anchor, anchor.getIs_follow() == 0, v);
                                         }

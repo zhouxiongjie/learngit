@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -35,6 +36,7 @@ import com.aliyun.player.source.VidAuth;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigInput;
@@ -194,6 +196,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     private boolean mIsInBackground = false;
     private int currentPage=1;
 
+    private Comment currentComment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setmOnServiceConnectionListener(new OnServiceConnectionListener() {
@@ -212,9 +215,20 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
             }
         });
         setTheme(MyApplication.getInstance().getCurrentTheme());
+
+//        Window window = getWindow();
+//        //After LOLLIPOP not translucent status bar
+//        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//        //Then call setStatusBarColor.
+//        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//        window.setStatusBarColor(getResources().getColor(R.color.white));
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_detail);
+        //CommonUtils.setTransparentStatusBar(this);
         //ImmersionBar.with(this).transparentBar().titleBar(activityTitle).init();
+        ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).init();
+        //ImmersionBar.with(this).statusBarDarkFont(true);
         ButterKnife.bind(this);
         init();
 
@@ -590,11 +604,11 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
     }
 
 
-    private void praise(String commentId, final View view) {
+    private void praise(Comment comment, final View view) {
         String url = ServerInfo.serviceIP + ServerInfo.praise;
         Map<String, String> params = new HashMap<>();
-        params.put("id", commentId);
-
+        params.put("id", ""+comment.getId());
+        currentComment=comment;
         OkHttpUtils.put(url, params, new OkHttpCallback(this) {
 
             @Override
@@ -606,6 +620,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                 bundle.putString("response", response);
                 msg.setData(bundle);
                 msg.obj = view;
+
                 mHandler.sendMessage(msg);
             }
 
@@ -683,7 +698,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                 bottom.setVisibility(View.VISIBLE);
                 activityTitle.setVisibility(View.VISIBLE);
                 aliyunVodPlayerView.setBackBtnVisiable(View.INVISIBLE);
-
+                ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).init();
             } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 //转到横屏了。
                 //隐藏状态栏
@@ -707,6 +722,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                 bottom.setVisibility(View.GONE);
                 activityTitle.setVisibility(View.GONE);
                 aliyunVodPlayerView.setBackBtnVisiable(View.VISIBLE);
+                ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(false).init();
             }
 
         }
@@ -824,7 +840,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                                 @Override
                                 public void praiseVideo() {
                                     if (User.getInstance() == null) {
-                                        startActivityForResult(new Intent(VideoDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                        startActivityForResult(new Intent(VideoDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                                     } else {
                                         if (mVideoDetail.getIs_likes() == 0) {
                                             like(true);
@@ -838,7 +854,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                                 @Override
                                 public void collectVideo() {
                                     if (User.getInstance() == null) {
-                                        startActivityForResult(new Intent(VideoDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                        startActivityForResult(new Intent(VideoDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                                     } else {
                                         if (mVideoDetail.getIs_collection() == 0) {
                                             collect(true);
@@ -1047,9 +1063,9 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                             @Override
                             public void praiseItem(Comment comment, View view) {
                                 if (User.getInstance() != null) {
-                                    praise("" + comment.getId(), view);
+                                    praise(comment, view);
                                 } else {
-                                    Intent it = new Intent(VideoDetailActivity.this, LoginActivity.class);
+                                    Intent it = new Intent(VideoDetailActivity.this, NewLoginActivity.class);
                                     startActivityForResult(it, REQUEST_LOGIN);
                                 }
                             }
@@ -1153,12 +1169,18 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
                         if (jsonObject.getInteger("data") == 1) {
                             //取消点赞
                             textView.setActivated(true);
-                            textView.setText("" + (Integer.parseInt(textView.getText().toString()) - 1));
+                            int num=Integer.parseInt(textView.getText().toString()) - 1;
+                            currentComment.setLike_count(num);
+                            currentComment.setFabulous(0);
+                            textView.setText("" + num);
+
                         } else {
                             //点赞成功
                             textView.setActivated(false);
-                            textView.setText("" + (Integer.parseInt(textView.getText().toString()) + 1));
-
+                            int num=Integer.parseInt(textView.getText().toString()) + 1;
+                            textView.setText("" + num);
+                            currentComment.setLike_count(num);
+                            currentComment.setFabulous(1);
                         }
                         //getComments();
 
@@ -1249,7 +1271,7 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
         switch (view.getId()) {
             case R.id.attention:
                 if (User.getInstance() == null) {
-                    startActivityForResult(new Intent(this, LoginActivity.class), REQUEST_LOGIN);
+                    startActivityForResult(new Intent(this, NewLoginActivity.class), REQUEST_LOGIN);
                 } else {
                     if (mVideoDetail.getIs_follow() == 0) {
                         attention(true);
@@ -1283,10 +1305,21 @@ public class VideoDetailActivity extends BaseActivity implements Handler.Callbac
 //                }
 //                break;
             case R.id.writeComment:
+//                if (User.getInstance() == null) {
+//                    Intent it = new Intent(this, LoginActivity.class);
+//                    startActivityForResult(it, REQUEST_LOGIN);
+//                }
+
                 if (User.getInstance() == null) {
-                    Intent it = new Intent(this, LoginActivity.class);
+                    Intent it = new Intent(this, NewLoginActivity.class);
                     startActivityForResult(it, REQUEST_LOGIN);
-                } else {
+                }else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+
+                    Intent it = new Intent(this, BindPhoneActivity.class);
+                    //it.putExtra("hasLogined",true);
+                    startActivity(it);
+                }
+                else {
                     mCommentDialog = new CircleDialog.Builder()
                             .setCanceledOnTouchOutside(false)
                             .setCancelable(true)

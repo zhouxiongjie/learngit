@@ -53,6 +53,8 @@ import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
+import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -76,7 +78,7 @@ import okhttp3.Call;
 import static android.widget.ExpandableListView.PACKED_POSITION_TYPE_CHILD;
 import static android.widget.ExpandableListView.PACKED_POSITION_TYPE_NULL;
 
-
+@EnableDragToClose()
 public class TvDetailActivity extends BaseActivity implements Handler.Callback {
 
 
@@ -505,7 +507,7 @@ public class TvDetailActivity extends BaseActivity implements Handler.Callback {
                 if (User.getInstance() != null) {
                     collect();
                 } else {
-                    startActivityForResult(new Intent(this, LoginActivity.class), REQUEST_LOGIN);
+                    startActivityForResult(new Intent(this, NewLoginActivity.class), REQUEST_LOGIN);
                 }
 
                 break;

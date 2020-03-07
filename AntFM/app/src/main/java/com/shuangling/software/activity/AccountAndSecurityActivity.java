@@ -89,12 +89,15 @@ public class AccountAndSecurityActivity extends AppCompatActivity implements Pla
             modifyPassword.setVisibility(View.GONE);
             bindPhoneText.setText("绑定手机号");
             phoneNum.setText("去绑定");
+            phoneNum.setTextColor(CommonUtils.getThemeColor(this));
+
         } else {
             modifyPassword.setVisibility(View.VISIBLE);
             bindPhoneText.setText("更换手机号");
 
             String sub = phone.substring(3, 7);
             phoneNum.setText(phone.replace(sub, "****"));
+            phoneNum.setTextColor(getResources().getColor(R.color.text_gray));
         }
 
 
@@ -103,6 +106,7 @@ public class AccountAndSecurityActivity extends AppCompatActivity implements Pla
             wechatBindText.setTextColor(getResources().getColor(R.color.text_gray));
         }else {
             wechatBindText.setText("尚未绑定");
+            wechatBindText.setTextColor(CommonUtils.getThemeColor(this));
         }
     }
 
@@ -267,8 +271,8 @@ public class AccountAndSecurityActivity extends AppCompatActivity implements Pla
 
     private void forceBind(final Platform platform){
         new CircleDialog.Builder()
-                .setTitle("提示框")
-                .setText("该第三方已经绑定其他账号，是否进行解绑并重新绑定此账号？")
+                .setTitle("提示")
+                .setText("该第三方已经绑定其他账号，是否重新绑定此账号？")
                 .setPositive("确定", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

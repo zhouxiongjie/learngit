@@ -103,6 +103,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
         String url=mUrl;
         url=initUrl(url);
 
+
         mHandler = new Handler(this);
         WebSettings s = webView.getSettings();
         CommonUtils.setWebviewUserAgent(s);

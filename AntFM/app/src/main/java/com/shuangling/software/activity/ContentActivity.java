@@ -62,6 +62,7 @@ import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
+import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -74,7 +75,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.Call;
 
-
+@EnableDragToClose()
 public class ContentActivity extends AppCompatActivity implements Handler.Callback {
 
     public static final String TAG = "ContentActivity";
@@ -1304,12 +1305,17 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
             it.putExtra("column", column);
             startActivity(it);
         }else if (url.startsWith(ServerInfo.scs + "/broke-create")) {
-            if (User.getInstance() != null) {
+            if (User.getInstance() == null) {
+                Intent it = new Intent(this, NewLoginActivity.class);
+                startActivity(it);
+            }else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+                Intent it = new Intent(this, BindPhoneActivity.class);
+                //it.putExtra("hasLogined",true);
+                startActivity(it);
+            }
+            else {
                 Intent it = new Intent(this, CluesActivity.class);
                 it.putExtra("url", ServerInfo.scs + "/broke-create");
-                startActivity(it);
-            } else {
-                Intent it = new Intent(this, LoginActivity.class);
                 startActivity(it);
             }
         }else if (url.startsWith(ServerInfo.h5IP + "/invitation-post") || url.startsWith(ServerInfo.h5HttpsIP + "/invitation-post")) {

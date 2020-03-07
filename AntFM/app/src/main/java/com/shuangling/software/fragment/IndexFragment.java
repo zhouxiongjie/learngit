@@ -54,6 +54,7 @@ import com.shuangling.software.activity.MainActivity;
 import com.shuangling.software.activity.MessageListActivity;
 import com.shuangling.software.activity.MoreAnchorOrOrganizationActivity;
 import com.shuangling.software.activity.MoreServiceActivity;
+import com.shuangling.software.activity.NewLoginActivity;
 import com.shuangling.software.activity.OrganizationDetailActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.activity.RadioListActivity;
@@ -676,7 +677,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                 @Override
                                 public void onClick(View v) {
                                     if (User.getInstance() == null) {
-                                        startActivityForResult(new Intent(getContext(), LoginActivity.class), REQUEST_LOGIN);
+                                        startActivityForResult(new Intent(getContext(), NewLoginActivity.class), REQUEST_LOGIN);
                                     } else {
                                         attention(anchor, anchor.getIs_follow() == 0, v);
                                     }
@@ -775,7 +776,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                 @Override
                                 public void onClick(View v) {
                                     if (User.getInstance() == null) {
-                                        startActivityForResult(new Intent(getContext(), LoginActivity.class), REQUEST_LOGIN);
+                                        startActivityForResult(new Intent(getContext(), NewLoginActivity.class), REQUEST_LOGIN);
                                     } else {
                                         attention(organization, organization.getIs_follow() == 0, v);
                                     }

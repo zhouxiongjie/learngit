@@ -249,8 +249,11 @@ public class ServerInfo {
 
     public static String weixinBindPhone="/v2/consumer/wechat_bind_phone";		//微信绑定手机号码
 
-	public static String getThirdPlatformInfo="/v2/consumer/proxies";		//微信绑定手机号码
+	public static String getThirdPlatformInfo="/v2/consumer/proxies";			//微信绑定手机号码
 
-	public static String bindWechat="/v2/consumer/bind_wechat";		//绑定微信
+	public static String bindWechat="/v2/consumer/bind_wechat";					//绑定微信
 
+	public static String clauses="/v1/consumer/clauses";						//隐私协议
+
+	public static String useProtocol="/v1/consumer/agreements";					//使用协议
 }

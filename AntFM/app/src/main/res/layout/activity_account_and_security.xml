@@ -105,7 +105,7 @@
             android:drawableRight="@drawable/ic_right"
             android:drawablePadding="20dp"
             android:layout_centerVertical="true"
-            android:textColor="#0C82FF"
+            android:textColor="?attr/themeColor"
             android:textSize="@dimen/font_size_26px"
             android:text="尚未绑定"/>
 

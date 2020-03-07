@@ -97,7 +97,7 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
     private Handler mHandler;
     private String mUrl;
     private int mActivityId;
-
+    private String mJumpUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -402,12 +402,30 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
 
         }
 
+//        @JavascriptInterface
+//        public void loginEvent(String str) {
+//            mHandler.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Intent it = new Intent(WebViewActivity.this, LoginActivity.class);
+//                    startActivityForResult(it, LOGIN_RESULT);
+//                }
+//            });
+//
+//
+//        }
         @JavascriptInterface
-        public void loginEvent(String str) {
+        public void loginEvent(final String bindPhone) {
+            mJumpUrl=null;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Intent it = new Intent(WebViewActivity.this, LoginActivity.class);
+                    Intent it = new Intent(WebViewActivity.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
                     startActivityForResult(it, LOGIN_RESULT);
                 }
             });
@@ -415,6 +433,39 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
 
         }
 
+
+
+        @JavascriptInterface
+        public void loginEvent(final String bindPhone,String url) {
+            mJumpUrl=url;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Intent it = new Intent(WebViewActivity.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
+                    startActivityForResult(it, LOGIN_RESULT);
+                }
+            });
+
+        }
+
+        @JavascriptInterface
+        public void bindPhoneEvent(final String url) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    //showShare();
+                    Intent it = new Intent(WebViewActivity.this, BindPhoneActivity.class);
+                    it.putExtra("hasLogined",true);
+                    startActivityForResult(it, LOGIN_RESULT);
+
+                }
+            });
+        }
 
 //        @JavascriptInterface
 //        public void shareEvent(final String str) {
@@ -563,7 +614,27 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (requestCode == LOGIN_RESULT) {
+            String url = webView.getUrl();
+            if (url.indexOf("?") > 0) {
+                url = url.substring(0, url.indexOf("?"));
+            }
+            if (User.getInstance() == null) {
+                url = url + "?app=android";
+            } else {
+
+                if(!TextUtils.isEmpty(mJumpUrl)){
+                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }else{
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                }
+
+                //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                webView.loadUrl(url);
+            }
+
+
+        }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (requestCode == REQUEST_SELECT_FILE&&resultCode == RESULT_OK && data != null) {
                 if (uploadMessage == null)
                     return;

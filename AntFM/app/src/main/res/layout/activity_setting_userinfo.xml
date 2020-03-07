@@ -87,7 +87,7 @@
         android:textColor="@color/black"
         android:textColorHint="#C4C4C4"
         android:hint="请设置昵称"
-        android:inputType="textPassword" />
+        android:inputType="text" />
 
     <RelativeLayout
         android:layout_width="match_parent"

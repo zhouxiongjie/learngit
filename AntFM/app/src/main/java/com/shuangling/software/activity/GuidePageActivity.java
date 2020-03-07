@@ -69,7 +69,7 @@ public class GuidePageActivity extends AppCompatActivity implements Handler.Call
         boolean firstRun = SharedPreferencesUtils.getBooleanValue(FIRST_RUN, true);
         //测试
 
-
+        MainActivity.firstRun=firstRun;
         if (firstRun) {
             setContentView(R.layout.activity_guidepage);
             ButterKnife.bind(this);

@@ -97,6 +97,10 @@ public class ModifyNicknameActivity extends AppCompatActivity {
     private void init() {
 
         nickName.setText("" + User.getInstance().getNickname());
+        if(!TextUtils.isEmpty(User.getInstance().getNickname())){
+            nickName.setSelection(User.getInstance().getNickname().length());//将光标移至文字末尾
+        }
+
         activityTitle.setMoreAction(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

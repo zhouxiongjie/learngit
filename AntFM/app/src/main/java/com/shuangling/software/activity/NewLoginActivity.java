@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
@@ -89,6 +90,10 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
     TextView useProtocol;
     @BindView(R.id.secretProtocol)
     TextView secretProtocol;
+    @BindView(R.id.and)
+    TextView and;
+    @BindView(R.id.protocol)
+    LinearLayout protocol;
 
 
     private List<View> mLoginViews = new ArrayList<View>();
@@ -104,6 +109,9 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
     private String weixinHeadimgurl;
 
     private boolean bindPhone;
+
+    private String mUseProtocolTitle;
+    private String mClauseTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +130,8 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
     }
 
     private void init() {
+        //getUseProtocol();
+
         bindPhone = getIntent().getBooleanExtra("bindPhone", false);
         if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getH5_logo())) {
             Uri uri = Uri.parse(MyApplication.getInstance().getStation().getH5_logo());
@@ -158,9 +168,29 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
             }
         });
 
+
+        if (!TextUtils.isEmpty(MyApplication.getInstance().useProtocolTitle)||!TextUtils.isEmpty(MyApplication.getInstance().secretProtocolTitle)){
+            protocol.setVisibility(View.VISIBLE);
+            if(!TextUtils.isEmpty(MyApplication.getInstance().useProtocolTitle)){
+                useProtocol.setText("《"+MyApplication.getInstance().useProtocolTitle+"》");
+            }
+            if(!TextUtils.isEmpty(MyApplication.getInstance().secretProtocolTitle)){
+                secretProtocol.setText("《"+MyApplication.getInstance().secretProtocolTitle+"》");
+            }
+
+            if(!TextUtils.isEmpty(MyApplication.getInstance().useProtocolTitle)&&!TextUtils.isEmpty(MyApplication.getInstance().secretProtocolTitle)){
+                and.setVisibility(View.VISIBLE);
+
+            }else{
+                and.setVisibility(View.GONE);
+            }
+        }else{
+            protocol.setVisibility(View.INVISIBLE);
+        }
+
     }
 
-    @OnClick({R.id.sendCode, R.id.passwordLogin, R.id.weiXin, R.id.qq, R.id.weiBo,R.id.useProtocol,R.id.secretProtocol})
+    @OnClick({R.id.sendCode, R.id.passwordLogin, R.id.weiXin, R.id.qq, R.id.weiBo, R.id.useProtocol, R.id.secretProtocol})
     public void onViewClicked(View view) {
         switch (view.getId()) {
 
@@ -184,21 +214,19 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
             case R.id.passwordLogin:
                 startActivity(new Intent(this, NewAccountPasswordLoginActivity.class));
                 break;
-            case R.id.useProtocol:
-                {
-                    Intent it = new Intent(this, WebViewActivity.class);
-                    it.putExtra("url", ServerInfo.h5HttpsIP+"/qulity-info?type=2");
-                    startActivity(it);
-                }
+            case R.id.useProtocol: {
+                Intent it = new Intent(this, WebViewActivity.class);
+                it.putExtra("url", ServerInfo.h5HttpsIP + "/qulity-info?type=2");
+                startActivity(it);
+            }
 
-                break;
-            case R.id.secretProtocol:
-                {
-                    Intent it = new Intent(this, WebViewActivity.class);
-                    it.putExtra("url", ServerInfo.h5HttpsIP+"/qulity-info?type=1");
-                    startActivity(it);
-                }
-                break;
+            break;
+            case R.id.secretProtocol: {
+                Intent it = new Intent(this, WebViewActivity.class);
+                it.putExtra("url", ServerInfo.h5HttpsIP + "/qulity-info?type=1");
+                startActivity(it);
+            }
+            break;
         }
     }
 
@@ -619,6 +647,96 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                 });
 
                 ToastUtils.show("获取验证码请求异常");
+
+
+            }
+        });
+    }
+
+
+    private void getUseProtocol() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.useProtocol;
+        Map<String, String> params = new HashMap<String, String>();
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                try {
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        mUseProtocolTitle = jsonObject.getJSONObject("data").getString("title");
+                    }
+                } catch (Exception e) {
+
+                }
+
+                getClauses();
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                getClauses();
+            }
+        });
+    }
+
+
+    private void getClauses() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.clauses;
+        Map<String, String> params = new HashMap<String, String>();
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                try {
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        if(jsonObject.getJSONObject("data")!=null){
+                            mClauseTitle = jsonObject.getJSONObject("data").getString("title");
+                        }
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!TextUtils.isEmpty(mUseProtocolTitle)||!TextUtils.isEmpty(mClauseTitle)){
+                                    protocol.setVisibility(View.VISIBLE);
+                                    if(!TextUtils.isEmpty(mUseProtocolTitle)){
+                                        useProtocol.setText("《"+mUseProtocolTitle+"》");
+                                    }
+                                    if(!TextUtils.isEmpty(mClauseTitle)){
+                                        secretProtocol.setText("《"+mClauseTitle+"》");
+                                    }
+
+                                    if(!TextUtils.isEmpty(mUseProtocolTitle)&&!TextUtils.isEmpty(mClauseTitle)){
+                                        and.setVisibility(View.VISIBLE);
+
+                                    }else{
+                                        and.setVisibility(View.GONE);
+                                    }
+                                }else{
+                                    protocol.setVisibility(View.INVISIBLE);
+                                }
+                            }
+                        });
+
+
+                    }
+                } catch (Exception e) {
+
+                    Log.e("test",e.getMessage());
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
 
 
             }

@@ -526,7 +526,7 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
                                     if(User.getInstance()!=null){
                                         collect();
                                     }else {
-                                        startActivityForResult(new Intent(RadioDetailActivity.this, LoginActivity.class),REQUEST_LOGIN);
+                                        startActivityForResult(new Intent(RadioDetailActivity.this, NewLoginActivity.class),REQUEST_LOGIN);
                                     }
                                 }
                             });

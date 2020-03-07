@@ -12,24 +12,16 @@
         android:id="@+id/activity_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:canBack="false"
+        app:canBack="true"
         app:moreText="跳过"
-        app:titleText="关联手机号"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:text="绑定手机号"
-        android:textColor="#333333"
-        android:textSize="@dimen/font_size_36px" />
+        app:titleText="绑定手机号"/>
 
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/head"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         app:actualImageScaleType="centerCrop"
         app:failureImage="@mipmap/ic_launcher"
         app:failureImageScaleType="centerCrop"
@@ -90,9 +82,9 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:text="根据国家法律法规，评论、报料等相关操作需绑定手 机号。"
+        android:text="根据国家法律法规，评论、报料等相关操作需绑定手机号。"
         android:textColor="#A0A0A0"
-        android:textSize="@dimen/font_size_26px" />
+        android:textSize="@dimen/font_size_24px" />
 
     <!--<LinearLayout-->
     <!--android:id="@+id/bottom"-->

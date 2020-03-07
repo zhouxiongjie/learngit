@@ -162,17 +162,71 @@ public class MoreServiceActivity extends AppCompatActivity implements Handler.Ca
             });
 
         }
+//        @JavascriptInterface
+//        public void loginEvent(String str){
+//            mHandler.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Intent it=new Intent(MoreServiceActivity.this,LoginActivity.class);
+//                    startActivityForResult(it,LOGIN_RESULT);
+//                }
+//            });
+//
+//
+//        }
+
+
         @JavascriptInterface
-        public void loginEvent(String str){
+        public void loginEvent(final String bindPhone) {
+            //mJumpUrl=null;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Intent it=new Intent(MoreServiceActivity.this,LoginActivity.class);
-                    startActivityForResult(it,LOGIN_RESULT);
+                    Intent it = new Intent(MoreServiceActivity.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
+                    startActivityForResult(it, LOGIN_RESULT);
                 }
             });
 
 
+        }
+
+
+
+        @JavascriptInterface
+        public void loginEvent(final String bindPhone,String url) {
+            //mJumpUrl=url;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Intent it = new Intent(MoreServiceActivity.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
+                    startActivityForResult(it, LOGIN_RESULT);
+                }
+            });
+
+        }
+
+        @JavascriptInterface
+        public void bindPhoneEvent(final String url) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    //showShare();
+                    Intent it = new Intent(MoreServiceActivity.this, BindPhoneActivity.class);
+                    it.putExtra("hasLogined",true);
+                    startActivityForResult(it, LOGIN_RESULT);
+
+                }
+            });
         }
 
 

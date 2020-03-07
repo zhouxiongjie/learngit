@@ -131,6 +131,8 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 
     public static final int MSG_DELETE_COMMENT = 0xb;
 
+    public static final int REQUEST_BIND_PHONE = 0xc;
+
 
     public static final int REQUEST_PERMISSION_CODE = 0x0110;
 
@@ -653,8 +655,16 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
             case R.id.writeComment: {
 
                 if (User.getInstance() == null) {
-                    startActivityForResult(new Intent(this, LoginActivity.class), REQUEST_LOGIN);
-                } else {
+
+                    Intent it = new Intent(this, NewLoginActivity.class);
+                    it.putExtra("bindPhone",true);
+                    startActivityForResult(it, REQUEST_LOGIN);
+                }else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+
+                    Intent it = new Intent(this, BindPhoneActivity.class);
+                    //it.putExtra("hasLogined",true);
+                    startActivity(it);
+                }else {
                     mCommentDialog = new CircleDialog.Builder()
                             .setCanceledOnTouchOutside(false)
                             .setCancelable(true)
@@ -833,7 +843,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                             @Override
                             public void onClick(View v) {
                                 if (User.getInstance() == null) {
-                                    startActivityForResult(new Intent(AudioDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                    startActivityForResult(new Intent(AudioDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                                 } else {
                                     subscribe(mAudioDetail.getAlbum().get(0).getIs_sub() == 0);
                                 }
@@ -941,7 +951,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                             if (User.getInstance() != null) {
                                 praise("" + comment.getId(), v);
                             } else {
-                                startActivityForResult(new Intent(AudioDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                startActivityForResult(new Intent(AudioDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                             }
 
                         }

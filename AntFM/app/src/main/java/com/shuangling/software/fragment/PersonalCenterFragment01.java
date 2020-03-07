@@ -31,11 +31,12 @@ import com.mylhyl.circledialog.CircleDialog;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AccountAndSecurityActivity;
 import com.shuangling.software.activity.AttentionActivity;
+import com.shuangling.software.activity.BindPhoneActivity;
 import com.shuangling.software.activity.CluesActivity;
 import com.shuangling.software.activity.CollectActivity;
+import com.shuangling.software.activity.CommentDetailActivity;
 import com.shuangling.software.activity.FeedbackActivity;
 import com.shuangling.software.activity.HistoryActivity;
-import com.shuangling.software.activity.LoginActivity;
 import com.shuangling.software.activity.MessageListActivity;
 import com.shuangling.software.activity.ModifyUserInfoActivity;
 import com.shuangling.software.activity.MyWalletsActivity;
@@ -156,7 +157,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), HistoryActivity.class));
                 } else {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
                 break;
@@ -164,7 +165,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), CollectActivity.class));
                 } else {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
                 break;
@@ -172,7 +173,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), SubscribeActivity.class));
                 } else {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
                 break;
@@ -180,7 +181,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), AccountAndSecurityActivity.class));
                 } else {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
                 break;
@@ -205,17 +206,22 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), FeedbackActivity.class));
                 } else {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
                 break;
             case R.id.brokeNews:
-                if (User.getInstance() != null) {
+                if (User.getInstance() == null) {
+
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
+                    startActivity(it);
+
+                } else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+                    Intent it = new Intent(getContext(), BindPhoneActivity.class);
+                    startActivity(it);
+                }else {
                     Intent it = new Intent(getContext(), CluesActivity.class);
                     it.putExtra("url", ServerInfo.scs + "/broke-create");
-                    startActivity(it);
-                } else {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
                     startActivity(it);
                 }
                 break;
@@ -226,7 +232,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                     it.putExtra("title", "我的发布");
                     startActivity(it);
                 } else {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
                 break;
@@ -234,7 +240,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), MessageListActivity.class));
                 } else {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
                 break;
@@ -254,7 +260,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), MyWalletsActivity.class));
                 } else {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
                 break;
@@ -265,7 +271,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                     it.putExtra("title", "奖品");
                     startActivity(it);
                 } else {
-                    Intent it = new Intent(getContext(), LoginActivity.class);
+                    Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
                 break;

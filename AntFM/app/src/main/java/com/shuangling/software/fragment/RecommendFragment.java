@@ -37,12 +37,13 @@ import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
 import com.shuangling.software.activity.AudioDetailActivity;
+import com.shuangling.software.activity.BindPhoneActivity;
 import com.shuangling.software.activity.CityListActivity;
 import com.shuangling.software.activity.CluesActivity;
 import com.shuangling.software.activity.ContentActivity;
 import com.shuangling.software.activity.GalleriaActivity;
-import com.shuangling.software.activity.LoginActivity;
 import com.shuangling.software.activity.MainActivity;
+import com.shuangling.software.activity.NewLoginActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.activity.RadioListActivity;
 import com.shuangling.software.activity.SearchActivity;
@@ -760,6 +761,8 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                             mRemoteColumns = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), Column.class);
 
 
+
+
                             Column col = new Column();
                             col.setName("首页");
                             col.setType(-1);
@@ -769,6 +772,9 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                 mRemoteColumns = new ArrayList<>();
                                 mRemoteColumns.add(col);
                             }
+
+
+
 
                             if (useLocal == 1) {
                                 String customColumn = SharedPreferencesUtils.getStringValue("custom_column", "");
@@ -1019,12 +1025,18 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             it.putExtra("column", column);
             startActivity(it);
         } else if (url.startsWith(ServerInfo.scs + "/broke-create")) {
-            if (User.getInstance() != null) {
+
+            if (User.getInstance() == null) {
+                Intent it = new Intent(getContext(), NewLoginActivity.class);
+                startActivity(it);
+            }else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+                Intent it = new Intent(getContext(), BindPhoneActivity.class);
+                //it.putExtra("hasLogined",true);
+                startActivity(it);
+            }
+            else {
                 Intent it = new Intent(getContext(), CluesActivity.class);
                 it.putExtra("url", ServerInfo.scs + "/broke-create");
-                startActivity(it);
-            } else {
-                Intent it = new Intent(getContext(), LoginActivity.class);
                 startActivity(it);
             }
 
@@ -1051,4 +1063,62 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             startActivity(it);
         }
     }
+
+
+    class AnalyseColumn extends Thread{
+
+        public List<Column> remoteColumns;
+
+        @Override
+        public void run() {
+
+            List<Column> allColumns= JSONObject.parseArray(SharedPreferencesUtils.getStringValue("all_column", null), Column.class);
+
+            if(mRemoteColumns!=null){
+
+                List<Integer> columnIds=new ArrayList<>();
+                for(int i=0;i<allColumns.size();i++){
+                    columnIds.add(allColumns.get(i).getId());
+                }
+            }
+
+
+
+
+
+//            List<Column> tempColumns=new ArrayList<>();
+//            List<Integer> columnIds=new ArrayList<>();
+//            for(int i=0;i<mCustomColumns.size();i++){
+//                columnIds.add(mCustomColumns.get(i).getId());
+//            }
+//            Iterator<Column> iterator = mColumns.iterator();
+//            while (iterator.hasNext()) {
+//                Column column = iterator.next();
+//                if (columnIds.contains(column.getId())) {
+//                    tempColumns.add(column);
+//                    iterator.remove();
+//
+//                }
+//            }
+//            mMoreColumns=mColumns;
+//            columnIds.clear();
+//            for(int i=0;i<tempColumns.size();i++){
+//                columnIds.add(tempColumns.get(i).getId());
+//            }
+//            tempColumns.clear();
+//
+//            iterator = mCustomColumns.iterator();
+//            while (iterator.hasNext()) {
+//                Column column = iterator.next();
+//                if (columnIds.contains(column.getId())) {
+//                    tempColumns.add(column);
+//
+//                }
+//            }
+//            mCustomColumns=tempColumns;
+
+        }
+    }
+
+
 }

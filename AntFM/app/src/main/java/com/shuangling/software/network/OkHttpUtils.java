@@ -8,6 +8,7 @@ import android.util.Log;
 import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.activity.LoginActivity;
+import com.shuangling.software.activity.NewLoginActivity;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
@@ -603,7 +604,7 @@ public class OkHttpUtils {
 							@Override
 							public void run() {
 								ToastUtils.show("您的登录信息已失效，请重新登录");
-								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+								Intent it=new Intent(callback.getContext(),NewLoginActivity.class);
 								callback.getContext().startActivity(it);
 							}
 						});
@@ -662,7 +663,7 @@ public class OkHttpUtils {
 							@Override
 							public void run() {
 								ToastUtils.show("您的登录信息已失效，请重新登录");
-								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+								Intent it=new Intent(callback.getContext(),NewLoginActivity.class);
 								callback.getContext().startActivity(it);
 							}
 						});
@@ -719,7 +720,7 @@ public class OkHttpUtils {
 							@Override
 							public void run() {
 								ToastUtils.show("您的登录信息已失效，请重新登录");
-								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+								Intent it=new Intent(callback.getContext(),NewLoginActivity.class);
 								callback.getContext().startActivity(it);
 							}
 						});
@@ -776,7 +777,7 @@ public class OkHttpUtils {
 							@Override
 							public void run() {
 								ToastUtils.show("您的登录信息已失效，请重新登录");
-								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+								Intent it=new Intent(callback.getContext(),NewLoginActivity.class);
 								callback.getContext().startActivity(it);
 							}
 						});
@@ -835,7 +836,7 @@ public class OkHttpUtils {
 							@Override
 							public void run() {
 								ToastUtils.show("您的登录信息已失效，请重新登录");
-								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+								Intent it=new Intent(callback.getContext(),NewLoginActivity.class);
 								callback.getContext().startActivity(it);
 							}
 						});
@@ -894,7 +895,7 @@ public class OkHttpUtils {
 							@Override
 							public void run() {
 								ToastUtils.show("您的登录信息已失效，请重新登录");
-								Intent it=new Intent(callback.getContext(),LoginActivity.class);
+								Intent it=new Intent(callback.getContext(),NewLoginActivity.class);
 								callback.getContext().startActivity(it);
 							}
 						});

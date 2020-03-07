@@ -53,6 +53,7 @@ import com.mylhyl.circledialog.CircleDialog;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.FontIconView;
+import com.shuangling.software.dialog.InformationDialog;
 import com.shuangling.software.dialog.UpdateDialog;
 import com.shuangling.software.entity.BottomMenu;
 import com.shuangling.software.entity.City;
@@ -143,6 +144,8 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
     ArrayList<BottomMenuHolder> mMenus=new ArrayList<>();
     private UpdateDialog mUpdateDialog;
+
+    public static boolean firstRun;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -735,6 +738,20 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
             public void onFailure(Call call, Exception exception) {
 
 
+                if(firstRun){
+
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            InformationDialog.getInstance().show(getSupportFragmentManager(), "InformationDialog");;
+                        }
+                    });
+
+
+
+                }
+
+
             }
         });
 
@@ -846,6 +863,14 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                         }
 
                     }
+
+                    if(firstRun){
+                        InformationDialog.getInstance().show(getSupportFragmentManager(), "InformationDialog");;
+                    }
+
+
+
+
 
 
                 } catch (Exception e) {
@@ -1715,5 +1740,12 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         BottomMenuHolder(View view) {
             ButterKnife.bind(this, view);
         }
+    }
+
+
+    private void showInformationTip(){
+
+
+
     }
 }

@@ -176,18 +176,20 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
                         //EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
-
-                        if(hasLogined==false){
+                        ToastUtils.show("绑定成功");
+                        if(User.getInstance()==null){
                             weixinLogin(weixinNickname, weixinHeadimgurl, weixinOpenid, weixinUnionid);
                         }else{
+                            User.getInstance().setPhone(mPhoneNumber);
+                            SharedPreferencesUtils.saveUser(User.getInstance());
                             AppManager.finishAllActivity();
                         }
 
                         //AppManager.finishAllActivity();
-                    } else if (support == 0) {
+                    }else if (jsonObject != null && jsonObject.getIntValue("code") == 202036)  {
                         mDialogFragment.dismiss();
                         new CircleDialog.Builder()
-                                .setTitle("提示框")
+                                .setTitle("提示")
                                 .setText("该手机号已绑定其他账号，是否重新绑定此账号？")
                                 .setPositive("确定", new View.OnClickListener() {
                                     @Override
@@ -199,14 +201,16 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
                                     @Override
                                     public void onClick(View v) {
                                         ToastUtils.show("取消绑定");
+                                        finish();
                                     }
                                 })
                                 .setCanceledOnTouchOutside(false)
                                 .setCancelable(false)
                                 .show(getSupportFragmentManager());
 
-
-                        ToastUtils.show("登录失败，请稍后再试");
+                    }else if(jsonObject != null){
+                        mDialogFragment.dismiss();
+                        ToastUtils.show(jsonObject.getString("msg"));
                     }
                 } catch (Exception e) {
 
@@ -324,18 +328,31 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
     }
 
 
+
+
+
     private void bindPhone(String phone, String verificationCode, final int support) {
         mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
-        String url = ServerInfo.serviceIP + ServerInfo.weixinBindPhone;
+        String url;
         Map<String, String> params = new HashMap<String, String>();
-        params.put("type", "2");
-        params.put("nickname", weixinNickname);
-        params.put("headimgurl", weixinHeadimgurl);
-        params.put("openid", weixinOpenid);
-        params.put("unionid", weixinUnionid);
-        params.put("phone", phone);
-        params.put("verification_code", verificationCode);
-        params.put("support", "" + support);
+        if(User.getInstance()==null){
+            url= ServerInfo.serviceIP + ServerInfo.weixinBindPhone;
+
+            params.put("type", "2");
+            params.put("nickname", weixinNickname);
+            params.put("headimgurl", weixinHeadimgurl);
+            params.put("openid", weixinOpenid);
+            params.put("unionid", weixinUnionid);
+            params.put("phone", phone);
+            params.put("verification_code", verificationCode);
+            params.put("support", "" + support);
+        }else{
+            url= ServerInfo.serviceIP + ServerInfo.bindPhone;
+            params.put("phone", phone);
+            params.put("verification_code", verificationCode);
+            params.put("support", "" + support);
+        }
+
 
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
@@ -370,7 +387,6 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
             }
         });
     }
-
 
 //    private void verifyPhone() {
 //

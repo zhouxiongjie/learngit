@@ -400,17 +400,71 @@ public class AnchorOrOrganizationDetailActivityH5 extends AppCompatActivity impl
 
         }
 
+//        @JavascriptInterface
+//        public void loginEvent(String str) {
+//            mHandler.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Intent it = new Intent(AnchorOrOrganizationDetailActivityH5.this, NewLoginActivity.class);
+//                    startActivityForResult(it, LOGIN_RESULT);
+//                }
+//            });
+//
+//
+//        }
+
+
         @JavascriptInterface
-        public void loginEvent(String str) {
+        public void loginEvent(final String bindPhone) {
+            //mJumpUrl=null;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    Intent it = new Intent(AnchorOrOrganizationDetailActivityH5.this, LoginActivity.class);
+                    Intent it = new Intent(AnchorOrOrganizationDetailActivityH5.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
                     startActivityForResult(it, LOGIN_RESULT);
                 }
             });
 
 
+        }
+
+
+
+        @JavascriptInterface
+        public void loginEvent(final String bindPhone,String url) {
+            //mJumpUrl=url;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Intent it = new Intent(AnchorOrOrganizationDetailActivityH5.this, NewLoginActivity.class);
+                    if(bindPhone.equals("0")){
+                        it.putExtra("bindPhone",false);
+                    }else{
+                        it.putExtra("bindPhone",true);
+                    }
+                    startActivityForResult(it, LOGIN_RESULT);
+                }
+            });
+
+        }
+
+        @JavascriptInterface
+        public void bindPhoneEvent(final String url) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    //showShare();
+                    Intent it = new Intent(AnchorOrOrganizationDetailActivityH5.this, BindPhoneActivity.class);
+                    it.putExtra("hasLogined",true);
+                    startActivityForResult(it, LOGIN_RESULT);
+
+                }
+            });
         }
 
 

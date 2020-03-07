@@ -176,7 +176,8 @@
                 android:maxLines="1"
                 android:textColor="@color/textColorThree"
                 android:textSize="@dimen/font_size_24px"
-                tools:text="5小时前" />
+                tools:text="5小时前"
+                android:visibility="gone"/>
 
 
         </LinearLayout>

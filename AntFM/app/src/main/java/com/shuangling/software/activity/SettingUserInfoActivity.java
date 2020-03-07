@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
@@ -91,6 +93,8 @@ import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
+import static android.os.Environment.DIRECTORY_PICTURES;
+
 @EnableDragToClose()
 public class SettingUserInfoActivity extends AppCompatActivity implements Handler.Callback, OSSCompletedCallback<PutObjectRequest, PutObjectResult> {
 
@@ -120,7 +124,7 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
     //OSS的上传下载
     private OssService mOssService;
     private Map<String, String> mUserInfo = new HashMap<>();
-
+    private Uri uritempFile;
     private boolean mPasswordVisible=false;
 
     @Override
@@ -143,7 +147,7 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
             Uri uri = Uri.parse(User.getInstance().getAvatar());
             ImageLoader.showThumb(uri, head, CommonUtils.dip2px(120), CommonUtils.dip2px(120));
         }
-
+        confirm.setEnabled(true);
 
         nickName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -161,16 +165,16 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
 
                 String nickname = s.toString();
                 mUserInfo.put("nickname",nickname);
-                String pwd=password.getText().toString();
-                if (!TextUtils.isEmpty(nickname)) {
-                    if (pwd.length() < 6 || pwd.length() > 20) {
-                        confirm.setEnabled(false);
-                    } else {
-                        confirm.setEnabled(true);
-                    }
-                }else{
-                    confirm.setEnabled(false);
-                }
+//                String pwd=password.getText().toString();
+//                if (!TextUtils.isEmpty(nickname)) {
+//                    if (!CommonUtils.isValidPassword(pwd)) {
+//                        confirm.setEnabled(false);
+//                    } else {
+//                        confirm.setEnabled(true);
+//                    }
+//                }else{
+//                    confirm.setEnabled(false);
+//                }
 
 
             }
@@ -191,17 +195,18 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
             @Override
             public void afterTextChanged(Editable s) {
 
-                String pwd = s.toString();
-                String nickname=nickName.getText().toString();
-                if (!TextUtils.isEmpty(nickname)) {
-                    if (pwd.length() < 6 || pwd.length() > 20) {
-                        confirm.setEnabled(false);
-                    } else {
-                        confirm.setEnabled(true);
-                    }
-                }else{
-                    confirm.setEnabled(false);
-                }
+//                String pwd = s.toString();
+//                String nickname=nickName.getText().toString();
+//                if (!TextUtils.isEmpty(nickname)) {
+//
+//                    if (CommonUtils.isValidPassword(pwd)) {
+//                        confirm.setEnabled(true);
+//                    } else {
+//                        confirm.setEnabled(false);
+//                    }
+//                }else{
+//                    confirm.setEnabled(false);
+//                }
 
 
             }
@@ -330,24 +335,43 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
 
         } else if (requestCode == CUT_OK) {
             if (resultCode == RESULT_OK && data != null) {
-                // 获取裁剪的图片数据
-                Bundle extras = data.getExtras();
-                if (extras != null) {
-                    Bitmap bitmap = extras.getParcelable("data");
+
+                try{
+                    Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uritempFile));
                     Random rand = new Random();
                     int randNum = rand.nextInt(1000);
-                    tempFile = new File(CommonUtils.getStoragePrivateDirectory(Environment.DIRECTORY_PICTURES), CommonUtils.getCurrentTimeString() + randNum + ".jpg");
+                    tempFile = new File(CommonUtils.getStoragePrivateDirectory(DIRECTORY_PICTURES), CommonUtils.getCurrentTimeString()+randNum+".jpg");
                     CommonUtils.saveBitmap(tempFile.getAbsolutePath(), bitmap);
                     //saveBitmapToFile(bitmap);
 //
                     // 2.把图片文件file上传到服务器
-                    if (mOssInfo != null&&mOssService!=null) {
-                        mOssService.asyncUploadFile(mOssInfo.getDir() + tempFile.getName(), tempFile.getAbsolutePath(), null, this);
-                    } else {
+                    if(mOssInfo != null&&mOssService!=null){
+                        mOssService.asyncUploadFile(mOssInfo.getDir()+tempFile.getName(),tempFile.getAbsolutePath(),null,this);
+                    }else{
                         ToastUtils.show("OSS初始化失败,请稍后再试");
                     }
+                }catch (Exception e){
 
                 }
+
+                // 获取裁剪的图片数据
+//                Bundle extras = data.getExtras();
+//                if (extras != null) {
+//                    Bitmap bitmap = extras.getParcelable("data");
+//                    Random rand = new Random();
+//                    int randNum = rand.nextInt(1000);
+//                    tempFile = new File(CommonUtils.getStoragePrivateDirectory(Environment.DIRECTORY_PICTURES), CommonUtils.getCurrentTimeString() + randNum + ".jpg");
+//                    CommonUtils.saveBitmap(tempFile.getAbsolutePath(), bitmap);
+//                    //saveBitmapToFile(bitmap);
+////
+//                    // 2.把图片文件file上传到服务器
+//                    if (mOssInfo != null&&mOssService!=null) {
+//                        mOssService.asyncUploadFile(mOssInfo.getDir() + tempFile.getName(), tempFile.getAbsolutePath(), null, this);
+//                    } else {
+//                        ToastUtils.show("OSS初始化失败,请稍后再试");
+//                    }
+//
+//                }
             }
 
         }
@@ -369,8 +393,11 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
         // outputX outputY 是裁剪图片宽高
         intent.putExtra("outputX", 150);
         intent.putExtra("outputY", 150);
-        intent.putExtra("return-data", true);
+        //intent.putExtra("return-data", true);
         // 你待会裁剪完之后需要获取数据   startActivityForResult
+        uritempFile = Uri.parse("file://" + "/" + CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES) + File.separator  + "small.jpg");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uritempFile);
+        intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
         startActivityForResult(intent, CUT_OK);
     }
 
@@ -430,6 +457,21 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
             }
             break;
             case R.id.confirm: {
+
+                if(TextUtils.isEmpty(mUserInfo.get("nickname"))){
+                    ToastUtils.show("请输入昵称");
+                    return;
+                }
+
+                if(TextUtils.isEmpty(password.getText().toString())){
+                    ToastUtils.show("请输入密码");
+                    return;
+                }
+                if(CommonUtils.isValidPassword(password.getText().toString())){
+                    ToastUtils.show("密码需由6-20位数字、字母或符号组成，至少两种");
+                    return;
+                }
+
                 modifyUerInfo();
 
             }
@@ -439,9 +481,16 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
                 if(mPasswordVisible){
                     eye.setText(R.string.password_visible);
                     password.setInputType(InputType.TYPE_CLASS_TEXT);
+                    if(TextUtils.isEmpty(password.getText().toString())){
+                        password.setSelection(password.getText().toString().length());//将光标移至文字末尾
+                    }
+
                 }else {
                     eye.setText(R.string.password_invisible);
                     password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    if(TextUtils.isEmpty(password.getText().toString())){
+                        password.setSelection(password.getText().toString().length());//将光标移至文字末尾
+                    }
                 }
                 break;
 
@@ -459,11 +508,19 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
         long upload_end = System.currentTimeMillis();
         mUserInfo.put("avatar",mOssInfo.getHost() + "/" + mOssInfo.getDir() + tempFile.getName());
         //modifyUerInfo("avatar", mOssInfo.getHost() + "/" + mOssInfo.getDir() + tempFile.getName());
-        if (!TextUtils.isEmpty(mUserInfo.get("avatar"))) {
-            Uri uri = Uri.parse(mUserInfo.get("avatar"));
-            ImageLoader.showThumb(uri, head, CommonUtils.dip2px(120), CommonUtils.dip2px(120));
 
-        }
+        long id=Thread.currentThread().getId();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (!TextUtils.isEmpty(mUserInfo.get("avatar"))) {
+                    Uri uri = Uri.parse(mUserInfo.get("avatar"));
+                    ImageLoader.showThumb(uri, head, CommonUtils.dip2px(120), CommonUtils.dip2px(120));
+
+                }
+            }
+        });
+
 
     }
 

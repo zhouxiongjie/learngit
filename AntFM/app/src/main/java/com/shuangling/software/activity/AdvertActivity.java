@@ -24,6 +24,8 @@ import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
+import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +35,7 @@ import okhttp3.Call;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-
+@EnableDragToClose()
 public class AdvertActivity extends AppCompatActivity  {
 
 

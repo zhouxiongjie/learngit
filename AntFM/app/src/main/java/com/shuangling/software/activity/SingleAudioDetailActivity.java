@@ -652,9 +652,20 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
 
             case R.id.writeComment: {
 
+//                if (User.getInstance() == null) {
+//                    startActivityForResult(new Intent(this, LoginActivity.class), REQUEST_LOGIN);
+//                }
+
                 if (User.getInstance() == null) {
-                    startActivityForResult(new Intent(this, LoginActivity.class), REQUEST_LOGIN);
-                } else {
+                    Intent it = new Intent(this, NewLoginActivity.class);
+                    startActivity(it);
+                }else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+
+                    Intent it = new Intent(this, BindPhoneActivity.class);
+                    //it.putExtra("hasLogined",true);
+                    startActivity(it);
+                }
+                else {
                     mCommentDialog = new CircleDialog.Builder()
                             .setCanceledOnTouchOutside(false)
                             .setCancelable(true)
@@ -765,7 +776,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
                             @Override
                             public void onClick(View v) {
                                 if (User.getInstance() == null) {
-                                    startActivityForResult(new Intent(SingleAudioDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                    startActivityForResult(new Intent(SingleAudioDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                                 } else {
                                     subscribe(mAudioDetail.getAlbum().get(0).getIs_sub() == 0);
                                 }
@@ -901,7 +912,7 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
                                 if (User.getInstance() != null) {
                                     praise("" + comment.getId(), v);
                                 } else {
-                                    startActivityForResult(new Intent(SingleAudioDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                    startActivityForResult(new Intent(SingleAudioDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                                 }
 
                             }

@@ -28,6 +28,8 @@ public class Column implements Serializable {
     private int parent_id;
     private List<Column> children;
 
+    private boolean isFresh;
+
     //private List<ColumnContent> content;
 
 

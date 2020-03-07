@@ -55,7 +55,6 @@ import butterknife.OnClick;
 import okhttp3.Call;
 
 
-
 public class StartupActivity extends Activity implements Handler.Callback {
 
     public static final int MSG_GET_ADVERT = 0x00;

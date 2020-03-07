@@ -79,5 +79,6 @@
         android:textColor="@color/transparent"
         android:longClickable="false"
         android:maxLength="4"
+        android:focusableInTouchMode="true"
         android:inputType="number" />
 </RelativeLayout>

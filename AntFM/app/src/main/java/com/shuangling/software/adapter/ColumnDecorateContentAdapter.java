@@ -96,8 +96,8 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
         this.mIsVideo = isVideo;
     }
 
-    public String getOssResize(int width,int height){
-        return "?x-oss-process=image/resize,m_fill,h_"+height+",w_"+width;
+    public String getOssResize(int width, int height) {
+        return "?x-oss-process=image/resize,m_fill,h_" + height + ",w_" + width;
     }
 
     private OnItemClickListener onItemClickListener;
@@ -234,7 +234,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = CommonUtils.dip2px(100);
                 int height = width;
-                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                 ImageLoader.showThumb(uri, audioViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(audioViewHolder.logo, R.drawable.article_placeholder);
@@ -271,7 +271,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                 ImageLoader.showThumb(uri, albumViewHolder.logo, width, height);
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
@@ -326,7 +326,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 //            albumViewHolder.title.setTag(listener);
 //            albumViewHolder.title.getViewTreeObserver().addOnPreDrawListener(listener);
             albumViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            if (content.getAlbums()!=null&&content.getAlbums().getStatus() == 1) {
+            if (content.getAlbums() != null && content.getAlbums().getStatus() == 1) {
                 //已完结
                 albumViewHolder.title.setText(CommonUtils.tagKeyword("完~" + content.getTitle(), "完~", CommonUtils.getThemeColor(mContext)));
             } else {
@@ -334,50 +334,46 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             }
 
 
-            if(content.getAlbums()!=null){
+            if (content.getAlbums() != null) {
                 albumViewHolder.count.setText("" + content.getAlbums().getCount() + "集");
             }
-            CommonUtils.setReadsAndComment(albumViewHolder.commentNum,content.getComment(),content.getView());
-
-            if (albumViewHolder.logo.getVisibility() == View.GONE) {
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                layoutParams.topMargin = CommonUtils.dip2px(10);
-                layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
-                albumViewHolder.layout.setLayoutParams(layoutParams);
-            }else{
-                albumViewHolder.title.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        int titleWidth = albumViewHolder.title.getWidth();
-                        int layoutWidth = albumViewHolder.layout.getWidth();
-                        int lineCount=albumViewHolder.title.getLineCount();
+            CommonUtils.setReadsAndComment(albumViewHolder.commentNum, content.getComment(), content.getView());
 
 
-                        if (lineCount> 2) {
+            albumViewHolder.title.post(new Runnable() {
+                @Override
+                public void run() {
+                    int titleWidth = albumViewHolder.title.getWidth();
+                    int layoutWidth = albumViewHolder.layout.getWidth();
+                    int lineCount = albumViewHolder.title.getLineCount();
+
+
+                    if (lineCount > 2) {
 //                            Log.i("test","getLineCount>2");
+                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                        layoutParams.topMargin = CommonUtils.dip2px(5);
+                        layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
+                        layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                        albumViewHolder.layout.setLayoutParams(layoutParams);
+                    } else {
+                        if (layoutWidth > titleWidth) {
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                             layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                             albumViewHolder.layout.setLayoutParams(layoutParams);
+
                         } else {
-                            if (layoutWidth > titleWidth) {
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
-                                albumViewHolder.layout.setLayoutParams(layoutParams);
-
-                            } else {
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
-                                albumViewHolder.layout.setLayoutParams(layoutParams);
-                            }
-
+                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                            layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.removeRule(RelativeLayout.BELOW);
+                            layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
+                            albumViewHolder.layout.setLayoutParams(layoutParams);
                         }
-
                     }
-                });
-            }
+                }
+
+            });
 
 
             albumViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -403,7 +399,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                     int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                     int height = (int) (2f * width / 3f);
-                    Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                    Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                     ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
                 } else {
                     articleViewHolder.logo.setVisibility(View.GONE);
@@ -415,7 +411,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                     int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                     int height = (int) (2f * width / 3f);
-                    Uri uri = Uri.parse(content.getArticle().getCovers().get(0)+getOssResize(width,height));
+                    Uri uri = Uri.parse(content.getArticle().getCovers().get(0) + getOssResize(width, height));
                     ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
                 } else {
                     articleViewHolder.logo.setVisibility(View.GONE);
@@ -474,7 +470,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             articleViewHolder.title.setText(content.getTitle());
 
             articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            CommonUtils.setReadsAndComment(articleViewHolder.commentNum,content.getComment(),content.getView());
+            CommonUtils.setReadsAndComment(articleViewHolder.commentNum, content.getComment(), content.getView());
 
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
@@ -482,35 +478,40 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
             if (articleViewHolder.logo.getVisibility() == View.GONE) {
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+
+                layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                 layoutParams.topMargin = CommonUtils.dip2px(10);
                 layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
 
                 articleViewHolder.layout.setLayoutParams(layoutParams);
-            }else{
+            } else {
                 articleViewHolder.title.post(new Runnable() {
                     @Override
                     public void run() {
                         int titleWidth = articleViewHolder.title.getWidth();
                         int layoutWidth = articleViewHolder.layout.getWidth();
-                        int lineCount=articleViewHolder.title.getLineCount();
+                        int lineCount = articleViewHolder.title.getLineCount();
 
 
-                        if (lineCount> 2) {
+                        if (lineCount > 2) {
 //                            Log.i("test","getLineCount>2");
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                             layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                             articleViewHolder.layout.setLayoutParams(layoutParams);
                         } else {
                             if (layoutWidth > titleWidth) {
                                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                                 layoutParams.topMargin = CommonUtils.dip2px(5);
+                                layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                                 layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                                 articleViewHolder.layout.setLayoutParams(layoutParams);
 
                             } else {
                                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                                 layoutParams.topMargin = CommonUtils.dip2px(5);
+                                layoutParams.removeRule(RelativeLayout.BELOW);
                                 layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
                                 articleViewHolder.layout.setLayoutParams(layoutParams);
                             }
@@ -520,8 +521,6 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                     }
                 });
             }
-
-
 
 
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -548,7 +547,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getArticle().getCovers().get(0)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getArticle().getCovers().get(0) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, articleViewHolder.pic1, width, height);
             } else {
                 ImageLoader.showThumb(articleViewHolder.pic1, R.drawable.video_placeholder);
@@ -557,7 +556,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getArticle().getCovers().get(1)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getArticle().getCovers().get(1) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, articleViewHolder.pic2, width, height);
             } else {
                 ImageLoader.showThumb(articleViewHolder.pic2, R.drawable.video_placeholder);
@@ -566,7 +565,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getArticle().getCovers().get(2)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getArticle().getCovers().get(2) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, articleViewHolder.pic3, width, height);
             } else {
                 ImageLoader.showThumb(articleViewHolder.pic3, R.drawable.video_placeholder);
@@ -576,7 +575,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             articleViewHolder.title.setText(content.getTitle());
 
             articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            CommonUtils.setReadsAndComment(articleViewHolder.commentNum,content.getComment(),content.getView());
+            CommonUtils.setReadsAndComment(articleViewHolder.commentNum, content.getComment(), content.getView());
 
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
@@ -606,7 +605,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = CommonUtils.getScreenWidth() - CommonUtils.dip2px(20);
                 int height = (int) (9f * width / 16f);
-                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                 ImageLoader.showThumb(uri, videoViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(videoViewHolder.logo, R.drawable.video_placeholder);
@@ -629,7 +628,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             }
             videoViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             videoViewHolder.title.setText(content.getTitle());
-            CommonUtils.setReadsAndComment(videoViewHolder.commentNum,content.getComment(),content.getView());
+            CommonUtils.setReadsAndComment(videoViewHolder.commentNum, content.getComment(), content.getView());
 
             videoViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -654,7 +653,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = CommonUtils.getScreenWidth();
                 int height = (int) (9f * width / 16f);
-                Uri uri = Uri.parse(content.getGallerie().getCovers().get(0)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getGallerie().getCovers().get(0) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, gallerieOneViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(gallerieOneViewHolder.logo, R.drawable.video_placeholder);
@@ -664,7 +663,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             }
             gallerieOneViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieOneViewHolder.title.setText(content.getTitle());
-            CommonUtils.setReadsAndComment(gallerieOneViewHolder.commentNum,content.getComment(),content.getView());
+            CommonUtils.setReadsAndComment(gallerieOneViewHolder.commentNum, content.getComment(), content.getView());
 
             gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
             gallerieOneViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -691,7 +690,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getGallerie().getCovers().get(0)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getGallerie().getCovers().get(0) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, gallerieViewThreeHolder.pic1, width, height);
             } else {
                 ImageLoader.showThumb(gallerieViewThreeHolder.pic1, R.drawable.video_placeholder);
@@ -700,7 +699,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getGallerie().getCovers().get(1)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getGallerie().getCovers().get(1) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, gallerieViewThreeHolder.pic2, width, height);
             } else {
                 ImageLoader.showThumb(gallerieViewThreeHolder.pic2, R.drawable.video_placeholder);
@@ -709,7 +708,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getGallerie().getCovers().get(2)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getGallerie().getCovers().get(2) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, gallerieViewThreeHolder.pic3, width, height);
             } else {
                 ImageLoader.showThumb(gallerieViewThreeHolder.pic3, R.drawable.video_placeholder);
@@ -719,7 +718,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             }
             gallerieViewThreeHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieViewThreeHolder.title.setText(content.getTitle());
-            CommonUtils.setReadsAndComment(gallerieViewThreeHolder.commentNum,content.getComment(),content.getView());
+            CommonUtils.setReadsAndComment(gallerieViewThreeHolder.commentNum, content.getComment(), content.getView());
 
             gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
             gallerieViewThreeHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -748,7 +747,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                 ImageLoader.showThumb(uri, specialViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(specialViewHolder.logo, R.drawable.article_placeholder);
@@ -805,48 +804,45 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                 specialViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
             specialViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            CommonUtils.setReadsAndComment(specialViewHolder.commentNum,content.getComment(),content.getView());
+            CommonUtils.setReadsAndComment(specialViewHolder.commentNum, content.getComment(), content.getView());
 
 
-            if (specialViewHolder.logo.getVisibility() == View.GONE) {
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                layoutParams.topMargin = CommonUtils.dip2px(10);
-                layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
-                specialViewHolder.layout.setLayoutParams(layoutParams);
-            }else{
-                specialViewHolder.title.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        int titleWidth = specialViewHolder.title.getWidth();
-                        int layoutWidth = specialViewHolder.layout.getWidth();
-                        int lineCount=specialViewHolder.title.getLineCount();
+            specialViewHolder.title.post(new Runnable() {
+                @Override
+                public void run() {
+                    int titleWidth = specialViewHolder.title.getWidth();
+                    int layoutWidth = specialViewHolder.layout.getWidth();
+                    int lineCount = specialViewHolder.title.getLineCount();
 
 
-                        if (lineCount> 2) {
+                    if (lineCount > 2) {
 //                            Log.i("test","getLineCount>2");
+                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                        layoutParams.topMargin = CommonUtils.dip2px(5);
+                        layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
+                        layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                        specialViewHolder.layout.setLayoutParams(layoutParams);
+                    } else {
+                        if (layoutWidth > titleWidth) {
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                             layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                             specialViewHolder.layout.setLayoutParams(layoutParams);
+
                         } else {
-                            if (layoutWidth > titleWidth) {
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
-                                specialViewHolder.layout.setLayoutParams(layoutParams);
-
-                            } else {
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
-                                specialViewHolder.layout.setLayoutParams(layoutParams);
-                            }
-
+                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                            layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.removeRule(RelativeLayout.BELOW);
+                            layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
+                            specialViewHolder.layout.setLayoutParams(layoutParams);
                         }
 
                     }
-                });
-            }
+
+                }
+            });
+
 
             specialViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -872,22 +868,22 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                 activityViewHolder.activity.setVisibility(View.VISIBLE);
             }
             activityViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            if(content.getActivitiy().getType()==1){
+            if (content.getActivitiy().getType() == 1) {
                 GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
                 hierarchy.setPlaceholderImage(R.drawable.activity_sign_up_logo);
-            }else if(content.getActivitiy().getType()==2){
+            } else if (content.getActivitiy().getType() == 2) {
                 GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
                 hierarchy.setPlaceholderImage(R.drawable.activity_answer_logo);
-            }else if(content.getActivitiy().getType()==3){
+            } else if (content.getActivitiy().getType() == 3) {
                 GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
                 hierarchy.setPlaceholderImage(R.drawable.activity_vote_logo);
-            }else if(content.getActivitiy().getType()==4){
+            } else if (content.getActivitiy().getType() == 4) {
                 GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
                 hierarchy.setPlaceholderImage(R.drawable.activity_luck_logo);
-            }else if(content.getActivitiy().getType()==5){
+            } else if (content.getActivitiy().getType() == 5) {
                 GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
                 hierarchy.setPlaceholderImage(R.drawable.activity_marathon_logo);
-            }else if(content.getActivitiy().getType()==6){
+            } else if (content.getActivitiy().getType() == 6) {
                 GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
                 hierarchy.setPlaceholderImage(R.drawable.activity_interact_logo);
             }
@@ -895,7 +891,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = CommonUtils.getScreenWidth();
                 int height = (int) (9f * width / 16f);
-                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                 ImageLoader.showThumb(uri, activityViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(activityViewHolder.logo, R.drawable.video_placeholder);
@@ -905,9 +901,9 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             }
             activityViewHolder.title.setText(content.getTitle());
             if (content.getActivitiy() != null) {
-                if(content.getActivitiy().getJoin_count()>0){
+                if (content.getActivitiy().getJoin_count() > 0) {
                     activityViewHolder.commentNum.setText(content.getActivitiy().getJoin_count() + "人参与");
-                }else {
+                } else {
                     activityViewHolder.commentNum.setText("");
                 }
 
@@ -917,7 +913,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                 public void onClick(View v) {
                     Intent it = new Intent(mContext, WebViewBackActivity.class);
                     it.putExtra("url", content.getActivitiy().getUrl());
-                    it.putExtra("title",content.getTitle());
+                    it.putExtra("title", content.getTitle());
                     if (content.getActivitiy().getType() == 2) {
                         it.putExtra("activityId", content.getActivitiy().getId());
                     }
@@ -938,7 +934,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
                 int width = CommonUtils.getScreenWidth();
                 int height = (int) (9f * width / 16f);
-                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                 ImageLoader.showThumb(uri, liveViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(liveViewHolder.logo, R.drawable.video_placeholder);
@@ -973,7 +969,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                 public void onClick(View v) {
                     Intent it = new Intent(mContext, WebViewBackActivity.class);
                     it.putExtra("url", content.getLive().getUrl());
-                    it.putExtra("title",content.getTitle());
+                    it.putExtra("title", content.getTitle());
                     mContext.startActivity(it);
                 }
             });

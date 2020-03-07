@@ -337,46 +337,43 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             albumViewHolder.count.setText("" + content.getAlbums().getCount() + "集");
             CommonUtils.setReadsAndComment(albumViewHolder.commentNum,content.getComment(),content.getView());
 
-            if (albumViewHolder.logo.getVisibility() == View.GONE) {
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                layoutParams.topMargin = CommonUtils.dip2px(10);
-                layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
 
-                albumViewHolder.layout.setLayoutParams(layoutParams);
-            }else{
-                albumViewHolder.title.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        int titleWidth = albumViewHolder.title.getWidth();
-                        int layoutWidth = albumViewHolder.layout.getWidth();
-                        int lineCount=albumViewHolder.title.getLineCount();
+            albumViewHolder.title.post(new Runnable() {
+                @Override
+                public void run() {
+                    int titleWidth = albumViewHolder.title.getWidth();
+                    int layoutWidth = albumViewHolder.layout.getWidth();
+                    int lineCount=albumViewHolder.title.getLineCount();
 
 
-                        if (lineCount> 2) {
+                    if (lineCount> 2) {
 //                            Log.i("test","getLineCount>2");
+                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                        layoutParams.topMargin = CommonUtils.dip2px(5);
+                        layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
+                        layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                        albumViewHolder.layout.setLayoutParams(layoutParams);
+                    } else {
+                        if (layoutWidth > titleWidth) {
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                             layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                             albumViewHolder.layout.setLayoutParams(layoutParams);
+
                         } else {
-                            if (layoutWidth > titleWidth) {
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
-                                albumViewHolder.layout.setLayoutParams(layoutParams);
-
-                            } else {
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
-                                albumViewHolder.layout.setLayoutParams(layoutParams);
-                            }
-
+                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                            layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.removeRule(RelativeLayout.BELOW);
+                            layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
+                            albumViewHolder.layout.setLayoutParams(layoutParams);
                         }
 
                     }
-                });
-            }
+
+                }
+            });
+
             albumViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -491,6 +488,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             if (articleViewHolder.logo.getVisibility() == View.GONE) {
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                 layoutParams.topMargin = CommonUtils.dip2px(10);
+                layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                 layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
                 articleViewHolder.layout.setLayoutParams(layoutParams);
             }else{
@@ -506,18 +504,21 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
 //                            Log.i("test","getLineCount>2");
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                             layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                             articleViewHolder.layout.setLayoutParams(layoutParams);
                         } else {
                             if (layoutWidth > titleWidth) {
                                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                                 layoutParams.topMargin = CommonUtils.dip2px(5);
+                                layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                                 layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                                 articleViewHolder.layout.setLayoutParams(layoutParams);
 
                             } else {
                                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                                 layoutParams.topMargin = CommonUtils.dip2px(5);
+                                layoutParams.removeRule(RelativeLayout.BELOW);
                                 layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
                                 articleViewHolder.layout.setLayoutParams(layoutParams);
                             }
@@ -884,46 +885,43 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             specialViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
 
             CommonUtils.setReadsAndComment(specialViewHolder.commentNum,content.getComment(),content.getView());
-            if (specialViewHolder.logo.getVisibility() == View.GONE) {
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                layoutParams.topMargin = CommonUtils.dip2px(10);
-                layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
 
-                specialViewHolder.layout.setLayoutParams(layoutParams);
-            }else{
-                specialViewHolder.title.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        int titleWidth = specialViewHolder.title.getWidth();
-                        int layoutWidth = specialViewHolder.layout.getWidth();
-                        int lineCount=specialViewHolder.title.getLineCount();
+            specialViewHolder.title.post(new Runnable() {
+                @Override
+                public void run() {
+                    int titleWidth = specialViewHolder.title.getWidth();
+                    int layoutWidth = specialViewHolder.layout.getWidth();
+                    int lineCount=specialViewHolder.title.getLineCount();
 
 
-                        if (lineCount> 2) {
+                    if (lineCount> 2) {
 //                            Log.i("test","getLineCount>2");
+                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                        layoutParams.topMargin = CommonUtils.dip2px(5);
+                        layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
+                        layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                        specialViewHolder.layout.setLayoutParams(layoutParams);
+                    } else {
+                        if (layoutWidth > titleWidth) {
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                             layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                             specialViewHolder.layout.setLayoutParams(layoutParams);
+
                         } else {
-                            if (layoutWidth > titleWidth) {
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
-                                specialViewHolder.layout.setLayoutParams(layoutParams);
-
-                            } else {
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
-                                specialViewHolder.layout.setLayoutParams(layoutParams);
-                            }
-
+                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                            layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.removeRule(RelativeLayout.BELOW);
+                            layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
+                            specialViewHolder.layout.setLayoutParams(layoutParams);
                         }
 
                     }
-                });
-            }
+
+                }
+            });
+
             specialViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

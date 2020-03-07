@@ -246,7 +246,7 @@ public class AlbumDetailActivity extends BaseActivity implements Handler.Callbac
                             @Override
                             public void onClick(View v) {
                                 if (User.getInstance() == null) {
-                                    startActivityForResult(new Intent(AlbumDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                    startActivityForResult(new Intent(AlbumDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                                 } else {
                                     subscribe(mAlbum.getIs_sub() == 0);
                                 }

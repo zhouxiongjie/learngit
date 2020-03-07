@@ -237,7 +237,12 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
                             @Override
                             public void replyItem(final Comment comment) {
                                 if (User.getInstance() == null) {
-                                    Intent it = new Intent(CommentDetailActivity.this, LoginActivity.class);
+                                    Intent it = new Intent(CommentDetailActivity.this, NewLoginActivity.class);
+                                    startActivity(it);
+                                }else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+
+                                    Intent it = new Intent(CommentDetailActivity.this, BindPhoneActivity.class);
+                                    //it.putExtra("hasLogined",true);
                                     startActivity(it);
                                 } else {
                                     mCommentDialog = new CircleDialog.Builder()
@@ -281,7 +286,7 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
                                 if (User.getInstance() != null) {
                                     praise("" + comment.getId(), view);
                                 } else {
-                                    Intent it = new Intent(CommentDetailActivity.this, LoginActivity.class);
+                                    Intent it = new Intent(CommentDetailActivity.this, NewLoginActivity.class);
                                     startActivity(it);
                                 }
 
@@ -376,7 +381,16 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
         if (User.getInstance() == null) {
             Intent it = new Intent(this, LoginActivity.class);
             startActivity(it);
-        } else {
+        }
+        if (User.getInstance() == null) {
+            Intent it = new Intent(this, NewLoginActivity.class);
+            startActivity(it);
+        }else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+
+            Intent it = new Intent(this, BindPhoneActivity.class);
+            //it.putExtra("hasLogined",true);
+            startActivity(it);
+        }else {
             mCommentDialog = new CircleDialog.Builder()
                     .setCanceledOnTouchOutside(false)
                     .setCancelable(true)

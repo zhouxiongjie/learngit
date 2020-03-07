@@ -431,7 +431,7 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
                             @Override
                             public void onClick(View v) {
                                 if (User.getInstance() == null) {
-                                    startActivityForResult(new Intent(OrganizationDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                    startActivityForResult(new Intent(OrganizationDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                                 } else {
                                     attention(mOrganization.getIs_follow() == 0);
                                 }
@@ -640,7 +640,7 @@ public class OrganizationDetailActivity extends BaseActivity implements Handler.
                                     @Override
                                     public void onClick(View v) {
                                         if (User.getInstance() == null) {
-                                            startActivityForResult(new Intent(OrganizationDetailActivity.this, LoginActivity.class), REQUEST_LOGIN);
+                                            startActivityForResult(new Intent(OrganizationDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                                         } else {
                                             attention(organization, organization.getIs_follow() == 0, v);
                                         }

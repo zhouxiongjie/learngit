@@ -1,6 +1,7 @@
 package com.shuangling.software.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -87,7 +88,19 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
         ButterKnife.bind(this);
         mHandler = new Handler(this);
         hasLogined = getIntent().getBooleanExtra("hasLogined", false);
-        if (hasLogined) {
+
+        init();
+    }
+
+
+    private void init() {
+        activityTitle.getMoreTextView().setTextColor(Color.parseColor("#AFAFB1"));
+        weixinUnionid = getIntent().getStringExtra("unionid");
+        weixinOpenid = getIntent().getStringExtra("openid");
+        weixinNickname = getIntent().getStringExtra("nickname");
+        weixinHeadimgurl = getIntent().getStringExtra("headimgurl");
+
+        if (User.getInstance()!=null) {
             activityTitle.setCanBack(true);
             AppManager.clearActivity();
             AppManager.addActivity(this);
@@ -98,6 +111,12 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
 
                 }
             });
+
+            nickname.setText(User.getInstance().getNickname());
+            if (!TextUtils.isEmpty(User.getInstance().getAvatar())) {
+                Uri uri = Uri.parse(User.getInstance().getAvatar());
+                ImageLoader.showThumb(uri, head, CommonUtils.dip2px(60), CommonUtils.dip2px(60));
+            }
         } else {
             activityTitle.setCanBack(false);
             AppManager.addActivity(this);
@@ -108,22 +127,14 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
                     weixinLogin(weixinNickname, weixinHeadimgurl, weixinOpenid, weixinUnionid);
                 }
             });
+
+            nickname.setText(weixinNickname);
+            if (!TextUtils.isEmpty(weixinHeadimgurl)) {
+                Uri uri = Uri.parse(weixinHeadimgurl);
+                ImageLoader.showThumb(uri, head, CommonUtils.dip2px(60), CommonUtils.dip2px(60));
+            }
         }
-        init();
-    }
 
-
-    private void init() {
-        weixinUnionid = getIntent().getStringExtra("unionid");
-        weixinOpenid = getIntent().getStringExtra("openid");
-        weixinNickname = getIntent().getStringExtra("nickname");
-        weixinHeadimgurl = getIntent().getStringExtra("headimgurl");
-
-        nickname.setText(weixinNickname);
-        if (!TextUtils.isEmpty(weixinHeadimgurl)) {
-            Uri uri = Uri.parse(weixinHeadimgurl);
-            ImageLoader.showThumb(uri, head, CommonUtils.dip2px(60), CommonUtils.dip2px(60));
-        }
 
 
         phoneNum.addTextChangedListener(new TextWatcher() {

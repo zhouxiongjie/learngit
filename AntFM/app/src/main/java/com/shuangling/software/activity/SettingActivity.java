@@ -48,6 +48,7 @@ import com.shuangling.software.utils.DataCleanManager;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +65,7 @@ import okhttp3.Call;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
-
+@EnableDragToClose()
 public class SettingActivity extends AppCompatActivity {
 
 
@@ -255,7 +256,7 @@ public class SettingActivity extends AppCompatActivity {
                 if (User.getInstance() != null) {
                     startActivity(new Intent(this, AccountAndSecurityActivity.class));
                 } else {
-                    Intent it = new Intent(this, LoginActivity.class);
+                    Intent it = new Intent(this, NewLoginActivity.class);
                     startActivity(it);
                 }
                 break;

@@ -179,7 +179,8 @@ public class AccountAndSecurityActivity extends AppCompatActivity implements Pla
                             mDialogFragment.dismiss();
                             if (result.getCode() == 100000) {
                                 ToastUtils.show("解绑成功");
-                                platformList.remove(0);
+                                if (platformList.size() > 0) platformList.remove(0);
+
                                 wechatBind = false;
                                 setUserInfo();
                             }
@@ -251,12 +252,13 @@ public class AccountAndSecurityActivity extends AppCompatActivity implements Pla
                             if (result.getCode() == 100000){
                                 wechatBind = true;
                                 setUserInfo();
+                                ToastUtils.show("绑定成功");
+                                Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
+                                wechat.removeAccount(true);
                             }else {
                                 forceBind(platform);
                             }
 
-                            Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
-                            wechat.removeAccount(true);
                         }
                     });
 

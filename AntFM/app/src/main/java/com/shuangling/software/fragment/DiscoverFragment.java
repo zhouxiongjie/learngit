@@ -448,6 +448,8 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
         @JavascriptInterface
         public void bindPhoneEvent(final String url) {
+            mJumpUrl=url;
+
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {

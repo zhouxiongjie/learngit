@@ -106,6 +106,15 @@ public class Column implements Serializable {
         this.children = children;
     }
 
+
+    public boolean isFresh() {
+        return isFresh;
+    }
+
+    public void setFresh(boolean fresh) {
+        isFresh = fresh;
+    }
+
 //    public List<ColumnContent> getContent() {
 //        return content;
 //    }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -36,5 +37,24 @@
         android:layout_alignParentRight="true"
         android:background="@drawable/delete_tag"
         />
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/newColumn"
+        android:layout_width="4dp"
+        android:layout_height="4dp"
+        android:layout_centerVertical="true"
+        app:actualImageScaleType="centerCrop"
+        app:failureImage="@color/red"
+        app:failureImageScaleType="centerCrop"
+        app:placeholderImage="@color/red"
+        app:placeholderImageScaleType="centerCrop"
+        app:roundAsCircle="true"
+        app:roundingBorderColor="@color/textColorSeven"
+        app:roundingBorderWidth="0dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"/>
 
 </RelativeLayout>

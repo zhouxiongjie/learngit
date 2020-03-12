@@ -200,16 +200,40 @@
 
             <!--app:tabTextSizeMode="gradient"-->
 
-
-
-            <ImageView
+            <FrameLayout
                 android:id="@+id/customColumn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/custom_column"
-                android:layout_centerVertical="true"/>
+                android:layout_centerVertical="true">
+                <ImageView
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:src="@drawable/custom_column"
+                    />
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/newColumn"
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:layout_gravity="right|top"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="5dp"
+                    app:actualImageScaleType="centerCrop"
+                    app:failureImage="@color/red"
+                    app:failureImageScaleType="centerCrop"
+                    app:placeholderImage="@color/red"
+                    app:placeholderImageScaleType="centerCrop"
+                    app:roundAsCircle="true"
+                    app:roundingBorderColor="@color/textColorSeven"
+                    app:roundingBorderWidth="0dp"
+                    android:visibility="invisible"/>
+
+            </FrameLayout>
+
+
         </RelativeLayout>
 
 

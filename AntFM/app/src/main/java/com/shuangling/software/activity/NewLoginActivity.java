@@ -344,11 +344,27 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                             }
                         });
 
+                        if(bindPhone==true&&TextUtils.isEmpty(User.getInstance().getPhone())){
 
-                        ToastUtils.show("登录成功");
-                        setResult(RESULT_OK);
-                        EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
-                        AppManager.finishAllActivity();
+                            Intent it = new Intent(this, BindPhoneActivity.class);
+                            it.putExtra("nickname", weixinNickname);
+                            it.putExtra("headimgurl", weixinHeadimgurl);
+                            it.putExtra("openid", weixinOpenid);
+                            it.putExtra("unionid", weixinUnionid);
+                            startActivity(it);
+
+                            ToastUtils.show("登录成功");
+                            setResult(RESULT_OK);
+                            EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
+                            AppManager.finishAllActivity();
+
+                        }else{
+                            ToastUtils.show("登录成功");
+                            setResult(RESULT_OK);
+                            EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
+                            AppManager.finishAllActivity();
+                        }
+
                         //finish();
 
 
@@ -446,11 +462,11 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
 
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
-                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000 && bindPhone == false) {
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         //mUserExist=true;
                         weixinLogin(weixinNickname, weixinHeadimgurl, weixinOpenid, weixinUnionid);
 
-                    } else if ((jsonObject != null && jsonObject.getIntValue("code") == 202004) || bindPhone == true) {
+                    } else if ((jsonObject != null && jsonObject.getIntValue("code") == 202004)) {
                         //mUserExist=false;
                         //weixinLogin(weixinNickname,weixinHeadimgurl,weixinOpenid,weixinUnionid);
                         Intent it = new Intent(this, BindPhoneActivity.class);

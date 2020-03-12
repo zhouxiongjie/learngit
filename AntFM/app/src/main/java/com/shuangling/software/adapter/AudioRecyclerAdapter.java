@@ -533,6 +533,8 @@ public class AudioRecyclerAdapter extends RecyclerView.Adapter implements View.O
                 int width = CommonUtils.dip2px(40);
                 int height = width;
                 ImageLoader.showThumb(uri, viewHolder.head, width, height);
+            }else{
+                ImageLoader.showThumb(viewHolder.head,R.drawable.ic_user1);
             }
             viewHolder.account.setText(comment.getUser().getNickname());
             viewHolder.time.setText(comment.getCreated_at());

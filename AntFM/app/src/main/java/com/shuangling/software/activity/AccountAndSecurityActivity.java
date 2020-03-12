@@ -274,7 +274,7 @@ public class AccountAndSecurityActivity extends AppCompatActivity implements Pla
     private void forceBind(final Platform platform){
         new CircleDialog.Builder()
                 .setTitle("提示")
-                .setText("该第三方已经绑定其他账号，是否重新绑定此账号？")
+                .setText("该第三方账号已经绑定其他账号，是否重新绑定此账号？")
                 .setPositive("确定", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

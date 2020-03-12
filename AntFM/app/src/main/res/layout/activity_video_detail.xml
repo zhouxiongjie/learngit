@@ -152,7 +152,7 @@
         android:layout_below="@+id/organizationLayout"
         android:layout_above="@+id/bottom"
         fresco:srlEnableRefresh="false"
-        fresco:srlEnableLoadMore="false">
+        fresco:srlEnableLoadMore="true">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"

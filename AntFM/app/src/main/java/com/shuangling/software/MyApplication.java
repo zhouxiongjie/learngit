@@ -143,8 +143,8 @@ public class MyApplication extends MultiDexApplication {
 
 
         setupDatabase();
-		Intent it = new Intent(this, AudioPlayerService.class);
-		startService(it);
+
+
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             int activitys=0;
             @Override

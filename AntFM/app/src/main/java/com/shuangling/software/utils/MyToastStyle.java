@@ -48,7 +48,7 @@ public class MyToastStyle implements IToastStyle {
 
     @Override
     public int getMaxLines() {
-        return 1;
+        return 2;
     }
 
     @Override

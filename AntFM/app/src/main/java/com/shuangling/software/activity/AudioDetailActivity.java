@@ -921,18 +921,25 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 
                     if (msg.arg1 == 0) {
                         mComments=comments;
-                        if(comments==null||comments.size()==0){
-                            refreshLayout.setEnableLoadMore(false);
-                        }else{
-                            refreshLayout.setEnableLoadMore(true);
-                        }
+//                        if(comments==null||comments.size()==0){
+//                            refreshLayout.setEnableLoadMore(false);
+//                        }else{
+//                            refreshLayout.setEnableLoadMore(true);
+//                        }
 
                     } else if (msg.arg1 == 1) {
 
                         if (refreshLayout.getState() == RefreshState.Loading) {
+//                            if(comments==null||comments.size()==0){
+//                                refreshLayout.setEnableLoadMore(false);
+//                                //refreshLayout.finishLoadMoreWithNoMoreData();
+//                            }else{
+//                                refreshLayout.finishLoadMore();
+//                            }
+
                             if(comments==null||comments.size()==0){
-                                refreshLayout.setEnableLoadMore(false);
-                                //refreshLayout.finishLoadMoreWithNoMoreData();
+                                //refreshLayout.setEnableLoadMore(false);
+                                refreshLayout.finishLoadMoreWithNoMoreData();
                             }else{
                                 refreshLayout.finishLoadMore();
                             }

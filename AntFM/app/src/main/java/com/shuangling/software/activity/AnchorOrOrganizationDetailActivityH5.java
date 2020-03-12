@@ -455,6 +455,7 @@ public class AnchorOrOrganizationDetailActivityH5 extends AppCompatActivity impl
 
         @JavascriptInterface
         public void bindPhoneEvent(final String url) {
+
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {

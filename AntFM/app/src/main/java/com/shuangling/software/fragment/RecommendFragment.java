@@ -1,9 +1,6 @@
 package com.shuangling.software.fragment;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,15 +11,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.LinearInterpolator;
-import android.widget.HorizontalScrollView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -88,12 +80,12 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
     public static final int MSG_GET_CITY_WEATHER = 0x2;
     @BindView(R.id.search)
     TextView search;
-//    @BindView(R.id.columnContent)
+    //    @BindView(R.id.columnContent)
 //    LinearLayout columnContent;
     @BindView(R.id.viewPager)
     ViewPager viewPager;
     Unbinder unbinder;
-//    @BindView(R.id.columnScrollView)
+    //    @BindView(R.id.columnScrollView)
 //    HorizontalScrollView columnScrollView;
     @BindView(R.id.city)
     TextView city;
@@ -108,7 +100,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
     @BindView(R.id.logo1)
     SimpleDraweeView logo1;
     @BindView(R.id.customColumn)
-    ImageView customColumn;
+    FrameLayout customColumn;
     @BindView(R.id.topBackground)
     SimpleDraweeView topBackground;
     @BindView(R.id.topBar)
@@ -117,6 +109,8 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
     View statusBar;
     @BindView(R.id.pagerIndicator)
     DynamicPagerIndicator pagerIndicator;
+    @BindView(R.id.newColumn)
+    SimpleDraweeView newColumn;
 
 
     /**
@@ -269,7 +263,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 //                return false;
 //            }
 //        });
-        if(MainActivity.sCurrentCity!=null){
+        if (MainActivity.sCurrentCity != null) {
             weather();
         }
         return rootView;
@@ -283,7 +277,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             mMyselfFragmentPagerAdapter = new MyselfFragmentPagerAdapter(getChildFragmentManager(), mColumns);
             viewPager.setAdapter(mMyselfFragmentPagerAdapter);
             viewPager.addOnPageChangeListener(mPageListener);
-            if(pagerIndicator.getViewPager()==null){
+            if (pagerIndicator.getViewPager() == null) {
                 pagerIndicator.setViewPager(viewPager);
             }
             pagerIndicator.updateIndicator(true);
@@ -310,7 +304,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 //                }, 500);
                 //mColumnSelectIndex = 1;
                 viewPager.setCurrentItem(1);
-            }else{
+            } else {
                 mPageListener.onPageSelected(0);
             }
         }
@@ -522,6 +516,8 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 //                            }
                             initFragment();
                             //mMyselfFragmentPagerAdapter.notifyDataSetChanged();
+
+
                         }
 
                         @Override
@@ -583,6 +579,13 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                 switchColumn(col);
                             }
 
+
+
+                        }
+
+                        @Override
+                        public void refreshRed() {
+                            new AnalyseColumn(mRemoteColumns).start();
                         }
                     });
                     dialog.show(getFragmentManager(), "AudioListDialog");
@@ -656,7 +659,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getEventBus(CommonEvent event) {
         if (event.getEventName().equals("onLocationChanged")) {
-            if(city!=null){
+            if (city != null) {
                 city.setText(MainActivity.sCurrentCity.getName());
             }
 
@@ -761,8 +764,6 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                             mRemoteColumns = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), Column.class);
 
 
-
-
                             Column col = new Column();
                             col.setName("首页");
                             col.setType(-1);
@@ -794,12 +795,16 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                                     }
                                 }
 
+                                new AnalyseColumn(mRemoteColumns).start();
+
                                 String custom_column = JSON.toJSONString(tempColumns);
                                 if (!custom_column.equals(customColumn)) {
                                     SharedPreferencesUtils.putPreferenceTypeValue("custom_column", SharedPreferencesUtils.PreferenceType.String, custom_column);
                                 }
                                 return true;
                             }
+                            SharedPreferencesUtils.putPreferenceTypeValue("all_column", SharedPreferencesUtils.PreferenceType.String, JSON.toJSONString(mRemoteColumns));
+                            new AnalyseColumn(mRemoteColumns).start();
                             mColumns = mRemoteColumns;
                             if (mColumns != null && mColumns.size() > 8) {
                                 mColumns = mColumns.subList(0, 8);
@@ -1029,12 +1034,11 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             if (User.getInstance() == null) {
                 Intent it = new Intent(getContext(), NewLoginActivity.class);
                 startActivity(it);
-            }else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+            } else if (User.getInstance() != null && TextUtils.isEmpty(User.getInstance().getPhone())) {
                 Intent it = new Intent(getContext(), BindPhoneActivity.class);
                 //it.putExtra("hasLogined",true);
                 startActivity(it);
-            }
-            else {
+            } else {
                 Intent it = new Intent(getContext(), CluesActivity.class);
                 it.putExtra("url", ServerInfo.scs + "/broke-create");
                 startActivity(it);
@@ -1065,25 +1069,65 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
     }
 
 
-    class AnalyseColumn extends Thread{
+    class AnalyseColumn extends Thread {
 
         public List<Column> remoteColumns;
+
+        AnalyseColumn(List<Column> columns){
+            remoteColumns=columns;
+        }
 
         @Override
         public void run() {
 
-            List<Column> allColumns= JSONObject.parseArray(SharedPreferencesUtils.getStringValue("all_column", null), Column.class);
+            List<Column> allColumns = JSONObject.parseArray(SharedPreferencesUtils.getStringValue("all_column", null), Column.class);
 
-            if(mRemoteColumns!=null){
+            if (mRemoteColumns != null) {
 
-                List<Integer> columnIds=new ArrayList<>();
-                for(int i=0;i<allColumns.size();i++){
+                List<Integer> columnIds = new ArrayList<>();
+                for (int i = 0; allColumns!=null&&i < allColumns.size(); i++) {
                     columnIds.add(allColumns.get(i).getId());
                 }
+                boolean hasNewClomn = false;
+                Iterator<Column> iterator = remoteColumns.iterator();
+                while (iterator.hasNext()) {
+                    Column column = iterator.next();
+                    if (!columnIds.contains(column.getId())) {
+                        column.setFresh(true);
+                        hasNewClomn = true;
+                    } else {
+                        column.setFresh(false);
+                    }
+                }
+
+                if (hasNewClomn) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try{
+                                newColumn.setVisibility(View.VISIBLE);
+                            }catch (Exception e){
+
+                            }
+
+                        }
+                    });
+                }else  {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try{
+                                newColumn.setVisibility(View.INVISIBLE);
+                            }catch (Exception e){
+
+                            }
+
+                        }
+                    });
+                }
+
+
             }
-
-
-
 
 
 //            List<Column> tempColumns=new ArrayList<>();

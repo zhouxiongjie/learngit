@@ -312,6 +312,11 @@ public class NewForgetPasswordActivity extends AppCompatActivity implements Hand
                 getVerifyCode(phoneNum.getText().toString());
                 break;
             case R.id.resetPassword:
+
+                if(!CommonUtils.isValidPassword(newPassword.getText().toString())){
+                    ToastUtils.show("密码需由6-20位数字、字母或符号组成，至少两种");
+                    return;
+                }
                 resetPassword();
                 break;
             case R.id.timer:
@@ -322,9 +327,15 @@ public class NewForgetPasswordActivity extends AppCompatActivity implements Hand
                 if(mPasswordVisible){
                     eye.setText(R.string.password_visible);
                     newPassword.setInputType(InputType.TYPE_CLASS_TEXT);
+                    if(!TextUtils.isEmpty(newPassword.getText().toString())){
+                        newPassword.setSelection(newPassword.getText().toString().length());//将光标移至文字末尾
+                    }
                 }else {
                     eye.setText(R.string.password_invisible);
                     newPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    if(!TextUtils.isEmpty(newPassword.getText().toString())){
+                        newPassword.setSelection(newPassword.getText().toString().length());//将光标移至文字末尾
+                    }
                 }
                 break;
         }

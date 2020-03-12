@@ -147,7 +147,7 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
             Uri uri = Uri.parse(User.getInstance().getAvatar());
             ImageLoader.showThumb(uri, head, CommonUtils.dip2px(120), CommonUtils.dip2px(120));
         }
-        confirm.setEnabled(true);
+        confirm.setEnabled(false);
 
         nickName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -165,16 +165,12 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
 
                 String nickname = s.toString();
                 mUserInfo.put("nickname",nickname);
-//                String pwd=password.getText().toString();
-//                if (!TextUtils.isEmpty(nickname)) {
-//                    if (!CommonUtils.isValidPassword(pwd)) {
-//                        confirm.setEnabled(false);
-//                    } else {
-//                        confirm.setEnabled(true);
-//                    }
-//                }else{
-//                    confirm.setEnabled(false);
-//                }
+                String pwd=password.getText().toString();
+                if (!TextUtils.isEmpty(nickname)&&!TextUtils.isEmpty(pwd)) {
+                    confirm.setEnabled(true);
+                }else{
+                    confirm.setEnabled(false);
+                }
 
 
             }
@@ -195,20 +191,13 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
             @Override
             public void afterTextChanged(Editable s) {
 
-//                String pwd = s.toString();
-//                String nickname=nickName.getText().toString();
-//                if (!TextUtils.isEmpty(nickname)) {
-//
-//                    if (CommonUtils.isValidPassword(pwd)) {
-//                        confirm.setEnabled(true);
-//                    } else {
-//                        confirm.setEnabled(false);
-//                    }
-//                }else{
-//                    confirm.setEnabled(false);
-//                }
-
-
+                String pwd = s.toString();
+                String nickname=nickName.getText().toString();
+                if (!TextUtils.isEmpty(nickname)&&!TextUtils.isEmpty(pwd)) {
+                    confirm.setEnabled(true);
+                }else{
+                    confirm.setEnabled(false);
+                }
             }
         });
 
@@ -467,7 +456,7 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
                     ToastUtils.show("请输入密码");
                     return;
                 }
-                if(CommonUtils.isValidPassword(password.getText().toString())){
+                if(!CommonUtils.isValidPassword(password.getText().toString())){
                     ToastUtils.show("密码需由6-20位数字、字母或符号组成，至少两种");
                     return;
                 }
@@ -481,14 +470,14 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
                 if(mPasswordVisible){
                     eye.setText(R.string.password_visible);
                     password.setInputType(InputType.TYPE_CLASS_TEXT);
-                    if(TextUtils.isEmpty(password.getText().toString())){
+                    if(!TextUtils.isEmpty(password.getText().toString())){
                         password.setSelection(password.getText().toString().length());//将光标移至文字末尾
                     }
 
                 }else {
                     eye.setText(R.string.password_invisible);
                     password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    if(TextUtils.isEmpty(password.getText().toString())){
+                    if(!TextUtils.isEmpty(password.getText().toString())){
                         password.setSelection(password.getText().toString().length());//将光标移至文字末尾
                     }
                 }

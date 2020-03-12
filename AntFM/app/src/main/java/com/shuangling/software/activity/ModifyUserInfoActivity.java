@@ -505,10 +505,10 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
             case R.id.headLayout: {
 
 
-                if(mOssService==null){
-                    ToastUtils.show("OSS上传服务初始化失败，请稍后再试");
-                    return;
-                }
+//                if(mOssService==null){
+//                    ToastUtils.show("OSS上传服务初始化失败，请稍后再试");
+//                    return;
+//                }
 
                 RxPermissions rxPermissions = new RxPermissions(ModifyUserInfoActivity.this);
                 rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -800,7 +800,7 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
             @Override
             public void onFailure(Call call, Exception exception) {
 
-
+                Log.e("test",exception.toString());
             }
         });
 

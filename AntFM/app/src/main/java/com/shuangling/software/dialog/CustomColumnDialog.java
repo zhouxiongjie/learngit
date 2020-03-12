@@ -68,7 +68,7 @@ public class CustomColumnDialog extends BaseCircleDialog {
     public interface OnCloseClickListener {
         void close();
         void switchClo(Column column,boolean initial);
-
+        void refreshRed();
 
     }
 
@@ -93,6 +93,8 @@ public class CustomColumnDialog extends BaseCircleDialog {
         // TODO: inflate a fragment view
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
         unbinder = ButterKnife.bind(this, rootView);
+
+        SharedPreferencesUtils.putPreferenceTypeValue("all_column", SharedPreferencesUtils.PreferenceType.String, JSON.toJSONString(mColumns));
         String customColumn=SharedPreferencesUtils.getStringValue("custom_column","");
         if(TextUtils.isEmpty(SharedPreferencesUtils.getStringValue("custom_column",""))){
             //第一次自定义栏目
@@ -260,5 +262,13 @@ public class CustomColumnDialog extends BaseCircleDialog {
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        if(mOnCloseClickListener!=null){
+            mOnCloseClickListener.refreshRed();
+        }
+        super.onDestroy();
     }
 }

@@ -275,11 +275,16 @@ public class NewAccountPasswordLoginActivity extends AppCompatActivity implement
                 if(mPasswordVisible){
                     eye.setText(R.string.password_visible);
                     password.setInputType(InputType.TYPE_CLASS_TEXT);
-                    password.postInvalidate();
+                    if(!TextUtils.isEmpty(password.getText().toString())){
+                        password.setSelection(password.getText().toString().length());//将光标移至文字末尾
+                    }
+
                 }else {
                     eye.setText(R.string.password_invisible);
                     password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    password.postInvalidate();
+                    if(!TextUtils.isEmpty(password.getText().toString())){
+                        password.setSelection(password.getText().toString().length());//将光标移至文字末尾
+                    }
                 }
                 break;
             case R.id.verifyCodeLogin:

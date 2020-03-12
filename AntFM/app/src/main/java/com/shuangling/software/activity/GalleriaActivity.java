@@ -319,6 +319,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
 
         @JavascriptInterface
         public void bindPhoneEvent(final String url) {
+            mJumpUrl=url;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {

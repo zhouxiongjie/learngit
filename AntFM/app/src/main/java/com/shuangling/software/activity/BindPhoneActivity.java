@@ -330,7 +330,9 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (User.getInstance()!=null){
+            super.onBackPressed();
+        }
     }
 
     @Override

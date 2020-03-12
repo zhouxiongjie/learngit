@@ -159,10 +159,16 @@ public class ModifyPasswordActivity extends AppCompatActivity implements Handler
                     return;
                 }
 
-                if (newPd.length() < 6 || newPd.length() > 20) {
-                    ToastUtils.show( "新密码长度不合法");
+//                if (newPd.length() < 6 || newPd.length() > 20) {
+//                    ToastUtils.show( "新密码长度不合法");
+//                    return;
+//                }
+
+                if(!CommonUtils.isValidPassword(newPd)){
+                    ToastUtils.show("密码需由6-20位数字、字母或符号组成，至少两种");
                     return;
                 }
+
                 modifyPassword(oldPd, newPd);
                 break;
             case R.id.forgetPassword:

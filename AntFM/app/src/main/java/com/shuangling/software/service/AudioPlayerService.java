@@ -83,6 +83,8 @@ public class AudioPlayerService extends Service {
     private int mPlayerState = IPlayer.idle;
     private  long mCurrentPosition;
 
+    public static boolean isRunning;
+
     //录制视频计时器
     class PlayCountDownTimer extends CountDownTimer {
 
@@ -542,6 +544,7 @@ public class AudioPlayerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        isRunning=true;
         mAliyunVodPlayer = AliPlayerFactory.createAliPlayer(getApplicationContext());
         mAliyunVodPlayer.setAutoPlay(true);
         //mAliyunVodPlayer.setReferer(ServerInfo.h5IP);
@@ -638,6 +641,7 @@ public class AudioPlayerService extends Service {
     @Override
     public void onDestroy() {
         mAliyunVodPlayer.stop();
+        isRunning=false;
         super.onDestroy();
     }
 

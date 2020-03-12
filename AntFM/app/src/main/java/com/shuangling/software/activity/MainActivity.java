@@ -70,6 +70,7 @@ import com.shuangling.software.fragment.RecommendFragment;
 import com.shuangling.software.fragment.ServiceFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ServerInfo;
@@ -222,6 +223,8 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
             }
         }
+
+        startAudioService();
 
 
     }
@@ -1746,6 +1749,15 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     private void showInformationTip(){
 
 
+
+    }
+
+
+    private void startAudioService(){
+        if(AudioPlayerService.isRunning){
+            Intent it = new Intent(this, AudioPlayerService.class);
+            startService(it);
+        }
 
     }
 }

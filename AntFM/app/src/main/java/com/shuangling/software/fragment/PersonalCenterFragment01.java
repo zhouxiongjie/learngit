@@ -423,14 +423,14 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            attentionNumber.setText("关注 " + jsonObject.getJSONObject("data").getInteger("follows_count"));
-                            subscribeNumber.setText("订阅 " + jsonObject.getJSONObject("data").getInteger("subscribe_count"));
-//                            messageNumber.setText("" + jsonObject.getJSONObject("data").getInteger("not_read_num"));
-//                            if (jsonObject.getJSONObject("data").getInteger("not_read_num") > 0) {
-//                                messageNumber.setVisibility(View.VISIBLE);
-//                            } else {
-//                                messageNumber.setVisibility(View.GONE);
-//                            }
+                            try{
+                                attentionNumber.setText("关注 " + jsonObject.getJSONObject("data").getInteger("follows_count"));
+                                subscribeNumber.setText("订阅 " + jsonObject.getJSONObject("data").getInteger("subscribe_count"));
+                            }catch (Exception e){
+
+                            }
+
+//
 
 
                         }

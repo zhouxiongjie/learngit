@@ -9,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.Column;
 
@@ -75,6 +76,11 @@ public class MoreColumnGridViewAdapter extends BaseAdapter {
         }else{
             vh.delete.setVisibility(View.INVISIBLE);
         }
+        if(column.isFresh()){
+            vh.newColumn.setVisibility(View.VISIBLE);
+        }else{
+            vh.newColumn.setVisibility(View.GONE);
+        }
         return convertView;
     }
 
@@ -97,7 +103,8 @@ public class MoreColumnGridViewAdapter extends BaseAdapter {
         TextView columnName;
         @BindView(R.id.delete)
         ImageView delete;
-
+        @BindView(R.id.newColumn)
+        SimpleDraweeView newColumn;
         ViewHolder(View view) {
             ButterKnife.bind(this, view);
         }

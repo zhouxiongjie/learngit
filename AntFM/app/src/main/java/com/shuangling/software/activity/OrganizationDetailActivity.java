@@ -22,9 +22,7 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -62,7 +60,7 @@ import butterknife.OnClick;
 import okhttp3.Call;
 
 @EnableDragToClose()
-public class OrganizationDetailActivity extends BaseActivity implements Handler.Callback {
+public class OrganizationDetailActivity extends BaseAudioActivity implements Handler.Callback {
 
     public static final String TAG = "AnchorDetailActivity";
 

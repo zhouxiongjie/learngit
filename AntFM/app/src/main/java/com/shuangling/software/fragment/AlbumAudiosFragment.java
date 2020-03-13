@@ -9,18 +9,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.alibaba.fastjson.JSONObject;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AudioDetailActivity;
-import com.shuangling.software.activity.BaseActivity;
+import com.shuangling.software.activity.BaseAudioActivity;
 import com.shuangling.software.adapter.AudioListAdapter;
 import com.shuangling.software.dialog.AudioSelectionsDialog;
 import com.shuangling.software.entity.Audio;
@@ -160,7 +156,7 @@ public class AlbumAudiosFragment extends Fragment implements Handler.Callback {
                         });
 
                         if (mAdapter == null) {
-                            mAdapter = new AudioListAdapter(getContext(), mAudios, ((BaseActivity) getActivity()).mAudioPlayer);
+                            mAdapter = new AudioListAdapter(getContext(), mAudios, ((BaseAudioActivity) getActivity()).mAudioPlayer);
                             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -173,7 +169,7 @@ public class AlbumAudiosFragment extends Fragment implements Handler.Callback {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-//                                            ((BaseActivity)getActivity()).mAudioPlayer.setPlayerList(mAudios);
+//                                            ((BaseAudioActivity)getActivity()).mAudioPlayer.setPlayerList(mAudios);
                                     AudioInfo audio = mAdapter.getItem(position);
                                     Intent it = new Intent(getContext(), AudioDetailActivity.class);
                                     it.putExtra("audioId", audio.getId());

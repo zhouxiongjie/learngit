@@ -114,6 +114,7 @@
 		app:trimMode="trimModeLength"
 		app:trimLines="3"
 		android:textColor="@color/textColorTwo"
+		android:textSize="@dimen/font_size_14sp"
 		tools:text="@string/test_text"
 		/>
 

@@ -58,7 +58,7 @@
 
         <activity
             android:name="com.shuangling.software.activity.MainActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:configChanges="orientation|screenSize|keyboardHidden|fontScale"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan|stateHidden"
             android:screenOrientation="portrait" >
@@ -301,6 +301,11 @@
             android:name=".activity.SettingActivity"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name=".activity.FontSizeSettingActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
 
         <activity
             android:name=".activity.AttentionActivity"

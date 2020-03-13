@@ -3,7 +3,6 @@ package com.shuangling.software.activity;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -11,7 +10,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -79,7 +77,7 @@ import static android.widget.ExpandableListView.PACKED_POSITION_TYPE_CHILD;
 import static android.widget.ExpandableListView.PACKED_POSITION_TYPE_NULL;
 
 @EnableDragToClose()
-public class TvDetailActivity extends BaseActivity implements Handler.Callback {
+public class TvDetailActivity extends BaseAudioActivity implements Handler.Callback {
 
 
     public static final String TAG = "RadioDetailActivity";

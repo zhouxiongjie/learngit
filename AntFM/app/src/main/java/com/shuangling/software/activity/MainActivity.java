@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -1759,5 +1761,30 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
             startService(it);
         }
 
+    }
+
+
+    @Override
+    public Resources getResources() {
+        //return CommonUtils.setFontSize(this);
+        Resources res=super.getResources();
+        float appFontSize = SharedPreferencesUtils.getFloatValue(FontSizeSettingActivity.FONT_SIZE, 1.00f);
+        float systemFontSize = res.getConfiguration().fontScale;
+        float mixFontSize=appFontSize*systemFontSize;
+
+        float max = (appFontSize > systemFontSize) ? appFontSize : systemFontSize;
+        float fontSize=Math.min(mixFontSize,max);
+
+        Configuration newConfig = new Configuration();
+        newConfig.fontScale=fontSize;
+        res.updateConfiguration(newConfig, res.getDisplayMetrics());
+        return res;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        //if (newConfig.fontScale != 1)//非默认值
+            getResources();
+        super.onConfigurationChanged(newConfig);
     }
 }

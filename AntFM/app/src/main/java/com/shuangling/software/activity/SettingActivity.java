@@ -95,6 +95,10 @@ public class SettingActivity extends AppCompatActivity {
     RelativeLayout checkUpdate;
     @BindView(R.id.update)
     TextView update;
+    @BindView(R.id.fontSize)
+    TextView fontSize;
+    @BindView(R.id.fontSizeLayout)
+    RelativeLayout fontSizeLayout;
 
     private Handler mHandler;
     private UpdateDialog mUpdateDialog;
@@ -126,6 +130,14 @@ public class SettingActivity extends AppCompatActivity {
         } else {
             netLoadDesc.setText("较省流量(智能下载)");
         }
+        float appFontSize = SharedPreferencesUtils.getFloatValue(FontSizeSettingActivity.FONT_SIZE, 1.00f);
+        if (appFontSize == 1.00f) {
+            fontSize.setText("标准");
+        }else if(appFontSize == 1.15f){
+            fontSize.setText("大号");
+        }else{
+            fontSize.setText("特大");
+        }
 //        else {
 //            netLoadDesc.setText("极省流量(不下载图)");
 //        }
@@ -148,7 +160,7 @@ public class SettingActivity extends AppCompatActivity {
     }
 
 
-    @OnClick({R.id.clearCache, R.id.netLoad, R.id.netPlay, R.id.accountAndSecurity, R.id.checkUpdate})
+    @OnClick({R.id.clearCache, R.id.netLoad, R.id.netPlay, R.id.accountAndSecurity, R.id.checkUpdate,R.id.fontSizeLayout})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.clearCache:
@@ -263,6 +275,11 @@ public class SettingActivity extends AppCompatActivity {
             case R.id.checkUpdate:
                 getUpdateInfo();
                 break;
+
+            case R.id.fontSizeLayout:
+                    startActivity(new Intent(this, FontSizeSettingActivity.class));
+
+                break;
         }
     }
 
@@ -352,7 +369,7 @@ public class SettingActivity extends AppCompatActivity {
                                     mUpdateDialog.setOnUpdateClickListener(new UpdateDialog.OnUpdateClickListener() {
                                         @Override
                                         public void download() {
-                                            if(mUpdateDialog!=null){
+                                            if (mUpdateDialog != null) {
                                                 mUpdateDialog.dismiss();
                                             }
                                             if (!TextUtils.isEmpty(updateInfo.getNew_version().getUrl())) {
@@ -404,7 +421,6 @@ public class SettingActivity extends AppCompatActivity {
                     @Override
                     public void accept(Boolean granted) throws Exception {
                         if (granted) {
-
 
 
                             File file = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + "ltsj.apk");
@@ -528,7 +544,7 @@ public class SettingActivity extends AppCompatActivity {
                             //queueSet.downloadTogether(tasks);
                             queueSet.start();
 
-                        }else{
+                        } else {
                             ToastUtils.show("没有文件写权限，请开启该权限");
                         }
 

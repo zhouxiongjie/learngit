@@ -231,6 +231,7 @@
             android:gravity="center"
             android:padding="15dp"
             android:text="退出登录"
+            android:textSize="@dimen/font_size_30px"
             android:textColor="#EA3632"
             android:background="#F5F6F7"/>
 

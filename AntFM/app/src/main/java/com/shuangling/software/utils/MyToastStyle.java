@@ -28,7 +28,7 @@ public class MyToastStyle implements IToastStyle {
 
     @Override
     public int getCornerRadius() {
-        return CommonUtils.dip2px(2);
+        return CommonUtils.dip2px(5);
     }
 
     @Override
@@ -43,7 +43,8 @@ public class MyToastStyle implements IToastStyle {
 
     @Override
     public float getTextSize() {
-        return 14;
+        //int size=CommonUtils.dip2px(14);
+        return CommonUtils.dip2px(14);
     }
 
     @Override
@@ -52,19 +53,22 @@ public class MyToastStyle implements IToastStyle {
     }
 
     @Override
-    public int getPaddingLeft() {
-        return CommonUtils.dip2px(4);
+    public int getPaddingStart() {
+        return CommonUtils.dip2px(10);
     }
+
+
 
     @Override
     public int getPaddingTop() {
-        return CommonUtils.dip2px(3);
+        return CommonUtils.dip2px(10);
     }
 
     @Override
-    public int getPaddingRight() {
-        return getPaddingLeft();
+    public int getPaddingEnd() {
+        return getPaddingStart();
     }
+
 
     @Override
     public int getPaddingBottom() {

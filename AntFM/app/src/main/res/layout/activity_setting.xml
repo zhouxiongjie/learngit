@@ -146,6 +146,38 @@
                 tools:text="提醒一次" />
         </RelativeLayout>
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@color/divideColorOne" />
+
+        <RelativeLayout
+            android:id="@+id/fontSizeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="字体大小"
+                android:textColor="#111111"
+                android:textSize="@dimen/font_size_32px" />
+
+            <TextView
+                android:id="@+id/fontSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:textColor="@color/textColorSeven"
+                android:textSize="@dimen/font_size_28px"
+                tools:text="标准" />
+        </RelativeLayout>
+
 
 
         <ImageView

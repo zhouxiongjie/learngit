@@ -69,6 +69,11 @@ public class SharedPreferencesUtils {
         return sp.getInt(key, defValue);
     }
 
+    public static float getFloatValue(String key,float defValue){
+        SharedPreferences sp = MyApplication.getInstance().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+        return sp.getFloat(key, defValue);
+    }
+
     public static boolean getBooleanValue(String key,boolean defValue){
         SharedPreferences sp = MyApplication.getInstance().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
         return sp.getBoolean(key, defValue);

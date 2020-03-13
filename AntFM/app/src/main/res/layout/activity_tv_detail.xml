@@ -35,7 +35,7 @@
             android:layout_centerVertical="true"
             android:text="CCTV-5体育频道"
             android:textColor="#111111"
-            android:textSize="@dimen/font_size_28px" />
+            android:textSize="@dimen/font_size_14sp" />
 
         <!--<com.shuangling.software.customview.FontIconView-->
             <!--android:id="@+id/collect"-->

@@ -20,9 +20,7 @@ import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
-import com.jaeger.library.StatusBarUtil;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
@@ -30,13 +28,11 @@ import com.shuangling.software.entity.Album;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.fragment.AlbumAudiosFragment;
 import com.shuangling.software.fragment.AlbumIntroduceFragment;
-import com.shuangling.software.fragment.SearchListFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
-import com.shuangling.software.utils.StatusBarManager;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.IOException;
@@ -46,7 +42,6 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.framework.ShareSDK;
@@ -58,10 +53,9 @@ import cn.sharesdk.wechat.favorite.WechatFavorite;
 import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
-import okhttp3.Response;
 
 @EnableDragToClose()
-public class AlbumDetailActivity extends BaseActivity implements Handler.Callback {
+public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Callback {
 
     private static final String[] category = new String[]{"简介", "节目"};
 

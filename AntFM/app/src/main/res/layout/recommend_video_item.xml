@@ -79,7 +79,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/textColorTwo"
-                android:textSize="@dimen/font_size_34px"
+                android:textSize="@dimen/font_size_17sp"
                 android:lineSpacingExtra="5dp"
                 android:lineSpacingMultiplier="1.0"
                 android:lines="2"

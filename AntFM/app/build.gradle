@@ -213,7 +213,7 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'com.mylhyl:circleDialog:2.6.7'
     implementation 'com.jack.frdialog:FRDialog:1.0.3'
-    implementation 'com.hjq:toast:6.0'
+    implementation 'com.hjq:toast:8.0'
     implementation 'com.amap.api:3dmap:6.4.0'
     implementation 'com.amap.api:location:4.2.0'
     implementation 'com.amap.api:search:6.1.0'

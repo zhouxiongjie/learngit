@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
@@ -49,6 +50,8 @@ import com.mylhyl.circledialog.res.values.CircleDimen;
 import com.mylhyl.circledialog.view.listener.OnCreateBodyViewListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.activity.FontSizeSettingActivity;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -1083,5 +1086,19 @@ public class CommonUtils {
             tv.setVisibility(View.GONE);
             tv.setText("");
         }
+    }
+
+
+    public static Resources setFontSize(Resources res) {
+        float appFontSize = SharedPreferencesUtils.getFloatValue(FontSizeSettingActivity.FONT_SIZE, 1.00f);
+        float systemFontSize = res.getConfiguration().fontScale;
+        float mixFontSize=appFontSize*systemFontSize;
+
+        float max = (appFontSize > systemFontSize) ? appFontSize : systemFontSize;
+        float fontSize=Math.min(mixFontSize,max);
+
+        res.getConfiguration().fontScale=fontSize;
+        res.updateConfiguration(res.getConfiguration(), res.getDisplayMetrics());
+        return res;
     }
 }

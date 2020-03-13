@@ -5,6 +5,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
@@ -38,6 +40,7 @@ import com.shuangling.software.network.ElnImageDownloaderFetcher;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.service.AudioPlayerService;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.CrashHandler;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.MyToastStyle;
@@ -64,7 +67,7 @@ public class MyApplication extends MultiDexApplication {
             public RefreshHeader createRefreshHeader(Context context, RefreshLayout layout) {
                 layout.setPrimaryColorsId(R.color.white,R.color.textColorThree);//全局设置主题颜色
 
-                return new ClassicsHeader(context).setEnableLastTime(false).setFinishDuration(0);//.setTimeFormat(new DynamicTimeFormat("更新于 %s"));//指定为经典Header，默认是 贝塞尔雷达Header
+                return new ClassicsHeader(context).setEnableLastTime(false).setFinishDuration(0).setTextSizeTitle(16);//.setTimeFormat(new DynamicTimeFormat("更新于 %s"));//指定为经典Header，默认是 贝塞尔雷达Header
             }
         });
         //设置全局的Footer构建器
@@ -211,6 +214,23 @@ public class MyApplication extends MultiDexApplication {
 
         getUseProtocol();
 	}
+
+
+
+    //设置字体为默认大小，不随系统字体大小改而改变
+//    @Override
+//    public void onConfigurationChanged(Configuration newConfig) {
+//        if (newConfig.fontScale != 1)//非默认值
+//            getResources();
+//        super.onConfigurationChanged(newConfig);
+//    }
+
+
+//    @Override
+//    public Resources getResources() {
+//        return CommonUtils.setFontSize(this);
+//    }
+
 
 
     private void initFresco(){

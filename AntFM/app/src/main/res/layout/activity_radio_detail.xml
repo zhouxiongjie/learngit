@@ -200,8 +200,7 @@
                     android:layout_centerInParent="true"
                     android:text="&#xe607;"
                     android:textColor="?attr/themeColor"
-                    android:textSize="75sp"/>
-
+                    android:textSize="@dimen/font_size_150px"/>
                 <!--<ImageButton-->
                     <!--android:id="@+id/previous"-->
                     <!--android:layout_width="wrap_content"-->
@@ -221,7 +220,7 @@
                     android:text="&#xe620;"
                     android:textColor="?attr/themeColor"
                     android:layout_toLeftOf="@+id/play"
-                    android:textSize="25sp"/>
+                    android:textSize="@dimen/font_size_50px"/>
 
                 <!--<ImageButton-->
                     <!--android:id="@+id/next"-->
@@ -241,7 +240,7 @@
                     android:layout_toRightOf="@+id/play"
                     android:text="&#xe622;"
                     android:textColor="?attr/themeColor"
-                    android:textSize="25sp" />
+                    android:textSize="@dimen/font_size_50px" />
 
 
                 <RelativeLayout
@@ -255,12 +254,13 @@
                         android:id="@+id/timer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="0dp"
                         android:drawableTop="@drawable/ic_timing"
-                        android:text="定时"
-                        android:textSize="@dimen/font_size_26px"
                         android:drawablePadding="5dp"
-                        android:textColor="@color/textColorTen"/>
+                        android:text="定时"
+                        android:textColor="@color/textColorTen"
+                        android:textSize="@dimen/font_size_26px" />
 
                 </RelativeLayout>
 
@@ -315,7 +315,7 @@
                         android:lines="1"
                         android:maxLines="1"
                         android:textColor="@color/textColorTwo"
-                        android:textSize="@dimen/font_size_30px"
+                        android:textSize="@dimen/font_size_15sp"
                         android:textStyle="bold"
                         tools:text="资讯文章内容中只有2张图片以下的，按左图右文的方式显示（左图为封面图）" />
 

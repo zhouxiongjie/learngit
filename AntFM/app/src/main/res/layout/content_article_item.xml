@@ -57,7 +57,7 @@
         android:lineSpacingExtra="5dp"
         android:lineSpacingMultiplier="1.0"
         android:textColor="@color/textColorTwo"
-        android:textSize="@dimen/font_size_34px"
+        android:textSize="@dimen/font_size_17sp"
         android:maxLines="3"
         android:ellipsize="end"
         android:layout_alignParentTop="true"

@@ -22,7 +22,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -46,7 +45,6 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
-import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -57,7 +55,6 @@ import com.shuangling.software.entity.Comment;
 import com.shuangling.software.entity.ResAuthInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.entity.VideoDetail;
-import com.shuangling.software.fragment.ContentFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.service.IAudioPlayer;
@@ -91,7 +88,7 @@ import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 
 
-public class VideoDetailActivity extends BaseActivity implements Handler.Callback {
+public class VideoDetailActivity extends BaseAudioActivity implements Handler.Callback {
 
 
     public static final int MSG_GET_VIDEO_DETAIL = 0x00;

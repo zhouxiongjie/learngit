@@ -100,8 +100,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
         mTitle= getIntent().getStringExtra("title");
         mActivityId= getIntent().getIntExtra("activityId",-1);
         activtyTitle.setTitleText(mTitle);
-        String url=mUrl;
-        url=initUrl(url);
+        String url=initUrl(mUrl);
 
 
         mHandler = new Handler(this);
@@ -111,6 +110,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
         webView.getSettings().setBlockNetworkImage(false);
+        s.setTextZoom(100);
         s.setJavaScriptEnabled(true);       //js
         s.setDomStorageEnabled(true);       //localStorage
 
@@ -242,9 +242,9 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
                 }
             } else {
                 if(url.contains("?")){
-                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple=";
                 }else{
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple=";
                 }
             }
         }
@@ -259,8 +259,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getEventBus(CommonEvent event) {
         if (event.getEventName().equals("OnLoginSuccess")||event.getEventName().equals("OnQuitLogin")) {
-            String url=mUrl;
-            url=initUrl(mUrl);
+            String url=initUrl(mUrl);
             webView.loadUrl(url);
         }
     }
@@ -708,24 +707,14 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == LOGIN_RESULT) {
-            String url = webView.getUrl();
-            if (url.indexOf("?") > 0) {
-                url = url.substring(0, url.indexOf("?"));
-            }
-            if (User.getInstance() == null) {
-                url = url + "?app=android";
-            } else {
 
+            String url=initUrl(mUrl);
+            if(User.getInstance()!=null){
                 if(!TextUtils.isEmpty(mJumpUrl)){
                     url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                }else{
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
                 }
-
-                //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
                 webView.loadUrl(url);
             }
-
 
         }
     }

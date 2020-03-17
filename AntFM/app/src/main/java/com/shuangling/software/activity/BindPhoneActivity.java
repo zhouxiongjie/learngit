@@ -284,7 +284,7 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
                     @Override
                     public void run() {
                         mDialogFragment.dismiss();
-                        ToastUtils.show("登陆异常");
+                        ToastUtils.show("登录异常");
                     }
                 });
 

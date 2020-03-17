@@ -179,6 +179,7 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
         webView.getSettings().setBlockNetworkImage(false);
+        s.setTextZoom(100);
         s.setJavaScriptEnabled(true);       //js
         s.setDomStorageEnabled(true);       //localStorage
 //        webView.setWebViewClient(new WebViewClient());
@@ -572,23 +573,30 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LOGIN_RESULT) {
-            String url = webView.getUrl();
-            if (url.indexOf("?") > 0) {
-                url = url.substring(0, url.indexOf("?"));
-            }
-            if (User.getInstance() == null) {
-                url = url + "?app=android";
-            } else {
+//            String url = webView.getUrl();
+//            if (url.indexOf("?") > 0) {
+//                url = url.substring(0, url.indexOf("?"));
+//            }
+//            if (User.getInstance() == null) {
+//                url = url + "?app=android";
+//            } else {
+//
+//                if(!TextUtils.isEmpty(mJumpUrl)){
+//                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+//                }else{
+//                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+//                }
+//
+//                //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+//                webView.loadUrl(url);
+//            }
 
-                if(!TextUtils.isEmpty(mJumpUrl)){
-                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                }else{
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                }
-
-                //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                webView.loadUrl(url);
+            String url=initUrl(mUrl);
+            if(!TextUtils.isEmpty(mJumpUrl)){
+                url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
             }
+            //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+            webView.loadUrl(url);
 
 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -741,15 +749,15 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
         if (User.getInstance() == null) {
             if (MainActivity.sCurrentCity != null) {
                 if(url.contains("?")){
-                    url = url + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                    url = url + "&app=android&city=" + MainActivity.sCurrentCity.getCode()+"&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
+                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode()+"&multiple="+CommonUtils.getFontSize();
                 }
             } else {
                 if(url.contains("?")){
-                    url = url + "&app=android";
+                    url = url + "&app=android"+"&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?app=android";
+                    url = url + "?app=android"+"&multiple="+CommonUtils.getFontSize();
                 }
             }
 

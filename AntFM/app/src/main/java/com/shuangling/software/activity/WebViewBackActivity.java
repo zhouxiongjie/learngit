@@ -100,8 +100,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
         mTitle= getIntent().getStringExtra("title");
         mActivityId= getIntent().getIntExtra("activityId",-1);
         activtyTitle.setTitleText(mTitle);
-        String url=mUrl;
-        url=initUrl(url);
+        String url=initUrl(mUrl);
 
 
         mHandler = new Handler(this);
@@ -111,6 +110,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
         webView.getSettings().setBlockNetworkImage(false);
+        s.setTextZoom(100);
         s.setJavaScriptEnabled(true);       //js
         s.setDomStorageEnabled(true);       //localStorage
 
@@ -220,15 +220,15 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
         if (User.getInstance() == null) {
             if (MainActivity.sCurrentCity != null) {
                 if(url.contains("?")){
-                    url = url + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                    url = url + "&app=android&city=" + MainActivity.sCurrentCity.getCode()+"&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
+                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode()+"&multiple="+CommonUtils.getFontSize();
                 }
             } else {
                 if(url.contains("?")){
-                    url = url + "&app=android";
+                    url = url + "&app=android"+"&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?app=android";
+                    url = url + "?app=android"+"&multiple="+CommonUtils.getFontSize();
                 }
             }
 
@@ -236,20 +236,20 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
         } else {
             if (MainActivity.sCurrentCity != null) {
                 if(url.contains("?")){
-                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode()+"&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode()+"&multiple="+CommonUtils.getFontSize();
                 }
             } else {
                 if(url.contains("?")){
-                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
                 }
             }
         }
         if(mActivityId!=-1){
-            url=url+"&qaa_act_id="+mActivityId;
+            url=url+"&qaa_act_id="+mActivityId+"&multiple="+CommonUtils.getFontSize();
         }
 
         return url;
@@ -259,8 +259,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getEventBus(CommonEvent event) {
         if (event.getEventName().equals("OnLoginSuccess")||event.getEventName().equals("OnQuitLogin")) {
-            String url=mUrl;
-            url=initUrl(mUrl);
+            String url=initUrl(mUrl);
             webView.loadUrl(url);
         }
     }
@@ -708,24 +707,13 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == LOGIN_RESULT) {
-            String url = webView.getUrl();
-            if (url.indexOf("?") > 0) {
-                url = url.substring(0, url.indexOf("?"));
+            String url=initUrl(mUrl);
+
+            if(!TextUtils.isEmpty(mJumpUrl)){
+                url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
             }
-            if (User.getInstance() == null) {
-                url = url + "?app=android";
-            } else {
-
-                if(!TextUtils.isEmpty(mJumpUrl)){
-                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                }else{
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                }
-
-                //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                webView.loadUrl(url);
-            }
-
+            //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+            webView.loadUrl(url);
 
         }
     }

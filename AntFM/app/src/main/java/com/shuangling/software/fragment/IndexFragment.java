@@ -1841,6 +1841,8 @@ public class IndexFragment extends Fragment implements Handler.Callback {
             //weather();
             //getCityColumns("");
             indexDecorate();
+        }else if(event.getEventName().equals("onFontSizeChanged")){
+            indexDecorate();
         }
     }
 

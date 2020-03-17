@@ -4,13 +4,17 @@ package com.shuangling.software.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.RemoteException;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
@@ -23,26 +27,37 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.player.IPlayer;
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.gyf.immersionbar.ImmersionBar;
+import com.mylhyl.circledialog.CircleDialog;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.Article;
+import com.shuangling.software.entity.ArticleVoicesInfo;
+import com.shuangling.software.entity.Audio;
+import com.shuangling.software.entity.AudioInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.jake.share.frdialog.dialog.FRDialog;
+import cn.jake.share.frdialog.interfaces.FRDialogClickListener;
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.Platform.ShareParams;
 import cn.sharesdk.framework.PlatformActionListener;
@@ -56,17 +71,18 @@ import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
+import static com.shuangling.software.service.AudioPlayerService.PLAY_ORDER;
 import static com.shuangling.software.utils.CommonUtils.NETWORKTYPE_WIFI;
 
 @EnableDragToClose()
-public class ArticleDetailActivity extends AppCompatActivity implements Handler.Callback {
+public class ArticleDetailActivity extends BaseAudioActivity implements Handler.Callback {
 
     private static final int LOGIN_RESULT = 0x1;
     public static final int MSG_GET_DETAIL = 0x2;
     private static final int SHARE_SUCCESS = 0x3;
     private static final int SHARE_FAILED = 0x4;
+    public static final int MSG_GET_VOICES = 0x5;
+    public static final int REQUEST_PERMISSION_CODE = 0x0110;
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
     @BindView(R.id.root)
@@ -79,6 +95,8 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
 
     private Handler mHandler;
     private Article mArticle;
+
+    private ArticleVoicesInfo mArticleVoicesInfo;
     private ViewSkeletonScreen mViewSkeletonScreen;
     private String mJumpUrl;
 //    private Runnable runnable=new Runnable() {
@@ -136,6 +154,32 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
     }
 
 
+    private void articleVoices() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.articleVoices + mArticleId;
+        Map<String, String> params = new HashMap<>();
+        OkHttpUtils.get(url, null, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_VOICES;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+    }
+
+
     private void init() {
         progressBar.setMax(100);
         mHandler = new Handler(this);
@@ -150,14 +194,14 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
         }
 
         if (User.getInstance() == null) {
-            url = url + "?app=android&size=" + size;
+            url = url + "?app=android&size=" + size+"&multiple="+CommonUtils.getFontSize();
         } else {
-            url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size;
+            url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size+"&multiple="+CommonUtils.getFontSize();
         }
 
         WebSettings s = webView.getSettings();
         CommonUtils.setWebviewUserAgent(s);
-
+        s.setTextZoom(100);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
@@ -276,22 +320,28 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-
                         mArticle = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), Article.class);
-
-
                     }
-
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
                 break;
             case SHARE_SUCCESS:
                 break;
             case SHARE_FAILED:
+                break;
+            case MSG_GET_VOICES:
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        mArticleVoicesInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), ArticleVoicesInfo.class);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
         }
         return false;
@@ -462,6 +512,65 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
 
         }
 
+
+        @JavascriptInterface
+        public void playAudios() {
+
+            if(mArticleVoicesInfo!=null&&mArticleVoicesInfo.getVoices().size()>0){
+
+                ArticleVoicesInfo.VoicesBean vb=mArticleVoicesInfo.getVoices().get(0);
+                List<AudioInfo> audioInfos = new ArrayList<>();
+                for (int i = 0; vb != null&&vb.getAudio()!=null&& i < vb.getAudio().size(); i++) {
+                    ArticleVoicesInfo.VoicesBean.AudioBean audio = vb.getAudio().get(i);
+                    AudioInfo audioInfo = new AudioInfo();
+                    audioInfo.setId(audio.getId());
+                    audioInfo.setIndex(i + 1);
+                    audioInfo.setIsRadio(2);
+                    audioInfo.setVideo_id(audio.getVideo_id());
+                    audioInfos.add(audioInfo);
+                }
+                try{
+                    AudioPlayerService.sPlayOrder=PLAY_ORDER;
+                    mAudioPlayer.playAudio(audioInfos.get(0));
+                    mAudioPlayer.setPlayerList(audioInfos);
+                }catch (RemoteException e){
+
+                }
+
+
+                if (!FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
+                    if (MyApplication.getInstance().remindPermission) {
+                        MyApplication.getInstance().remindPermission = false;
+                        showFloatWindowPermission();
+
+                    }
+                }else {
+                    FloatWindowUtil.getInstance().showFloatWindow();
+                }
+
+
+
+            }
+
+
+
+
+
+
+
+//            if (!FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
+//                if (MyApplication.getInstance().remindPermission) {
+//                    MyApplication.getInstance().remindPermission = false;
+//                    showFloatWindowPermission();
+//
+//                }
+//            }
+//            FloatWindowUtil.getInstance().hideWindow();
+
+
+
+        }
+
         @JavascriptInterface
         public void bonesEvent(String str) {
 //            mHandler.post(new Runnable() {
@@ -487,12 +596,12 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
                 size = 2;
             }
             if (User.getInstance() == null) {
-                url = url + "?app=android&size=" + size;
+                url = url + "?app=android&size=" + size+"&multiple="+CommonUtils.getFontSize();
             } else {
                 if(!TextUtils.isEmpty(mJumpUrl)){
-                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size;
+                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size+"&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size;
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size+"&multiple="+CommonUtils.getFontSize();
                 }
                 webView.loadUrl(url);
 
@@ -500,6 +609,17 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
             }
 
 
+        }else if (requestCode == REQUEST_PERMISSION_CODE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                if (FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
+                    FloatWindowUtil.getInstance().showFloatWindow();
+                } else {
+                    //不显示悬浮窗 并提示
+                }
+
+
+            }
         }
     }
 
@@ -632,5 +752,35 @@ public class ArticleDetailActivity extends AppCompatActivity implements Handler.
 //            mHandler.removeCallbacks(runnable);
 //        }
         super.onDestroy();
+    }
+
+
+    private void showFloatWindowPermission() {
+        FloatWindowUtil.getInstance().addOnPermissionListener(new FloatWindowUtil.OnPermissionListener() {
+            @Override
+            public void showPermissionDialog() {
+                FRDialog dialog = new FRDialog.MDBuilder(ArticleDetailActivity.this)
+                        .setTitle("是否显示悬浮播放器")
+                        .setMessage("要显示悬浮播放器，需要开启悬浮窗权限")
+                        .setPositiveContentAndListener("现在去开启", new FRDialogClickListener() {
+                            @Override
+                            public boolean onDialogClick(View view) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                                    intent.setData(Uri.parse("package:" + getPackageName()));
+                                    startActivityForResult(intent, REQUEST_PERMISSION_CODE);
+                                }
+                                return true;
+                            }
+                        }).setNegativeContentAndListener("暂不开启", new FRDialogClickListener() {
+                            @Override
+                            public boolean onDialogClick(View view) {
+                                return true;
+                            }
+                        }).create();
+                dialog.show();
+            }
+        });
+        FloatWindowUtil.getInstance().setPermission();
     }
 }

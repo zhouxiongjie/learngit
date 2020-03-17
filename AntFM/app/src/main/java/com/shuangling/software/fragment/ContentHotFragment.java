@@ -68,6 +68,7 @@ import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.DecorModule;
 import com.shuangling.software.entity.Station;
+import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ACache;
@@ -75,6 +76,10 @@ import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -134,6 +139,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
         mACache = ACache.get(getContext());
         mColumn = (Column) args.getSerializable("Column");
         mHandler = new Handler(this);
+        EventBus.getDefault().register(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -224,6 +230,14 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
         return view;
     }
 
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if(event.getEventName().equals("onFontSizeChanged")){
+            columnDecorateContent(GetContent.Normal);
+        }
+    }
 
     public void columnDecorateContent(final GetContent getContent) {
 
@@ -461,8 +475,15 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
 
     @Override
     public void onDestroyView() {
+
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     @Override

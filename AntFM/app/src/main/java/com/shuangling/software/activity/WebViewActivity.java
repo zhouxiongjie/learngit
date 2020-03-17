@@ -126,6 +126,7 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
         webView.getSettings().setBlockNetworkImage(false);
+        s.setTextZoom(100);
         s.setJavaScriptEnabled(true);       //js
         s.setDomStorageEnabled(true);       //localStorage
 
@@ -321,15 +322,15 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
         if (User.getInstance() == null) {
             if (MainActivity.sCurrentCity != null) {
                 if(url.contains("?")){
-                    url = url + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                    url = url + "&app=android&city=" + MainActivity.sCurrentCity.getCode()+"&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
+                    url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode()+"&multiple="+CommonUtils.getFontSize();
                 }
             } else {
                 if(url.contains("?")){
-                    url = url + "&app=android";
+                    url = url + "&app=android"+"&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?app=android";
+                    url = url + "?app=android"+"&multiple="+CommonUtils.getFontSize();
                 }
             }
 
@@ -337,20 +338,20 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
         } else {
             if (MainActivity.sCurrentCity != null) {
                 if(url.contains("?")){
-                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode()+"&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode();
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&city=" + MainActivity.sCurrentCity.getCode()+"&multiple="+CommonUtils.getFontSize();
                 }
             } else {
                 if(url.contains("?")){
-                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                    url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
                 }
             }
         }
         if(mActivityId!=-1){
-            url=url+"&qaa_act_id="+mActivityId;
+            url=url+"&qaa_act_id="+mActivityId+"&multiple="+CommonUtils.getFontSize();
         }
 
         return url;
@@ -615,25 +616,33 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+//        if (requestCode == LOGIN_RESULT) {
+//            String url = webView.getUrl();
+//            if (url.indexOf("?") > 0) {
+//                url = url.substring(0, url.indexOf("?"));
+//            }
+//            if (User.getInstance() == null) {
+//                url = url + "?app=android"+"&multiple="+CommonUtils.getFontSize();
+//            } else {
+//
+//                if(!TextUtils.isEmpty(mJumpUrl)){
+//                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
+//                }else{
+//                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
+//                }
+//                //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+//                webView.loadUrl(url);
+//            }
+//
+//        }
         if (requestCode == LOGIN_RESULT) {
-            String url = webView.getUrl();
-            if (url.indexOf("?") > 0) {
-                url = url.substring(0, url.indexOf("?"));
+            String url=initUrl(mUrl);
+
+            if(!TextUtils.isEmpty(mJumpUrl)){
+                url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
             }
-            if (User.getInstance() == null) {
-                url = url + "?app=android";
-            } else {
-
-                if(!TextUtils.isEmpty(mJumpUrl)){
-                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                }else{
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                }
-
-                //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-                webView.loadUrl(url);
-            }
-
+            //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+            webView.loadUrl(url);
 
         }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (requestCode == REQUEST_SELECT_FILE&&resultCode == RESULT_OK && data != null) {

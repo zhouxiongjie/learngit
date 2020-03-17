@@ -12,9 +12,12 @@ import android.widget.RelativeLayout;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
+import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+
+import org.greenrobot.eventbus.EventBus;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -74,7 +77,7 @@ public class FontSizeSettingActivity extends AppCompatActivity {
                 large.setVisibility(View.GONE);
                 superLarge.setVisibility(View.GONE);
                 CommonUtils.setFontSize(getResources());
-
+                EventBus.getDefault().post(new CommonEvent("onFontSizeChanged"));
 //                Resources res=getResources();
 //                float appFontSize = 1.00f;
 //                float systemFontSize = res.getConfiguration().fontScale;
@@ -106,6 +109,9 @@ public class FontSizeSettingActivity extends AppCompatActivity {
                 superLarge.setVisibility(View.GONE);
 
                 CommonUtils.setFontSize(getResources());
+                EventBus.getDefault().post(new CommonEvent("onFontSizeChanged"));
+
+
             }
 
                 break;
@@ -117,7 +123,7 @@ public class FontSizeSettingActivity extends AppCompatActivity {
                 superLarge.setVisibility(View.VISIBLE);
 
                 CommonUtils.setFontSize(getResources());
-
+                EventBus.getDefault().post(new CommonEvent("onFontSizeChanged"));
             }
 
                 break;

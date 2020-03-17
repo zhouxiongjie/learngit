@@ -1090,15 +1090,20 @@ public class CommonUtils {
 
 
     public static Resources setFontSize(Resources res) {
+
+        res.getConfiguration().fontScale=getFontSize();
+        res.updateConfiguration(res.getConfiguration(), res.getDisplayMetrics());
+        return res;
+    }
+
+
+    public static float getFontSize(){
         float appFontSize = SharedPreferencesUtils.getFloatValue(FontSizeSettingActivity.FONT_SIZE, 1.00f);
-        float systemFontSize = res.getConfiguration().fontScale;
+        float systemFontSize = Constant.SYSTEM_FONT_SCALE;
         float mixFontSize=appFontSize*systemFontSize;
 
         float max = (appFontSize > systemFontSize) ? appFontSize : systemFontSize;
         float fontSize=Math.min(mixFontSize,max);
-
-        res.getConfiguration().fontScale=fontSize;
-        res.updateConfiguration(res.getConfiguration(), res.getDisplayMetrics());
-        return res;
+        return fontSize;
     }
 }

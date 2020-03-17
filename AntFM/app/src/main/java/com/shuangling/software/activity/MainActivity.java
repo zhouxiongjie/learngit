@@ -74,6 +74,7 @@ import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
@@ -1767,24 +1768,20 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     @Override
     public Resources getResources() {
         //return CommonUtils.setFontSize(this);
-        Resources res=super.getResources();
-        float appFontSize = SharedPreferencesUtils.getFloatValue(FontSizeSettingActivity.FONT_SIZE, 1.00f);
-        float systemFontSize = res.getConfiguration().fontScale;
-        float mixFontSize=appFontSize*systemFontSize;
+        return CommonUtils.setFontSize(super.getResources());
 
-        float max = (appFontSize > systemFontSize) ? appFontSize : systemFontSize;
-        float fontSize=Math.min(mixFontSize,max);
-
-        Configuration newConfig = new Configuration();
-        newConfig.fontScale=fontSize;
-        res.updateConfiguration(newConfig, res.getDisplayMetrics());
-        return res;
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         //if (newConfig.fontScale != 1)//非默认值
-            getResources();
+        if(newConfig.fontScale!=Constant.SYSTEM_FONT_SCALE){
+            Constant.SYSTEM_FONT_SCALE=newConfig.fontScale;
+            CommonUtils.setFontSize(getResources());
+            EventBus.getDefault().post(new CommonEvent("onFontSizeChanged"));
+        }
+
+        //getResources();
         super.onConfigurationChanged(newConfig);
     }
 }

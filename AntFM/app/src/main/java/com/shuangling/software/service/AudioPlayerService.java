@@ -23,6 +23,7 @@ import com.aliyun.player.source.UrlSource;
 import com.aliyun.player.source.VidAuth;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.entity.AudioInfo;
+import com.shuangling.software.entity.AudioOrVideoAuthInfo;
 import com.shuangling.software.entity.ResAuthInfo;
 import com.shuangling.software.event.PlayerEvent;
 import com.shuangling.software.network.OkHttpCallback;
@@ -194,8 +195,10 @@ public class AudioPlayerService extends Service {
                     urlSource.setTitle(audioInfo.getTitle());
                     mAliyunVodPlayer.setDataSource(urlSource);
                     mAliyunVodPlayer.prepare();
-                }else{
+                }else if(audioInfo.getIsRadio()==0){
                     getAudioAuth(audioInfo.getSourceId());
+                }else{
+                    getArticleAuth(audioInfo.getVideo_id());
                 }
 
             } else {
@@ -212,8 +215,10 @@ public class AudioPlayerService extends Service {
                             urlSource.setTitle(audioInfo.getTitle());
                             mAliyunVodPlayer.setDataSource(urlSource);
                             mAliyunVodPlayer.prepare();
-                        }else{
+                        }else if(audioInfo.getIsRadio()==0){
                             getAudioAuth(audioInfo.getSourceId());
+                        }else{
+                            getArticleAuth(audioInfo.getVideo_id());
                         }
 
                     }else{
@@ -230,8 +235,10 @@ public class AudioPlayerService extends Service {
                         urlSource.setTitle(audioInfo.getTitle());
                         mAliyunVodPlayer.setDataSource(urlSource);
                         mAliyunVodPlayer.prepare();
-                    }else{
+                    }else if(audioInfo.getIsRadio()==0){
                         getAudioAuth(audioInfo.getSourceId());
+                    }else{
+                        getArticleAuth(audioInfo.getVideo_id());
                     }
                 }
             }
@@ -673,6 +680,40 @@ public class AudioPlayerService extends Service {
 
                     mAliyunVodPlayer.setDataSource(vidAuth);
                     mAliyunVodPlayer.prepare();
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+            }
+        });
+    }
+
+
+    private void getArticleAuth(final String videoId) {
+        String url = ServerInfo.serviceIP + ServerInfo.playAuth;
+        Map<String, String> params = new HashMap<>();
+        params.put("video_id",videoId);
+        OkHttpUtils.get(url, params, new OkHttpCallback(getApplicationContext()) {
+
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                JSONObject jsonObject = JSONObject.parseObject(response);
+                if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                    AudioOrVideoAuthInfo audioOrVideoAuth = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), AudioOrVideoAuthInfo.class);
+                    VidAuth vidAuth = new VidAuth();
+                    vidAuth.setPlayAuth(audioOrVideoAuth.getPlayAuth());
+                    vidAuth.setVid(videoId);
+                    vidAuth.setRegion("cn-shanghai");
+                    mAliyunVodPlayer.setDataSource(vidAuth);
+                    mAliyunVodPlayer.prepare();
+
+
 
                 }
             }

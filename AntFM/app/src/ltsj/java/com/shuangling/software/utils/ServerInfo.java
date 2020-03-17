@@ -8,19 +8,19 @@ public class ServerInfo {
 
 
 
-	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
-
-	public static String h5IP="http://www-cms-c.staging.slradio.cn";
-
-	public static String h5HttpsIP="https://www-cms-c.staging.slradio.cn";
-
-	public static String activity="https://www-asc-c.staging.slradio.cn/";
-
-	public static String scs="http://www-scs-c.staging.slradio.cn";
-
-    public static String emc="http://api-emc.staging.slradio.cn";
-
-	public static String vms="http://api-vms.staging.slradio.cn";
+//	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
+//
+//	public static String h5IP="http://www-cms-c.staging.slradio.cn";
+//
+//	public static String h5HttpsIP="https://www-cms-c.staging.slradio.cn";
+//
+//	public static String activity="https://www-asc-c.staging.slradio.cn/";
+//
+//	public static String scs="http://www-scs-c.staging.slradio.cn";
+//
+//    public static String emc="http://api-emc.staging.slradio.cn";
+//
+//	public static String vms="http://api-vms.staging.slradio.cn";
 
 
 //	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
@@ -38,19 +38,19 @@ public class ServerInfo {
 //	public static String vms="http://api-vms.review.slradio.cn";
 
 
-//	public static String serviceIP="http://api-cms.on-radio.cn";
-//
-//	public static String h5IP="http://cms.on-radio.cn";
-//
-//	public static String h5HttpsIP="http://cms.on-radio.cn";
-//
-//	public static String activity="http://asc.on-radio.cn/";
-//
-//	public static String scs="http://scs.on-radio.cn";
-//
-//	public static String emc="http://api-emc.on-radio.cn";
-//
-//	public static String vms="http://api-vms.on-radio.cn";
+	public static String serviceIP="http://api-cms.on-radio.cn";
+
+	public static String h5IP="http://cms.on-radio.cn";
+
+	public static String h5HttpsIP="http://cms.on-radio.cn";
+
+	public static String activity="http://asc.on-radio.cn/";
+
+	public static String scs="http://scs.on-radio.cn";
+
+	public static String emc="http://api-emc.on-radio.cn";
+
+	public static String vms="http://api-vms.on-radio.cn";
 
 
 
@@ -238,4 +238,10 @@ public class ServerInfo {
 	public static String clauses="/v1/consumer/clauses";						//隐私协议
 
 	public static String useProtocol="/v1/consumer/agreements";					//使用协议
+
+	//public static String articleVoiceConfigs="/v2/article_voice_configs";		//c端获取语音播报配置
+
+	public static String articleVoices="/v2/article_voices/";					//c端获取语音播报配置
+
+	public static String playAuth="/v1/playAuth";								//c端获取语音播报配置
 }

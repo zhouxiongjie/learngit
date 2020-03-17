@@ -4,6 +4,7 @@
     <dimen name="font_size_100px">50dp</dimen>
     <dimen name="font_size_60px">30dp</dimen>
     <dimen name="font_size_50px">25dp</dimen>
+    <dimen name="font_size_46px">23dp</dimen>
     <dimen name="font_size_44px">22dp</dimen>
     <dimen name="font_size_42px">21dp</dimen>
     <dimen name="font_size_40px">20dp</dimen>

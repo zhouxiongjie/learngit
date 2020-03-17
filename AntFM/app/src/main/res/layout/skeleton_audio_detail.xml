@@ -95,8 +95,8 @@
         <!--android:background="@drawable/ic_play" />-->
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/play"
-            android:layout_width="75sp"
-            android:layout_height="75sp"
+            android:layout_width="@dimen/font_size_150px"
+            android:layout_height="@dimen/font_size_150px"
             android:layout_centerInParent="true"
             fresco:placeholderImage="@color/light_skeleton_color"
             fresco:viewAspectRatio="1"

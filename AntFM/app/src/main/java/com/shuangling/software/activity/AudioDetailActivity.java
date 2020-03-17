@@ -602,13 +602,12 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
             //2.设置定时器更新进度条
             try {
 
-
                 mHeadViewHolder.play.setText(R.string.play_icon_pause);
-
                 mHeadViewHolder.endTime.setText(CommonUtils.getShowTime(mAudioPlayer.getDuration()));
                 mHeadViewHolder.seekBar.setMax((int) (mAudioPlayer.getDuration()));
                 mHeadViewHolder.seekBar.setOnSeekBarChangeListener(new SeekBarChangeListener());
                 startUpdateTimer();
+
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -949,7 +948,9 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                     }
 
 
-
+                    if(mComments==null||mComments.size()==0){
+                        refreshLayout.setEnableLoadMore(false);
+                    }
                     mAdapter.setComments(mComments);
 
                     mAdapter.setOnPraise(new AudioRecyclerAdapter.OnPraise() {

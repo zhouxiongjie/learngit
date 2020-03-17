@@ -114,9 +114,9 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
         getSpecialDetail();
         String url = ServerInfo.h5IP + ServerInfo.getSpecialPage + mSpecialId;
         if (User.getInstance() == null) {
-            url = url + "?app=android";
+            url = url + "?app=android&multiple="+CommonUtils.getFontSize();
         } else {
-            url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+            url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&multiple="+CommonUtils.getFontSize();
         }
         WebSettings s = webView.getSettings();
         CommonUtils.setWebviewUserAgent(s);
@@ -420,14 +420,14 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
         if (requestCode == LOGIN_RESULT ) {
             String url = ServerInfo.h5IP + ServerInfo.getSpecialPage + mSpecialId;
             if (User.getInstance() == null) {
-                url = url + "?app=android";
+                url = url + "?app=android"+"&multiple="+CommonUtils.getFontSize();
             } else {
                 //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
 
                 if(!TextUtils.isEmpty(mJumpUrl)){
-                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&multiple="+CommonUtils.getFontSize();
                 }
                 webView.loadUrl(url);
             }

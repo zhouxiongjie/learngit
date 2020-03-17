@@ -1060,6 +1060,9 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                             mComments.addAll(comments);
                         }
 
+                        if(mComments==null||mComments.size()==0){
+                            refreshLayout.setEnableLoadMore(false);
+                        }
                         mAdapter.setComments(mComments);
 
                         mAdapter.setOnPraise(new VideoRecyclerAdapter.OnPraise() {

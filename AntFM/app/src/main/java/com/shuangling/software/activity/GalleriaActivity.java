@@ -120,9 +120,9 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
         String url = ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId;
 
         if (User.getInstance() == null) {
-            url = url + "?app=android";
+            url = url + "?app=android"+"&multiple="+CommonUtils.getFontSize();
         } else {
-            url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+            url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
         }
         WebSettings s = webView.getSettings();
         CommonUtils.setWebviewUserAgent(s);
@@ -130,6 +130,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
         webView.getSettings().setBlockNetworkImage(false);
+        s.setTextZoom(100);
         s.setJavaScriptEnabled(true);       //js
         s.setDomStorageEnabled(true);       //localStorage
 
@@ -431,12 +432,12 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
         if (requestCode == LOGIN_RESULT) {
             String url = ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId;
             if (User.getInstance() == null) {
-                url = url + "?app=android";
+                url = url + "?app=android"+"&multiple="+CommonUtils.getFontSize();
             } else  {
                 if(!TextUtils.isEmpty(mJumpUrl)){
-                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
                 }else{
-                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+                    url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
                 }
                 webView.loadUrl(url);
             }

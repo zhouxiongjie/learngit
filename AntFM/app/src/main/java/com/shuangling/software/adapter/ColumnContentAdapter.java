@@ -352,6 +352,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                         layoutParams.topMargin = CommonUtils.dip2px(5);
                         layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                         layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                        layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
                         albumViewHolder.layout.setLayoutParams(layoutParams);
                     } else {
                         if (layoutWidth > titleWidth) {
@@ -506,6 +507,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                             layoutParams.topMargin = CommonUtils.dip2px(5);
                             layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                             layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                            layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
                             articleViewHolder.layout.setLayoutParams(layoutParams);
                         } else {
                             if (layoutWidth > titleWidth) {
@@ -900,6 +902,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                         layoutParams.topMargin = CommonUtils.dip2px(5);
                         layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                         layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                        layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
                         specialViewHolder.layout.setLayoutParams(layoutParams);
                     } else {
                         if (layoutWidth > titleWidth) {

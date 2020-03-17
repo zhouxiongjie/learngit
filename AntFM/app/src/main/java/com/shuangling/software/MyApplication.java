@@ -33,6 +33,7 @@ import com.scwang.smartrefresh.layout.api.RefreshHeader;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
+import com.shuangling.software.activity.FontSizeSettingActivity;
 import com.shuangling.software.dao.DaoMaster;
 import com.shuangling.software.dao.DaoSession;
 import com.shuangling.software.entity.Station;
@@ -41,10 +42,12 @@ import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.CrashHandler;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.MyToastStyle;
 import com.shuangling.software.utils.ServerInfo;
+import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.youngfeng.snake.Snake;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -102,6 +105,8 @@ public class MyApplication extends MultiDexApplication {
     public boolean remindPermission=true;
     public boolean findNewVerison=false;
 
+    //private static int articleVoiceStatus;
+
     public Station getStation() {
         return station;
     }
@@ -115,7 +120,7 @@ public class MyApplication extends MultiDexApplication {
 
 		super.onCreate();
 		sInstance = this;
-
+        Constant.SYSTEM_FONT_SCALE = getResources().getConfiguration().fontScale;
 //        OkHttpClient okHttpClient=OkHttpUtils.okHttpClient;
 //        ImagePipelineConfig config = OkHttpImagePipelineConfigFactory
 //                .newBuilder(this, okHttpClient)
@@ -428,10 +433,10 @@ public class MyApplication extends MultiDexApplication {
 
 
     public void initStation(){
-        String url = ServerInfo.serviceIP + ServerInfo.getStationInfo;
+        String url = ServerInfo.serviceIP + ServerInfo.articleVoices;
         Map<String, String> params = new HashMap<String, String>();
 
-        OkHttpUtils.getNotAuthorization(url, params, new OkHttpCallback(this) {
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
@@ -461,6 +466,41 @@ public class MyApplication extends MultiDexApplication {
             }
         });
     }
+
+
+//    public void articleVoiceConfigs(){
+//        String url = ServerInfo.serviceIP + ServerInfo.articleVoiceConfigs;
+//        Map<String, String> params = new HashMap<String, String>();
+//
+//        OkHttpUtils.getNotAuthorization(url, params, new OkHttpCallback(this) {
+//
+//            @Override
+//            public void onResponse(Call call, String response) throws IOException {
+//
+//
+//                try{
+//
+//                    JSONObject jsonObject = JSONObject.parseObject(response);
+//
+//                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+//
+//                        articleVoiceStatus=jsonObject.getJSONObject("data").getIntValue("status");
+//
+//                    }
+//
+//
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call call, Exception exception) {
+//
+//
+//            }
+//        });
+//    }
 
 
 
@@ -520,5 +560,7 @@ public class MyApplication extends MultiDexApplication {
             }
         });
     }
+
+
 
 }

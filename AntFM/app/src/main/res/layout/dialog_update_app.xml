@@ -67,7 +67,7 @@
                 android:text="发现新版本"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="10dp"
-                android:textSize="23sp"
+                android:textSize="@dimen/font_size_46px"
                 android:textColor="#229BFE"
                 android:textStyle="bold"
                 android:layout_centerHorizontal="true"/>

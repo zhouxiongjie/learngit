@@ -644,7 +644,7 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
                 }
                 webView.loadUrl(url);
             }
-            
+
 
         }else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (requestCode == REQUEST_SELECT_FILE&&resultCode == RESULT_OK && data != null) {

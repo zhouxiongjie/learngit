@@ -707,13 +707,23 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == LOGIN_RESULT) {
-            String url=initUrl(mUrl);
+//            String url=initUrl(mUrl);
+//
+//            if(!TextUtils.isEmpty(mJumpUrl)){
+//                url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
+//            }
+//            //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+//            webView.loadUrl(url);
 
-            if(!TextUtils.isEmpty(mJumpUrl)){
-                url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
+
+
+            String url=initUrl(mUrl);
+            if(User.getInstance()!=null){
+                if(!TextUtils.isEmpty(mJumpUrl)){
+                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
+                }
+                webView.loadUrl(url);
             }
-            //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-            webView.loadUrl(url);
 
         }
     }

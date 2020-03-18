@@ -591,12 +591,21 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 //                webView.loadUrl(url);
 //            }
 
+//            String url=initUrl(mUrl);
+//            if(!TextUtils.isEmpty(mJumpUrl)){
+//                url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
+//            }
+//            //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+//            webView.loadUrl(url);
+
+
             String url=initUrl(mUrl);
-            if(!TextUtils.isEmpty(mJumpUrl)){
-                url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
+            if(User.getInstance()!=null){
+                if(!TextUtils.isEmpty(mJumpUrl)){
+                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
+                }
+                webView.loadUrl(url);
             }
-            //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
-            webView.loadUrl(url);
 
 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

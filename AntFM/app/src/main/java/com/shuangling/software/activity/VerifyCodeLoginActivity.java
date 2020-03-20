@@ -300,7 +300,7 @@ public class VerifyCodeLoginActivity extends AppCompatActivity implements Handle
             @Override
             public void onFailure(Call call, Exception exception) {
 
-                ToastUtils.show("登陆异常");
+                ToastUtils.show("登录异常");
 
 
             }

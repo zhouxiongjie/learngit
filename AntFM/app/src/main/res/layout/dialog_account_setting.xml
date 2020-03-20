@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:text="1、支付宝账号或姓名输入错误将无法提现到账\n2、使用支付宝提现需要您已注册支付宝并 在支付宝中实名认证；\n3、支付宝账号是您注册支付宝的手机号或 者邮箱号您可以登陆支付宝查看。"
+            android:text="1、支付宝账号或姓名输入错误将无法提现到账\n2、使用支付宝提现需要您已注册支付宝并 在支付宝中实名认证；\n3、支付宝账号是您注册支付宝的手机号或 者邮箱号您可以登录支付宝查看。"
             android:textColor="#666666"
             android:lineSpacingExtra="5dp"
             android:textSize="@dimen/font_size_30px" />

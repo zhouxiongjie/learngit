@@ -41,7 +41,7 @@
         android:textStyle="bold"
         android:textColor="#333333"
         android:textSize="@dimen/font_size_42px"
-        android:text="登录/注册"/>
+        android:text="登录"/>
 
 
 
@@ -106,7 +106,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="25dp"
-        app:layout_constraintTop_toBottomOf="@+id/passwordLogin" />
+        app:layout_constraintTop_toBottomOf="@+id/passwordLogin"
+        android:visibility="invisible"/>
     <LinearLayout
         android:id="@+id/protocol"
         android:layout_width="wrap_content"
@@ -121,7 +122,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="注册即代表同意"
+            android:text="登录即代表同意"
             android:layout_gravity="center_vertical"
             android:textColor="#A0A0A0"
             android:textSize="@dimen/font_size_26px" />

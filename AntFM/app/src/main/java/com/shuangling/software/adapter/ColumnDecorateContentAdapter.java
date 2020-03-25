@@ -3,6 +3,7 @@ package com.shuangling.software.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -182,6 +183,17 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             return new LiveViewHolder(inflater.inflate(R.layout.content_live_item, parent, false));
         }
     }
+
+//    @Override
+//    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List payloads) {
+//
+//        if(payloads.isEmpty()){
+//            onBindViewHolder(holder, position);
+//        } else {
+//            onBindItemHolder(holder, position);
+//        }
+//
+//    }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {

@@ -227,6 +227,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                 startActivity(it);
             }
             break;
+            
         }
     }
 

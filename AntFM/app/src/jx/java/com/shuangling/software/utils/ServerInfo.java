@@ -71,13 +71,13 @@ public class ServerInfo {
 
 	public static String getGalleriaPage="/atlas/";					    		//图集h5页面
 
-    public static String getGalleriaDetail="/v1/c_galleries/";					//图集详情
+	public static String getGalleriaDetail="/v1/c_galleries/";					//图集详情
 
 	public static String getSpecialPage="/specials/";							//专题h5页面
 
-    public static String getSpecialDetail="/v1/c_special/";						//专题详情
+	public static String getSpecialDetail="/v1/c_special/";						//专题详情
 
-    public static String getAlbumDetail="/v1/c_album/";							//专辑详情
+	public static String getAlbumDetail="/v1/c_album/";							//专辑详情
 
 	public static String getArticleDetail="/v1/c_article/";						//文章详情
 
@@ -106,11 +106,11 @@ public class ServerInfo {
 
 	public static String indexDecorate="/v1/consumer/layouts";					//首页装修
 
-    public static String topPost="/v1/top_posts";			            		//热门置顶
+	public static String topPost="/v1/top_posts";			            		//热门置顶
 
-    public static String marvellousPosts="/v1/marvellousPosts";         		//热门精彩推荐
+	public static String marvellousPosts="/v1/marvellousPosts";         		//热门精彩推荐
 
-    public static String getRadioList="/v1/mobile/channel";    					//电台列表
+	public static String getRadioList="/v1/mobile/channel";    					//电台列表
 
 	public static String getRadioDetail="/v1/mobile/channel/play";    			//电台详情
 
@@ -184,7 +184,7 @@ public class ServerInfo {
 
 	public static String shareStatistics="/v2/share";							//分享添加来记录
 
-    public static String bottomMenus="/v2/consumer/menus";					    //C端获取底部菜单
+	public static String bottomMenus="/v2/consumer/menus";					    //C端获取底部菜单
 
 	public static String indexDecorateContent="/v2/cassify_posts";			    //首页装修内容（c端）
 
@@ -219,4 +219,24 @@ public class ServerInfo {
 	public static String getCashRegular="/v1/consumer/transfer_config";			//获取提现设置
 
 	public static String addPlayTimes="/v2/plays/";								//增加播放量
+
+	public static String isUserExist="/v2/consumer/query_user";					//查询用户是否存在
+
+	public static String settingPwd="/v2/consumer/init_password";				//初始化用户密码
+
+	public static String wechatLogin="/v2/consumer/login_by_wechat";			//微信登录
+
+	public static String bindPhone="/v2/consumer/bind_phone";					//绑定手机号码
+
+	public static String weixinBindPhone="/v2/consumer/wechat_bind_phone";		//微信绑定手机号码
+
+	public static String getThirdPlatformInfo="/v2/consumer/proxies";			//微信绑定手机号码
+
+	public static String bindWechat="/v2/consumer/bind_wechat";					//绑定微信
+
+	public static String clauses="/v1/consumer/clauses";						//隐私协议
+
+	public static String useProtocol="/v1/consumer/agreements";					//使用协议
+
+
 }

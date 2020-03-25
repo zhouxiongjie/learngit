@@ -222,9 +222,14 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if (refreshLayout.getState() == RefreshState.Refreshing) {
-                                refreshLayout.finishRefresh();
+                            try{
+
+                            }catch (Exception e){
+                                if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                    refreshLayout.finishRefresh();
+                                }
                             }
+
                         }
                     });
 

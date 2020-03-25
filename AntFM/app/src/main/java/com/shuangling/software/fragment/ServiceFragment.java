@@ -141,7 +141,9 @@ public class ServiceFragment extends SimpleImmersionFragment implements Handler.
 
         String url = ServerInfo.serviceIP + ServerInfo.getServices;
         Map<String, String> params = new HashMap<>();
-        params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
+        if(MainActivity.sCurrentCity!=null){
+            params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
+        }
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
 
             @Override

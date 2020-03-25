@@ -57,7 +57,7 @@ public class RadioListFragment extends SimpleImmersionFragment implements Handle
     @BindView(R.id.statusBar)
     View statusBar;
 
-    private String mType;
+    private String mType="1";
     private Handler mHandler;
     private RadioGroupAdapter mRadioGroupAdapter;
     private RadioListAdapter mRadioListAdapter;

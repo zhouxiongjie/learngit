@@ -66,7 +66,7 @@
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="1px"
+        android:layout_height="0.5dp"
         android:background="@color/divideColorOne"/>
 
     <LinearLayout
@@ -76,8 +76,8 @@
         android:padding="15dp">
 
         <RelativeLayout
-            android:id="@+id/weixin"
-            android:layout_width="wrap_content"
+            android:id="@+id/zfb"
+            android:layout_width="0dp"
             android:layout_height="45dp"
             android:layout_weight="1"
             android:layout_marginRight="10dp"
@@ -85,13 +85,15 @@
 
 
             <com.shuangling.software.customview.FontIconView
+                android:id="@+id/zfbSelectedIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:text="&#xe681;"
-                android:textColor="#181818"
-                android:textSize="@dimen/font_size_36px" />
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_30px"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -125,8 +127,8 @@
 
 
         <RelativeLayout
-            android:id="@+id/zhifubao"
-            android:layout_width="wrap_content"
+            android:id="@+id/wx"
+            android:layout_width="0dp"
             android:layout_height="45dp"
             android:layout_weight="1"
             android:layout_marginLeft="10dp"
@@ -134,13 +136,17 @@
 
 
             <com.shuangling.software.customview.FontIconView
+                android:id="@+id/wxSelectedIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
+                android:layout_marginEnd="0dp"
+                android:layout_marginBottom="1dp"
                 android:text="&#xe681;"
-                android:textColor="#181818"
-                android:textSize="@dimen/font_size_30px" />
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_30px"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -179,7 +185,18 @@
         android:layout_height="6dp"
         android:background="#fff5f5f8"/>
 
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:textSize="@dimen/font_size_30px"
+        android:textColor="#666666"
+        android:textStyle="bold"
+        android:text="提现金额"/>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/divideColorOne"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -187,55 +204,101 @@
         android:orientation="horizontal"
         android:padding="15dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/cashAll"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="45dp"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:layout_marginRight="10dp"
+            android:layout_gravity="center_vertical"
             android:background="@drawable/round_corner_rectangle_bg">
 
-            <TextView
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#4D4D4D"
-                android:textSize="@dimen/font_size_28px"
-                android:textStyle="bold"
-                android:text="全部提现"/>
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="#4D4D4D"
+                    android:textSize="@dimen/font_size_28px"
+                    android:textStyle="bold"
+                    android:text="全部提现"/>
 
-            <TextView
-                android:id="@+id/allMoney"
+                <TextView
+                    android:id="@+id/allMoney"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="#4690FF"
+                    android:textSize="@dimen/font_size_24px"
+                    android:textStyle="bold"
+                    tools:text="10000.00元" />
+
+            </LinearLayout>
+
+
+
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/allSelectedIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#4690FF"
-                android:textSize="@dimen/font_size_24px"
-                android:textStyle="bold"
-                tools:text="1000.00元" />
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:visibility="gone"
+                android:text="&#xe681;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_30px" />
 
-        </LinearLayout>
-        <EditText
-            android:id="@+id/customAmount"
-            android:layout_width="wrap_content"
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/customAmountLayout"
+            android:layout_width="0dp"
             android:layout_height="45dp"
             android:layout_weight="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:layout_marginLeft="10dp"
-            android:inputType="numberDecimal"
-            android:background="@drawable/round_corner_rectangle_bg"
-            android:hint="自定义"
-            android:cursorVisible="false"
-            android:gravity="center">
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/round_corner_rectangle_bg">
 
-        </EditText>
+            <EditText
+                android:id="@+id/customAmount"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberDecimal"
+                android:background="@null"
+                android:hint="自定义"
+                android:cursorVisible="false"
+                android:gravity="center"/>
+
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/customSelectedIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="0dp"
+                android:text="&#xe681;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_30px"
+                android:visibility="gone"/>
+        </RelativeLayout>
+
 
     </LinearLayout>
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="6dp"
-        android:background="@color/divideColorOne"/>
+        android:background="@color/divideColorOne" />
 
     <RelativeLayout
         android:id="@+id/accountLayout"
@@ -294,14 +357,15 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/cash"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="20dp"
             android:orientation="vertical">
+
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="@dimen/font_size_24px"
+                android:layout_height="match_parent"
+                android:text="规则说明"
                 android:textColor="#4690FF"
-                android:text="规则说明"/>
+                android:textSize="@dimen/font_size_24px" />
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="0.5dp"

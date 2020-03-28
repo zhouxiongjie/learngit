@@ -33,6 +33,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.activity.AnchorOrOrganizationDetailActivityH5;
+import com.shuangling.software.activity.ArticleDetailActivity;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.customview.FloatView;
@@ -262,7 +264,12 @@ public class FloatWindowUtil {
                                         Glide.with(mContext).load(logo).into(mProgressCircleImageView);
                                     }else{
                                         //mProgressCircleImageView.setDisableCircularTransformation(false);
-                                        Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
+                                        if(mAudioPlayer.getPlayerState()==IPlayer.started){
+                                            Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
+                                        }else {
+                                            Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
+                                        }
+
                                     }
 
                                 }catch (RemoteException e){
@@ -315,7 +322,11 @@ public class FloatWindowUtil {
                                         Glide.with(mContext).load(logo).into(mProgressCircleImageView);
                                     }else{
                                         //mProgressCircleImageView.setDisableCircularTransformation(false);
-                                        Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
+                                        if(mAudioPlayer.getPlayerState()==IPlayer.started){
+                                            Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
+                                        }else {
+                                            Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
+                                        }
                                     }
 
                                 }catch (RemoteException e){
@@ -347,10 +358,14 @@ public class FloatWindowUtil {
                             it.putExtra("audioId",audio.getId());
                             it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
                             mContext.startActivity(it);
-                        }else{
+                        }else if(audio.getIsRadio()==1){
                             Intent it=new Intent(mContext,RadioDetailActivity.class);
                             it.putExtra("radioId",audio.getId());
                             it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
+                            mContext.startActivity(it);
+                        }else {
+                            Intent it = new Intent(mContext, ArticleDetailActivity.class);
+                            it.putExtra("articleId", audio.getArticleId());
                             mContext.startActivity(it);
                         }
 
@@ -660,17 +675,49 @@ public class FloatWindowUtil {
         }else if (event.getEventName().equals("OnTimerCancel")) {
 
         }else if(event.getEventName().equals("OnPause")){
-            mPlay.setImageResource(R.drawable.float_play_icon);
-            cancelUpdateTimer();
-            if(mControllerLayout.getVisibility()==View.GONE){
-                Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
+
+            try{
+                mPlay.setImageResource(R.drawable.float_play_icon);
+                cancelUpdateTimer();
+                if(mControllerLayout.getVisibility()==View.GONE){
+                    Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
+                }else{
+                    String logo=mAudioPlayer.getCurrentAudio()!=null?mAudioPlayer.getCurrentAudio().getLogo():null;
+                    if(!TextUtils.isEmpty(logo)){
+                        //mProgressCircleImageView.setDisableCircularTransformation(false);
+                        Glide.with(mContext).load(logo).into(mProgressCircleImageView);
+                    }else{
+                        //mProgressCircleImageView.setDisableCircularTransformation(false);
+
+                        Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
+
+
+                    }
+                }
+            }catch (RemoteException e){
+
             }
+
         }else if(event.getEventName().equals("OnStart")){
             try{
                 mProgressCircleImageView.setDuration(mAudioPlayer.getDuration());
                 mPlay.setImageResource(R.drawable.float_pause_icon);
                 if(mControllerLayout.getVisibility()==View.GONE){
                     Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
+                }else{
+                    String logo=mAudioPlayer.getCurrentAudio()!=null?mAudioPlayer.getCurrentAudio().getLogo():null;
+                    if(!TextUtils.isEmpty(logo)){
+                        //mProgressCircleImageView.setDisableCircularTransformation(false);
+                        Glide.with(mContext).load(logo).into(mProgressCircleImageView);
+                    }else{
+                        //mProgressCircleImageView.setDisableCircularTransformation(false);
+
+                        Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
+
+
+                    }
+
+
                 }
                 startUpdateTimer();
             }catch (RemoteException e){

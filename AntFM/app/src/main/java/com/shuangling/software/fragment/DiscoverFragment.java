@@ -122,6 +122,7 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
         mHandler = new Handler(this);
         mUrl = getArguments().getString("url");
         mTitle=getArguments().getString("title");
+        EventBus.getDefault().register(this);
     }
 
 
@@ -158,7 +159,6 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
 
     private void init() {
-        EventBus.getDefault().register(this);
         activtyTitle.setTitleText(mTitle);
         TextView tv=activtyTitle.getTitleTextView();
         tv.setTextColor(getResources().getColor(R.color.white));
@@ -523,11 +523,15 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getEventBus(CommonEvent event) {
         if (event.getEventName().equals("OnLoginSuccess")||event.getEventName().equals("OnQuitLogin")) {
-            String url=mUrl;
-            url=initUrl(mUrl);
+            String url=initUrl(mUrl);
+            webView.loadUrl(url);
+        }else if(event.getEventName().equals("onFontSizeChanged")){
+            String url=initUrl(mUrl);
             webView.loadUrl(url);
         }
     }
+
+
 
 
     @Override
@@ -563,7 +567,6 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
     @Override
     public void onDestroyView() {
-        EventBus.getDefault().unregister(this);
         webView.destroy();
         unbinder.unbind();
         super.onDestroyView();
@@ -791,5 +794,11 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
         return url;
     }
 
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
 
 }

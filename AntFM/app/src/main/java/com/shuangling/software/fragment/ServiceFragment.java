@@ -116,6 +116,7 @@ public class ServiceFragment extends SimpleImmersionFragment implements Handler.
         super.onCreate(savedInstanceState);
         mHandler = new Handler(this);
         mTitle=getArguments().getString("title");
+        EventBus.getDefault().register(this);
     }
 
 
@@ -136,6 +137,13 @@ public class ServiceFragment extends SimpleImmersionFragment implements Handler.
         getServers();
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if(event.getEventName().equals("onFontSizeChanged")){
+
+        }
+    }
 
     private void getServers() {
 
@@ -227,6 +235,13 @@ public class ServiceFragment extends SimpleImmersionFragment implements Handler.
     public void onDestroyView() {
         unbinder.unbind();
         super.onDestroyView();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
 

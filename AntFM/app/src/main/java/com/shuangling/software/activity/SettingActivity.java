@@ -40,6 +40,8 @@ import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.dialog.UpdateDialog;
 import com.shuangling.software.entity.UpdateInfo;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.event.CommonEvent;
+import com.shuangling.software.fragment.ContentFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ACache;
@@ -49,6 +51,10 @@ import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.io.IOException;
@@ -107,7 +113,7 @@ public class SettingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-
+        EventBus.getDefault().register(this);
         setContentView(R.layout.activity_setting);
         CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
@@ -157,6 +163,22 @@ public class SettingActivity extends AppCompatActivity {
         }
 
 
+    }
+
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if(event.getEventName().equals("onFontSizeChanged")){
+            float appFontSize = SharedPreferencesUtils.getFloatValue(FontSizeSettingActivity.FONT_SIZE, 1.00f);
+            if (appFontSize == 1.00f) {
+                fontSize.setText("标准");
+            }else if(appFontSize == 1.15f){
+                fontSize.setText("大号");
+            }else{
+                fontSize.setText("特大");
+            }
+        }
     }
 
 
@@ -557,5 +579,13 @@ public class SettingActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 }

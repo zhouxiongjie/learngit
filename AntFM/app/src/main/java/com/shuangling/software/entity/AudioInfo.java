@@ -15,11 +15,8 @@ public class AudioInfo implements Parcelable {
     private String logo;
     private int isRadio;    //是否是电台  0 音频  1 电台   2文章播报
     private int sourceId;
-
-
-
     private String video_id;
-
+    private int articleId;
     public AudioInfo(){
 
     }
@@ -104,6 +101,14 @@ public class AudioInfo implements Parcelable {
         this.video_id = video_id;
     }
 
+    public int getArticleId() {
+        return articleId;
+    }
+
+    public void setArticleId(int articleId) {
+        this.articleId = articleId;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -124,6 +129,7 @@ public class AudioInfo implements Parcelable {
         out.writeInt(isRadio);
         out.writeInt(sourceId);
         out.writeString(video_id);
+        out.writeInt(articleId);
     }
 
 
@@ -149,6 +155,7 @@ public class AudioInfo implements Parcelable {
         isRadio=in.readInt();
         sourceId=in.readInt();
         video_id=in.readString();
+        articleId=in.readInt();
 
     }
 }

@@ -25,9 +25,14 @@ import com.shuangling.software.adapter.RadioGroupAdapter;
 import com.shuangling.software.adapter.RadioListAdapter;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.RadioSet;
+import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ServerInfo;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -68,6 +73,7 @@ public class RadioListFragment extends SimpleImmersionFragment implements Handle
         Bundle args = getArguments();
         mType = args.getString("type");
         mHandler = new Handler(this);
+        EventBus.getDefault().register(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -127,10 +133,29 @@ public class RadioListFragment extends SimpleImmersionFragment implements Handle
     }
 
 
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if(event.getEventName().equals("onFontSizeChanged")){
+            if (mRadioListAdapter == null) {
+                mRadioListAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
     }
 
     @Override

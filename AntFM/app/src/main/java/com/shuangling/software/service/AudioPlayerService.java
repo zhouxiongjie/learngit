@@ -221,6 +221,9 @@ public class AudioPlayerService extends Service {
                             getArticleAuth(audioInfo.getVideo_id());
                         }
 
+                    }else if(mPlayerState==IPlayer.paused){
+                        mAliyunVodPlayer.start();
+                        EventBus.getDefault().post(new PlayerEvent("OnPrepared",mCurrentAudio));
                     }else{
                         EventBus.getDefault().post(new PlayerEvent("OnPrepared",mCurrentAudio));
                     }
@@ -402,6 +405,11 @@ public class AudioPlayerService extends Service {
 //            if(sPlayOrder==PLAY_CIRCLE){
 //                playAudio(mCurrentAudio);
 //            }
+
+            if(mCurrentAudio.getIsRadio()==2){
+                return;
+            }
+
             if(sPlayOrder==PLAY_CIRCLE||sPlayOrder==PLAY_ORDER){
 
                 if(sSequence==POSITIVE){
@@ -461,7 +469,6 @@ public class AudioPlayerService extends Service {
                         }
                     }
                 }
-
             }
         }
 
@@ -472,7 +479,6 @@ public class AudioPlayerService extends Service {
             if(sPlayOrder==PLAY_CIRCLE){
                 playAudio(mCurrentAudio);
             }else if(sPlayOrder==PLAY_ORDER){
-
                 if(sSequence==POSITIVE){
                     for (int i = 0; mAudioList!=null&&i < mAudioList.size(); i++) {
                         AudioInfo pi = mAudioList.get(i);
@@ -530,13 +536,8 @@ public class AudioPlayerService extends Service {
                         }
                     }
                 }
-
             }
         }
-
-
-
-
     };
 
 

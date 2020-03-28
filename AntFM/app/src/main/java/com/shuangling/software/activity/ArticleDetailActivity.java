@@ -106,6 +106,7 @@ public class ArticleDetailActivity extends BaseAudioActivity implements Handler.
 //        }
 //    };
 
+    private boolean firstTime=true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
@@ -183,8 +184,10 @@ public class ArticleDetailActivity extends BaseAudioActivity implements Handler.
     private void init() {
         progressBar.setMax(100);
         mHandler = new Handler(this);
+
         //mHandler.postDelayed(runnable,8000);
         mArticleId = getIntent().getIntExtra("articleId", 0);
+        articleVoices();
         getArticleDetail();
         String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
         int size = 1;
@@ -514,43 +517,55 @@ public class ArticleDetailActivity extends BaseAudioActivity implements Handler.
 
 
         @JavascriptInterface
-        public void playAudios() {
+        public void playArticle(String playOrPause,String id) {
+            if(playOrPause.equals("1")){
 
-            if(mArticleVoicesInfo!=null&&mArticleVoicesInfo.getVoices().size()>0){
+                if(firstTime==true){
+                    firstTime=false;
+                    if(mArticleVoicesInfo!=null&&mArticleVoicesInfo.getVoices().size()>0){
+                        ArticleVoicesInfo.VoicesBean vb=mArticleVoicesInfo.getVoices().get(0);
+                        List<AudioInfo> audioInfos = new ArrayList<>();
+                        for (int i = 0; vb != null&&vb.getAudio()!=null&& i < vb.getAudio().size(); i++) {
+                            ArticleVoicesInfo.VoicesBean.AudioBean audio = vb.getAudio().get(i);
+                            AudioInfo audioInfo = new AudioInfo();
+                            audioInfo.setId(audio.getId());
+                            audioInfo.setIndex(i + 1);
+                            audioInfo.setIsRadio(2);
+                            audioInfo.setArticleId(mArticleId);
+                            audioInfo.setVideo_id(audio.getVideo_id());
+                            audioInfos.add(audioInfo);
+                        }
+                        try{
+                            AudioPlayerService.sPlayOrder=PLAY_ORDER;
+                            mAudioPlayer.playAudio(audioInfos.get(0));
+                            mAudioPlayer.setPlayerList(audioInfos);
+                        }catch (RemoteException e){
+                        }
+                        if (!FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
+                            if (MyApplication.getInstance().remindPermission) {
+                                MyApplication.getInstance().remindPermission = false;
+                                showFloatWindowPermission();
+                            }
+                        }
+                    }
+                }else{
+                    try{
+                        mAudioPlayer.start();
+                    }catch (RemoteException e){
 
-                ArticleVoicesInfo.VoicesBean vb=mArticleVoicesInfo.getVoices().get(0);
-                List<AudioInfo> audioInfos = new ArrayList<>();
-                for (int i = 0; vb != null&&vb.getAudio()!=null&& i < vb.getAudio().size(); i++) {
-                    ArticleVoicesInfo.VoicesBean.AudioBean audio = vb.getAudio().get(i);
-                    AudioInfo audioInfo = new AudioInfo();
-                    audioInfo.setId(audio.getId());
-                    audioInfo.setIndex(i + 1);
-                    audioInfo.setIsRadio(2);
-                    audioInfo.setVideo_id(audio.getVideo_id());
-                    audioInfos.add(audioInfo);
+                    }
                 }
+
+            }else{
                 try{
-                    AudioPlayerService.sPlayOrder=PLAY_ORDER;
-                    mAudioPlayer.playAudio(audioInfos.get(0));
-                    mAudioPlayer.setPlayerList(audioInfos);
+                    mAudioPlayer.pause();
                 }catch (RemoteException e){
 
                 }
 
-
-                if (!FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
-                    if (MyApplication.getInstance().remindPermission) {
-                        MyApplication.getInstance().remindPermission = false;
-                        showFloatWindowPermission();
-
-                    }
-                }else {
-                    FloatWindowUtil.getInstance().showFloatWindow();
-                }
-
-
-
             }
+
+
 
 
 
@@ -586,6 +601,31 @@ public class ArticleDetailActivity extends BaseAudioActivity implements Handler.
     }
 
     @Override
+    protected void onResume() {
+        FloatWindowUtil.getInstance().hideWindow();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        try {
+            if (mAudioPlayer.getPlayerState() == IPlayer.paused ||
+                    mAudioPlayer.getPlayerState() == IPlayer.started) {
+
+                if (FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
+                    FloatWindowUtil.getInstance().showFloatWindow();
+                } else {
+                    //showFloatWindowPermission();
+                }
+            }
+        } catch (RemoteException e) {
+
+        }
+        super.onPause();
+    }
+
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == LOGIN_RESULT ) {
@@ -613,7 +653,7 @@ public class ArticleDetailActivity extends BaseAudioActivity implements Handler.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
                 if (FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
-                    FloatWindowUtil.getInstance().showFloatWindow();
+                    //FloatWindowUtil.getInstance().showFloatWindow();
                 } else {
                     //不显示悬浮窗 并提示
                 }

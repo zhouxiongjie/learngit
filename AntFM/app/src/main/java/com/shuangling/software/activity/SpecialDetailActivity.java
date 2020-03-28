@@ -120,6 +120,7 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
         }
         WebSettings s = webView.getSettings();
         CommonUtils.setWebviewUserAgent(s);
+        s.setTextZoom(100);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }

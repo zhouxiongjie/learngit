@@ -1,4 +1,4 @@
-﻿apply plugin: 'com.mob.sdk'
+apply plugin: 'com.mob.sdk'
 
 MobSDK {
     appKey "2cf092dea3067"

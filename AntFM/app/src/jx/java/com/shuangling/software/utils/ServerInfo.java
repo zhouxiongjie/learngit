@@ -219,4 +219,28 @@ public class ServerInfo {
 	public static String getCashRegular="/v1/consumer/transfer_config";			//获取提现设置
 
 	public static String addPlayTimes="/v2/plays/";								//增加播放量
+
+	public static String isUserExist="/v2/consumer/query_user";					//查询用户是否存在
+
+	public static String settingPwd="/v2/consumer/init_password";				//初始化用户密码
+
+	public static String wechatLogin="/v2/consumer/login_by_wechat";			//微信登录
+
+	public static String bindPhone="/v2/consumer/bind_phone";					//绑定手机号码
+
+	public static String weixinBindPhone="/v2/consumer/wechat_bind_phone";		//微信绑定手机号码
+
+	public static String getThirdPlatformInfo="/v2/consumer/proxies";			//微信绑定手机号码
+
+	public static String bindWechat="/v2/consumer/bind_wechat";					//绑定微信
+
+	public static String clauses="/v1/consumer/clauses";						//隐私协议
+
+	public static String useProtocol="/v1/consumer/agreements";					//使用协议
+
+	//public static String articleVoiceConfigs="/v2/article_voice_configs";		//c端获取语音播报配置
+
+	public static String articleVoices="/v2/article_voices/";					//c端获取语音播报配置
+
+	public static String playAuth="/v1/playAuth";								//c端获取语音播报配置
 }

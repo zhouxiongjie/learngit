@@ -41,6 +41,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.widget.TextView;
 
+import com.aliyun.vodplayerview.utils.Common;
 import com.gyf.immersionbar.ImmersionBar;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigDialog;
@@ -391,6 +392,26 @@ public class CommonUtils {
     public static int px2dip(float pxValue) {
         final float scale = MyApplication.getInstance().getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
+    }
+
+    public static int px2sp( float pxValue) {
+        final float fontScale = MyApplication.getInstance().getResources().getDisplayMetrics().scaledDensity;
+        return (int) (pxValue / fontScale + 0.5f);
+    }
+
+    public static int sp2px(float spValue) {
+        final float fontScale = MyApplication.getInstance().getResources().getDisplayMetrics().scaledDensity;
+        return (int) (spValue * fontScale + 0.5f);
+    }
+
+    public static int dp2sp(float dp) {
+        final float density = MyApplication.getInstance().getResources().getDisplayMetrics().density;
+        final float fontScale = MyApplication.getInstance().getResources().getDisplayMetrics().scaledDensity;
+        float s=CommonUtils.getFontSize();
+        //int sp = (int)((dp*density+0.5)/CommonUtils.getFontSize() +0.5);
+        //int sp = (int) (dip2px(dp) / (float) sp2px(dp));
+        int sp = px2sp(dip2px(dp));
+        return sp;
     }
 
     public static boolean isMobileNO(String mobiles) {

@@ -441,7 +441,7 @@ public class MyApplication extends MultiDexApplication {
 
 
     public void initStation(){
-        String url = ServerInfo.serviceIP + ServerInfo.articleVoices;
+        String url = ServerInfo.serviceIP + ServerInfo.getStationInfo;
         Map<String, String> params = new HashMap<String, String>();
 
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {

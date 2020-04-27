@@ -155,6 +155,9 @@ public class RadioListActivity extends AppCompatActivity implements Handler.Call
 
                         if(mRadioListAdapter==null){
                             mRadioListAdapter=new RadioListAdapter(this,radioGroups);
+                            if(mType.equals("1")){
+                                mRadioListAdapter.setShowLogo(true);
+                            }
                             contentList.setAdapter(mRadioListAdapter);
                             for (int i = 0; i < mRadioListAdapter.getGroupCount(); i++) {
                                 contentList.expandGroup(i);

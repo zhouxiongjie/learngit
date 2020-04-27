@@ -667,8 +667,13 @@ public class LoginActivity extends AppCompatActivity implements Handler.Callback
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
-                        ToastUtils.show("登录异常");
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("登录异常");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
 

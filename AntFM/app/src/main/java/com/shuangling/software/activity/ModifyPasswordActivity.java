@@ -100,7 +100,12 @@ public class ModifyPasswordActivity extends AppCompatActivity implements Handler
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
+                        try{
+                            mDialogFragment.dismiss();
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
             }

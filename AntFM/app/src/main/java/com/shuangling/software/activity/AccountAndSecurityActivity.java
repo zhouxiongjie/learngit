@@ -162,8 +162,13 @@ public class AccountAndSecurityActivity extends AppCompatActivity implements Pla
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
-                        ToastUtils.show("解绑失败,请稍后再试");
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("解绑失败,请稍后再试");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
             }
@@ -176,14 +181,19 @@ public class AccountAndSecurityActivity extends AppCompatActivity implements Pla
                         @Override
                         public void run() {
 
-                            mDialogFragment.dismiss();
-                            if (result.getCode() == 100000) {
-                                ToastUtils.show("解绑成功");
-                                if (platformList.size() > 0) platformList.remove(0);
+                            try{
+                                mDialogFragment.dismiss();
+                                if (result.getCode() == 100000) {
+                                    ToastUtils.show("解绑成功");
+                                    if (platformList.size() > 0) platformList.remove(0);
 
-                                wechatBind = false;
-                                setUserInfo();
+                                    wechatBind = false;
+                                    setUserInfo();
+                                }
+                            }catch (Exception e){
+
                             }
+
 
                         }
                     });
@@ -232,10 +242,15 @@ public class AccountAndSecurityActivity extends AppCompatActivity implements Pla
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
-                        ToastUtils.show("绑定失败,请稍后再试");
-                        Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
-                        wechat.removeAccount(true);
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("绑定失败,请稍后再试");
+                            Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
+                            wechat.removeAccount(true);
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
             }
@@ -248,24 +263,34 @@ public class AccountAndSecurityActivity extends AppCompatActivity implements Pla
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mDialogFragment.dismiss();
-                            if (result.getCode() == 100000){
-                                wechatBind = true;
-                                setUserInfo();
-                                ToastUtils.show("绑定成功");
-                                Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
-                                wechat.removeAccount(true);
-                            }else {
-                                forceBind(platform);
+                            try{
+                                mDialogFragment.dismiss();
+                                if (result.getCode() == 100000){
+                                    wechatBind = true;
+                                    setUserInfo();
+                                    ToastUtils.show("绑定成功");
+                                    Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
+                                    wechat.removeAccount(true);
+                                }else {
+                                    forceBind(platform);
+                                }
+                            }catch (Exception e){
+
                             }
+
 
                         }
                     });
 
                 }catch (Exception e){
-                    mDialogFragment.dismiss();
-                    Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
-                    wechat.removeAccount(true);
+                    try {
+                        mDialogFragment.dismiss();
+                        Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
+                        wechat.removeAccount(true);
+                    }catch (Exception ex){
+
+                    }
+
                 }
             }
         });

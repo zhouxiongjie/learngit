@@ -23,6 +23,7 @@ import com.shuangling.software.customview.MyGridView;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.RadioSet;
 import com.shuangling.software.utils.SharedPreferencesUtils;
+import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +40,7 @@ import butterknife.Unbinder;
  * 注销框
  * Created by hupei on 2017/4/5.
  */
+@EnableDragToClose()
 public class CustomColumnDialog extends BaseCircleDialog {
 
 
@@ -98,17 +100,17 @@ public class CustomColumnDialog extends BaseCircleDialog {
         String customColumn=SharedPreferencesUtils.getStringValue("custom_column","");
         if(TextUtils.isEmpty(SharedPreferencesUtils.getStringValue("custom_column",""))){
             //第一次自定义栏目
-            if(mColumns.size()>8){
-                for(int i=0;i<mColumns.size();i++){
-                  if(i<8){
-                      mCustomColumns.add(mColumns.get(i));
-                  }else{
-                      mMoreColumns.add(mColumns.get(i));
-                  }
-                }
-            }else{
+//            if(mColumns.size()>8){
+//                for(int i=0;i<mColumns.size();i++){
+//                  if(i<8){
+//                      mCustomColumns.add(mColumns.get(i));
+//                  }else{
+//                      mMoreColumns.add(mColumns.get(i));
+//                  }
+//                }
+//            }else{
                 mCustomColumns=mColumns;
-            }
+//            }
         }else{
             try{
                 mCustomColumns= JSONObject.parseArray(customColumn, Column.class);

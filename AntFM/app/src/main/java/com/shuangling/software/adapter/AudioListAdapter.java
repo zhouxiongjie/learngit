@@ -83,7 +83,7 @@ public class AudioListAdapter extends BaseAdapter {
                 vh.index.setVisibility(View.VISIBLE);
                 vh.audioJump.setVisibility(View.GONE);
             }
-        }catch (RemoteException e){
+        }catch (Exception e){
 
         }
 

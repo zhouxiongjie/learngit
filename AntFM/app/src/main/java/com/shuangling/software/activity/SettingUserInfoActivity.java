@@ -143,7 +143,7 @@ public class SettingUserInfoActivity extends AppCompatActivity implements Handle
 
     private void init() {
         nickName.setText("");
-        if (!TextUtils.isEmpty(User.getInstance().getAvatar())) {
+        if (User.getInstance()!=null&&!TextUtils.isEmpty(User.getInstance().getAvatar())) {
             Uri uri = Uri.parse(User.getInstance().getAvatar());
             ImageLoader.showThumb(uri, head, CommonUtils.dip2px(120), CommonUtils.dip2px(120));
         }

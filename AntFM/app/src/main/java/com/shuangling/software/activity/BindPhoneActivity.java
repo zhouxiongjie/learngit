@@ -283,8 +283,13 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
-                        ToastUtils.show("登录异常");
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("登录异常");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
 
@@ -317,11 +322,18 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
+
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("获取验证码请求异常");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
 
-                ToastUtils.show("获取验证码请求异常");
+
 
 
             }

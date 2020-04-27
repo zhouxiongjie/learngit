@@ -813,15 +813,22 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                                 .subscribe(new Consumer<Boolean>() {
                                                     @Override
                                                     public void accept(Boolean granted) throws Exception {
-                                                        if (granted) {
-                                                            if(mUpdateDialog!=null){
-                                                                mUpdateDialog.dismiss();
-                                                            }
 
-                                                            downloadApk(updateInfo.getNew_version().getUrl());
-                                                        }else {
-                                                            ToastUtils.show("没有文件写权限，请开启该权限");
+                                                        try{
+                                                            if (granted) {
+                                                                if(mUpdateDialog!=null){
+                                                                    mUpdateDialog.dismiss();
+                                                                }
+
+                                                                downloadApk(updateInfo.getNew_version().getUrl());
+                                                            }else {
+                                                                ToastUtils.show("没有文件写权限，请开启该权限");
+                                                            }
+                                                        }catch (Exception e){
+
                                                         }
+
+
                                                     }
                                                 });
                                     }else {
@@ -949,7 +956,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                                 transaction.hide(radioListFragment);
                                             }
 
-                                            transaction.commit();
+                                            transaction.commitAllowingStateLoss();
                                         }
                                     });
                                 } else if (bottomMenu.getType() == 2) {
@@ -988,7 +995,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             if(radioListFragment!=null&&!radioListFragment.isHidden()){
                                                 transaction.hide(radioListFragment);
                                             }
-                                            transaction.commit();
+                                            transaction.commitAllowingStateLoss();
                                         }
                                     });
                                 } else if (bottomMenu.getType() == 3) {
@@ -1033,7 +1040,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             if(radioListFragment!=null&&!radioListFragment.isHidden()){
                                                 transaction.hide(radioListFragment);
                                             }
-                                            transaction.commit();
+                                            transaction.commitAllowingStateLoss();
 
 
                                             //跳到媒体矩阵
@@ -1081,7 +1088,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             if(radioListFragment!=null&&!radioListFragment.isHidden()){
                                                 transaction.hide(radioListFragment);
                                             }
-                                            transaction.commit();
+                                            transaction.commitAllowingStateLoss();
                                         }
                                     });
                                 } else if (bottomMenu.getType() == 5) {
@@ -1125,7 +1132,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             if(radioListFragment!=null&&!radioListFragment.isHidden()){
                                                 transaction.hide(radioListFragment);
                                             }
-                                            transaction.commit();
+                                            transaction.commitAllowingStateLoss();
                                         }
                                     });
                                 } else if (bottomMenu.getType() == 6) {
@@ -1166,7 +1173,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             if(radioListFragment!=null&&!radioListFragment.isHidden()){
                                                 transaction.hide(radioListFragment);
                                             }
-                                            transaction.commit();
+                                            transaction.commitAllowingStateLoss();
                                         }
                                     });
                                 } else if (bottomMenu.getType() == 7) {
@@ -1210,7 +1217,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             if(radioListFragment!=null&&!radioListFragment.isHidden()){
                                                 transaction.hide(radioListFragment);
                                             }
-                                            transaction.commit();
+                                            transaction.commitAllowingStateLoss();
                                         }
                                     });
                                 } else if (bottomMenu.getType() == 8) {
@@ -1219,41 +1226,47 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                     bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
-                                            bottomMenuHolder.name.setSelected(true);
-                                            bottomMenuHolder.icon.setSelected(true);
-                                            for(int i=0;i<mMenus.size();i++){
-                                                BottomMenuHolder holder=mMenus.get(i);
-                                                if(holder!=bottomMenuHolder){
-                                                    holder.name.setSelected(false);
-                                                    holder.icon.setSelected(false);
+
+
+                                            synchronized(MainActivity.this){
+                                                bottomMenuHolder.name.setSelected(true);
+                                                bottomMenuHolder.icon.setSelected(true);
+                                                for(int i=0;i<mMenus.size();i++){
+                                                    BottomMenuHolder holder=mMenus.get(i);
+                                                    if(holder!=bottomMenuHolder){
+                                                        holder.name.setSelected(false);
+                                                        holder.icon.setSelected(false);
+                                                    }
                                                 }
+
+                                                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                                if (radioListFragment == null) {
+                                                    radioListFragment = new RadioListFragment();
+                                                    Bundle bundle = new Bundle();
+                                                    bundle.putString("type","2");
+                                                    radioListFragment.setArguments(bundle);
+                                                    transaction.add(R.id.content, radioListFragment);
+                                                } else {
+                                                    ((RadioListFragment)radioListFragment).setType("2");
+                                                    transaction.show(radioListFragment);
+                                                }
+                                                if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                                    transaction.hide(recommendFragment);
+                                                }
+                                                if(serverFragment!=null&&!serverFragment.isHidden()){
+                                                    transaction.hide(serverFragment);
+                                                }
+                                                if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                                    transaction.hide(personalCenterFragment);
+                                                }
+                                                if(discoverFragment!=null&&!discoverFragment.isHidden()){
+                                                    transaction.hide(discoverFragment);
+                                                }
+
+                                                transaction.commitAllowingStateLoss();
                                             }
 
-                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                            if (radioListFragment == null) {
-                                                radioListFragment = new RadioListFragment();
-                                                Bundle bundle = new Bundle();
-                                                bundle.putString("type","2");
-                                                radioListFragment.setArguments(bundle);
-                                                transaction.add(R.id.content, radioListFragment);
-                                            } else {
-                                                ((RadioListFragment)radioListFragment).setType("2");
-                                                transaction.show(radioListFragment);
-                                            }
-                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
-                                                transaction.hide(recommendFragment);
-                                            }
-                                            if(serverFragment!=null&&!serverFragment.isHidden()){
-                                                transaction.hide(serverFragment);
-                                            }
-                                            if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
-                                                transaction.hide(personalCenterFragment);
-                                            }
-                                            if(discoverFragment!=null&&!discoverFragment.isHidden()){
-                                                transaction.hide(discoverFragment);
-                                            }
 
-                                            transaction.commit();
 
 
 
@@ -1268,41 +1281,46 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                     bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
-                                            bottomMenuHolder.name.setSelected(true);
-                                            bottomMenuHolder.icon.setSelected(true);
-                                            for(int i=0;i<mMenus.size();i++){
-                                                BottomMenuHolder holder=mMenus.get(i);
-                                                if(holder!=bottomMenuHolder){
-                                                    holder.name.setSelected(false);
-                                                    holder.icon.setSelected(false);
+
+                                            synchronized(MainActivity.this){
+                                                bottomMenuHolder.name.setSelected(true);
+                                                bottomMenuHolder.icon.setSelected(true);
+                                                for(int i=0;i<mMenus.size();i++){
+                                                    BottomMenuHolder holder=mMenus.get(i);
+                                                    if(holder!=bottomMenuHolder){
+                                                        holder.name.setSelected(false);
+                                                        holder.icon.setSelected(false);
+                                                    }
                                                 }
+
+                                                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                                if (radioListFragment == null) {
+                                                    radioListFragment = new RadioListFragment();
+                                                    Bundle bundle = new Bundle();
+                                                    bundle.putString("type","1");
+                                                    radioListFragment.setArguments(bundle);
+                                                    transaction.add(R.id.content, radioListFragment);
+                                                } else {
+                                                    ((RadioListFragment)radioListFragment).setType("1");
+                                                    transaction.show(radioListFragment);
+                                                }
+                                                if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                                    transaction.hide(recommendFragment);
+                                                }
+                                                if(serverFragment!=null&&!serverFragment.isHidden()){
+                                                    transaction.hide(serverFragment);
+                                                }
+                                                if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+                                                    transaction.hide(personalCenterFragment);
+                                                }
+                                                if(discoverFragment!=null&&!discoverFragment.isHidden()){
+                                                    transaction.hide(discoverFragment);
+                                                }
+
+                                                transaction.commitAllowingStateLoss();
                                             }
 
-                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                            if (radioListFragment == null) {
-                                                radioListFragment = new RadioListFragment();
-                                                Bundle bundle = new Bundle();
-                                                bundle.putString("type","1");
-                                                radioListFragment.setArguments(bundle);
-                                                transaction.add(R.id.content, radioListFragment);
-                                            } else {
-                                                ((RadioListFragment)radioListFragment).setType("1");
-                                                transaction.show(radioListFragment);
-                                            }
-                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
-                                                transaction.hide(recommendFragment);
-                                            }
-                                            if(serverFragment!=null&&!serverFragment.isHidden()){
-                                                transaction.hide(serverFragment);
-                                            }
-                                            if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
-                                                transaction.hide(personalCenterFragment);
-                                            }
-                                            if(discoverFragment!=null&&!discoverFragment.isHidden()){
-                                                transaction.hide(discoverFragment);
-                                            }
 
-                                            transaction.commit();
 //                                        Intent it=new Intent(MainActivity.this,RadioListActivity.class);
 //                                        it.putExtra("type","1");
 //                                        startActivity(it);
@@ -1359,7 +1377,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             }
 
 
-                                            transaction.commit();
+                                            transaction.commitAllowingStateLoss();
 
 
 

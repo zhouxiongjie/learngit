@@ -3,6 +3,7 @@ package com.shuangling.software.network;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
@@ -59,7 +60,10 @@ public class OkHttpUtils {
 		Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 		if(params!=null&&params.size()>0){
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				builder.addFormDataPart(entry.getKey(),entry.getValue()) ;
+				if(!TextUtils.isEmpty(entry.getValue())){
+					builder.addFormDataPart(entry.getKey(),entry.getValue()) ;
+				}
+
 			}
 		}
 		for(int i=0;files!=null&&i<files.size();i++){
@@ -148,7 +152,10 @@ public class OkHttpUtils {
 		Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 		if(textMap!=null&&textMap.size()>0){
 			for (Map.Entry<String, String> entry : textMap.entrySet()) {
-				builder.addFormDataPart(entry.getKey(),entry.getValue()) ;
+				if(!TextUtils.isEmpty(entry.getValue())){
+					builder.addFormDataPart(entry.getKey(),entry.getValue()) ;
+				}
+
 			}
 		}
 		if(fileMap!=null&&fileMap.size()>0){
@@ -260,7 +267,10 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(params!=null&&params.size()>0){
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				builder.add(entry.getKey(),entry.getValue()) ;
+				if(!TextUtils.isEmpty(entry.getValue())){
+					builder.add(entry.getKey(),entry.getValue()) ;
+				}
+
 			}
 		}
 		FormBody body = builder.build();
@@ -324,7 +334,10 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(params!=null&&params.size()>0){
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				builder.add(entry.getKey(),entry.getValue()) ;
+				if(!TextUtils.isEmpty(entry.getValue())){
+					builder.add(entry.getKey(),entry.getValue()) ;
+				}
+
 			}
 		}
 		FormBody body = builder.build();
@@ -390,7 +403,10 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(params!=null&&params.size()>0){
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				builder.add(entry.getKey(),entry.getValue()) ;
+				if(!TextUtils.isEmpty(entry.getValue())){
+					builder.add(entry.getKey(),entry.getValue()) ;
+				}
+
 			}
 		}
 		FormBody body = builder.build();
@@ -455,8 +471,11 @@ public class OkHttpUtils {
 		if(params!=null&&params.size()>0){
 			newUrl+="?";
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				newUrl+=(entry.getKey()+"="+entry.getValue());
-				newUrl+="&";
+				if(!TextUtils.isEmpty(entry.getValue())){
+					newUrl+=(entry.getKey()+"="+entry.getValue());
+					newUrl+="&";
+				}
+
 			}
 		}
 		if(newUrl.endsWith("&")){
@@ -524,8 +543,11 @@ public class OkHttpUtils {
 		if(params!=null&&params.size()>0){
 			newUrl+="?";
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				newUrl+=(entry.getKey()+"="+entry.getValue());
-				newUrl+="&";
+				if(!TextUtils.isEmpty(entry.getValue())){
+					newUrl+=(entry.getKey()+"="+entry.getValue());
+					newUrl+="&";
+				}
+
 			}
 		}
 		if(newUrl.endsWith("&")){
@@ -572,7 +594,10 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(loginParams!=null&&loginParams.size()>0){
 			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
-				builder.add(entry.getKey(),entry.getValue()) ;
+				if(!TextUtils.isEmpty(entry.getValue())){
+					builder.add(entry.getKey(),entry.getValue()) ;
+				}
+
 			}
 		}
 		FormBody body = builder.build();
@@ -631,7 +656,10 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(loginParams!=null&&loginParams.size()>0){
 			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
-				builder.add(entry.getKey(),entry.getValue()) ;
+				if(!TextUtils.isEmpty(entry.getValue())){
+					builder.add(entry.getKey(),entry.getValue()) ;
+				}
+
 			}
 		}
 		FormBody body = builder.build();
@@ -688,7 +716,10 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(loginParams!=null&&loginParams.size()>0){
 			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
-				builder.add(entry.getKey(),entry.getValue()) ;
+				if(!TextUtils.isEmpty(entry.getValue())){
+					builder.add(entry.getKey(),entry.getValue()) ;
+				}
+
 			}
 		}
 		FormBody body = builder.build();
@@ -745,7 +776,10 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(loginParams!=null&&loginParams.size()>0){
 			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
-				builder.add(entry.getKey(),entry.getValue()) ;
+				if(!TextUtils.isEmpty(entry.getValue())){
+					builder.add(entry.getKey(),entry.getValue()) ;
+				}
+
 			}
 		}
 		FormBody body = builder.build();
@@ -804,7 +838,10 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(loginParams!=null&&loginParams.size()>0){
 			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
-				builder.add(entry.getKey(),entry.getValue()) ;
+				if(!TextUtils.isEmpty(entry.getValue())){
+					builder.add(entry.getKey(),entry.getValue()) ;
+				}
+
 			}
 		}
 		FormBody body = builder.build();
@@ -863,7 +900,10 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(loginParams!=null&&loginParams.size()>0){
 			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
-				builder.add(entry.getKey(),entry.getValue()) ;
+				if(!TextUtils.isEmpty(entry.getValue())){
+					builder.add(entry.getKey(),entry.getValue()) ;
+				}
+
 			}
 		}
 		FormBody body = builder.build();

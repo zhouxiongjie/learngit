@@ -98,15 +98,21 @@ public class PhoneBindActivity extends AppCompatActivity implements Handler.Call
             }
 
             @Override
-            public void onFailure(Call call, Exception exception) {
+            public void onFailure(final Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("获取验证码请求异常");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
 
-                ToastUtils.show("获取验证码请求异常");
+
 
 
             }

@@ -241,8 +241,13 @@ public class NewAccountPasswordLoginActivity extends AppCompatActivity implement
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
-                        ToastUtils.show("登录异常");
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("登录异常");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
 

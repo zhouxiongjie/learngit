@@ -176,7 +176,7 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
         String url = ServerInfo.serviceIP + ServerInfo.getColumnContent + mColumn.getId();
         Map<String, String> params = new HashMap<String, String>();
         params.put("limit", "" + Constant.PAGE_SIZE);
-        params.put("sorceType", "0");
+        params.put("sorce_type", "0");
 
         if (getContent == GetContent.Refresh) {
             params.put("operation", "up");
@@ -1205,7 +1205,7 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
             it.putExtra("type","2");
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/radios/")||url.startsWith(ServerInfo.h5HttpsIP+"/radios/")){
-            String radioId=url.substring(url.lastIndexOf("/")+1);
+            String radioId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
             Intent it=new Intent(this,TvDetailActivity.class);
             it.putExtra("radioId",Integer.parseInt(radioId));
             startActivity(it);
@@ -1214,7 +1214,7 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
             it.putExtra("type","1");
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/radios/")||url.startsWith(ServerInfo.h5HttpsIP+"/radios/")){
-            String radioId=url.substring(url.lastIndexOf("/")+1);
+            String radioId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
             Intent it=new Intent(this,RadioDetailActivity.class);
             it.putExtra("radioId",Integer.parseInt(radioId));
             startActivity(it);
@@ -1267,37 +1267,37 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
             it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+anchorId);
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/atlas/")||url.startsWith(ServerInfo.h5HttpsIP+"/atlas/")){
-            String galleriaId=url.substring(url.lastIndexOf("/")+1);
+            String galleriaId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
             Intent it = new Intent(this, GalleriaActivity.class);
             it.putExtra("galleriaId", Integer.parseInt(galleriaId));
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/albums/")||url.startsWith(ServerInfo.h5HttpsIP+"/albums/")){
-            String albumId=url.substring(url.lastIndexOf("/")+1);
+            String albumId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
             Intent it = new Intent(this, AlbumDetailActivity.class);
             it.putExtra("albumId", Integer.parseInt(albumId));
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/audios/")||url.startsWith(ServerInfo.h5HttpsIP+"/audios/")){
-            String audioId=url.substring(url.lastIndexOf("/")+1);
+            String audioId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
             Intent it = new Intent(this, AudioDetailActivity.class);
             it.putExtra("audioId", Integer.parseInt(audioId));
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/posts/")||url.startsWith(ServerInfo.h5HttpsIP+"/posts/")){
-            String articleId=url.substring(url.lastIndexOf("/")+1);
+            String articleId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
             Intent it = new Intent(this, ArticleDetailActivity.class);
             it.putExtra("articleId", Integer.parseInt(articleId));
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/specials/")||url.startsWith(ServerInfo.h5HttpsIP+"/specials/")){
-            String specialId=url.substring(url.lastIndexOf("/")+1);
+            String specialId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
             Intent it = new Intent(this, SpecialDetailActivity.class);
             it.putExtra("specialId", Integer.parseInt(specialId));
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/videos/")||url.startsWith(ServerInfo.h5HttpsIP+"/videos/")){
-            String videoId=url.substring(url.lastIndexOf("/")+1);
+            String videoId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
             Intent it = new Intent(this, VideoDetailActivity.class);
             it.putExtra("videoId",Integer.parseInt(videoId));
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/subcates/")||url.startsWith(ServerInfo.h5IP+"/subcates/")){
-            String columnid=url.substring(url.lastIndexOf("/")+1,url.lastIndexOf("?"));
+            String columnid=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
             Column column=new Column();
             column.setId(Integer.parseInt(columnid));
             column.setName(url.substring(url.lastIndexOf("=")+1));

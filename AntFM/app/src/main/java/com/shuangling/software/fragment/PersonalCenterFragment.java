@@ -329,8 +329,13 @@ public class PersonalCenterFragment extends Fragment {
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                mDialogFragment.dismiss();
-                ToastUtils.show("请求失败，请稍后再试");
+                try{
+                    mDialogFragment.dismiss();
+                    ToastUtils.show("请求失败，请稍后再试");
+                }catch (Exception e){
+
+                }
+
 
             }
         });

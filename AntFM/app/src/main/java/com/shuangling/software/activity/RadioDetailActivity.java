@@ -379,10 +379,12 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
     @Override
     protected void onPause() {
         try{
-            if(mAudioPlayer.getPlayerState()==IPlayer.started){
-                FloatWindowUtil.getInstance().showFloatWindow();
+            if(mAudioPlayer!=null){
+                if(mAudioPlayer.getPlayerState()==IPlayer.started){
+                    FloatWindowUtil.getInstance().showFloatWindow();
+                }
             }
-        }catch (RemoteException e){
+        }catch (Exception e){
 
         }
 
@@ -662,8 +664,10 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.list:
-
-                RadioListDialog.getInstance(mRadioDetail).show(getSupportFragmentManager(), "RadioListDialog");
+                if(mRadioDetail!=null){
+                    RadioListDialog.getInstance(mRadioDetail).show(getSupportFragmentManager(), "RadioListDialog");
+                }
+//                RadioListDialog.getInstance(mRadioDetail).show(getSupportFragmentManager(), "RadioListDialog");
 
                 break;
             case R.id.play:
@@ -677,7 +681,7 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
                         //play.setBackgroundResource(R.drawable.ic_play);
                         play.setText(R.string.play_icon_play);
                     }
-                } catch (RemoteException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;

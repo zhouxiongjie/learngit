@@ -246,6 +246,19 @@ public class ArticleDetailActivity extends BaseAudioActivity implements Handler.
             public void onPageFinished(WebView view, String url) {
                 //progressBar.setVisibility(View.GONE);
                 super.onPageFinished(view, url);
+
+
+
+//                int w = View.MeasureSpec.makeMeasureSpec(0,
+//                        View.MeasureSpec.UNSPECIFIED);
+//                int h = View.MeasureSpec.makeMeasureSpec(0,
+//                        View.MeasureSpec.UNSPECIFIED);
+//                //重新测量
+//                view.measure(w, h);
+//                mWebViewHeight = view.getHeight();
+//                Log.i(TAG, "WEBVIEW高度:" + view.getHeight());
+
+
             }
 
             // WebView加载的所有资源url
@@ -609,16 +622,20 @@ public class ArticleDetailActivity extends BaseAudioActivity implements Handler.
     @Override
     protected void onPause() {
         try {
-            if (mAudioPlayer.getPlayerState() == IPlayer.paused ||
-                    mAudioPlayer.getPlayerState() == IPlayer.started) {
+            if(mAudioPlayer!=null){
+                if (mAudioPlayer.getPlayerState() == IPlayer.paused ||
+                        mAudioPlayer.getPlayerState() == IPlayer.started) {
 
-                if (FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
-                    FloatWindowUtil.getInstance().showFloatWindow();
-                } else {
-                    //showFloatWindowPermission();
+                    if (FloatWindowUtil.getInstance().checkFloatWindowPermission()) {
+                        FloatWindowUtil.getInstance().showFloatWindow();
+                    } else {
+                        //showFloatWindowPermission();
+                    }
                 }
+            }else{
+                Log.e("ArticleDetailActivity","mAudioPlayer==null");
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
 
         }
         super.onPause();

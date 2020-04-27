@@ -366,10 +366,16 @@ public class NewForgetPasswordActivity extends AppCompatActivity implements Hand
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("服务请求异常");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
-                ToastUtils.show("服务请求异常");
+
 
 
             }
@@ -436,10 +442,16 @@ public class NewForgetPasswordActivity extends AppCompatActivity implements Hand
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("重置密码请求异常");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
-                ToastUtils.show("重置密码请求异常");
+
 
 
             }

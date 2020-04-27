@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -23,6 +25,13 @@ public class RadioListAdapter extends BaseExpandableListAdapter implements View.
     private List<RadioSet> mRadioGroups;
     private Context mContext;
 
+
+
+    private boolean showLogo=false;
+    public void setShowLogo(boolean showLogo) {
+        this.showLogo = showLogo;
+
+    }
 
     public RadioListAdapter(Context context, List<RadioSet> list) {
         super();
@@ -92,6 +101,18 @@ public class RadioListAdapter extends BaseExpandableListAdapter implements View.
 
         GroupViewHolder vh = new GroupViewHolder(convertView);
 
+        if(groupPosition==0&&showLogo){
+            vh.logo.setVisibility(View.VISIBLE);
+            String logo="http://fcgtvb-cdn.fcgtvb.com/cms/customer/static/dist/img/radio-cover-bg@2x.png?x-oss-process=image/resize,w_500,h_200";
+            Uri uri = Uri.parse(logo);
+            int width = 500;
+            int height = 200;
+            ImageLoader.showThumb(uri, vh.logo, width, height);
+
+        }else{
+            vh.logo.setVisibility(View.GONE);
+        }
+
         vh.label.setText(getGroup(groupPosition).getLabel());
         return convertView;
     }
@@ -103,7 +124,7 @@ public class RadioListAdapter extends BaseExpandableListAdapter implements View.
             //
             convertView=new View(mContext);
             convertView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,parent.getHeight()-CommonUtils.dip2px(100)));
-
+            convertView.setVisibility(View.INVISIBLE);
         }else{
             if (convertView == null||!(convertView instanceof RelativeLayout)) {
                 convertView = LayoutInflater.from(mContext).inflate(R.layout.radio_child_item, parent, false);
@@ -148,7 +169,9 @@ public class RadioListAdapter extends BaseExpandableListAdapter implements View.
         @BindView(R.id.label)
         TextView label;
         @BindView(R.id.root)
-        RelativeLayout root;
+        LinearLayout root;
+        @BindView(R.id.logo)
+        SimpleDraweeView logo;
 
         GroupViewHolder(View view) {
             ButterKnife.bind(this, view);

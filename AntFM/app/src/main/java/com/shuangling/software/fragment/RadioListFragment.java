@@ -88,17 +88,23 @@ public class RadioListFragment extends SimpleImmersionFragment implements Handle
     }
 
     private void init() {
-        if (mType.equals("1")) {
-            activityTitle.setTitleText("电台");
-        } else {
-            activityTitle.setTitleText("电视台");
+
+        try{
+            if (mType.equals("1")) {
+                activityTitle.setTitleText("电台");
+            } else {
+                activityTitle.setTitleText("电视台");
+            }
+            getRadioList();
+        }catch (Exception e){
+
         }
-        getRadioList();
+
     }
 
 
     public void setType(String type) {
-        if (!mType.equals(type)) {
+        if (mType==null||!mType.equals(type)) {
             mType = type;
             init();
         }
@@ -196,12 +202,17 @@ public class RadioListFragment extends SimpleImmersionFragment implements Handle
                         }
 
 
-                        if (mRadioListAdapter == null) {
+                        //if (mRadioListAdapter == null) {
                             mRadioListAdapter = new RadioListAdapter(getContext(), radioGroups);
+                            if(mType.equals("1")){
+                                mRadioListAdapter.setShowLogo(true);
+                            }
                             contentList.setAdapter(mRadioListAdapter);
                             for (int i = 0; i < mRadioListAdapter.getGroupCount(); i++) {
                                 contentList.expandGroup(i);
                             }
+
+
                             contentList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
                                 @Override
                                 public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
@@ -215,10 +226,15 @@ public class RadioListFragment extends SimpleImmersionFragment implements Handle
                                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
                                     if (mType.equals("1")) {
-                                        Intent it = new Intent(getContext(), RadioDetailActivity.class);
-                                        RadioSet.Radio radio=mRadioListAdapter.getChild(groupPosition,childPosition);
-                                        it.putExtra("radioId", radio.getId());
-                                        startActivity(it);
+
+                                        RadioSet radioSet=mRadioListAdapter.getGroup(groupPosition);
+                                        if (childPosition < radioSet.getList().size()) {
+                                            Intent it = new Intent(getContext(), RadioDetailActivity.class);
+                                            //RadioSet.Radio radio=mRadioListAdapter.getChild(groupPosition,childPosition);
+                                            it.putExtra("radioId", radioSet.getList().get(childPosition).getId());
+                                            startActivity(it);
+                                        }
+
                                         return true;
                                     } else {
                                         RadioSet radioSet=mRadioListAdapter.getGroup(groupPosition);
@@ -234,9 +250,9 @@ public class RadioListFragment extends SimpleImmersionFragment implements Handle
                                 }
                             });
 
-                        } else {
-                            mRadioListAdapter.updateListView(radioGroups);
-                        }
+//                        } else {
+//                            mRadioListAdapter.updateListView(radioGroups);
+//                        }
 
 
                         contentList.setOnScrollListener(new AbsListView.OnScrollListener() {

@@ -277,68 +277,200 @@ public class AudioRecyclerAdapter extends RecyclerView.Adapter implements View.O
             final ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
 
 
-            if (!TextUtils.isEmpty(content.getCover())) {
+//            if (!TextUtils.isEmpty(content.getCover())) {
+//                articleViewHolder.logo.setVisibility(View.VISIBLE);
+//                Uri uri = Uri.parse(content.getCover());
+//                int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
+//                int height = (int) (2f * width / 3f);
+//                ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
+//            }else {
+//                articleViewHolder.logo.setVisibility(View.GONE);
+//            }
+//
+//            articleViewHolder.title.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+//                @Override
+//                public boolean onPreDraw() {
+//                    ViewTreeObserver obs = articleViewHolder.title.getViewTreeObserver();
+//                    obs.removeOnPreDrawListener(this);
+//
+//                    if(articleViewHolder.logo.getVisibility()==View.GONE){
+////                            Log.i("test","articleViewHolder.logo=GONE");
+//                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                        layoutParams.topMargin = CommonUtils.dip2px(10);
+//                        layoutParams.addRule(RelativeLayout.BELOW,R.id.title);
+//                        articleViewHolder.layout.setLayoutParams(layoutParams);
+//
+//                    }else{
+//                        if(articleViewHolder.title.getLineCount()>2){
+////                            Log.i("test","getLineCount>2");
+//                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                            layoutParams.topMargin = CommonUtils.dip2px(5);
+//                            layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
+//                            articleViewHolder.layout.setLayoutParams(layoutParams);
+//                        } else{
+//
+//                            if(articleViewHolder.layout.getWidth()>articleViewHolder.title.getWidth()){
+////                                Log.i("test","layout.getWidth()>title.getWidth()");
+//                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                                layoutParams.topMargin = CommonUtils.dip2px(5);
+//                                layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
+//                                articleViewHolder.layout.setLayoutParams(layoutParams);
+//
+//                            }else{
+////                                Log.i("test","layout.getWidth()<title.getWidth()");
+//                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                                layoutParams.topMargin = CommonUtils.dip2px(5);
+//                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM,R.id.logo);
+//                                articleViewHolder.layout.setLayoutParams(layoutParams);
+//                            }
+//
+//                        }
+//                    }
+//
+//
+//                    return true;
+//                }
+//            });
+//
+//            if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
+//                articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
+//            }
+//
+//            articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
+//            articleViewHolder.title.setText(content.getTitle());
+//            articleViewHolder.commentNum.setText("" + content.getComment() + "评论");
+//            articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Intent it = new Intent(mContext, ArticleDetailActivity.class);
+//                    it.putExtra("articleId", content.getId());
+//                    mContext.startActivity(it);
+//                }
+//            });
+
+
+            articleViewHolder.excellent.setVisibility(View.GONE);
+
+
+            if (content.getArticle().getCovers().size() > 0 && !TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
                 articleViewHolder.logo.setVisibility(View.VISIBLE);
-                Uri uri = Uri.parse(content.getCover());
+
                 int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                 int height = (int) (2f * width / 3f);
+                Uri uri = Uri.parse(content.getArticle().getCovers().get(0) + CommonUtils.getOssResize(width, height));
                 ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
-            }else {
+            } else {
                 articleViewHolder.logo.setVisibility(View.GONE);
             }
 
-            articleViewHolder.title.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-                @Override
-                public boolean onPreDraw() {
-                    ViewTreeObserver obs = articleViewHolder.title.getViewTreeObserver();
-                    obs.removeOnPreDrawListener(this);
-
-                    if(articleViewHolder.logo.getVisibility()==View.GONE){
-//                            Log.i("test","articleViewHolder.logo=GONE");
-                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                        layoutParams.topMargin = CommonUtils.dip2px(10);
-                        layoutParams.addRule(RelativeLayout.BELOW,R.id.title);
-                        articleViewHolder.layout.setLayoutParams(layoutParams);
-
-                    }else{
-                        if(articleViewHolder.title.getLineCount()>2){
-//                            Log.i("test","getLineCount>2");
-                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                            layoutParams.topMargin = CommonUtils.dip2px(5);
-                            layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
-                            articleViewHolder.layout.setLayoutParams(layoutParams);
-                        } else{
-
-                            if(articleViewHolder.layout.getWidth()>articleViewHolder.title.getWidth()){
-//                                Log.i("test","layout.getWidth()>title.getWidth()");
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.BELOW,R.id.logo);
-                                articleViewHolder.layout.setLayoutParams(layoutParams);
-
-                            }else{
-//                                Log.i("test","layout.getWidth()<title.getWidth()");
-                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
-                                layoutParams.topMargin = CommonUtils.dip2px(5);
-                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM,R.id.logo);
-                                articleViewHolder.layout.setLayoutParams(layoutParams);
-                            }
-
-                        }
-                    }
 
 
-                    return true;
-                }
-            });
+
+//            articleViewHolder.title.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+//                @Override
+//                public boolean onPreDraw() {
+//                    Log.i("test", "articleViewHolder onPreDraw");
+//                    Log.i("test", content.getTitle());
+//                    ViewTreeObserver obs = articleViewHolder.title.getViewTreeObserver();
+//                    obs.removeOnPreDrawListener(this);
+//
+//                    if (articleViewHolder.logo.getVisibility() == View.GONE) {
+////                            Log.i("test","articleViewHolder.logo=GONE");
+//                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                        layoutParams.topMargin = CommonUtils.dip2px(10);
+//                        layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
+//                        articleViewHolder.layout.setLayoutParams(layoutParams);
+//
+//                    } else {
+//                        if (articleViewHolder.title.getLineCount() > 2) {
+////                            Log.i("test","getLineCount>2");
+//                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                            layoutParams.topMargin = CommonUtils.dip2px(5);
+//                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+//                            articleViewHolder.layout.setLayoutParams(layoutParams);
+//                        } else {
+//
+//                            if (articleViewHolder.layout.getWidth() > articleViewHolder.title.getWidth()) {
+////                                Log.i("test","layout.getWidth()>title.getWidth()");
+//                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                                layoutParams.topMargin = CommonUtils.dip2px(5);
+//                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+//                                articleViewHolder.layout.setLayoutParams(layoutParams);
+//
+//                            } else {
+////                                Log.i("test","layout.getWidth()<title.getWidth()");
+//                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+//                                layoutParams.topMargin = CommonUtils.dip2px(5);
+//                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
+//                                articleViewHolder.layout.setLayoutParams(layoutParams);
+//                            }
+//
+//                        }
+//                    }
+//
+//
+//                    return true;
+//                }
+//            });
+
+
+            articleViewHolder.title.setText(content.getTitle());
+
+            articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
+            CommonUtils.setReadsAndComment(articleViewHolder.commentNum, content.getComment(), content.getView());
 
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
 
-            articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            articleViewHolder.title.setText(content.getTitle());
-            articleViewHolder.commentNum.setText("" + content.getComment() + "评论");
+            if (articleViewHolder.logo.getVisibility() == View.GONE) {
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+
+                layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
+                layoutParams.topMargin = CommonUtils.dip2px(10);
+                layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
+
+                articleViewHolder.layout.setLayoutParams(layoutParams);
+            } else {
+                articleViewHolder.title.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        int titleWidth = articleViewHolder.title.getWidth();
+                        int layoutWidth = articleViewHolder.layout.getWidth();
+                        int lineCount = articleViewHolder.title.getLineCount();
+
+
+                        if (lineCount > 2) {
+//                            Log.i("test","getLineCount>2");
+                            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                            layoutParams.topMargin = CommonUtils.dip2px(5);
+                            layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
+                            layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                            layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
+                            articleViewHolder.layout.setLayoutParams(layoutParams);
+                        } else {
+                            if (layoutWidth > titleWidth) {
+                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                                layoutParams.topMargin = CommonUtils.dip2px(5);
+                                layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
+                                layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
+                                articleViewHolder.layout.setLayoutParams(layoutParams);
+
+                            } else {
+                                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
+                                layoutParams.topMargin = CommonUtils.dip2px(5);
+                                layoutParams.removeRule(RelativeLayout.BELOW);
+                                layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
+                                articleViewHolder.layout.setLayoutParams(layoutParams);
+                            }
+
+                        }
+
+                    }
+                });
+            }
+
+
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -347,6 +479,7 @@ public class AudioRecyclerAdapter extends RecyclerView.Adapter implements View.O
                     mContext.startActivity(it);
                 }
             });
+
         } else if (type == TYPE_VIDEO) {
 
             final ColumnContent content = mPostContents.get(position-1);
@@ -603,42 +736,42 @@ public class AudioRecyclerAdapter extends RecyclerView.Adapter implements View.O
 
 
     public class HeadViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.logo)
-        public SimpleDraweeView logo;
-        @BindView(R.id.audioTitle)
-        public TextView audioTitle;
-        @BindView(R.id.organization)
-        public TextView organization;
-        @BindView(R.id.currentTime)
-        public TextView currentTime;
-        @BindView(R.id.endTime)
-        public TextView endTime;
-        @BindView(R.id.seekBar)
-        public SeekBar seekBar;
-        @BindView(R.id.play)
-        public FontIconView play;
-        @BindView(R.id.previous)
-        public FontIconView previous;
-        @BindView(R.id.next)
-        public FontIconView next;
-        @BindView(R.id.actionBar)
-        public RelativeLayout actionBar;
-        @BindView(R.id.list)
-        public TextView list;
-        @BindView(R.id.timer)
-        public TextView timer;
-        @BindView(R.id.rate)
-        public TextView rate;
-        @BindView(R.id.albumLogo)
-        public SimpleDraweeView albumLogo;
-        @BindView(R.id.albumTitle)
-        public TextView albumTitle;
-        @BindView(R.id.anchorName)
-        public TextView anchorName;
-        @BindView(R.id.audioNumber)
-        public TextView audioNumber;
-        @BindView(R.id.subscribe)
-        public TextView subscribe;
+//        @BindView(R.id.logo)
+//        public SimpleDraweeView logo;
+//        @BindView(R.id.audioTitle)
+//        public TextView audioTitle;
+//        @BindView(R.id.organization)
+//        public TextView organization;
+//        @BindView(R.id.currentTime)
+//        public TextView currentTime;
+//        @BindView(R.id.endTime)
+//        public TextView endTime;
+//        @BindView(R.id.seekBar)
+//        public SeekBar seekBar;
+//        @BindView(R.id.play)
+//        public FontIconView play;
+//        @BindView(R.id.previous)
+//        public FontIconView previous;
+//        @BindView(R.id.next)
+//        public FontIconView next;
+//        @BindView(R.id.actionBar)
+//        public RelativeLayout actionBar;
+//        @BindView(R.id.list)
+//        public TextView list;
+//        @BindView(R.id.timer)
+//        public TextView timer;
+//        @BindView(R.id.rate)
+//        public TextView rate;
+//        @BindView(R.id.albumLogo)
+//        public SimpleDraweeView albumLogo;
+//        @BindView(R.id.albumTitle)
+//        public TextView albumTitle;
+//        @BindView(R.id.anchorName)
+//        public TextView anchorName;
+//        @BindView(R.id.audioNumber)
+//        public TextView audioNumber;
+//        @BindView(R.id.subscribe)
+//        public TextView subscribe;
 
         HeadViewHolder(View view) {
             super(view);

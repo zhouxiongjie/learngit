@@ -1279,9 +1279,9 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                 if (User.getInstance() == null) {
                     startActivityForResult(new Intent(this, NewLoginActivity.class), REQUEST_LOGIN);
                 } else {
-                    if (mVideoDetail.getIs_follow() == 0) {
+                    if (mVideoDetail!=null&&mVideoDetail.getIs_follow() == 0) {
                         attention(true);
-                    } else {
+                    } else if(mVideoDetail!=null){
                         attention(false);
                     }
                 }

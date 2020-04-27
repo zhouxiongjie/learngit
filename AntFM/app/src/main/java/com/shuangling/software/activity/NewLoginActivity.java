@@ -481,9 +481,14 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                         ToastUtils.show("登录失败，请稍后再试");
                     }
                 } catch (Exception e) {
+                    try{
+                        mDialogFragment.dismiss();
+                        ToastUtils.show("登录失败，请稍后再试");
+                    }catch (Exception ex){
 
-                    mDialogFragment.dismiss();
-                    ToastUtils.show("登录失败，请稍后再试");
+                    }
+
+
 
 
                 }
@@ -557,8 +562,13 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
-                        ToastUtils.show("登录异常");
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("登录异常");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
 
@@ -623,10 +633,16 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("登录异常");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
-                ToastUtils.show("登录异常");
+
 
 
             }
@@ -658,11 +674,17 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("获取验证码请求异常");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
 
-                ToastUtils.show("获取验证码请求异常");
+
 
 
             }

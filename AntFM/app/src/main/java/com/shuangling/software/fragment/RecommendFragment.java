@@ -806,9 +806,13 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                             SharedPreferencesUtils.putPreferenceTypeValue("all_column", SharedPreferencesUtils.PreferenceType.String, JSON.toJSONString(mRemoteColumns));
                             new AnalyseColumn(mRemoteColumns).start();
                             mColumns = mRemoteColumns;
-                            if (mColumns != null && mColumns.size() > 8) {
-                                mColumns = mColumns.subList(0, 8);
-                            }
+
+                            //第一次取前8个栏目
+//                            if (mColumns != null && mColumns.size() > 8) {
+//                                mColumns = mColumns.subList(0, 8);
+//                            }
+
+
 //                            for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
 //                                Column column = mColumns.get(i);
 //                                //LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -918,12 +922,14 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 
 
     public void jumpTo(String url, String title) {
+
+
         if (url.startsWith(ServerInfo.h5IP + "/tv") || url.startsWith(ServerInfo.h5HttpsIP + "/tv")) {
             Intent it = new Intent(getContext(), RadioListActivity.class);
             it.putExtra("type", "2");
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/radios/") || url.startsWith(ServerInfo.h5HttpsIP + "/radios/")) {
-            String radioId = url.substring(url.lastIndexOf("/") + 1);
+            String radioId = CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
             Intent it = new Intent(getContext(), TvDetailActivity.class);
             it.putExtra("radioId", Integer.parseInt(radioId));
             startActivity(it);
@@ -932,7 +938,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             it.putExtra("type", "1");
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/radios/") || url.startsWith(ServerInfo.h5HttpsIP + "/radios/")) {
-            String radioId = url.substring(url.lastIndexOf("/") + 1);
+            String radioId = CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
             Intent it = new Intent(getContext(), RadioDetailActivity.class);
             it.putExtra("radioId", Integer.parseInt(radioId));
             startActivity(it);
@@ -954,7 +960,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/cates/") || url.startsWith(ServerInfo.h5HttpsIP + "/cates/")) {
             //跳转栏目
-            String columnid = url.substring(url.lastIndexOf("/") + 1);
+            String columnid =CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
             Column column = new Column();
             column.setId(Integer.parseInt(columnid));
             switchColumn(column);
@@ -992,37 +998,37 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             it.putExtra("url", ServerInfo.h5HttpsIP + "/anchors/" + anchorId);
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/atlas/") || url.startsWith(ServerInfo.h5HttpsIP + "/atlas/")) {
-            String galleriaId = url.substring(url.lastIndexOf("/") + 1);
+            String galleriaId = CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
             Intent it = new Intent(getContext(), GalleriaActivity.class);
             it.putExtra("galleriaId", Integer.parseInt(galleriaId));
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/albums/") || url.startsWith(ServerInfo.h5HttpsIP + "/albums/")) {
-            String albumId = url.substring(url.lastIndexOf("/") + 1);
+            String albumId = CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
             Intent it = new Intent(getContext(), AlbumDetailActivity.class);
             it.putExtra("albumId", Integer.parseInt(albumId));
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/audios/") || url.startsWith(ServerInfo.h5HttpsIP + "/audios/")) {
-            String audioId = url.substring(url.lastIndexOf("/") + 1);
+            String audioId = CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
             Intent it = new Intent(getContext(), AudioDetailActivity.class);
             it.putExtra("audioId", Integer.parseInt(audioId));
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/posts/") || url.startsWith(ServerInfo.h5HttpsIP + "/posts/")) {
-            String articleId = url.substring(url.lastIndexOf("/") + 1);
+            String articleId = CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
             Intent it = new Intent(getContext(), ArticleDetailActivity.class);
             it.putExtra("articleId", Integer.parseInt(articleId));
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/specials/") || url.startsWith(ServerInfo.h5HttpsIP + "/specials/")) {
-            String specialId = url.substring(url.lastIndexOf("/") + 1);
+            String specialId = CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
             Intent it = new Intent(getContext(), SpecialDetailActivity.class);
             it.putExtra("specialId", Integer.parseInt(specialId));
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/videos/") || url.startsWith(ServerInfo.h5HttpsIP + "/videos/")) {
-            String videoId = url.substring(url.lastIndexOf("/") + 1);
+            String videoId = CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
             Intent it = new Intent(getContext(), VideoDetailActivity.class);
             it.putExtra("videoId", Integer.parseInt(videoId));
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/subcates/") || url.startsWith(ServerInfo.h5IP + "/subcates/")) {
-            String columnid = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("?"));
+            String columnid = CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
             Column column = new Column();
             column.setId(Integer.parseInt(columnid));
             column.setName(url.substring(url.lastIndexOf("=") + 1));
@@ -1084,6 +1090,15 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 
             if (mRemoteColumns != null) {
 
+
+                String customColumn = SharedPreferencesUtils.getStringValue("custom_column", "");
+                List<Column> customColumns = JSONObject.parseArray(customColumn, Column.class);
+                int size=0;
+                if(customColumns!=null){
+                    size=customColumns.size();
+                }else{
+                    customColumns=new ArrayList<>();
+                }
                 List<Integer> columnIds = new ArrayList<>();
                 for (int i = 0; allColumns!=null&&i < allColumns.size(); i++) {
                     columnIds.add(allColumns.get(i).getId());
@@ -1093,6 +1108,9 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                 while (iterator.hasNext()) {
                     Column column = iterator.next();
                     if (!columnIds.contains(column.getId())) {
+                        //新栏目添加到自定义栏目中
+                        customColumns.add(column);
+
                         column.setFresh(true);
                         hasNewClomn = true;
                     } else {
@@ -1100,6 +1118,10 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                     }
                 }
 
+                if(size!=customColumns.size()){
+                    String custom_column = JSON.toJSONString(customColumns);
+                    SharedPreferencesUtils.putPreferenceTypeValue("custom_column", SharedPreferencesUtils.PreferenceType.String, custom_column);
+                }
                 if (hasNewClomn) {
                     mHandler.post(new Runnable() {
                         @Override

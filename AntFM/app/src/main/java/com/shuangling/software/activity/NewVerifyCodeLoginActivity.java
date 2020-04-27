@@ -238,8 +238,13 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
                     }
                 } catch (Exception e) {
 
-                    mDialogFragment.dismiss();
-                    ToastUtils.show("登录失败，请稍后再试");
+                    try{
+                        mDialogFragment.dismiss();
+                        ToastUtils.show("登录失败，请稍后再试");
+                    }catch (Exception ex){
+
+                    }
+
 
 
 

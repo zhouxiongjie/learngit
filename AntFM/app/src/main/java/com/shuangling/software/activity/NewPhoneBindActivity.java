@@ -152,8 +152,13 @@ public class NewPhoneBindActivity extends AppCompatActivity implements Handler.C
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
-                        ToastUtils.show("IO异常");
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("IO异常");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
 

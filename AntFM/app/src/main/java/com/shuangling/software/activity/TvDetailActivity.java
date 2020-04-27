@@ -726,16 +726,30 @@ public class TvDetailActivity extends BaseAudioActivity implements Handler.Callb
                                 contentList.expandGroup(i);
                             }
 
+                            contentList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+                                @Override
+                                public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                                    return true;
+                                }
+                            });
+
                             contentList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                                 @Override
                                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
                                     //选择了某台
-                                    mRadioId = mRadioSetList.get(groupPosition).getList().get(childPosition).getId();
-                                    getRadioDetail();
+//                                    mRadioId = mRadioSetList.get(groupPosition).getList().get(childPosition).getId();
+//                                    getRadioDetail();
+//
+//                                    return true;
 
+
+                                    if(childPosition<mRadioSetList.get(groupPosition).getList().size()){
+                                        mRadioId = mRadioSetList.get(groupPosition).getList().get(childPosition).getId();
+                                        getRadioDetail();
+
+                                    }
                                     return true;
-
 
                                 }
                             });

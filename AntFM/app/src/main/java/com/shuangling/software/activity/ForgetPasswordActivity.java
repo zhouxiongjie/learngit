@@ -268,10 +268,16 @@ public class ForgetPasswordActivity extends AppCompatActivity implements Handler
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mDialogFragment.dismiss();
+                        try{
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("获取验证码请求异常");
+                        }catch (Exception e){
+
+                        }
+
                     }
                 });
-                ToastUtils.show("获取验证码请求异常");
+
 
 
             }

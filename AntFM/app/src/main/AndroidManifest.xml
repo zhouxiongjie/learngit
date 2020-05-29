@@ -257,6 +257,17 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name=".activity.SmallVideoContentActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
+        </activity>
+
+        <activity android:name=".activity.AlivcLittleLiveActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar"/>
+
+        <activity
             android:name=".activity.FeedbackActivity"
             android:screenOrientation="portrait" >
         </activity>
@@ -339,6 +350,9 @@
             android:name=".activity.CashActivity"
             android:screenOrientation="portrait" >
         </activity>
+
+
+
 
 
 

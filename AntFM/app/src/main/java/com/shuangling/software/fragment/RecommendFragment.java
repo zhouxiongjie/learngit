@@ -601,6 +601,8 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
         Map<String, String> params = new HashMap<>();
         params.put("page", "1");
         params.put("page_size", "" + Integer.MAX_VALUE);
+        params.put("source", "" + "mobile");
+
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
 
             @Override
@@ -715,9 +717,16 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                 contentFragment.setArguments(data);
                 return contentFragment;
             } else {
-                ContentFragment contentFragment = new ContentFragment();
-                contentFragment.setArguments(data);
-                return contentFragment;
+                if (mColumns.get(position).getPost_type() == 12) {
+                    SmallVideoFragment smallVideoFragment = new SmallVideoFragment();
+                    smallVideoFragment.setArguments(data);
+                    return smallVideoFragment;
+                }else{
+                    ContentFragment contentFragment = new ContentFragment();
+                    contentFragment.setArguments(data);
+                    return contentFragment;
+                }
+
             }
 
         }

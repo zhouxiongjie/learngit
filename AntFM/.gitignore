@@ -7,6 +7,7 @@
 /.idea/workspace.xml
 .DS_Store
 /build
+/.idea/
 /zxing/build
 /Aliyunplayer/player_demo/build
 /captures

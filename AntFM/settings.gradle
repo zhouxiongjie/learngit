@@ -3,3 +3,5 @@ include ':AliyunVideoCommon'
 include ':Aliyunplayer:AlivcPlayer'
 include ':zxing'
 include ':Aliyunplayer:player_demo'
+include ':AlivcLittleVideo'
+

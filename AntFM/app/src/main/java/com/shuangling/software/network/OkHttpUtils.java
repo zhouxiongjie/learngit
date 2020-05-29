@@ -488,6 +488,8 @@ public class OkHttpUtils {
 		}else {
 			request= new Request.Builder().url(newUrl).addHeader("Authorization", User.getInstance().getAuthorization()).get().build();
 		}
+
+
 		okHttpClient.newCall(request).enqueue(new Callback() {
 			@Override
 			public void onFailure(Call call, IOException e) {

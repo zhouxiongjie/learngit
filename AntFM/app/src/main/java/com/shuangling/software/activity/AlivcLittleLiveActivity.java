@@ -595,10 +595,10 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
         } else {
             params.put("type", "0");
         }
-        OkHttpUtils.put(url, params, new OkHttpCallback(this) {
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
-
+                Log.d("SmallVideo",response);
 //            Message msg = Message.obtain();
 //            msg.what = MSG_PRAISE;
 //            Bundle bundle = new Bundle();

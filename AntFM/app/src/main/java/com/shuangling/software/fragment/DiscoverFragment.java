@@ -33,6 +33,7 @@ import com.hjq.toast.ToastUtils;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.BindPhoneActivity;
 import com.shuangling.software.activity.GalleriaActivity;
@@ -497,7 +498,7 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
                         it.putExtra("albumId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("3")) {
-                        Intent it = new Intent(getContext(), ArticleDetailActivity.class);
+                        Intent it = new Intent(getContext(), ArticleDetailActivity02.class);
                         it.putExtra("articleId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("4")) {

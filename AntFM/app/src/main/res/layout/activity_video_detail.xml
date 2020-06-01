@@ -1,10 +1,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical">
+
+
 
     <com.shuangling.software.customview.TopTitleBar
         android:id="@+id/activity_title"
@@ -13,6 +16,7 @@
         android:layout_alignParentTop="true"
         fresco:moreImg="@drawable/ic_more"
         fresco:canBack="true" />
+
 
     <com.aliyun.vodplayerview.widget.AliyunVodPlayerView
         android:id="@+id/aliyunVodPlayerView"
@@ -173,6 +177,9 @@
         <!--ptr:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
 
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+
+
 
 
 
@@ -400,6 +407,44 @@
 
 
     </LinearLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/noData"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:layout_below="@+id/activity_title"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/content_deleted" />
+
+        <TextView
+            android:id="@+id/noScriptText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/logo"
+            android:layout_marginBottom="10dp"
+            android:layout_centerHorizontal="true"
+            android:textColor="#666666"
+            android:textSize="@dimen/font_size_28px"
+            android:layout_gravity="center_horizontal"
+            android:text="该内容已不存在~" />
+
+
+    </RelativeLayout>
+
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/activity_title"
+        layout="@layout/network_error" />
 
 </RelativeLayout>
 

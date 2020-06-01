@@ -12,15 +12,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
+import com.ethanhua.skeleton.Skeleton;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.RefreshState;
-import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.shuangling.software.R;
@@ -44,6 +46,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import okhttp3.Call;
 
@@ -60,13 +63,23 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
     SmartRefreshLayout refreshLayout;
     Unbinder unbinder;
     @BindView(R.id.noData)
-    LinearLayout noData;
+    RelativeLayout noData;
+    @BindView(R.id.root)
+    RelativeLayout root;
+    @BindView(R.id.refresh)
+    TextView refresh;
+    @BindView(R.id.networkError)
+    RelativeLayout networkError;
 
     private int mCategory;
     private String mOrganizationId;
-    private List<History> mHistorys=new ArrayList<>();
+    private List<History> mHistorys = new ArrayList<>();
+
+    private RecyclerViewSkeletonScreen mSkeletonScreen;
     private HistoryAdapter mAdapter;
     private Handler mHandler;
+
+
 
     public enum GetContent {
         Refresh,
@@ -91,7 +104,7 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         EventBus.getDefault().register(this);
-        View view = inflater.inflate(R.layout.fragment_content, null);
+        View view = inflater.inflate(R.layout.fragment_history, null);
         unbinder = ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         //recyclerView.addItemDecoration(new MyItemDecoration());
@@ -126,6 +139,20 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
 
     public void getContent(final GetContent getContent) {
 
+
+        if (getContent == GetContent.Normal) {
+            mSkeletonScreen =
+                    Skeleton.bind(recyclerView)
+                            .adapter(mAdapter)
+                            .shimmer(false)
+                            .angle(20)
+                            .frozen(false)
+                            .duration(3000)
+                            .count(10)
+                            .load(R.layout.item_skeleton_content)
+                            .show();
+        }
+
         String url = ServerInfo.serviceIP + ServerInfo.history;
 
         Map<String, String> params = new HashMap<String, String>();
@@ -149,7 +176,6 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-
 
 
 //                mHandler.post(new Runnable() {
@@ -190,7 +216,7 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
                     @Override
                     public void run() {
 
-                        try{
+                        try {
                             if (getContent == GetContent.Refresh) {
                                 if (refreshLayout.getState() == RefreshState.Refreshing) {
                                     refreshLayout.finishRefresh();
@@ -199,8 +225,13 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
                                 if (refreshLayout.getState() == RefreshState.Loading) {
                                     refreshLayout.finishLoadMore();
                                 }
+                            } else {
+                                if (mSkeletonScreen != null) {
+                                    mSkeletonScreen.hide();
+                                }
+                                networkError.setVisibility(View.VISIBLE);
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
 
                         }
 
@@ -258,6 +289,12 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
         unbinder.unbind();
     }
 
+
+    @OnClick(R.id.refresh)
+    public void onViewClicked() {
+        getContent(GetContent.Normal);
+    }
+
     @Override
     public boolean handleMessage(Message msg) {
 
@@ -266,6 +303,7 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
+                    networkError.setVisibility(View.GONE);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         List<History> histories = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), History.class);
 
@@ -279,17 +317,20 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
                         } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
                             mHistorys.addAll(histories);
                             if (refreshLayout.getState() == RefreshState.Loading) {
-                                if(histories==null||histories.size()==0){
+                                if (histories == null || histories.size() == 0) {
                                     //refreshLayout.setEnableLoadMore(false);
                                     refreshLayout.finishLoadMoreWithNoMoreData();
-                                }else{
+                                } else {
                                     refreshLayout.finishLoadMore();
                                 }
 
                             }
 
                         } else {
-                            mHistorys=histories;
+                            if (mSkeletonScreen != null) {
+                                mSkeletonScreen.hide();
+                            }
+                            mHistorys = histories;
                         }
 
 
@@ -314,9 +355,9 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
                             recyclerView.setAdapter(mAdapter);
                         } else {
                             mAdapter.setData(mHistorys);
-                            mAdapter.notifyDataSetChanged();
+
                         }
-                    }else{
+                    } else {
                         if (msg.arg1 == GetContent.Refresh.ordinal()) {
                             if (refreshLayout.getState() == RefreshState.Refreshing) {
                                 refreshLayout.finishRefresh();

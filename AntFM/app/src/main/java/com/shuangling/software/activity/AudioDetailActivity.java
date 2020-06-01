@@ -40,7 +40,9 @@ import com.ethanhua.skeleton.Skeleton;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
+import com.mylhyl.circledialog.callback.ConfigButton;
 import com.mylhyl.circledialog.callback.ConfigInput;
+import com.mylhyl.circledialog.params.ButtonParams;
 import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -154,7 +156,12 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     LinearLayout bottom;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
-
+    @BindView(R.id.noData)
+    RelativeLayout noData;
+    @BindView(R.id.refresh)
+    TextView refresh;
+    @BindView(R.id.networkError)
+    RelativeLayout networkError;
 
     private int mNetPlay;
     private int mNeedTipPlay;
@@ -175,7 +182,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     private AudioRecyclerAdapter mAdapter;
 
     private HeadViewHolder mHeadViewHolder;
-    private int currentPage=1;
+    private int currentPage = 1;
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
@@ -296,7 +303,15 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
             @Override
             public void onClick(View v) {
                 if (mAudioDetail != null) {
-                    showShare(mAudioDetail.getAlbum().get(0).getTitle(), mAudioDetail.getTitle(), mAudioDetail.getAlbum().get(0).getCover(), ServerInfo.h5IP + "/audios/" + mAudioId);
+
+                    String url;
+                    if(User.getInstance()!=null){
+                        url=ServerInfo.h5IP + "/audios/" + mAudioId+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP + "/audios/" + mAudioId;
+                    }else{
+                        url=ServerInfo.h5IP + "/audios/" + mAudioId+"?from_url="+ServerInfo.h5IP + "/audios/" + mAudioId;
+                    }
+
+                    showShare(mAudioDetail.getAlbum().get(0).getTitle(), mAudioDetail.getTitle(), mAudioDetail.getAlbum().get(0).getCover(), url);
                     //shareTest();
                 }
             }
@@ -365,7 +380,12 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mViewSkeletonScreen.hide();
+                        if (!isOnPrepared) {
+                            mViewSkeletonScreen.hide();
+                            networkError.setVisibility(View.VISIBLE);
+                        }
+
+                        noData.setVisibility(View.GONE);
                     }
                 });
 
@@ -433,8 +453,8 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 
     //type  0 正常   1 加载更多
     private void getComments(final int type) {
-        if(type==0){
-            currentPage=1;
+        if (type == 0) {
+            currentPage = 1;
         }
         String url = ServerInfo.serviceIP + ServerInfo.getComentList;
         Map<String, String> params = new HashMap<>();
@@ -448,7 +468,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_COMMENTS;
-                msg.arg1=type;
+                msg.arg1 = type;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
 
@@ -646,7 +666,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
         super.onDestroy();
     }
 
-    @OnClick({R.id.writeComment, R.id.commentNumLayout})
+    @OnClick({R.id.writeComment, R.id.commentNumLayout,R.id.refresh})
     public void onViewClicked(View view) {
         switch (view.getId()) {
 
@@ -656,14 +676,15 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                 if (User.getInstance() == null) {
 
                     Intent it = new Intent(this, NewLoginActivity.class);
-                    it.putExtra("bindPhone",true);
+                    it.putExtra("bindPhone", true);
+                    it.putExtra("jump_url",ServerInfo.h5IP + "/audios/" + mAudioId);
                     startActivityForResult(it, REQUEST_LOGIN);
-                }else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+                } else if (User.getInstance() != null && TextUtils.isEmpty(User.getInstance().getPhone())) {
 
                     Intent it = new Intent(this, BindPhoneActivity.class);
                     //it.putExtra("hasLogined",true);
                     startActivity(it);
-                }else {
+                } else {
                     mCommentDialog = new CircleDialog.Builder()
                             .setCanceledOnTouchOutside(false)
                             .setCancelable(true)
@@ -681,6 +702,13 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                                 }
                             })
                             .setNegative("取消", null)
+                            .configPositive(new ConfigButton() {
+                                @Override
+                                public void onConfig(ButtonParams params) {
+                                    //按钮字体颜色
+                                    params.textColor = CommonUtils.getThemeColor(AudioDetailActivity.this);
+                                }
+                            })
                             .setPositiveInput("发表", new OnInputClickListener() {
                                 @Override
                                 public void onClick(String text, View v) {
@@ -710,6 +738,10 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                     llm.setStackFromEnd(false);
                 }
                 break;
+            case R.id.refresh:
+                getAudioDetail(false);
+                getComments(0);
+                break;
         }
     }
 
@@ -725,11 +757,11 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                         mViewSkeletonScreen.hide();
                     }
                     JSONObject jsonObject = JSONObject.parseObject(result);
-
+                    networkError.setVisibility(View.GONE);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
                         mAudioDetail = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), AudioDetail.class);
-
+                        noData.setVisibility(View.GONE);
                         if (!isOnPrepared) {
                             mAudioInfo = new AudioInfo();
                             mAudioInfo.setId(mAudioDetail.getId());
@@ -842,12 +874,21 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                             @Override
                             public void onClick(View v) {
                                 if (User.getInstance() == null) {
-                                    startActivityForResult(new Intent(AudioDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
+                                    Intent it=new Intent(AudioDetailActivity.this, NewLoginActivity.class);
+                                    it.putExtra("jump_url",ServerInfo.h5IP + "/audios/" + mAudioId);
+                                    startActivityForResult(it, REQUEST_LOGIN);
+
+
                                 } else {
                                     subscribe(mAudioDetail.getAlbum().get(0).getIs_sub() == 0);
                                 }
                             }
                         });
+
+
+                    } else if (jsonObject != null && jsonObject.getIntValue("code") == 403001) {
+                        //资源不存在
+                        noData.setVisibility(View.VISIBLE);
 
 
                     }
@@ -919,7 +960,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                     List<Comment> comments = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), Comment.class);
 
                     if (msg.arg1 == 0) {
-                        mComments=comments;
+                        mComments = comments;
 //                        if(comments==null||comments.size()==0){
 //                            refreshLayout.setEnableLoadMore(false);
 //                        }else{
@@ -936,10 +977,10 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 //                                refreshLayout.finishLoadMore();
 //                            }
 
-                            if(comments==null||comments.size()==0){
+                            if (comments == null || comments.size() == 0) {
                                 //refreshLayout.setEnableLoadMore(false);
                                 refreshLayout.finishLoadMoreWithNoMoreData();
-                            }else{
+                            } else {
                                 refreshLayout.finishLoadMore();
                             }
                         }
@@ -948,7 +989,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                     }
 
 
-                    if(mComments==null||mComments.size()==0){
+                    if (mComments == null || mComments.size() == 0) {
                         refreshLayout.setEnableLoadMore(false);
                     }
                     mAdapter.setComments(mComments);
@@ -959,7 +1000,11 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                             if (User.getInstance() != null) {
                                 praise("" + comment.getId(), v);
                             } else {
-                                startActivityForResult(new Intent(AudioDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
+                                //startActivityForResult(new Intent(AudioDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
+                                Intent it=new Intent(AudioDetailActivity.this, NewLoginActivity.class);
+                                it.putExtra("jump_url",ServerInfo.h5IP + "/audios/" + mAudioId);
+                                startActivityForResult(it, REQUEST_LOGIN);
+
                             }
 
                         }
@@ -981,6 +1026,65 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                                         }
                                     })
                                     .show(getSupportFragmentManager());
+                        }
+                    });
+
+                    mAdapter.setOnItemReply(new AudioRecyclerAdapter.OnItemReply() {
+                        @Override
+                        public void replyItem(final Comment comment) {
+                            if (User.getInstance() == null) {
+
+                                Intent it = new Intent(AudioDetailActivity.this, NewLoginActivity.class);
+                                it.putExtra("bindPhone", true);
+                                it.putExtra("jump_url",ServerInfo.h5IP + "/audios/" + mAudioId);
+                                startActivityForResult(it, REQUEST_LOGIN);
+                            } else if (User.getInstance() != null && TextUtils.isEmpty(User.getInstance().getPhone())) {
+
+                                Intent it = new Intent(AudioDetailActivity.this, BindPhoneActivity.class);
+                                //it.putExtra("hasLogined",true);
+                                startActivity(it);
+                            } else {
+                                mCommentDialog = new CircleDialog.Builder()
+                                        .setCanceledOnTouchOutside(false)
+                                        .setCancelable(true)
+                                        .setInputManualClose(true)
+                                        .setTitle("发表评论")
+//                        .setSubTitle("发表评论")
+                                        .setInputHint("写评论")
+//                        .setInputText("默认文本")
+                                        .autoInputShowKeyboard()
+                                        .setInputCounter(200)
+                                        .configInput(new ConfigInput() {
+                                            @Override
+                                            public void onConfig(InputParams params) {
+                                                params.styleText = Typeface.NORMAL;
+                                            }
+                                        })
+                                        .setNegative("取消", null)
+                                        .configPositive(new ConfigButton() {
+                                            @Override
+                                            public void onConfig(ButtonParams params) {
+                                                //按钮字体颜色
+                                                params.textColor = CommonUtils.getThemeColor(AudioDetailActivity.this);
+                                            }
+                                        })
+                                        .setPositiveInput("发表", new OnInputClickListener() {
+                                            @Override
+                                            public void onClick(String text, View v) {
+                                                if (TextUtils.isEmpty(text)) {
+                                                    ToastUtils.show("请输入内容");
+                                                } else {
+
+                                                    CommonUtils.closeInputMethod(AudioDetailActivity.this);
+                                                    //发送评论
+                                                    writeComments(text, "" + comment.getId(), "" + comment.getId());
+
+                                                    mCommentDialog.dismiss();
+                                                }
+                                            }
+                                        })
+                                        .show(getSupportFragmentManager());
+                            }
                         }
                     });
                 }
@@ -1109,6 +1213,9 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
                 break;
             case R.id.rate:
                 AudioSpeedDialog.getInstance().show(getSupportFragmentManager(), "AudioSpeedDialog");
+                break;
+            case R.id.refresh:
+                getAudioDetail(false);
                 break;
         }
     }

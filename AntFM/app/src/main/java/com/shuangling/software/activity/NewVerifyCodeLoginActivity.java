@@ -66,6 +66,8 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
     private boolean mUserExist=false;
     private DialogFragment mDialogFragment;
 
+    private String mJumpUrl;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +83,7 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
     }
 
     private void init() {
-
+        mJumpUrl = getIntent().getStringExtra("jump_url");
         mPhoneNumber = getIntent().getStringExtra("PhoneNumber");
         phoneNum.setText(mPhoneNumber);
         mCountDownTimer = new CountDownTimer(60 * 1000, 500) {
@@ -334,7 +336,9 @@ public class NewVerifyCodeLoginActivity extends AppCompatActivity implements Han
         params.put("type", "1");
         params.put("phone", mPhoneNumber);
         params.put("verification_code", verifyCode);
-
+        params.put("from_url", SharedPreferencesUtils.getStringValue("from_url",null));
+        params.put("from_user_id", SharedPreferencesUtils.getStringValue("from_user_id",null));
+        params.put("jump_url", mJumpUrl);
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
             @Override

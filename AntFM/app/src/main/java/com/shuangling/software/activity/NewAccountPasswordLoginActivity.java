@@ -224,6 +224,8 @@ public class NewAccountPasswordLoginActivity extends AppCompatActivity implement
         params.put("type", "0");
         params.put("phone", "" + phone);
         params.put("password", pwd);
+        params.put("from_url", SharedPreferencesUtils.getStringValue("from_url",null));
+        params.put("from_user_id", SharedPreferencesUtils.getStringValue("from_user_id",null));
 
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 

@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.alibaba.fastjson.JSONObject;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -58,7 +59,7 @@ public class ProgramAnchorFragment extends Fragment implements Handler.Callback 
     SmartRefreshLayout refreshLayout;
     Unbinder unbinder;
     @BindView(R.id.noData)
-    LinearLayout noData;
+    RelativeLayout noData;
 
     private AnchorOrganizationColumn mColumn;
     private String mOrganizationId;

@@ -23,6 +23,7 @@ import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONArray;
@@ -93,7 +94,7 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
     @BindView(R.id.noScriptText)
     TextView noScriptText;
     @BindView(R.id.noData)
-    LinearLayout noData;
+    RelativeLayout noData;
 
     private Column mColumn;
     private String mOrderBy = "1";
@@ -1204,7 +1205,7 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
             Intent it=new Intent(this,RadioListActivity.class);
             it.putExtra("type","2");
             startActivity(it);
-        }else if(url.startsWith(ServerInfo.h5IP+"/radios/")||url.startsWith(ServerInfo.h5HttpsIP+"/radios/")){
+        }else if(url.startsWith(ServerInfo.h5IP+"/lives/")||url.startsWith(ServerInfo.h5HttpsIP+"/lives/")){
             String radioId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
             Intent it=new Intent(this,TvDetailActivity.class);
             it.putExtra("radioId",Integer.parseInt(radioId));
@@ -1219,19 +1220,23 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
             it.putExtra("radioId",Integer.parseInt(radioId));
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/gover")||url.startsWith(ServerInfo.h5HttpsIP+"/gover")){
-            Intent it=new Intent(this,WebViewActivity.class);
+            Intent it=new Intent(this,WebViewBackActivity.class);
+            it.putExtra("title",title);
             it.putExtra("url",url);
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/dj")||url.startsWith(ServerInfo.h5HttpsIP+"/dj")){
-            Intent it=new Intent(this,WebViewActivity.class);
+            Intent it=new Intent(this,WebViewBackActivity.class);
+            it.putExtra("title",title);
             it.putExtra("url",url);
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/interact")||url.startsWith(ServerInfo.h5HttpsIP+"/interact")){
-            Intent it=new Intent(this,WebViewActivity.class);
+            Intent it=new Intent(this,WebViewBackActivity.class);
+            it.putExtra("title",title);
             it.putExtra("url",url);
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/guide")||url.startsWith(ServerInfo.h5HttpsIP+"/guide")){
-            Intent it=new Intent(this,WebViewActivity.class);
+            Intent it=new Intent(this,WebViewBackActivity.class);
+            it.putExtra("title",title);
             it.putExtra("url",url);
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/cates/")||url.startsWith(ServerInfo.h5HttpsIP+"/cates/")){
@@ -1253,8 +1258,9 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
 //            Intent it = new Intent(this, OrganizationDetailActivity.class);
 //            it.putExtra("organizationId", Integer.parseInt(organizationId));
 //            startActivity(it);
-            Intent it = new Intent(this, WebViewActivity.class);
+            Intent it = new Intent(this, WebViewBackActivity.class);
             it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+organizationId);
+            it.putExtra("title",title);
             startActivity(it);
 
         }else if(url.startsWith(ServerInfo.h5IP+"/anchors/")||url.startsWith(ServerInfo.h5HttpsIP+"/anchors/")){
@@ -1263,8 +1269,9 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
 //            it.putExtra("anchorId", Integer.parseInt(anchorId));
 //            startActivity(it);
 
-            Intent it = new Intent(this, WebViewActivity.class);
+            Intent it = new Intent(this, WebViewBackActivity.class);
             it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+anchorId);
+            it.putExtra("title",title);
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/atlas/")||url.startsWith(ServerInfo.h5HttpsIP+"/atlas/")){
             String galleriaId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
@@ -1319,20 +1326,24 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
                 startActivity(it);
             }
         }else if (url.startsWith(ServerInfo.h5IP + "/invitation-post") || url.startsWith(ServerInfo.h5HttpsIP + "/invitation-post")) {
-            Intent it = new Intent(this, WebViewActivity.class);
+            Intent it = new Intent(this, WebViewBackActivity.class);
             it.putExtra("url", url);
+            it.putExtra("title",title);
             startActivity(it);
         }else if (url.startsWith(ServerInfo.h5IP + "/actrank") || url.startsWith(ServerInfo.h5HttpsIP + "/actrank")) {
-            Intent it = new Intent(this, WebViewActivity.class);
+            Intent it = new Intent(this, WebViewBackActivity.class);
             it.putExtra("url", url);
+            it.putExtra("title",title);
             startActivity(it);
         }else if (url.startsWith(ServerInfo.h5IP + "/wish") || url.startsWith(ServerInfo.h5HttpsIP + "/wish")) {
-            Intent it = new Intent(this, WebViewActivity.class);
+            Intent it = new Intent(this, WebViewBackActivity.class);
             it.putExtra("url", url);
+            it.putExtra("title",title);
             startActivity(it);
         }else if (url.startsWith(ServerInfo.h5IP + "/actlist") || url.startsWith(ServerInfo.h5HttpsIP + "/actlist")) {
-            Intent it = new Intent(this, WebViewActivity.class);
+            Intent it = new Intent(this, WebViewBackActivity.class);
             it.putExtra("url", url);
+            it.putExtra("title",title);
             startActivity(it);
         }else {
             Intent it=new Intent(this,WebViewBackActivity.class);

@@ -2,28 +2,31 @@ package com.shuangling.software.entity;
 
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Comment implements Serializable {
 
 
     /**
-     * id : 349
-     * post_id : 1858
+     * id : 1190
+     * post_id : 17293
      * type : 1
      * like_count : 0
-     * comment_count : 0
-     * parent_id : 348
-     * base_comment_id : 268
-     * user_id : 325
+     * comment_count : 5
+     * parent_id : 0
+     * base_comment_id : 0
+     * user_id : 149
      * green_status : 3
      * status : 1
-     * created_at : 2019-06-26 09:57:30
+     * created_at : 2020-05-11 08:57:43
+     * model : 0
+     * sort_weight : 70
      * delete : 0
      * fabulous : 0
-     * time_length : 2小时前
-     * text : {"post_comment_id":349,"content":"敌法很叼？"}
-     * user : {"id":325,"nickname":"151****1111","avatar":""}
-     * parent : {"id":348,"parent_id":347,"user_id":325,"created_at":"2019-06-26 09:56:36","time_length":"2小时前","text":{"post_comment_id":348,"content":"敌法敌法敌法"},"user":{"id":325,"nickname":"151****1111","avatar":""}}
+     * time_length : 昨天
+     * text : {"post_comment_id":1190,"content":"好样的"}
+     * user : {"id":149,"nickname":"18874751342","avatar":""}
+     * parent_comment : [{"id":1191,"post_id":17293,"type":1,"like_count":0,"comment_count":0,"parent_id":1190,"base_comment_id":1190,"user_id":149,"green_status":3,"status":1,"created_at":"2020-05-11 08:57:59","model":0,"sort_weight":0,"delete":0,"fabulous":0,"time_length":"昨天","text":{"post_comment_id":1191,"content":"非常棒"},"user":{"id":149,"nickname":"18874751342","avatar":""}},{"id":1195,"post_id":17293,"type":1,"like_count":0,"comment_count":0,"parent_id":1190,"base_comment_id":1190,"user_id":1,"green_status":3,"status":1,"created_at":"2020-05-11 10:57:39","model":0,"sort_weight":0,"delete":0,"fabulous":0,"time_length":"昨天","text":{"post_comment_id":1195,"content":"哎呀"},"user":{"id":1,"nickname":"手动阀","avatar":"https://sl-cdn.slradio.cn/ucenter/avatar/imges/kr137bdceP01yipw1584610030811.png"}}]
      */
 
     private int id;
@@ -37,12 +40,15 @@ public class Comment implements Serializable {
     private int green_status;
     private int status;
     private String created_at;
+    private int model;
+    private int sort_weight;
     private int delete;
     private int fabulous;
     private String time_length;
     private TextBean text;
     private UserBean user;
-    private ParentBean parent;
+    private boolean expand;
+    private List<Comment> parent_comment;
 
     public int getId() {
         return id;
@@ -132,6 +138,22 @@ public class Comment implements Serializable {
         this.created_at = created_at;
     }
 
+    public int getModel() {
+        return model;
+    }
+
+    public void setModel(int model) {
+        this.model = model;
+    }
+
+    public int getSort_weight() {
+        return sort_weight;
+    }
+
+    public void setSort_weight(int sort_weight) {
+        this.sort_weight = sort_weight;
+    }
+
     public int getDelete() {
         return delete;
     }
@@ -172,18 +194,12 @@ public class Comment implements Serializable {
         this.user = user;
     }
 
-    public ParentBean getParent() {
-        return parent;
-    }
 
-    public void setParent(ParentBean parent) {
-        this.parent = parent;
-    }
 
     public static class TextBean {
         /**
-         * post_comment_id : 349
-         * content : 敌法很叼？
+         * post_comment_id : 1190
+         * content : 好样的
          */
 
         private int post_comment_id;
@@ -208,8 +224,8 @@ public class Comment implements Serializable {
 
     public static class UserBean {
         /**
-         * id : 325
-         * nickname : 151****1111
+         * id : 149
+         * nickname : 18874751342
          * avatar :
          */
 
@@ -242,80 +258,22 @@ public class Comment implements Serializable {
         }
     }
 
-    public static class ParentBean {
-        /**
-         * id : 348
-         * parent_id : 347
-         * user_id : 325
-         * created_at : 2019-06-26 09:56:36
-         * time_length : 2小时前
-         * text : {"post_comment_id":348,"content":"敌法敌法敌法"}
-         * user : {"id":325,"nickname":"151****1111","avatar":""}
-         */
-
-        private int id;
-        private int parent_id;
-        private int user_id;
-        private String created_at;
-        private String time_length;
-        private TextBean text;
-        private UserBean user;
-
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
-
-        public int getParent_id() {
-            return parent_id;
-        }
-
-        public void setParent_id(int parent_id) {
-            this.parent_id = parent_id;
-        }
-
-        public int getUser_id() {
-            return user_id;
-        }
-
-        public void setUser_id(int user_id) {
-            this.user_id = user_id;
-        }
-
-        public String getCreated_at() {
-            return created_at;
-        }
-
-        public void setCreated_at(String created_at) {
-            this.created_at = created_at;
-        }
-
-        public String getTime_length() {
-            return time_length;
-        }
-
-        public void setTime_length(String time_length) {
-            this.time_length = time_length;
-        }
-
-        public TextBean getText() {
-            return text;
-        }
-
-        public void setText(TextBean text) {
-            this.text = text;
-        }
-
-        public UserBean getUser() {
-            return user;
-        }
-
-        public void setUser(UserBean user) {
-            this.user = user;
-        }
-
+    public boolean isExpand() {
+        return expand;
     }
+
+    public void setExpand(boolean expand) {
+        this.expand = expand;
+    }
+
+
+    public List<Comment> getParent_comment() {
+        return parent_comment;
+    }
+
+    public void setParent_comment(List<Comment> parent_comment) {
+        this.parent_comment = parent_comment;
+    }
+
+
 }

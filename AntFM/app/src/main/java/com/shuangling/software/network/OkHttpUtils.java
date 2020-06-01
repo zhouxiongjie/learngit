@@ -60,7 +60,7 @@ public class OkHttpUtils {
 		Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 		if(params!=null&&params.size()>0){
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					builder.addFormDataPart(entry.getKey(),entry.getValue()) ;
 				}
 
@@ -152,7 +152,7 @@ public class OkHttpUtils {
 		Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 		if(textMap!=null&&textMap.size()>0){
 			for (Map.Entry<String, String> entry : textMap.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					builder.addFormDataPart(entry.getKey(),entry.getValue()) ;
 				}
 
@@ -267,7 +267,7 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(params!=null&&params.size()>0){
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					builder.add(entry.getKey(),entry.getValue()) ;
 				}
 
@@ -334,7 +334,7 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(params!=null&&params.size()>0){
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					builder.add(entry.getKey(),entry.getValue()) ;
 				}
 
@@ -403,7 +403,7 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(params!=null&&params.size()>0){
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					builder.add(entry.getKey(),entry.getValue()) ;
 				}
 
@@ -471,7 +471,7 @@ public class OkHttpUtils {
 		if(params!=null&&params.size()>0){
 			newUrl+="?";
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					newUrl+=(entry.getKey()+"="+entry.getValue());
 					newUrl+="&";
 				}
@@ -543,7 +543,7 @@ public class OkHttpUtils {
 		if(params!=null&&params.size()>0){
 			newUrl+="?";
 			for (Map.Entry<String, String> entry : params.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					newUrl+=(entry.getKey()+"="+entry.getValue());
 					newUrl+="&";
 				}
@@ -594,7 +594,7 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(loginParams!=null&&loginParams.size()>0){
 			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					builder.add(entry.getKey(),entry.getValue()) ;
 				}
 
@@ -656,7 +656,7 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(loginParams!=null&&loginParams.size()>0){
 			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					builder.add(entry.getKey(),entry.getValue()) ;
 				}
 
@@ -716,7 +716,7 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(loginParams!=null&&loginParams.size()>0){
 			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					builder.add(entry.getKey(),entry.getValue()) ;
 				}
 
@@ -776,7 +776,7 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(loginParams!=null&&loginParams.size()>0){
 			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					builder.add(entry.getKey(),entry.getValue()) ;
 				}
 
@@ -838,7 +838,7 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(loginParams!=null&&loginParams.size()>0){
 			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					builder.add(entry.getKey(),entry.getValue()) ;
 				}
 
@@ -900,7 +900,7 @@ public class OkHttpUtils {
 		FormBody.Builder builder = new FormBody.Builder();
 		if(loginParams!=null&&loginParams.size()>0){
 			for (Map.Entry<String, String> entry : loginParams.entrySet()) {
-				if(!TextUtils.isEmpty(entry.getValue())){
+				if(entry.getValue()!=null){
 					builder.add(entry.getKey(),entry.getValue()) ;
 				}
 

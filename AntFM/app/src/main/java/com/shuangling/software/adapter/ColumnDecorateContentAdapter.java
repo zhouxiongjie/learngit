@@ -22,6 +22,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
@@ -56,8 +57,8 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
     public static final int TYPE_SPECIAL = 5;           //专题
     public static final int TYPE_GALLERIE_ONE = 6;      //一图集
     public static final int TYPE_GALLERIE_THREE = 7;    //三图集
-    public static final int TYPE_ACTIVITY = 8;    //三图集
-    public static final int TYPE_LIVE = 9;    //三图集
+    public static final int TYPE_ACTIVITY = 8;          //三图集
+    public static final int TYPE_LIVE = 9;              //三图集
     public static final int TYPE_HEAD = 10;              //头
     public static final int TYPE_DECORATE = 11;          //装修头
 
@@ -528,7 +529,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, ArticleDetailActivity.class);
+                    Intent it = new Intent(mContext, ArticleDetailActivity02.class);
                     it.putExtra("articleId", content.getId());
                     mContext.startActivity(it);
                 }
@@ -587,7 +588,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, ArticleDetailActivity.class);
+                    Intent it = new Intent(mContext, ArticleDetailActivity02.class);
                     it.putExtra("articleId", content.getId());
                     mContext.startActivity(it);
                 }

@@ -285,7 +285,8 @@ public class VerifyCodeLoginActivity extends AppCompatActivity implements Handle
         params.put("type", "1");
         params.put("phone", mPhoneNumber);
         params.put("verification_code", verifyCode.getText().toString());
-
+        params.put("from_url", SharedPreferencesUtils.getStringValue("from_url",null));
+        params.put("from_user_id", SharedPreferencesUtils.getStringValue("from_user_id",null));
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
             @Override

@@ -34,11 +34,15 @@ import com.aliyun.player.IPlayer;
 import com.aliyun.player.source.VidAuth;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
+import com.ethanhua.skeleton.Skeleton;
+import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
+import com.mylhyl.circledialog.callback.ConfigButton;
 import com.mylhyl.circledialog.callback.ConfigInput;
+import com.mylhyl.circledialog.params.ButtonParams;
 import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -171,6 +175,14 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
     TopTitleBar activityTitle;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
+    @BindView(R.id.noData)
+    RelativeLayout noData;
+    @BindView(R.id.refresh)
+    TextView refresh;
+    @BindView(R.id.networkError)
+    RelativeLayout networkError;
+    @BindView(R.id.root)
+    RelativeLayout root;
 
 
     private Handler mHandler;
@@ -179,7 +191,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
     private List<ColumnContent> mPostContents;
 //    private RecommendContentAdapter mAdapter;
 
-    private List<Comment> mComments=new ArrayList<>();
+    private List<Comment> mComments = new ArrayList<>();
 //    private CommentListAdapter mCommentListAdapter;
 
     boolean mScrollToTop = false;
@@ -191,9 +203,11 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
 
     private VideoRecyclerAdapter mAdapter;
     private boolean mIsInBackground = false;
-    private int currentPage=1;
+    private int currentPage = 1;
 
     private Comment currentComment;
+    private ViewSkeletonScreen mViewSkeletonScreen;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setmOnServiceConnectionListener(new OnServiceConnectionListener() {
@@ -233,6 +247,15 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
     }
 
     private void init() {
+
+        mViewSkeletonScreen = Skeleton.bind(root)
+                .load(R.layout.skeleton_video_detail)
+                .shimmer(false)
+                .angle(20)
+                .duration(1000)
+                .color(R.color.shimmer_color)
+                .show();
+
         //refreshLayout.setRefreshHeader(new ClassicsHeader(this));
         refreshLayout.setRefreshFooter(new ClassicsFooter(this));//设置
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -250,7 +273,15 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
             @Override
             public void onClick(View v) {
                 if (mVideoDetail != null) {
-                    showShare(mVideoDetail.getTitle(), mVideoDetail.getDes(), mVideoDetail.getCover(), ServerInfo.h5IP + "/videos/" + mVideoId);
+
+                    String url;
+                    if (User.getInstance() != null) {
+                        url = ServerInfo.h5IP + "/videos/" + mVideoId + "?from_user_id=" + User.getInstance().getId() + "&from_url=" + ServerInfo.h5IP + "/videos/" + mVideoId;
+                    } else {
+                        url = ServerInfo.h5IP + "/videos/" + mVideoId + "?from_url=" + ServerInfo.h5IP + "/videos/" + mVideoId;
+                    }
+
+                    showShare(mVideoDetail.getTitle(), mVideoDetail.getDes(), mVideoDetail.getCover(), url);
                     //shareTest();
                 }
 
@@ -264,8 +295,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
         });
         initAliyunPlayerView();
         getVideoDetail();
-        getRelatedPosts();
-        getComments(0);
+
         refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
@@ -330,7 +360,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Log.i("test",response);
+                Log.i("test", response);
             }
 
             @Override
@@ -355,6 +385,15 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
 
             @Override
             public void onFailure(Call call, Exception exception) {
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mViewSkeletonScreen.hide();
+                        noData.setVisibility(View.GONE);
+                        networkError.setVisibility(View.VISIBLE);
+                    }
+                });
 
             }
         });
@@ -405,10 +444,11 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
             }
         });
     }
+
     //type  0 正常   1 加载更多
     private void getComments(final int type) {
-        if(type==0){
-            currentPage=1;
+        if (type == 0) {
+            currentPage = 1;
         }
         String url = ServerInfo.serviceIP + ServerInfo.getComentList;
         Map<String, String> params = new HashMap<>();
@@ -422,7 +462,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
 
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_COMMENTS;
-                msg.arg1=type;
+                msg.arg1 = type;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
 
@@ -604,8 +644,8 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
     private void praise(Comment comment, final View view) {
         String url = ServerInfo.serviceIP + ServerInfo.praise;
         Map<String, String> params = new HashMap<>();
-        params.put("id", ""+comment.getId());
-        currentComment=comment;
+        params.put("id", "" + comment.getId());
+        currentComment = comment;
         OkHttpUtils.put(url, params, new OkHttpCallback(this) {
 
             @Override
@@ -799,9 +839,15 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
+                    mViewSkeletonScreen.hide();
+                    networkError.setVisibility(View.GONE);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         mVideoDetail = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), VideoDetail.class);
+                        noData.setVisibility(View.GONE);
+
                         if (mVideoDetail.getVideo() != null) {
+                            getRelatedPosts();
+                            getComments(0);
                             getVideoAuth(mVideoDetail.getVideo().getSource_id());
 
 
@@ -837,7 +883,9 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                                 @Override
                                 public void praiseVideo() {
                                     if (User.getInstance() == null) {
-                                        startActivityForResult(new Intent(VideoDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
+                                        Intent it = new Intent(VideoDetailActivity.this, NewLoginActivity.class);
+                                        it.putExtra("jump_url", ServerInfo.h5IP + "/videos/" + mVideoId);
+                                        startActivityForResult(it, REQUEST_LOGIN);
                                     } else {
                                         if (mVideoDetail.getIs_likes() == 0) {
                                             like(true);
@@ -851,7 +899,10 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                                 @Override
                                 public void collectVideo() {
                                     if (User.getInstance() == null) {
-                                        startActivityForResult(new Intent(VideoDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
+                                        //startActivityForResult(new Intent(VideoDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
+                                        Intent it = new Intent(VideoDetailActivity.this, NewLoginActivity.class);
+                                        it.putExtra("jump_url", ServerInfo.h5IP + "/videos/" + mVideoId);
+                                        startActivityForResult(it, REQUEST_LOGIN);
                                     } else {
                                         if (mVideoDetail.getIs_collection() == 0) {
                                             collect(true);
@@ -904,6 +955,10 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                             //setPlaySource(DEFAULT_URL);
                         }
 
+
+                    } else if (jsonObject != null && jsonObject.getIntValue("code") == 403001) {
+                        //资源不存在
+                        noData.setVisibility(View.VISIBLE);
 
                     }
 
@@ -1033,7 +1088,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                         List<Comment> comments = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), Comment.class);
 
                         if (msg.arg1 == 0) {
-                            mComments=comments;
+                            mComments = comments;
 //                            if(comments==null||comments.size()==0){
 //                                refreshLayout.setEnableLoadMore(false);
 //                            }else{
@@ -1049,10 +1104,10 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
 //                                }else{
 //                                    refreshLayout.finishLoadMore();
 //                                }
-                                if(comments==null||comments.size()==0){
+                                if (comments == null || comments.size() == 0) {
                                     //refreshLayout.setEnableLoadMore(false);
                                     refreshLayout.finishLoadMoreWithNoMoreData();
-                                }else{
+                                } else {
                                     refreshLayout.finishLoadMore();
                                 }
                             }
@@ -1060,7 +1115,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                             mComments.addAll(comments);
                         }
 
-                        if(mComments==null||mComments.size()==0){
+                        if (mComments == null || mComments.size() == 0) {
                             refreshLayout.setEnableLoadMore(false);
                         }
                         mAdapter.setComments(mComments);
@@ -1071,7 +1126,10 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                                 if (User.getInstance() != null) {
                                     praise(comment, view);
                                 } else {
+//                                    Intent it = new Intent(VideoDetailActivity.this, NewLoginActivity.class);
+//                                    startActivityForResult(it, REQUEST_LOGIN);
                                     Intent it = new Intent(VideoDetailActivity.this, NewLoginActivity.class);
+                                    it.putExtra("jump_url", ServerInfo.h5IP + "/videos/" + mVideoId);
                                     startActivityForResult(it, REQUEST_LOGIN);
                                 }
                             }
@@ -1094,6 +1152,65 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                                             }
                                         })
                                         .show(getSupportFragmentManager());
+                            }
+                        });
+
+                        mAdapter.setOnItemReply(new VideoRecyclerAdapter.OnItemReply() {
+                            @Override
+                            public void replyItem(final Comment comment) {
+                                if (User.getInstance() == null) {
+
+                                    Intent it = new Intent(VideoDetailActivity.this, NewLoginActivity.class);
+                                    it.putExtra("bindPhone", true);
+                                    it.putExtra("jump_url", ServerInfo.h5IP + "/videos/" + mVideoId);
+                                    startActivityForResult(it, REQUEST_LOGIN);
+                                } else if (User.getInstance() != null && TextUtils.isEmpty(User.getInstance().getPhone())) {
+
+                                    Intent it = new Intent(VideoDetailActivity.this, BindPhoneActivity.class);
+                                    //it.putExtra("hasLogined",true);
+                                    startActivity(it);
+                                } else {
+                                    mCommentDialog = new CircleDialog.Builder()
+                                            .setCanceledOnTouchOutside(false)
+                                            .setCancelable(true)
+                                            .setInputManualClose(true)
+                                            .setTitle("发表评论")
+//                        .setSubTitle("发表评论")
+                                            .setInputHint("写评论")
+//                        .setInputText("默认文本")
+                                            .autoInputShowKeyboard()
+                                            .setInputCounter(200)
+                                            .configInput(new ConfigInput() {
+                                                @Override
+                                                public void onConfig(InputParams params) {
+                                                    params.styleText = Typeface.NORMAL;
+                                                }
+                                            })
+                                            .setNegative("取消", null)
+                                            .configPositive(new ConfigButton() {
+                                                @Override
+                                                public void onConfig(ButtonParams params) {
+                                                    //按钮字体颜色
+                                                    params.textColor = CommonUtils.getThemeColor(VideoDetailActivity.this);
+                                                }
+                                            })
+                                            .setPositiveInput("发表", new OnInputClickListener() {
+                                                @Override
+                                                public void onClick(String text, View v) {
+                                                    if (TextUtils.isEmpty(text)) {
+                                                        ToastUtils.show("请输入内容");
+                                                    } else {
+
+                                                        CommonUtils.closeInputMethod(VideoDetailActivity.this);
+                                                        //发送评论
+                                                        writeComments(text, "" + comment.getId(), "" + comment.getId());
+
+                                                        mCommentDialog.dismiss();
+                                                    }
+                                                }
+                                            })
+                                            .show(getSupportFragmentManager());
+                                }
                             }
                         });
 
@@ -1175,7 +1292,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                         if (jsonObject.getInteger("data") == 1) {
                             //取消点赞
                             textView.setActivated(true);
-                            int num=Integer.parseInt(textView.getText().toString()) - 1;
+                            int num = Integer.parseInt(textView.getText().toString()) - 1;
                             currentComment.setLike_count(num);
                             currentComment.setFabulous(0);
                             textView.setText("" + num);
@@ -1183,7 +1300,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                         } else {
                             //点赞成功
                             textView.setActivated(false);
-                            int num=Integer.parseInt(textView.getText().toString()) + 1;
+                            int num = Integer.parseInt(textView.getText().toString()) + 1;
                             textView.setText("" + num);
                             currentComment.setLike_count(num);
                             currentComment.setFabulous(1);
@@ -1272,16 +1389,19 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
 
     }
 
-    @OnClick({R.id.attention, R.id.writeComment, R.id.commentNumLayout})
+    @OnClick({R.id.attention, R.id.writeComment, R.id.commentNumLayout, R.id.refresh})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.attention:
                 if (User.getInstance() == null) {
-                    startActivityForResult(new Intent(this, NewLoginActivity.class), REQUEST_LOGIN);
+                    //startActivityForResult(new Intent(this, NewLoginActivity.class), REQUEST_LOGIN);
+                    Intent it = new Intent(VideoDetailActivity.this, NewLoginActivity.class);
+                    it.putExtra("jump_url", ServerInfo.h5IP + "/videos/" + mVideoId);
+                    startActivityForResult(it, REQUEST_LOGIN);
                 } else {
-                    if (mVideoDetail!=null&&mVideoDetail.getIs_follow() == 0) {
+                    if (mVideoDetail != null && mVideoDetail.getIs_follow() == 0) {
                         attention(true);
-                    } else if(mVideoDetail!=null){
+                    } else if (mVideoDetail != null) {
                         attention(false);
                     }
                 }
@@ -1316,16 +1436,22 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
 //                    startActivityForResult(it, REQUEST_LOGIN);
 //                }
 
+                if (mVideoDetail == null) {
+                    return;
+                }
+
                 if (User.getInstance() == null) {
-                    Intent it = new Intent(this, NewLoginActivity.class);
+//                    Intent it = new Intent(this, NewLoginActivity.class);
+//                    startActivityForResult(it, REQUEST_LOGIN);
+                    Intent it = new Intent(VideoDetailActivity.this, NewLoginActivity.class);
+                    it.putExtra("jump_url", ServerInfo.h5IP + "/videos/" + mVideoId);
                     startActivityForResult(it, REQUEST_LOGIN);
-                }else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+                } else if (User.getInstance() != null && TextUtils.isEmpty(User.getInstance().getPhone())) {
 
                     Intent it = new Intent(this, BindPhoneActivity.class);
                     //it.putExtra("hasLogined",true);
                     startActivity(it);
-                }
-                else {
+                } else {
                     mCommentDialog = new CircleDialog.Builder()
                             .setCanceledOnTouchOutside(false)
                             .setCancelable(true)
@@ -1343,6 +1469,13 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                                 }
                             })
                             .setNegative("取消", null)
+                            .configPositive(new ConfigButton() {
+                                @Override
+                                public void onConfig(ButtonParams params) {
+                                    //按钮字体颜色
+                                    params.textColor = CommonUtils.getThemeColor(VideoDetailActivity.this);
+                                }
+                            })
                             .setPositiveInput("发表", new OnInputClickListener() {
                                 @Override
                                 public void onClick(String text, View v) {
@@ -1372,6 +1505,9 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                     llm.scrollToPositionWithOffset(mPostContents != null ? 1 + mPostContents.size() : 1, 0);
                     llm.setStackFromEnd(false);
                 }
+                break;
+            case R.id.refresh:
+                getVideoDetail();
                 break;
 
         }

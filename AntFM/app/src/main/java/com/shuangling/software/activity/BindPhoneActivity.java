@@ -76,7 +76,7 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
     private String weixinOpenid;
     private String weixinNickname;
     private String weixinHeadimgurl;
-
+    private String mJumpUrl;
     private boolean hasLogined;
 
     @Override
@@ -99,7 +99,7 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
         weixinOpenid = getIntent().getStringExtra("openid");
         weixinNickname = getIntent().getStringExtra("nickname");
         weixinHeadimgurl = getIntent().getStringExtra("headimgurl");
-
+        mJumpUrl= getIntent().getStringExtra("jump_url");
         if (User.getInstance()!=null) {
             activityTitle.setCanBack(true);
             AppManager.clearActivity();
@@ -188,6 +188,7 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
                         it.putExtra("headimgurl", weixinHeadimgurl);
                         it.putExtra("openid", weixinOpenid);
                         it.putExtra("unionid", weixinUnionid);
+                        it.putExtra("jump_url", mJumpUrl);
                         startActivity(it);
 
                     } else if (jsonObject != null) {
@@ -267,6 +268,9 @@ public class BindPhoneActivity extends AppCompatActivity implements Handler.Call
         params.put("headimgurl", headimgurl);
         params.put("openid", openid);
         params.put("unionid", unionid);
+        params.put("from_url", SharedPreferencesUtils.getStringValue("from_url",null));
+        params.put("from_user_id", SharedPreferencesUtils.getStringValue("from_user_id",null));
+        params.put("jump_url", mJumpUrl);
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
             @Override

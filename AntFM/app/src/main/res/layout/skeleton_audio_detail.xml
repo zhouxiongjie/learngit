@@ -322,7 +322,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="相关推荐"
+        tools:text=""
         android:textColor="@color/black"
         android:textSize="@dimen/font_size_36px" />
 
@@ -351,7 +351,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="全部评论"
+            android:text=""
             android:textColor="@color/black"
             android:textSize="@dimen/font_size_36px"
             android:textStyle="bold" />
@@ -361,7 +361,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:text="(12)"
+            android:text=""
             android:textColor="@color/black"
             android:textSize="@dimen/font_size_36px"
             android:textStyle="bold" />

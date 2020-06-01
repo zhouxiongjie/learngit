@@ -23,8 +23,11 @@ import com.shuangling.software.entity.Comment;
 import com.shuangling.software.entity.VideoDetail;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
+import com.shuangling.software.utils.TimeUtil;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,13 +39,16 @@ import butterknife.ButterKnife;
  */
 public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.OnClickListener {
 
+    static final int DEFAULT_SHOW_CHILD_NUMBER=3;
 
     public static final int TYPE_HEAD = 0;                  //顶部点赞，收藏等布局
     public static final int TYPE_POST_VIDEO = 1;            //推荐视频
     public static final int TYPE_COMMENT_TOP = 2;           //评论头
     public static final int TYPE_NO_COMMENT = 3;            //评论空白页
-    public static final int TYPE_COMMENT = 4;               //评论
+    //public static final int TYPE_COMMENT = 4;               //评论
 
+    public static final int TYPE_COMMENT_ROOT = 4;     //一级评论
+    public static final int TYPE_COMMENT_CHILD = 5;    //二级评论
 
     private Context mContext;
     private LayoutInflater inflater;
@@ -56,7 +62,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
     private OnItemReply mOnItemReply;
     private VideoItemClickListener mVideoItemClickListener;
 
-
+    private Map<Integer,TypeAndData> mPositionTypeMap=new LinkedHashMap<>();
     public void setTotalComments(int totalComments) {
         this.mTotalComments = totalComments;
         notifyDataSetChanged();
@@ -144,16 +150,18 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
             return new CommentTopViewHolder(inflater.inflate(R.layout.video_comment_top, parent, false));
         } else if (viewType == TYPE_NO_COMMENT) {
             return new NoCommentViewHolder(inflater.inflate(R.layout.no_data_layout, parent, false));
-        } else {
-            return new CommentViewHolder(inflater.inflate(R.layout.comment_item, parent, false));
+        } else if (viewType == TYPE_COMMENT_ROOT) {
+            return new RootCommentViewHolder(inflater.inflate(R.layout.root_comment_item, parent, false));
+        }else{
+            return new ChildCommentViewHolder(inflater.inflate(R.layout.child_comment_item, parent, false));
         }
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
 
-
-        if (getItemViewType(position) == TYPE_HEAD) {
+        int type=getItemViewType(position);
+        if (type == TYPE_HEAD) {
             final HeadViewHolder viewHolder = (HeadViewHolder) holder;
             if (mVideoDetail != null) {
                 viewHolder.videoTitle.setText(mVideoDetail.getTitle());
@@ -223,7 +231,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
                 });
             }
 
-        } else if (getItemViewType(position) == TYPE_POST_VIDEO) {
+        } else if (type == TYPE_POST_VIDEO) {
 
 
             final ColumnContent content = mPostContents.get(position - 1);
@@ -252,7 +260,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
             }
 
 
-        } else if (getItemViewType(position) == TYPE_COMMENT_TOP) {
+        } else if (type == TYPE_COMMENT_TOP) {
             CommentTopViewHolder viewHolder = (CommentTopViewHolder) holder;
             if (mTotalComments == 0) {
                 viewHolder.commentNum.setText("");
@@ -261,41 +269,49 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
             }
 
 
-        } else if (getItemViewType(position) == TYPE_NO_COMMENT) {
+        } else if (type == TYPE_NO_COMMENT) {
 
 
-        } else {
-            final CommentViewHolder viewHolder = (CommentViewHolder) holder;
-            int pos = mPostContents != null ? position - 2 - mPostContents.size() : position - 2;
-            final Comment comment = mComments.get(pos);
+        } else if (type == TYPE_COMMENT_ROOT){
+            final RootCommentViewHolder vh = (RootCommentViewHolder) holder;
+            //int pos = mPostContents != null ? position - 2 - mPostContents.size() : position - 2;
+            final Comment comment = (Comment)mPositionTypeMap.get(position).data;
+
+
             if (!TextUtils.isEmpty(comment.getUser().getAvatar())) {
                 Uri uri = Uri.parse(comment.getUser().getAvatar());
-                int width = CommonUtils.dip2px(40);
+                int width = CommonUtils.dip2px(25);
                 int height = width;
-                ImageLoader.showThumb(uri, viewHolder.head, width, height);
-            }else{
-                ImageLoader.showThumb(viewHolder.head,R.drawable.ic_user1);
-            }
-            viewHolder.account.setText(comment.getUser().getNickname());
-            viewHolder.time.setText(comment.getCreated_at());
-
-
-            viewHolder.praiseSum.setText("" + comment.getLike_count());
-            if (comment.getFabulous() == 1) {
-                //viewHolder.praise.setTextColor(CommonUtils.getThemeColor(mContext));
-                viewHolder.praiseSum.setActivated(false);
+                ImageLoader.showThumb(uri, vh.head, width, height);
             } else {
-                //viewHolder.praise.setTextColor(mContext.getResources().getColor(R.color.textColorThree));
-                viewHolder.praiseSum.setActivated(true);
+                ImageLoader.showThumb(vh.head, R.drawable.ic_user1);
             }
+            vh.account.setText(comment.getUser().getNickname());
+            vh.time.setText(TimeUtil.formatDateTime(comment.getCreated_at()));
+
+
+
+            if(comment.getLike_count()>0){
+                vh.praiseSum.setText("" + comment.getLike_count());
+            }else{
+                vh.praiseSum.setText("");
+            }
+
+
+            if (comment.getFabulous() == 0) {
+                vh.praiseSum.setActivated(true);
+            } else {
+                vh.praiseSum.setActivated(false);
+            }
+            vh.comments.setText(comment.getText().getContent());
 
             if (comment.getDelete() == 0) {
                 //不可删除
-                viewHolder.delete.setVisibility(View.GONE);
+                vh.delete.setVisibility(View.GONE);
             } else {
-                viewHolder.delete.setVisibility(View.VISIBLE);
+                vh.delete.setVisibility(View.VISIBLE);
             }
-            viewHolder.delete.setOnClickListener(new View.OnClickListener() {
+            vh.delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mOnPraise != null) {
@@ -304,27 +320,122 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
                 }
             });
 
-            viewHolder.comments.setText(comment.getText().getContent());
+            //可省略
+            vh.reply.setText("回复");
+            vh.reply.setBackgroundResource(R.color.transparent);
 
 
-            if (comment.getComment_count() > 0) {
-                viewHolder.reply.setText(comment.getComment_count() + "回复");
-                viewHolder.reply.setBackgroundResource(R.drawable.write_comment_bg);
+            vh.reply.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    Intent it = new Intent(mContext, CommentDetailActivity.class);
+//                    it.putExtra("commentId", comment.getId());
+//                    mContext.startActivity(it);
+                    if(mOnItemReply!=null){
+                        mOnItemReply.replyItem(comment);
+                    }
+                }
+            });
+
+            vh.praiseSum.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mOnPraise != null) {
+                        mOnPraise.praiseItem(comment, v);
+                    }
+                }
+            });
+        }else if (type == TYPE_COMMENT_CHILD){
+            final ChildCommentViewHolder vh = (ChildCommentViewHolder) holder;
+            //int pos = mPostContents != null ? position - 2 - mPostContents.size() : position - 2;
+            final Comment comment = (Comment)mPositionTypeMap.get(position).data;
+
+            if (!TextUtils.isEmpty(comment.getUser().getAvatar())) {
+                Uri uri = Uri.parse(comment.getUser().getAvatar());
+                int width = CommonUtils.dip2px(25);
+                int height = width;
+                ImageLoader.showThumb(uri, vh.head, width, height);
             } else {
-                viewHolder.reply.setText("回复");
-                viewHolder.reply.setBackgroundResource(R.color.transparent);
+                ImageLoader.showThumb(vh.head, R.drawable.ic_user1);
+            }
+            vh.account.setText(comment.getUser().getNickname());
+            vh.time.setText(TimeUtil.formatDateTime(comment.getCreated_at()));
+
+
+
+            if(comment.getLike_count()>0){
+                vh.praiseSum.setText("" + comment.getLike_count());
+            }else{
+                vh.praiseSum.setText("");
             }
 
-            viewHolder.reply.setOnClickListener(new View.OnClickListener() {
+            if (comment.getFabulous() == 0) {
+                vh.praiseSum.setActivated(true);
+            } else {
+                vh.praiseSum.setActivated(false);
+            }
+            vh.comments.setText(comment.getText().getContent());
+
+            if (comment.getDelete() == 0) {
+                //不可删除
+                vh.delete.setVisibility(View.GONE);
+            } else {
+                vh.delete.setVisibility(View.VISIBLE);
+            }
+            vh.delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mOnPraise != null) {
+                        mOnPraise.deleteItem(comment, v);
+                    }
+                }
+            });
+
+            if (comment.getComment_count() > 0) {
+                vh.reply.setText(comment.getComment_count() + "回复");
+                vh.reply.setBackgroundResource(R.drawable.write_comment_bg);
+            } else {
+                vh.reply.setText("回复");
+                vh.reply.setBackgroundResource(R.color.transparent);
+            }
+
+            vh.reply.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent it = new Intent(mContext, CommentDetailActivity.class);
-                    it.putExtra("commentId", comment.getId());
+                    it.putExtra("commentId", ((Comment)mPositionTypeMap.get(position).parentData).getId());
+                    it.putExtra("scrollToCommentId", comment.getId());
                     mContext.startActivity(it);
                 }
             });
 
-            viewHolder.praiseSum.setOnClickListener(new View.OnClickListener() {
+            if(((Comment)mPositionTypeMap.get(position).parentData).isExpand()){
+                vh.showMore.setVisibility(View.GONE);
+            }else{
+
+                if(((Comment)mPositionTypeMap.get(position).parentData).getParent_comment().size()>DEFAULT_SHOW_CHILD_NUMBER&&((Comment)mPositionTypeMap.get(position).parentData).getParent_comment().get(DEFAULT_SHOW_CHILD_NUMBER-1).getId()==comment.getId()){
+                    vh.showMore.setText("查看全部"+((Comment)mPositionTypeMap.get(position).parentData).getParent_comment().size()+"条回复");
+                    vh.showMore.setVisibility(View.VISIBLE);
+                }else{
+                    vh.showMore.setVisibility(View.GONE);
+                }
+
+            }
+
+            vh.showMore.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    ((Comment)mPositionTypeMap.get(position).parentData).setExpand(true);
+//                    notifyDataSetChanged();
+
+                    Intent it = new Intent(mContext, CommentDetailActivity.class);
+                    it.putExtra("commentId", ((Comment)mPositionTypeMap.get(position).parentData).getId());
+                    it.putExtra("scrollToCommentId", comment.getId());
+                    mContext.startActivity(it);
+                }
+            });
+
+            vh.praiseSum.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mOnPraise != null) {
@@ -406,7 +517,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
         @BindView(R.id.noScriptText)
         TextView noScriptText;
         @BindView(R.id.noData)
-        LinearLayout noData;
+        RelativeLayout noData;
 
         NoCommentViewHolder(View view) {
             super(view);
@@ -415,11 +526,11 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
     }
 
 
-    class CommentViewHolder extends RecyclerView.ViewHolder {
+    class RootCommentViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.head)
         SimpleDraweeView head;
-        //        @BindView(R.id.praise)
-//        FontIconView praise;
+        //@BindView(R.id.praise)
+        //FontIconView praise;
         @BindView(R.id.praiseSum)
         TextView praiseSum;
         @BindView(R.id.delete)
@@ -433,7 +544,33 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
         @BindView(R.id.reply)
         TextView reply;
 
-        CommentViewHolder(View view) {
+        RootCommentViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
+    }
+
+    static class ChildCommentViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.head)
+        SimpleDraweeView head;
+        @BindView(R.id.praiseSum)
+        TextView praiseSum;
+        @BindView(R.id.account)
+        TextView account;
+        @BindView(R.id.comments)
+        ReadMoreTextView comments;
+        @BindView(R.id.time)
+        TextView time;
+        @BindView(R.id.circle)
+        SimpleDraweeView circle;
+        @BindView(R.id.reply)
+        TextView reply;
+        @BindView(R.id.delete)
+        ImageView delete;
+        @BindView(R.id.showMore)
+        TextView showMore;
+
+        ChildCommentViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
@@ -446,55 +583,121 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
         //评论头 +1
         //推荐size
         //评论size
-        int count = 2;
+//        int count = 2;
+//        if (mPostContents != null) {
+//            count += mPostContents.size();
+//        }
+//        if (mComments != null && mComments.size() > 0) {
+//            count += mComments.size();
+//        } else {
+//            count += 1;
+//        }
+//        return count;
+
+
+        int position=0;
+        mPositionTypeMap.clear();
+
+        //音频详情头 +1
+        //评论头 +1
+        //相关推荐size
+        //评论size
+        mPositionTypeMap.put(position,new TypeAndData(TYPE_HEAD,null,null));
         if (mPostContents != null) {
-            count += mPostContents.size();
+
+            for(int i=0;i<mPostContents.size();i++){
+                position++;
+                mPositionTypeMap.put(position,new TypeAndData(TYPE_POST_VIDEO,null,null));
+            }
+
         }
-        if (mComments != null && mComments.size() > 0) {
-            count += mComments.size();
+        position++;
+        mPositionTypeMap.put(position,new TypeAndData(TYPE_COMMENT_TOP,null,null));
+
+        if (mComments == null || mComments.size() == 0) {
+            position++;
+            mPositionTypeMap.put(position,new TypeAndData(TYPE_NO_COMMENT,null,null));
+
         } else {
-            count += 1;
+            for(int i=0;i<mComments.size();i++){
+                position++;
+                mPositionTypeMap.put(position,new TypeAndData(TYPE_COMMENT_ROOT,mComments.get(i),null));
+
+                if(mComments.get(i).getParent_comment()!=null&&mComments.get(i).getParent_comment().size()>0){
+                    if(mComments.get(i).isExpand()){
+                        for(int j=0;j<mComments.get(i).getParent_comment().size();j++){
+                            position++;
+                            mPositionTypeMap.put(position,new TypeAndData(TYPE_COMMENT_CHILD,mComments.get(i).getParent_comment().get(j),mComments.get(i)));
+                        }
+                    }else{
+                        for(int j=0;j<mComments.get(i).getParent_comment().size()&&j<DEFAULT_SHOW_CHILD_NUMBER;j++){
+                            position++;
+                            mPositionTypeMap.put(position,new TypeAndData(TYPE_COMMENT_CHILD,mComments.get(i).getParent_comment().get(j),mComments.get(i)));
+                        }
+                    }
+                }
+            }
         }
-        return count;
+        position++;
+        return position;
+
+
 
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
-            return TYPE_HEAD;
-        } else {
-            if (mPostContents != null) {
-                if (position <= mPostContents.size()) {
-                    return TYPE_POST_VIDEO;
-                } else {
-                    if (position == mPostContents.size() + 1) {
-                        return TYPE_COMMENT_TOP;
-                    } else if (position == mPostContents.size() + 2) {
-                        if (mComments == null || mComments.size() == 0) {
-                            return TYPE_NO_COMMENT;
-                        } else {
-                            return TYPE_COMMENT;
-                        }
-                    } else {
-                        return TYPE_COMMENT;
-                    }
-                }
-            } else {
-                if (position == 1) {
-                    return TYPE_COMMENT_TOP;
-                } else if (position == 2) {
-                    if (mComments == null || mComments.size() == 0) {
-                        return TYPE_NO_COMMENT;
-                    } else {
-                        return TYPE_COMMENT;
-                    }
-                } else {
-                    return TYPE_COMMENT;
-                }
-            }
-        }
+//        if (position == 0) {
+//            return TYPE_HEAD;
+//        } else {
+//            if (mPostContents != null) {
+//                if (position <= mPostContents.size()) {
+//                    return TYPE_POST_VIDEO;
+//                } else {
+//                    if (position == mPostContents.size() + 1) {
+//                        return TYPE_COMMENT_TOP;
+//                    } else if (position == mPostContents.size() + 2) {
+//                        if (mComments == null || mComments.size() == 0) {
+//                            return TYPE_NO_COMMENT;
+//                        } else {
+//                            return TYPE_COMMENT;
+//                        }
+//                    } else {
+//                        return TYPE_COMMENT;
+//                    }
+//                }
+//            } else {
+//                if (position == 1) {
+//                    return TYPE_COMMENT_TOP;
+//                } else if (position == 2) {
+//                    if (mComments == null || mComments.size() == 0) {
+//                        return TYPE_NO_COMMENT;
+//                    } else {
+//                        return TYPE_COMMENT;
+//                    }
+//                } else {
+//                    return TYPE_COMMENT;
+//                }
+//            }
+//        }
 
+        int viewType= mPositionTypeMap.get(position).type;
+        return viewType;
+
+    }
+
+
+    static class TypeAndData{
+
+        int type;
+        Object data;
+        Object parentData;
+
+        public TypeAndData(int type, Object data,Object parentData) {
+            this.type = type;
+            this.data = data;
+            this.parentData = parentData;
+        }
     }
 
 

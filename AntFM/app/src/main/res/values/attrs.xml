@@ -105,4 +105,11 @@
         <attr name="hvp_topOffset" format="dimension"/>
     </declare-styleable>
 
+
+    <declare-styleable name="SlideSelectView">
+        <attr name="circleCount" format="integer"/>
+        <attr name="sstextSize" format="dimension"/>
+
+    </declare-styleable>
+
 </resources>

@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
@@ -59,7 +60,7 @@ public class AttentionFragment extends Fragment implements Handler.Callback {
     SmartRefreshLayout refreshLayout;
     Unbinder unbinder;
     @BindView(R.id.noData)
-    LinearLayout noData;
+    RelativeLayout noData;
 
     private int mCategory;
     private String mOrganizationId;

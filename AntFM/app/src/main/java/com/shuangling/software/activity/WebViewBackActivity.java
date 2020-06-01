@@ -398,7 +398,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
                         it.putExtra("albumId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("3")) {
-                        Intent it = new Intent(WebViewBackActivity.this, ArticleDetailActivity.class);
+                        Intent it = new Intent(WebViewBackActivity.this, ArticleDetailActivity02.class);
                         it.putExtra("articleId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("4")) {

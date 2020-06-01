@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
@@ -187,7 +188,7 @@ public class CollectAdapter extends RecyclerView.Adapter implements View.OnClick
                         }
 
                     }else{
-                        Intent it = new Intent(mContext, ArticleDetailActivity.class);
+                        Intent it = new Intent(mContext, ArticleDetailActivity02.class);
                         it.putExtra("articleId", content.getId());
                         mContext.startActivity(it);
                     }

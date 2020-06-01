@@ -13,8 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
+import com.ethanhua.skeleton.Skeleton;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -60,12 +63,13 @@ public class CollectFragment extends Fragment implements Handler.Callback {
     SmartRefreshLayout refreshLayout;
     Unbinder unbinder;
     @BindView(R.id.noData)
-    LinearLayout noData;
+    RelativeLayout noData;
 
     private int mCategory;
     private String mOrganizationId;
     private List<Collect> mCollects=new ArrayList<>();
     private CollectAdapter mAdapter;
+    private RecyclerViewSkeletonScreen mSkeletonScreen;
     private Handler mHandler;
 
     public enum GetContent {
@@ -91,7 +95,7 @@ public class CollectFragment extends Fragment implements Handler.Callback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         EventBus.getDefault().register(this);
-        View view = inflater.inflate(R.layout.fragment_content, null);
+        View view = inflater.inflate(R.layout.fragment_collect, null);
         unbinder = ButterKnife.bind(this, view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
@@ -124,6 +128,18 @@ public class CollectFragment extends Fragment implements Handler.Callback {
 
 
     public void getContent(final GetContent getContent) {
+        if (getContent == GetContent.Normal) {
+            mSkeletonScreen =
+                    Skeleton.bind(recyclerView)
+                            .adapter(mAdapter)
+                            .shimmer(false)
+                            .angle(20)
+                            .frozen(false)
+                            .duration(3000)
+                            .count(10)
+                            .load(R.layout.item_skeleton_content)
+                            .show();
+        }
 
         String url = ServerInfo.serviceIP + ServerInfo.myCollect;
 
@@ -196,6 +212,10 @@ public class CollectFragment extends Fragment implements Handler.Callback {
                             } else if (getContent == GetContent.LoadMore) {
                                 if (refreshLayout.getState() == RefreshState.Loading) {
                                     refreshLayout.finishLoadMore();
+                                }
+                            }else{
+                                if(mSkeletonScreen!=null){
+                                    mSkeletonScreen.hide();
                                 }
                             }
                         }catch (Exception e){
@@ -287,6 +307,9 @@ public class CollectFragment extends Fragment implements Handler.Callback {
                             }
 
                         } else {
+                            if(mSkeletonScreen!=null){
+                                mSkeletonScreen.hide();
+                            }
                             mCollects=collects;
                         }
 

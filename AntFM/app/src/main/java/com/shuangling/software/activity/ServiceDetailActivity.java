@@ -347,7 +347,7 @@ public class ServiceDetailActivity extends AppCompatActivity implements Handler.
                         it.putExtra("albumId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("3")) {
-                        Intent it = new Intent(ServiceDetailActivity.this, ArticleDetailActivity.class);
+                        Intent it = new Intent(ServiceDetailActivity.this, ArticleDetailActivity02.class);
                         it.putExtra("articleId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("4")) {

@@ -198,7 +198,15 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
             @Override
             public void onClick(View v) {
                 if (mRadioDetail != null) {
-                    showShare(mRadioDetail.getChannel().getName(), mRadioDetail.getChannel().getDes(), mRadioDetail.getChannel().getLogo(), ServerInfo.h5IP + "/radios/" + mRadioDetail.getChannel().getId());
+                    String shareUrl=ServerInfo.h5IP + "/radios/" + mRadioDetail.getChannel().getId();
+                    String url;
+                    if(User.getInstance()!=null){
+                        url=shareUrl+"?from_user_id="+User.getInstance().getId()+"&from_url="+shareUrl;
+                    }else{
+                        url=shareUrl+"?from_url="+shareUrl;
+                    }
+
+                    showShare(mRadioDetail.getChannel().getName(), mRadioDetail.getChannel().getDes(), mRadioDetail.getChannel().getLogo(), url);
                     //shareTest();
                 }
 
@@ -528,7 +536,9 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
                                     if(User.getInstance()!=null){
                                         collect();
                                     }else {
-                                        startActivityForResult(new Intent(RadioDetailActivity.this, NewLoginActivity.class),REQUEST_LOGIN);
+                                        Intent it=new Intent(RadioDetailActivity.this, NewLoginActivity.class);
+                                        it.putExtra("jump_url",ServerInfo.h5IP + "/radios/"+mRadioId);
+                                        startActivityForResult(it,REQUEST_LOGIN);
                                     }
                                 }
                             });

@@ -21,6 +21,7 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
@@ -357,7 +358,7 @@ public class ColumnDecorateVideoContentAdapter extends RecyclerView.Adapter impl
                 }
             } else {
                 articleViewHolder.top.setVisibility(View.GONE);
-                if (content.getArticle().getCovers().size() > 0 && !TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
+                if (content.getArticle().getCovers()!=null&&content.getArticle().getCovers().size() > 0 && !TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
                     articleViewHolder.logo.setVisibility(View.VISIBLE);
 
                     int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
@@ -431,7 +432,7 @@ public class ColumnDecorateVideoContentAdapter extends RecyclerView.Adapter impl
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, ArticleDetailActivity.class);
+                    Intent it = new Intent(mContext, ArticleDetailActivity02.class);
                     it.putExtra("articleId", content.getId());
                     mContext.startActivity(it);
                 }
@@ -502,7 +503,7 @@ public class ColumnDecorateVideoContentAdapter extends RecyclerView.Adapter impl
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, ArticleDetailActivity.class);
+                    Intent it = new Intent(mContext, ArticleDetailActivity02.class);
                     it.putExtra("articleId", content.getId());
                     mContext.startActivity(it);
                 }

@@ -260,9 +260,14 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (refreshLayout.getState() == RefreshState.Refreshing) {
-                            refreshLayout.finishRefresh();
+                        try{
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
+                            }
+                        }catch (Exception e){
+
                         }
+
                     }
                 });
 
@@ -1590,7 +1595,8 @@ public class IndexFragment extends Fragment implements Handler.Callback {
 
 
                                 String[] ids= module.getData_source_id().split(",");
-                                final String columnId=ids[ids.length-1];
+                                //final String columnId=ids[ids.length-1];
+                                final String columnId=ids[0];
                                 more.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {

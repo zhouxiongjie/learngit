@@ -28,7 +28,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 @EnableDragToClose()
-public class CollectActivity extends AppCompatActivity {
+public class  CollectActivity extends AppCompatActivity {
 
     public static final String TAG = "HistoryActivity";
 

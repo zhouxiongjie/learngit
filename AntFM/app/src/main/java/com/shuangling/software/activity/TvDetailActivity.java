@@ -181,7 +181,14 @@ public class TvDetailActivity extends BaseAudioActivity implements Handler.Callb
             @Override
             public void onClick(View v) {
                 if (mRadioDetail != null) {
-                    showShare(mRadioDetail.getChannel().getName(), mRadioDetail.getChannel().getDes(), mRadioDetail.getChannel().getLogo(), ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId());
+
+                    String url;
+                    if(User.getInstance()!=null){
+                        url=ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId()+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId();
+                    }else{
+                        url=ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId()+"?from_url="+ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId();
+                    }
+                    showShare(mRadioDetail.getChannel().getName(), mRadioDetail.getChannel().getDes(), mRadioDetail.getChannel().getLogo(), url);
                     //shareTest();
                 }
 
@@ -505,7 +512,9 @@ public class TvDetailActivity extends BaseAudioActivity implements Handler.Callb
                 if (User.getInstance() != null) {
                     collect();
                 } else {
-                    startActivityForResult(new Intent(this, NewLoginActivity.class), REQUEST_LOGIN);
+                    Intent it=new Intent(this, NewLoginActivity.class);
+                    it.putExtra("jump_url",ServerInfo.h5IP+"/lives/"+mRadioId);
+                    startActivityForResult(it, REQUEST_LOGIN);
                 }
 
                 break;

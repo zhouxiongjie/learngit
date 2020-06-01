@@ -18,7 +18,7 @@ import com.shuangling.software.R;
 /**
  * 标题控件
  */
-public class TopTitleBar extends RelativeLayout {
+public class  TopTitleBar extends RelativeLayout {
 
     private String titleText;
     private boolean canBack;

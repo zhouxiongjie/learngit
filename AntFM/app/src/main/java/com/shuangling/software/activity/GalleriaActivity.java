@@ -291,6 +291,8 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
                     }else{
                         it.putExtra("bindPhone",true);
                     }
+                    it.putExtra("jump_url",ServerInfo.h5IP + "/atlas/"+mGalleriaId);
+
                     startActivityForResult(it, LOGIN_RESULT);
                 }
             });
@@ -312,6 +314,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
                     }else{
                         it.putExtra("bindPhone",true);
                     }
+                    it.putExtra("jump_url",ServerInfo.h5IP + "/atlas/"+mGalleriaId);
                     startActivityForResult(it, LOGIN_RESULT);
                 }
             });
@@ -341,7 +344,14 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    showShare();
+                    String shareUrl=ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId;
+                    String url;
+                    if(User.getInstance()!=null){
+                        url=shareUrl+"?from_user_id="+User.getInstance().getId()+"&from_url="+shareUrl;
+                    }else{
+                        url=shareUrl+"?from_url="+shareUrl;
+                    }
+                    showShare(url);
                 }
             });
         }
@@ -364,7 +374,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
                         it.putExtra("albumId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("3")) {
-                        Intent it = new Intent(GalleriaActivity.this, ArticleDetailActivity.class);
+                        Intent it = new Intent(GalleriaActivity.this, ArticleDetailActivity02.class);
                         it.putExtra("articleId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("4")) {
@@ -447,7 +457,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
     }
 
 
-    private void showShare() {
+    private void showShare(final String url) {
 
         if (mGalleria != null) {
             OnekeyShare oks = new OnekeyShare();
@@ -476,20 +486,20 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
                         if (mGalleria.getGallerie().getCovers().size() > 0) {
                             paramsToShare.setImageUrl(mGalleria.getGallerie().getCovers().get(0));
                         }
-                        paramsToShare.setText(mGalleria.getTitle() + ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId + "?app=android");
+                        paramsToShare.setText(mGalleria.getTitle() + url);
                     } else if (QQ.NAME.equals(platform.getName())) {
                         chanel = "3";
                         paramsToShare.setTitle(mGalleria.getTitle());
                         if (mGalleria.getGallerie().getCovers().size() > 0) {
                             paramsToShare.setImageUrl(mGalleria.getGallerie().getCovers().get(0));
                         }
-                        paramsToShare.setTitleUrl(ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId + "?app=android");
+                        paramsToShare.setTitleUrl(url);
                         paramsToShare.setText(mGalleria.getTitle());
 
                     } else if (Wechat.NAME.equals(platform.getName())) {
                         paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                         paramsToShare.setTitle(mGalleria.getTitle());
-                        paramsToShare.setUrl(ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId + "?app=android");
+                        paramsToShare.setUrl(url);
                         if (mGalleria.getGallerie().getCovers().size() > 0) {
                             paramsToShare.setImageUrl(mGalleria.getGallerie().getCovers().get(0));
                         }
@@ -497,19 +507,19 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
                     } else if (WechatMoments.NAME.equals(platform.getName())) {
                         paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                         paramsToShare.setTitle(mGalleria.getTitle());
-                        paramsToShare.setUrl(ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId + "?app=android");
+                        paramsToShare.setUrl(url);
                         if (mGalleria.getGallerie().getCovers().size() > 0) {
                             paramsToShare.setImageUrl(mGalleria.getGallerie().getCovers().get(0));
                         }
                     } else if (WechatFavorite.NAME.equals(platform.getName())) {
                         paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                         paramsToShare.setTitle(mGalleria.getTitle());
-                        paramsToShare.setUrl(ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId + "?app=android");
+                        paramsToShare.setUrl(url);
                         if (mGalleria.getGallerie().getCovers().size() > 0) {
                             paramsToShare.setImageUrl(mGalleria.getGallerie().getCovers().get(0));
                         }
                     }
-                    shareStatistics(chanel, "" + mGalleria.getId(), ServerInfo.h5IP + ServerInfo.getGalleriaPage + mGalleriaId + "?app=android");
+                    shareStatistics(chanel, "" + mGalleria.getId(), url);
 
                 }
             });

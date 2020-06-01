@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.sdk.android.utils.AlicloudTracker;
 import com.aliyun.apsara.alivclittlevideo.constants.AlivcLittleHttpConfig;
 import com.aliyun.apsara.alivclittlevideo.net.HttpEngine;
 import com.aliyun.apsara.alivclittlevideo.net.LittleHttpManager;
@@ -30,9 +32,12 @@ import com.aliyun.apsara.alivclittlevideo.view.video.videolist.AlivcVideoListVie
 import com.aliyun.player.source.VidAuth;
 import com.aliyun.player.source.VidSts;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerPortraitView;
+import com.ethanhua.skeleton.Skeleton;
 import com.hjq.toast.ToastUtils;
+import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.adapter.SmallVideoRecyclerViewAdapter;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.LiveInfo;
@@ -41,17 +46,22 @@ import com.shuangling.software.entity.SmallVideoBean;
 import com.shuangling.software.entity.StsInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.entity.VideoDetail;
+import com.shuangling.software.fragment.SmallVideoFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.ACache;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -74,7 +84,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
 
 
     private AlivcVideoPlayView videoPlayView;
-
+    private Column mColumn;
 
     private List<ColumnContent> mColumnContents = new ArrayList<>();
     private int mPageIndex = 1;
@@ -103,8 +113,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
        // newGuest();
         mColumnContents.addAll((List<ColumnContent>) getIntent().getSerializableExtra("smallVideos"));
         mVideoPosition = getIntent().getIntExtra("position",0);
-
-
+        mColumn = (Column) getIntent().getSerializableExtra("Column");
         getSts();
     }
     protected void initView() {
@@ -221,7 +230,6 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
 
                 }
 
-
             }
         });
 
@@ -255,6 +263,12 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onBackPressed() {
+        out();
+        //super.onBackPressed();
+    }
+
     private static class MyRefreshDataListener implements AlivcVideoListView.OnRefreshDataListener {
         WeakReference<AlivcLittleLiveActivity> weakReference;
 
@@ -284,7 +298,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
             }
             AlivcLittleLiveActivity activity = weakReference.get();
             if (activity != null) {
-               // activity.loadPlayList(activity.mPageIndex);
+                activity.getMoreContent();
                 activity.isRefreshData = false;
             }
         }
@@ -294,7 +308,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
 
             AlivcLittleLiveActivity activity = weakReference.get();
             if (activity != null) {
-                activity.willExitVideo();
+               // activity.willExitVideo();
             }
 
         }
@@ -320,10 +334,11 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
             case MotionEvent.ACTION_UP:
                 currentX = ev.getX();// 抬起时的坐标
                 currentY = ev.getY();
-
-                handleUpDownTouch();
+                handleTouch();
                 break;
         }
+
+
         return super.dispatchTouchEvent(ev);
     }
 
@@ -419,7 +434,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
             JSONObject jsonObject = JSONObject.parseObject(result);
             if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                 mStsInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), StsInfo.class);
-                getData();
+                setData(mColumnContents);
                 getVideoDetail(mVideoPosition);
 
             } else if (jsonObject != null) {
@@ -431,11 +446,82 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
 
     }
 
-    private void getData(){
+
+
+
+
+
+    //获取更多数据
+    public void getMoreContent() {
+
+        isRefreshData = false;
+        String url = ServerInfo.serviceIP + ServerInfo.getColumnContent + mColumn.getId();
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("limit", "" + Constant.PAGE_SIZE);
+        params.put("sorce_type", "0");
+        params.put("operation", "down");
+        params.put("publish_at", mColumnContents.size() > 0 ? mColumnContents.get(mColumnContents.size() - 1).getPublish_at() : "");
+        //params.put("mobile_source", "app");
+        params.put("order_by", "1");
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(AlivcLittleLiveActivity.this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+
+                try {
+                    String result = response;
+                    Log.d("content",result);
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        List<ColumnContent> columnContents=JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), ColumnContent.class);
+                        Iterator<ColumnContent> iterator = columnContents.iterator();
+                        while (iterator.hasNext()) {
+                            ColumnContent columnContent = iterator.next();
+                            if ( columnContent.getType()!=12) {
+                                iterator.remove();
+                            }
+                        }
+
+
+                        if(columnContents.size()<10){
+                            //没有更多
+                        }
+
+                        setData(columnContents);
+                        mColumnContents.addAll(columnContents);
+
+
+
+
+
+                    }else{
+
+                    }
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+            }
+        });
+
+    }
+
+
+    private void setData(List<ColumnContent> columnContents){
         mDatas = new ArrayList<SmallVideoBean>();
-        mRequestCount = mColumnContents.size() ;
-        for(int i = 0; i<mColumnContents.size(); i++) {
-            ColumnContent columnContent = mColumnContents.get(i);
+        mRequestCount = columnContents.size() ;
+        for(int i = 0; i<columnContents.size(); i++) {
+            ColumnContent columnContent = columnContents.get(i);
             if(columnContent.getVideo() != null && mStsInfo != null ){
 
                 VidSts vidSts = new VidSts();
@@ -466,15 +552,11 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
         AlivcLittleLiveActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 if (isRefreshData) {
                     videoPlayView.refreshVideoList(mDatas,mVideoPosition);
                 } else {
                     videoPlayView.addMoreData(mDatas);
                 }
-
-                 //videoPlayView.playVideoAtPostion(mVideoPosition);
-
             }
         });
 
@@ -824,8 +906,11 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
 
     }
 
+
+
+
     //判断上下滑动
-    public void handleUpDownTouch() {
+    public void handleTouch() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -834,36 +919,69 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if (currentY - oldY > 200) {
-                    Message message = new Message();
-                    message.what = 1;
-                    handler.sendMessage(message);
+
+
+
+                if(Math.abs(currentX- oldX) < Math.abs(currentY- oldY)){
+                    handleVerticalTouch();
+                }else{
+                   if(mVideoPosition == 0) {
+                       //当前是第一页
+                       handleHorizontalTouch();
+                   }
                 }
+
+
             }
         }).start();
     }
 
-    public void willExitVideo(){
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if (currentX - oldX > 200) {
-                    Message message = new Message();
-                    message.what = 1;
-                    handler.sendMessage(message);
-                }
-            }
-        }).start();
+    //垂直方向
+    public void handleVerticalTouch() {
+        if (currentY - oldY > 200) {
+            Message message = new Message();
+            message.what = 1;
+            handler.sendMessage(message);
+        }
     }
+
+    //水平方向
+    public void handleHorizontalTouch(){
+        if (currentX - oldX > 200) {
+            Message message = new Message();
+            message.what = 1;
+            handler.sendMessage(message);
+        }
+    }
+
+//    public void willExitVideo(){
+//
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    Thread.sleep(200);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                if (currentX - oldX > 200) {
+//                    Message message = new Message();
+//                    message.what = 1;
+//                    handler.sendMessage(message);
+//                }
+//            }
+//        }).start();
+//    }
 
     // 退出动画
     public void out() {
+
+        Intent intent = new Intent();
+        intent.putExtra("smallVideos", (Serializable) mColumnContents);
+        intent.putExtra("position",  mVideoPosition);
+        setResult(RESULT_OK, intent);
+
         finish();
         overridePendingTransition(0, R.anim.out);
     }

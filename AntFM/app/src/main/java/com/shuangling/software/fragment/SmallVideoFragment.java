@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +29,7 @@ import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlivcLittleLiveActivity;
 import com.shuangling.software.activity.SmallVideoContentActivity;
+import com.shuangling.software.adapter.SmallVideoRecyclerViewAdapter;
 import com.shuangling.software.adapter.SmallVideoRecyclerViewAdapter;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
@@ -69,13 +71,15 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
     public static final int MSG_GET_TYPE_CONTENT = 0x3;
 
     @BindView(R.id.recyclerView)
-    RecyclerView recyclerView;
+    RecyclerView mRecyclerView;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
     Unbinder unbinder;
     @BindView(R.id.noData)
     LinearLayout noData;
 
+    private int mVideoPosition = 0;//当前选中的视频位置
+    private GridLayoutManager mGridLayoutManager;
     private Column mColumn;
     private String mOrderBy = "1";
     private StsInfo mStsInfo;
@@ -92,7 +96,7 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
 
     private ACache mACache;
     private RecyclerViewSkeletonScreen mSkeletonScreen;
-    private List<RecyclerView> mContentRecyclerView = new ArrayList<>();
+    private List<RecyclerView> mContentmRecyclerView = new ArrayList<>();
     private LinearLayout mDecorateLayout;
 
     @Override
@@ -107,6 +111,18 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
         super.onCreate(savedInstanceState);
     }
 
+
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mColumnContents.clear();
+        mColumnContents.addAll((List<ColumnContent>) data.getSerializableExtra("smallVideos"));
+        mVideoPosition = data.getIntExtra("position",0);
+        mAdapter.notifyDataSetChanged();
+        mRecyclerView.scrollToPosition(mVideoPosition);
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -130,10 +146,10 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
             }
         });
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(),2);
+        mGridLayoutManager = new GridLayoutManager(getActivity(),2);
         mAdapter = new SmallVideoRecyclerViewAdapter(getActivity(),mColumnContents);
-        recyclerView.setLayoutManager(gridLayoutManager);
-        recyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(mGridLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.setOnItemClickListener(new SmallVideoRecyclerViewAdapter.OnItemClickListener() {
             @Override
@@ -148,13 +164,19 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
 
                 Intent intent = new Intent(getContext(), AlivcLittleLiveActivity.class);
                 intent.putExtra("smallVideos", (Serializable) mColumnContents);
+                intent.putExtra("Column", (Serializable) mColumn);
                 intent.putExtra("position",  position);
              //   intent.putExtra("sts", (Serializable)  mStsInfo);
-                startActivity(intent);
+                //startActivity(intent);
+
+                startActivityForResult(intent,1);
 
             }
 
         });
+
+
+
 
 
        // columnDecorateContent(GetContent.Normal);
@@ -170,95 +192,19 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
         }
     }
 
-    public void columnDecorateContent(final GetContent getContent) {
-
-        if (getContent == GetContent.Normal) {
-            mSkeletonScreen =
-                    Skeleton.bind(recyclerView)
-                            .shimmer(false)
-                            .frozen(false)
-                            .duration(3000)
-                            .color(R.color.shimmer_color)
-                            //.count(2)
-                            .load(R.layout.small_video_recycler_view_item)
-                            .show();
-        }
-        String url = ServerInfo.serviceIP + ServerInfo.columnDecorateContent + mColumn.getId();
-        Map<String, String> params = new HashMap<String, String>();
-
-        OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
-
-            @Override
-            public void onResponse(Call call, String response) throws IOException {
-
-
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        try{
-                            if (getContent == GetContent.Refresh) {
-                                if (refreshLayout.getState() == RefreshState.Refreshing) {
-                                    refreshLayout.finishRefresh();
-                                }
-                            } else {
-                                mSkeletonScreen.hide();
-                            }
-                        }catch (Exception e){
-
-                        }
-
-                    }
-                });
-
-                Message msg = Message.obtain();
-                msg.what = MSG_GET_COLUMN_DECORATE;
-                msg.obj = response;
-                mHandler.sendMessage(msg);
-
-            }
-
-            @Override
-            public void onFailure(Call call, Exception exception) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        try{
-                            if (getContent == GetContent.Refresh) {
-                                if (refreshLayout.getState() == RefreshState.Refreshing) {
-                                    refreshLayout.finishRefresh();
-                                }
-                            } else {
-                                mSkeletonScreen.hide();
-                            }
-                        }catch (Exception e){
-
-                        }
-
-                    }
-                });
-
-            }
-        });
-
-    }
-
-
-
 
 
     public void getContent(final GetContent getContent) {
 
         if (getContent == GetContent.Normal) {
             mSkeletonScreen =
-                    Skeleton.bind(recyclerView)
+                    Skeleton.bind(mRecyclerView)
                             .adapter(mAdapter)
                             .shimmer(false)
                             .angle(20)
                             .frozen(false)
                             .duration(3000)
-                            .count(10)
-                            .color(R.color.shimmer_color)
+                            .count(6)
                             .load(R.layout.small_video_recycler_view_item_skeleton)
                             .show();
         }
@@ -291,7 +237,7 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
                                 if (refreshLayout.getState() == RefreshState.Refreshing) {
                                     refreshLayout.finishRefresh();
                                 }
-                            } else {
+                            } else if(getContent == GetContent.Normal) {
                                 mSkeletonScreen.hide();
                             }
                         }catch (Exception e){
@@ -410,6 +356,7 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
                         }
 
 
+
                         if (msg.arg1 == GetContent.Refresh.ordinal()) {
                             //mColumnContents.clear();
                             mColumnContents.addAll(0, columnContents);
@@ -439,29 +386,13 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
                         } else {
                             noData.setVisibility(View.GONE);
                         }
-                        //加入缓存 前10条数据
-//                        if (mColumnContents.size()>0&&mColumnContents.size() <= 10) {
-//                            mACache.put(ServerInfo.serviceIP + ServerInfo.getColumnContent + mColumn.getId(), JSON.toJSONString(mColumnContents));
-//                        } else if(mColumnContents.size() > 10) {
-//                            List<ColumnContent> arr = mColumnContents.subList(0, 10);
-//                            mACache.put(ServerInfo.serviceIP + ServerInfo.getColumnContent + mColumn.getId(), JSON.toJSONString(arr));
-//                        }
 
-                        if (mAdapter == null) {
-                            mAdapter = new SmallVideoRecyclerViewAdapter(getContext(), mColumnContents);
-                            //设置添加或删除item时的动画，这里使用默认动画
-                            recyclerView.setItemAnimator(new DefaultItemAnimator());
-                            //设置适配器
-                            recyclerView.setAdapter(mAdapter);
 
-                        } else {
-                            //mAdapter.setData(mColumnContents);
-                            mAdapter.notifyDataSetChanged();
-                            if (msg.arg1 == GetContent.Refresh.ordinal()) {
-                                recyclerView.smoothScrollToPosition(0);
-                            }
 
+                        if (msg.arg1 == GetContent.Refresh.ordinal()) {
+                            mRecyclerView.smoothScrollToPosition(0);
                         }
+
 
                     }else{
                         if (msg.arg1 == GetContent.Refresh.ordinal()) {

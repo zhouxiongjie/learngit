@@ -116,6 +116,7 @@
         <activity
             android:name=".activity.ArticleDetailActivity02"
             android:screenOrientation="portrait"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize|stateHidden">
         </activity>
 

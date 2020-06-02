@@ -35,6 +35,7 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AnchorOrOrganizationDetailActivityH5;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.customview.FloatView;
@@ -364,7 +365,7 @@ public class FloatWindowUtil {
                             it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
                             mContext.startActivity(it);
                         }else {
-                            Intent it = new Intent(mContext, ArticleDetailActivity.class);
+                            Intent it = new Intent(mContext, ArticleDetailActivity02.class);
                             it.putExtra("articleId", audio.getArticleId());
                             mContext.startActivity(it);
                         }

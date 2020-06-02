@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
@@ -79,6 +80,17 @@ public class HistoryAdapter extends RecyclerView.Adapter implements View.OnClick
 
     public void setData(List<History> historys) {
         this.mHistorys = historys;
+        if(mEditorMode){
+
+            if(mItemSelected.length>0&&mHistorys.size()>=mItemSelected.length){
+                int[] temp=new int[mHistorys.size()];
+                for(int i=0;i<mItemSelected.length;i++){
+                    temp[i]=mItemSelected[i];
+                }
+                mItemSelected=temp;
+            }
+        }
+        notifyDataSetChanged();
 
     }
 
@@ -191,7 +203,7 @@ public class HistoryAdapter extends RecyclerView.Adapter implements View.OnClick
                         }
 
                     }else{
-                        Intent it = new Intent(mContext, ArticleDetailActivity.class);
+                        Intent it = new Intent(mContext, ArticleDetailActivity02.class);
                         it.putExtra("articleId", content.getPost_id());
                         mContext.startActivity(it);
                     }

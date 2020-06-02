@@ -185,6 +185,11 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                 verifyUserInfo();
 
                 String type=uri.getQueryParameter("type");
+                String fromUrl=uri.getQueryParameter("from_url");
+                String fromUserId=uri.getQueryParameter("from_user_id");
+                //保存fromUrl fromUserId到SharedPreferences
+                SharedPreferencesUtils.putPreferenceTypeValue("from_url", SharedPreferencesUtils.PreferenceType.String,fromUrl);
+                SharedPreferencesUtils.putPreferenceTypeValue("from_user_id", SharedPreferencesUtils.PreferenceType.String,fromUserId);
                 if(type.equals("1")){
                     //音频
                     Intent intent = new Intent(this, AudioDetailActivity.class);
@@ -199,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     startActivity(intent);
                 }else if(type.equals("3")){
                     //文章
-                    Intent intent = new Intent(this, ArticleDetailActivity.class);
+                    Intent intent = new Intent(this, ArticleDetailActivity02.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra("articleId", Integer.parseInt(uri.getQueryParameter("id")));
                     startActivity(intent);
@@ -221,6 +226,19 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra("galleriaId", Integer.parseInt(uri.getQueryParameter("id")));
                     startActivity(intent);
+                }else if(type.equals("98")){
+                    //机构
+                    Intent intent = new Intent(this, WebViewBackActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    it.putExtra("url", ServerInfo.h5HttpsIP + "/orgs/" + Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(it);
+                }else if(type.equals("99")){
+                    //主播
+
+                    Intent intent = new Intent(this, WebViewBackActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    it.putExtra("url", ServerInfo.h5HttpsIP + "/anchors/" + Integer.parseInt(uri.getQueryParameter("id")));
+                    startActivity(it);
                 }
 
 
@@ -246,6 +264,11 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
 
                 String type=uri.getQueryParameter("type");
+                String fromUrl=uri.getQueryParameter("from_url");
+                String fromUserId=uri.getQueryParameter("from_user_id");
+                //保存fromUrl fromUserId到SharedPreferences
+                SharedPreferencesUtils.putPreferenceTypeValue("from_url", SharedPreferencesUtils.PreferenceType.String,fromUrl);
+                SharedPreferencesUtils.putPreferenceTypeValue("from_user_id", SharedPreferencesUtils.PreferenceType.String,fromUserId);
                 if(type.equals("1")){
                     //音频
                     Intent intent = new Intent(this, AudioDetailActivity.class);
@@ -260,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     startActivity(intent);
                 }else if(type.equals("3")){
                     //文章
-                    Intent intent = new Intent(this, ArticleDetailActivity.class);
+                    Intent intent = new Intent(this, ArticleDetailActivity02.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra("articleId", Integer.parseInt(uri.getQueryParameter("id")));
                     startActivity(intent);

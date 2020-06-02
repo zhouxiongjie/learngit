@@ -2,6 +2,8 @@ package com.shuangling.software.utils;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothProfile;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -80,6 +82,8 @@ public class CommonUtils {
     public static final int NETWORKTYPE_INVALID = 0x3;
 
     private static AudioManager am;
+
+
     public static String getStoragePublicDirectory(String dirType) {
         String state = Environment.getExternalStorageState();
         Context context=MyApplication.getInstance();
@@ -864,6 +868,17 @@ public class CommonUtils {
     }
 
 
+
+    public static void closeInputMethod(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        boolean isOpen = imm.isActive();
+        if (isOpen) {
+            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);//没有显示则显示
+            //imm.hideSoftInputFromWindow(mobile_topup_num.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+
     public static void showKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) view.getContext()
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -1149,5 +1164,10 @@ public class CommonUtils {
         }
         return regular.substring(0, index);
     }
+
+
+
+
+
 
 }

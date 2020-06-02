@@ -105,6 +105,7 @@
         <attr name="hvp_topOffset" format="dimension"/>
     </declare-styleable>
 
+
     <declare-styleable name="CircleIndicator">
         <attr name="ci_width" format="dimension" />
         <attr name="ci_height" format="dimension" />
@@ -157,6 +158,12 @@
             <!-- Push object to the end of its container, not changing its size. -->
             <flag name="end" value="0x00800005" />
         </attr>
+    </declare-styleable>
+
+    <declare-styleable name="SlideSelectView">
+        <attr name="circleCount" format="integer"/>
+        <attr name="sstextSize" format="dimension"/>
+
 
     </declare-styleable>
 

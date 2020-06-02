@@ -38,7 +38,9 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
+import com.mylhyl.circledialog.callback.ConfigButton;
 import com.mylhyl.circledialog.callback.ConfigInput;
+import com.mylhyl.circledialog.params.ButtonParams;
 import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
 import com.shuangling.software.MyApplication;
@@ -683,6 +685,13 @@ public class SingleAudioDetailActivity extends AppCompatActivity implements Hand
                                 }
                             })
                             .setNegative("取消", null)
+                            .configPositive(new ConfigButton() {
+                                @Override
+                                public void onConfig(ButtonParams params) {
+                                    //按钮字体颜色
+                                    params.textColor = CommonUtils.getThemeColor(SingleAudioDetailActivity.this);
+                                }
+                            })
                             .setPositiveInput("发表", new OnInputClickListener() {
                                 @Override
                                 public void onClick(String text, View v) {

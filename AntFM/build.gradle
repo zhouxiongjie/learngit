@@ -7,6 +7,10 @@ buildscript {
 
         maven { url "http://mvn.mob.com/android" }
         maven { url 'https://dl.bintray.com/umsdk/release' }
+
+        maven { url 'https://jitpack.io' }
+
+
         maven {
             url 'http://maven.aliyun.com/nexus/content/repositories/releases/'
         }
@@ -16,11 +20,10 @@ buildscript {
         maven {
             url 'https://maven.aliyun.com/repository/google'
         }
-        maven { url 'https://jitpack.io' }
+
+
         google()
         jcenter()
-
-
 
     }
 

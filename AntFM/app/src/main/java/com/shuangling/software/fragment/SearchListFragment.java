@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -51,7 +52,7 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
     SmartRefreshLayout refreshLayout;
     Unbinder unbinder;
     @BindView(R.id.noData)
-    LinearLayout noData;
+    RelativeLayout noData;
 
     private Handler mHandler;
     private String mKeyword;

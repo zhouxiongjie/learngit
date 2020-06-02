@@ -426,6 +426,7 @@ public class AnchorOrOrganizationDetailActivityH5 extends AppCompatActivity impl
                     }else{
                         it.putExtra("bindPhone",true);
                     }
+
                     startActivityForResult(it, LOGIN_RESULT);
                 }
             });
@@ -499,7 +500,7 @@ public class AnchorOrOrganizationDetailActivityH5 extends AppCompatActivity impl
                         it.putExtra("albumId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("3")) {
-                        Intent it = new Intent(AnchorOrOrganizationDetailActivityH5.this, ArticleDetailActivity.class);
+                        Intent it = new Intent(AnchorOrOrganizationDetailActivityH5.this, ArticleDetailActivity02.class);
                         it.putExtra("articleId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("4")) {

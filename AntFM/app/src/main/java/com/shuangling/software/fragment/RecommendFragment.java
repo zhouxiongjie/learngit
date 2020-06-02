@@ -28,6 +28,7 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.BindPhoneActivity;
 import com.shuangling.software.activity.CityListActivity;
@@ -42,7 +43,6 @@ import com.shuangling.software.activity.SearchActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.TvDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
-import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.activity.WebViewBackActivity;
 import com.shuangling.software.dialog.CustomColumnDialog;
 import com.shuangling.software.entity.Column;
@@ -937,7 +937,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             Intent it = new Intent(getContext(), RadioListActivity.class);
             it.putExtra("type", "2");
             startActivity(it);
-        } else if (url.startsWith(ServerInfo.h5IP + "/radios/") || url.startsWith(ServerInfo.h5HttpsIP + "/radios/")) {
+        } else if (url.startsWith(ServerInfo.h5IP + "/lives/") || url.startsWith(ServerInfo.h5HttpsIP + "/lives/")) {
             String radioId = CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
             Intent it = new Intent(getContext(), TvDetailActivity.class);
             it.putExtra("radioId", Integer.parseInt(radioId));
@@ -952,19 +952,23 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             it.putExtra("radioId", Integer.parseInt(radioId));
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/gover") || url.startsWith(ServerInfo.h5HttpsIP + "/gover")) {
-            Intent it = new Intent(getContext(), WebViewActivity.class);
+            Intent it = new Intent(getContext(), WebViewBackActivity.class);
+            it.putExtra("title", title);
             it.putExtra("url", url);
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/dj") || url.startsWith(ServerInfo.h5HttpsIP + "/dj")) {
-            Intent it = new Intent(getContext(), WebViewActivity.class);
+            Intent it = new Intent(getContext(), WebViewBackActivity.class);
+            it.putExtra("title", title);
             it.putExtra("url", url);
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/interact") || url.startsWith(ServerInfo.h5HttpsIP + "/interact")) {
-            Intent it = new Intent(getContext(), WebViewActivity.class);
+            Intent it = new Intent(getContext(), WebViewBackActivity.class);
+            it.putExtra("title", title);
             it.putExtra("url", url);
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/guide") || url.startsWith(ServerInfo.h5HttpsIP + "/guide")) {
-            Intent it = new Intent(getContext(), WebViewActivity.class);
+            Intent it = new Intent(getContext(), WebViewBackActivity.class);
+            it.putExtra("title", title);
             it.putExtra("url", url);
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/cates/") || url.startsWith(ServerInfo.h5HttpsIP + "/cates/")) {
@@ -994,7 +998,8 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 //            it.putExtra("organizationId", Integer.parseInt(organizationId));
 //            startActivity(it);
 
-            Intent it = new Intent(getContext(), WebViewActivity.class);
+            Intent it = new Intent(getContext(), WebViewBackActivity.class);
+            it.putExtra("title", title);
             it.putExtra("url", ServerInfo.h5HttpsIP + "/orgs/" + organizationId);
             startActivity(it);
 
@@ -1003,8 +1008,9 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
 //            Intent it = new Intent(getContext(), AnchorDetailActivity.class);
 //            it.putExtra("anchorId", Integer.parseInt(anchorId));
 //            startActivity(it);
-            Intent it = new Intent(getContext(), WebViewActivity.class);
+            Intent it = new Intent(getContext(), WebViewBackActivity.class);
             it.putExtra("url", ServerInfo.h5HttpsIP + "/anchors/" + anchorId);
+            it.putExtra("title", title);
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/atlas/") || url.startsWith(ServerInfo.h5HttpsIP + "/atlas/")) {
             String galleriaId = CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
@@ -1023,7 +1029,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/posts/") || url.startsWith(ServerInfo.h5HttpsIP + "/posts/")) {
             String articleId = CommonUtils.getQuantity(url.substring(url.lastIndexOf("/") + 1));
-            Intent it = new Intent(getContext(), ArticleDetailActivity.class);
+            Intent it = new Intent(getContext(), ArticleDetailActivity02.class);
             it.putExtra("articleId", Integer.parseInt(articleId));
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/specials/") || url.startsWith(ServerInfo.h5HttpsIP + "/specials/")) {
@@ -1060,20 +1066,24 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             }
 
         } else if (url.startsWith(ServerInfo.h5IP + "/invitation-post") || url.startsWith(ServerInfo.h5HttpsIP + "/invitation-post")) {
-            Intent it = new Intent(getContext(), WebViewActivity.class);
+            Intent it = new Intent(getContext(), WebViewBackActivity.class);
             it.putExtra("url", url);
+            it.putExtra("title", title);
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/actrank") || url.startsWith(ServerInfo.h5HttpsIP + "/actrank")) {
-            Intent it = new Intent(getContext(), WebViewActivity.class);
+            Intent it = new Intent(getContext(), WebViewBackActivity.class);
             it.putExtra("url", url);
+            it.putExtra("title", title);
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/wish") || url.startsWith(ServerInfo.h5HttpsIP + "/wish")) {
-            Intent it = new Intent(getContext(), WebViewActivity.class);
+            Intent it = new Intent(getContext(), WebViewBackActivity.class);
             it.putExtra("url", url);
+            it.putExtra("title", title);
             startActivity(it);
         } else if (url.startsWith(ServerInfo.h5IP + "/actlist") || url.startsWith(ServerInfo.h5HttpsIP + "/actlist")) {
-            Intent it = new Intent(getContext(), WebViewActivity.class);
+            Intent it = new Intent(getContext(), WebViewBackActivity.class);
             it.putExtra("url", url);
+            it.putExtra("title", title);
             startActivity(it);
         } else {
             Intent it = new Intent(getContext(), WebViewBackActivity.class);

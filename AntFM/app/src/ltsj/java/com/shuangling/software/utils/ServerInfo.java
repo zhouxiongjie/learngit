@@ -4,10 +4,6 @@ public class ServerInfo {
 
 
 
-
-
-
-
 	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
 
 	public static String h5IP="http://www-cms-c.staging.slradio.cn";
@@ -21,6 +17,7 @@ public class ServerInfo {
     public static String emc="http://api-emc.staging.slradio.cn";
 
 	public static String vms="http://api-vms.staging.slradio.cn";
+
 
 
 //	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
@@ -244,5 +241,5 @@ public class ServerInfo {
 
 	public static String playAuth="/v1/playAuth";								//c端获取语音播报配置
 
-	public static String ossSts="/v1/vod_play_auth";								//c端获取oss临时凭证
+	public static String commentReplay ="/v2/parent_comments";
 }

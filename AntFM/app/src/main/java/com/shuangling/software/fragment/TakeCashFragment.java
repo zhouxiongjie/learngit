@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
@@ -64,7 +66,9 @@ public class TakeCashFragment extends Fragment implements Handler.Callback {
     SmartRefreshLayout refreshLayout;
     Unbinder unbinder;
     @BindView(R.id.noData)
-    LinearLayout noData;
+    RelativeLayout noData;
+    @BindView(R.id.noScriptText)
+    TextView noScriptText;
 
     private int mCategory;
     private String mOrganizationId;
@@ -92,9 +96,10 @@ public class TakeCashFragment extends Fragment implements Handler.Callback {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_content, null);
+        View view = inflater.inflate(R.layout.fragment_cash_income, null);
         EventBus.getDefault().register(this);
         unbinder = ButterKnife.bind(this, view);
+        noScriptText.setText("你还没有任何提现记录~");
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         //recyclerView.addItemDecoration(new MyItemDecoration());
         DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);

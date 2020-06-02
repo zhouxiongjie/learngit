@@ -33,6 +33,7 @@ import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
@@ -91,6 +92,9 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
 
     @BindView(R.id.webView)
     WebView webView;
+//    @BindView(R.id.activtyTitle)
+//    TopTitleBar activtyTitle;
+
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
 
@@ -548,7 +552,7 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
                         it.putExtra("albumId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("3")) {
-                        Intent it = new Intent(WebViewActivity.this, ArticleDetailActivity.class);
+                        Intent it = new Intent(WebViewActivity.this, ArticleDetailActivity02.class);
                         it.putExtra("articleId", Integer.parseInt(id));
                         startActivity(it);
                     } else if (type.equals("4")) {

@@ -22,7 +22,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
+import com.mylhyl.circledialog.callback.ConfigButton;
 import com.mylhyl.circledialog.callback.ConfigInput;
+import com.mylhyl.circledialog.params.ButtonParams;
 import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
 import com.shuangling.software.MyApplication;
@@ -72,6 +74,7 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
     LinearLayout bottom;
 
     private int mCommentId;
+    private int mScrollToCommentId;
     private Handler mHandler;
     private Comment mComment;
     private List<Comment> mReplyComment;
@@ -93,6 +96,7 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
     private void init() {
         mHandler = new Handler(this);
         mCommentId = getIntent().getIntExtra("commentId", 0);
+        mScrollToCommentId= getIntent().getIntExtra("scrollToCommentId", -1);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         //recyclerView.addItemDecoration(new MyItemDecoration());
         //recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
@@ -103,7 +107,7 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
     private void getComments() {
 
 
-        String url = ServerInfo.serviceIP + ServerInfo.getLevelTwoComentList;
+        String url = ServerInfo.serviceIP + ServerInfo.commentReplay;
         Map<String, String> params = new HashMap<>();
         params.put("id", "" + mCommentId);
         params.put("page", "" + 1);
@@ -228,11 +232,16 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
 
                     mComment = JSONObject.parseObject(jsonObject.getJSONObject("data").getJSONObject("chief").toJSONString(), Comment.class);
                     mReplyComment = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONObject("reply").getJSONArray("data").toJSONString(), Comment.class);
+                    recyclerView.setHasFixedSize(true);
+
 
 
                     if (mCommentListAdapter == null) {
                         mCommentListAdapter = new LevelTwoCommentAdapter(this, mReplyComment);
                         mCommentListAdapter.setTopComment(mComment);
+                        if(mScrollToCommentId!=-1){
+                            mCommentListAdapter.setScrollToCommentId(mScrollToCommentId);
+                        }
                         mCommentListAdapter.setOnItemReply(new LevelTwoCommentAdapter.OnItemReply() {
                             @Override
                             public void replyItem(final Comment comment) {
@@ -262,16 +271,24 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
                                                 }
                                             })
                                             .setNegative("取消", null)
+                                            .configPositive(new ConfigButton() {
+                                                @Override
+                                                public void onConfig(ButtonParams params) {
+                                                    //按钮字体颜色
+                                                    params.textColor = CommonUtils.getThemeColor(CommentDetailActivity.this);
+                                                }
+                                            })
                                             .setPositiveInput("发表", new OnInputClickListener() {
                                                 @Override
                                                 public void onClick(String text, View v) {
                                                     if (TextUtils.isEmpty(text)) {
                                                         ToastUtils.show("请输入内容");
                                                     } else {
-                                                        mCommentDialog.dismiss();
+
+                                                        CommonUtils.closeInputMethod(CommentDetailActivity.this);
                                                         //发送评论
                                                         writeComments(text, "" + comment.getId(), "" + mComment.getId());
-
+                                                        mCommentDialog.dismiss();
                                                     }
                                                 }
                                             })
@@ -310,6 +327,12 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
                                             }
                                         })
                                         .show(getSupportFragmentManager());
+                            }
+
+                            @Override
+                            public void scrollToPosition(int position) {
+
+                                ((LinearLayoutManager)recyclerView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
                             }
                         });
                         recyclerView.setAdapter(mCommentListAdapter);
@@ -378,10 +401,8 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
 
     @OnClick(R.id.writeComment)
     public void onViewClicked() {
-        if (User.getInstance() == null) {
-            Intent it = new Intent(this, LoginActivity.class);
-            startActivity(it);
-        }
+
+
         if (User.getInstance() == null) {
             Intent it = new Intent(this, NewLoginActivity.class);
             startActivity(it);
@@ -408,16 +429,24 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
                         }
                     })
                     .setNegative("取消", null)
+                    .configPositive(new ConfigButton() {
+                        @Override
+                        public void onConfig(ButtonParams params) {
+                            //按钮字体颜色
+                            params.textColor = CommonUtils.getThemeColor(CommentDetailActivity.this);
+                        }
+                    })
                     .setPositiveInput("发表", new OnInputClickListener() {
                         @Override
                         public void onClick(String text, View v) {
                             if (TextUtils.isEmpty(text)) {
                                 ToastUtils.show("请输入内容");
                             } else {
-                                mCommentDialog.dismiss();
+
+                                CommonUtils.closeInputMethod(CommentDetailActivity.this);
                                 //发送评论
                                 writeComments(text, "" + mComment.getId(), "" + mComment.getId());
-
+                                mCommentDialog.dismiss();
                             }
                         }
                     })

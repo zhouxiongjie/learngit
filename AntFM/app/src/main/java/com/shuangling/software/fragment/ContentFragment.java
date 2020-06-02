@@ -23,38 +23,26 @@ import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
 import com.ethanhua.skeleton.Skeleton;
+import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
-import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
-import com.shuangling.software.activity.AnchorDetailActivity;
-import com.shuangling.software.activity.ArticleDetailActivity;
-import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.ContentActivity;
-import com.shuangling.software.activity.GalleriaActivity;
-import com.shuangling.software.activity.MainActivity;
-import com.shuangling.software.activity.OrganizationDetailActivity;
-import com.shuangling.software.activity.RadioDetailActivity;
-import com.shuangling.software.activity.RadioListActivity;
-import com.shuangling.software.activity.SpecialDetailActivity;
-import com.shuangling.software.activity.TvDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
-import com.shuangling.software.activity.WebViewActivity;
-import com.shuangling.software.activity.WebViewBackActivity;
 import com.shuangling.software.adapter.ColumnAlbumContentAdapter;
 import com.shuangling.software.adapter.ColumnContentAdapter;
 import com.shuangling.software.adapter.ColumnDecorateContentAdapter;
@@ -86,9 +74,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import okhttp3.Call;
 
@@ -106,15 +96,23 @@ public class ContentFragment extends Fragment implements Handler.Callback {
     SmartRefreshLayout refreshLayout;
     Unbinder unbinder;
     @BindView(R.id.noData)
-    LinearLayout noData;
+    RelativeLayout noData;
+    @BindView(R.id.refresh)
+    TextView refresh;
+    @BindView(R.id.networkError)
+    RelativeLayout networkError;
+    @BindView(R.id.root)
+    RelativeLayout root;
 
     private Column mColumn;
     private String mOrderBy = "1";
-    private List<ColumnContent> mColumnContents=new ArrayList<>();
+    private List<ColumnContent> mColumnContents = new ArrayList<>();
     private ColumnDecorateContentAdapter mAdapter;
     private Handler mHandler;
     private boolean addInfoStream;
-    private boolean hasDecorate=false;
+    private boolean hasDecorate = false;
+
+
     public enum GetContent {
         Refresh,
         LoadMore,
@@ -123,8 +121,13 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
     private ACache mACache;
     private RecyclerViewSkeletonScreen mSkeletonScreen;
+    //private ViewSkeletonScreen mSkeletonScreen;
     private List<RecyclerView> mContentRecyclerView = new ArrayList<>();
     private LinearLayout mDecorateLayout;
+
+
+    private boolean mShouldHide = false;
+    private AtomicInteger mInterfaceNumber;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -134,7 +137,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
         mColumn = (Column) args.getSerializable("Column");
         mHandler = new Handler(this);
         EventBus.getDefault().register(this);
-        ClassicsFooter.REFRESH_FOOTER_NOTHING="没有更多了";
+        ClassicsFooter.REFRESH_FOOTER_NOTHING = "没有更多了";
         super.onCreate(savedInstanceState);
     }
 
@@ -172,12 +175,12 @@ public class ContentFragment extends Fragment implements Handler.Callback {
             divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_video_divider_drawable));
             recyclerView.addItemDecoration(divider);
             mAdapter.setIsVideo(true);
-        } else if(mColumn.getPost_type() == 9){
+        } else if (mColumn.getPost_type() == 9) {
             DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
             divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
             recyclerView.addItemDecoration(divider);
             mAdapter.setIsActivity(true);
-        }else{
+        } else {
             DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
             divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
             recyclerView.addItemDecoration(divider);
@@ -266,7 +269,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getEventBus(CommonEvent event) {
-        if(event.getEventName().equals("onFontSizeChanged")){
+        if (event.getEventName().equals("onFontSizeChanged")) {
             columnDecorateContent(GetContent.Normal);
         }
     }
@@ -281,9 +284,17 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                             .angle(20)
                             .frozen(false)
                             .duration(3000)
-                            .count(4)
-                            .load(R.layout.item_skeleton_content)
+                            //.count(4)
+                            .load(R.layout.skeleton_content)
                             .show();
+
+//            mSkeletonScreen = Skeleton.bind(root)
+//                    .load(R.layout.skeleton_content)
+//                    .shimmer(false)
+//                    .angle(20)
+//                    .duration(1000)
+//                    .color(R.color.shimmer_color)
+//                    .show();
         }
         String url = ServerInfo.serviceIP + ServerInfo.columnDecorateContent + mColumn.getId();
         Map<String, String> params = new HashMap<String, String>();
@@ -297,15 +308,18 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        try{
+                        try {
+                            mShouldHide = false;
+                            networkError.setVisibility(View.GONE);
                             if (getContent == GetContent.Refresh) {
                                 if (refreshLayout.getState() == RefreshState.Refreshing) {
                                     refreshLayout.finishRefresh();
                                 }
-                            } else {
-                                mSkeletonScreen.hide();
+                            } else if (getContent == GetContent.Normal) {
+                                //mSkeletonScreen.hide();
+                                mShouldHide = true;
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
 
                         }
 
@@ -325,15 +339,17 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                     @Override
                     public void run() {
 
-                        try{
+                        try {
+                            mShouldHide = false;
                             if (getContent == GetContent.Refresh) {
                                 if (refreshLayout.getState() == RefreshState.Refreshing) {
                                     refreshLayout.finishRefresh();
                                 }
-                            } else {
+                            } else if (getContent == GetContent.Normal) {
                                 mSkeletonScreen.hide();
+                                networkError.setVisibility(View.VISIBLE);
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
 
                         }
 
@@ -344,7 +360,6 @@ public class ContentFragment extends Fragment implements Handler.Callback {
         });
 
     }
-
 
 
     public void getContent(final GetContent getContent) {
@@ -383,6 +398,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
+
 //                mHandler.post(new Runnable() {
 //                    @Override
 //                    public void run() {
@@ -419,7 +435,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        try{
+                        try {
                             if (getContent == GetContent.Refresh) {
                                 if (refreshLayout.getState() == RefreshState.Refreshing) {
                                     refreshLayout.finishRefresh();
@@ -428,8 +444,14 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                 if (refreshLayout.getState() == RefreshState.Loading) {
                                     refreshLayout.finishLoadMore();
                                 }
+                            } else {
+                                if (mInterfaceNumber.decrementAndGet() == 0) {
+                                    if (mShouldHide) {
+                                        mSkeletonScreen.hide();
+                                    }
+                                }
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
 
                         }
 
@@ -442,17 +464,16 @@ public class ContentFragment extends Fragment implements Handler.Callback {
     }
 
 
-
     public void getDecorateContent(final int animated, final int orderBy, final int type, String columnId, String contentNumber, final int position) {
 
-        String url = ServerInfo.serviceIP + ServerInfo.indexDecorateContent ;
+        String url = ServerInfo.serviceIP + ServerInfo.indexDecorateContent;
         Map<String, String> params = new HashMap<String, String>();
         params.put("id", columnId);
-        params.put("type", ""+type);
+        params.put("type", "" + type);
         params.put("limit", contentNumber);
         params.put("sorce_type", "0");
         //params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
-        params.put("order_by", ""+orderBy);
+        params.put("order_by", "" + orderBy);
 
 
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
@@ -460,13 +481,22 @@ public class ContentFragment extends Fragment implements Handler.Callback {
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
-
+                if (mInterfaceNumber.decrementAndGet() == 0) {
+                    if (mShouldHide) {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mSkeletonScreen.hide();
+                            }
+                        });
+                    }
+                }
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_TYPE_CONTENT;
-                Bundle bundle=new Bundle();
-                bundle.putInt("type",type);
-                bundle.putInt("position",position);
-                bundle.putInt("animated",animated);
+                Bundle bundle = new Bundle();
+                bundle.putInt("type", type);
+                bundle.putInt("position", position);
+                bundle.putInt("animated", animated);
                 msg.setData(bundle);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
@@ -475,13 +505,28 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
             @Override
             public void onFailure(Call call, Exception exception) {
-
+                if (mInterfaceNumber.decrementAndGet() == 0) {
+                    if (mShouldHide) {
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mSkeletonScreen.hide();
+                            }
+                        });
+                    }
+                }
 
             }
         });
 
     }
 
+
+    @OnClick(R.id.refresh)
+    public void onViewClicked() {
+
+        columnDecorateContent(GetContent.Normal);
+    }
 
     @Override
     public void onDestroyView() {
@@ -502,21 +547,22 @@ public class ContentFragment extends Fragment implements Handler.Callback {
         switch (msg.what) {
             case MSG_UPDATE_LIST:
                 try {
+
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        List<ColumnContent> columnContents=JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), ColumnContent.class);
+                        List<ColumnContent> columnContents = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), ColumnContent.class);
                         Iterator<ColumnContent> iterator = columnContents.iterator();
                         while (iterator.hasNext()) {
                             ColumnContent columnContent = iterator.next();
-                            if (columnContent.getType()!=1&&
-                                    columnContent.getType()!=2&&
-                                    columnContent.getType()!=3&&
-                                    columnContent.getType()!=4&&
-                                    columnContent.getType()!=5&&
-                                    columnContent.getType()!=7&&
-                                    columnContent.getType()!=9&&
-                                    columnContent.getType()!=10) {
+                            if (columnContent.getType() != 1 &&
+                                    columnContent.getType() != 2 &&
+                                    columnContent.getType() != 3 &&
+                                    columnContent.getType() != 4 &&
+                                    columnContent.getType() != 5 &&
+                                    columnContent.getType() != 7 &&
+                                    columnContent.getType() != 9 &&
+                                    columnContent.getType() != 10) {
 
                                 iterator.remove();
 
@@ -533,10 +579,10 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                         } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
                             mColumnContents.addAll(columnContents);
                             if (refreshLayout.getState() == RefreshState.Loading) {
-                                if(columnContents==null||columnContents.size()==0){
+                                if (columnContents == null || columnContents.size() == 0) {
                                     //refreshLayout.setEnableLoadMore(false);
                                     refreshLayout.finishLoadMoreWithNoMoreData();
-                                }else{
+                                } else {
                                     refreshLayout.finishLoadMore();
                                 }
 
@@ -545,9 +591,16 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
                         } else {
                             mColumnContents = columnContents;
+
+                            if (mInterfaceNumber.decrementAndGet() == 0) {
+                                if (mShouldHide) {
+                                    mSkeletonScreen.hide();
+                                }
+                            }
+
                         }
 
-                        if (mColumnContents.size() == 0&&hasDecorate==false) {
+                        if (mColumnContents.size() == 0 && hasDecorate == false) {
                             noData.setVisibility(View.VISIBLE);
                         } else {
                             noData.setVisibility(View.GONE);
@@ -590,7 +643,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
                         }
 
-                    }else{
+                    } else {
                         if (msg.arg1 == GetContent.Refresh.ordinal()) {
                             if (refreshLayout.getState() == RefreshState.Refreshing) {
                                 refreshLayout.finishRefresh();
@@ -606,27 +659,35 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                 } catch (Exception e) {
                     e.printStackTrace();
 
+                } finally {
+                    if (mInterfaceNumber.decrementAndGet() == 0) {
+                        if (mShouldHide) {
+                            mSkeletonScreen.hide();
+                        }
+                    }
                 }
                 break;
             case MSG_GET_COLUMN_DECORATE:
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
+
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        JSONArray modules=jsonObject.getJSONObject("data").getJSONArray("modules");
-                        addInfoStream=true;
-                        if(modules!=null){
+                        JSONArray modules = jsonObject.getJSONObject("data").getJSONArray("modules");
+                        addInfoStream = true;
+                        mInterfaceNumber = new AtomicInteger(1);
+                        if (modules != null) {
 
                             List<DecorModule> decorModules = JSONObject.parseArray(modules.toJSONString(), DecorModule.class);
-                            Iterator<DecorModule> iterator=decorModules.iterator();
-                            while(iterator.hasNext()){
-                                DecorModule decorModule=iterator.next();
-                                if ((decorModule.getType()==1&&decorModule.getStatus()==0)||(decorModule.getType()==2&&decorModule.getStatus()==0)) {
+                            Iterator<DecorModule> iterator = decorModules.iterator();
+                            while (iterator.hasNext()) {
+                                DecorModule decorModule = iterator.next();
+                                if ((decorModule.getType() == 1 && decorModule.getStatus() == 0) || (decorModule.getType() == 2 && decorModule.getStatus() == 0)) {
                                     iterator.remove();
                                 }
                             }
-                            if(decorModules.size()>0){
-                                hasDecorate=true;
+                            if (decorModules.size() > 0) {
+                                hasDecorate = true;
                                 mContentRecyclerView.clear();
                                 mDecorateLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.content_decorate_layout, recyclerView, false);
                                 for (int i = 0; i < decorModules.size(); i++) {
@@ -658,21 +719,21 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                             public void onClick(View view) {
                                                 BannerInfo banner = (BannerInfo) view.getTag();
 
-                                                String url=banner.getUrl();
-                                                String title=banner.getTitle();
-                                                ((RecommendFragment)getParentFragment()).jumpTo(url,title);
+                                                String url = banner.getUrl();
+                                                String title = banner.getTitle();
+                                                ((RecommendFragment) getParentFragment()).jumpTo(url, title);
 
 
                                             }
                                         });
 
 
-                                    }else if (module.getType() == 2) {
+                                    } else if (module.getType() == 2) {
                                         //金刚区
 
-                                        final int cols=module.getCols();
-                                        final int flip=module.getPage_animated();
-                                        if(flip==1){
+                                        final int cols = module.getCols();
+                                        final int flip = module.getPage_animated();
+                                        if (flip == 1) {
                                             //翻页
                                             final ViewPager moduleViewPager = new ViewPager(getContext());
                                             moduleViewPager.setBackgroundResource(R.color.white);
@@ -699,7 +760,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                                     MyGridView gv = v.findViewById(R.id.gridView);
                                                     gv.setNumColumns(cols);
                                                     List<DecorModule.ContentsBean> contents = new ArrayList<>();
-                                                    for (int i = position * cols*2; i < (position + 1) * cols*2 && i < module.getContents().size(); i++) {
+                                                    for (int i = position * cols * 2; i < (position + 1) * cols * 2 && i < module.getContents().size(); i++) {
                                                         contents.add(module.getContents().get(i));
                                                     }
                                                     final MoudleGridViewAdapter adapter = new MoudleGridViewAdapter(getActivity(), contents);
@@ -707,24 +768,24 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                                     gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                                         @Override
                                                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                                            DecorModule.ContentsBean cb=adapter.getItem(position);
+                                                            DecorModule.ContentsBean cb = adapter.getItem(position);
 
-                                                            String url=cb.getSource_url();
-                                                            String title=cb.getTitle();
-                                                            ((RecommendFragment)getParentFragment()).jumpTo(url,title);
+                                                            String url = cb.getSource_url();
+                                                            String title = cb.getTitle();
+                                                            ((RecommendFragment) getParentFragment()).jumpTo(url, title);
 
 
                                                         }
                                                     });
                                                     v.setTag(position);
                                                     container.addView(v);
-                                                    if(position==0){
+                                                    if (position == 0) {
                                                         v.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                                                             @Override
                                                             public void onGlobalLayout() {
-                                                                int height=v.getHeight();
-                                                                ViewGroup.LayoutParams lp=moduleViewPager.getLayoutParams();
-                                                                lp.height=height;
+                                                                int height = v.getHeight();
+                                                                ViewGroup.LayoutParams lp = moduleViewPager.getLayoutParams();
+                                                                lp.height = height;
                                                                 moduleViewPager.setLayoutParams(lp);
                                                             }
                                                         });
@@ -739,7 +800,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
                                                 @Override
                                                 public int getCount() {
-                                                    return (module.getContents().size() + cols*2-1) / (cols*2);
+                                                    return (module.getContents().size() + cols * 2 - 1) / (cols * 2);
                                                 }
                                             };
 
@@ -764,7 +825,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                                 }
                                             };
                                             moduleViewPager.addOnPageChangeListener(pageChangeListener);
-                                        }else{
+                                        } else {
                                             //连续
                                             LayoutInflater inflater = LayoutInflater.from(getContext());
                                             View root = inflater.inflate(R.layout.index_module_layout, mDecorateLayout, false);
@@ -775,20 +836,20 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                             for (int j = 0; j < module.getContents().size(); j++) {
                                                 final DecorModule.ContentsBean content = module.getContents().get(j);
 
-                                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.getScreenWidth()/cols, LinearLayout.LayoutParams.WRAP_CONTENT);
-                                                params.gravity=Gravity.CENTER;
-                                                params.topMargin=CommonUtils.dip2px(20);
-                                                params.bottomMargin=CommonUtils.dip2px(20);
+                                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.getScreenWidth() / cols, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                                params.gravity = Gravity.CENTER;
+                                                params.topMargin = CommonUtils.dip2px(20);
+                                                params.bottomMargin = CommonUtils.dip2px(20);
                                                 View anchorView = LayoutInflater.from(getContext()).inflate(R.layout.anchor_gridview_item, moduleLayout, false);
                                                 TextView anchorName = anchorView.findViewById(R.id.anchorName);
                                                 SimpleDraweeView anchor = anchorView.findViewById(R.id.anchor);
 
 
-                                                if(!TextUtils.isEmpty(content.getCover())){
+                                                if (!TextUtils.isEmpty(content.getCover())) {
                                                     Uri uri = Uri.parse(content.getCover());
-                                                    int width=CommonUtils.dip2px(35);
-                                                    int height=width;
-                                                    ImageLoader.showThumb(uri,anchor,width,height);
+                                                    int width = CommonUtils.dip2px(35);
+                                                    int height = width;
+                                                    ImageLoader.showThumb(uri, anchor, width, height);
 
                                                 }
 
@@ -798,9 +859,9 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                                     @Override
                                                     public void onClick(View v) {
 
-                                                        String url=content.getSource_url();
-                                                        String title=content.getTitle();
-                                                        ((RecommendFragment)getParentFragment()).jumpTo(url,title);
+                                                        String url = content.getSource_url();
+                                                        String title = content.getTitle();
+                                                        ((RecommendFragment) getParentFragment()).jumpTo(url, title);
 
 
                                                     }
@@ -812,33 +873,31 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                         }
 
 
-
-
-                                    }else if (module.getType() == 15){
-                                        addInfoStream=false;
+                                    } else if (module.getType() == 15) {
+                                        addInfoStream = false;
                                         //视频
                                         LayoutInflater inflater = LayoutInflater.from(getContext());
                                         View clolumnLayout = inflater.inflate(R.layout.index_column_item, mDecorateLayout, false);
-                                        SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
+                                        SimpleDraweeView logo = clolumnLayout.findViewById(R.id.logo);
                                         TextView column = clolumnLayout.findViewById(R.id.column);
-                                        TextView more= clolumnLayout.findViewById(R.id.more);
-                                        ImageView divider=clolumnLayout.findViewById(R.id.divider);
+                                        TextView more = clolumnLayout.findViewById(R.id.more);
+                                        ImageView divider = clolumnLayout.findViewById(R.id.divider);
                                         more.setVisibility(View.GONE);
                                         column.setText(module.getTitle());
 
-                                        Station station=MyApplication.getInstance().getStation();
-                                        if(station!=null&&!TextUtils.isEmpty(station.getIcon3())){
+                                        Station station = MyApplication.getInstance().getStation();
+                                        if (station != null && !TextUtils.isEmpty(station.getIcon3())) {
                                             Uri uri = Uri.parse(station.getIcon3());
-                                            int width=CommonUtils.dip2px(9);
-                                            int height=width*2;
-                                            ImageLoader.showThumb(uri,logo,width,height);
-                                        }else{
+                                            int width = CommonUtils.dip2px(9);
+                                            int height = width * 2;
+                                            ImageLoader.showThumb(uri, logo, width, height);
+                                        } else {
                                             logo.setVisibility(View.GONE);
                                         }
 
 
-                                        String[] ids= module.getData_source_id().split(",");
-                                        final String columnId=ids[ids.length-1];
+                                        String[] ids = module.getData_source_id().split(",");
+                                        final String columnId = ids[ids.length - 1];
                                         more.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
@@ -848,37 +907,38 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                         RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);
 
                                         mContentRecyclerView.add(recyclerView);
-                                        if(mDecorateLayout.getChildCount()==0){
+                                        if (mDecorateLayout.getChildCount() == 0) {
                                             divider.setVisibility(View.GONE);
                                         }
                                         mDecorateLayout.addView(clolumnLayout);
-                                        getDecorateContent(module.getAnimated(),module.getOrder_by(),4,columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
+                                        mInterfaceNumber.incrementAndGet();
+                                        getDecorateContent(module.getAnimated(), module.getOrder_by(), 4, columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
 
-                                    }else if (module.getType() == 16){
+                                    } else if (module.getType() == 16) {
                                         //音频
-                                        addInfoStream=false;
+                                        addInfoStream = false;
                                         LayoutInflater inflater = LayoutInflater.from(getContext());
                                         View clolumnLayout = inflater.inflate(R.layout.index_column_item, mDecorateLayout, false);
-                                        SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
+                                        SimpleDraweeView logo = clolumnLayout.findViewById(R.id.logo);
                                         TextView column = clolumnLayout.findViewById(R.id.column);
-                                        TextView more= clolumnLayout.findViewById(R.id.more);
-                                        ImageView divider=clolumnLayout.findViewById(R.id.divider);
+                                        TextView more = clolumnLayout.findViewById(R.id.more);
+                                        ImageView divider = clolumnLayout.findViewById(R.id.divider);
                                         more.setVisibility(View.GONE);
                                         column.setText(module.getTitle());
 
-                                        Station station=MyApplication.getInstance().getStation();
-                                        if(station!=null&&!TextUtils.isEmpty(station.getIcon3())){
+                                        Station station = MyApplication.getInstance().getStation();
+                                        if (station != null && !TextUtils.isEmpty(station.getIcon3())) {
                                             Uri uri = Uri.parse(station.getIcon3());
-                                            int width=CommonUtils.dip2px(9);
-                                            int height=width*2;
-                                            ImageLoader.showThumb(uri,logo,width,height);
-                                        }else{
+                                            int width = CommonUtils.dip2px(9);
+                                            int height = width * 2;
+                                            ImageLoader.showThumb(uri, logo, width, height);
+                                        } else {
                                             logo.setVisibility(View.GONE);
                                         }
 
 
-                                        String[] ids= module.getData_source_id().split(",");
-                                        final String columnId=ids[ids.length-1];
+                                        String[] ids = module.getData_source_id().split(",");
+                                        final String columnId = ids[ids.length - 1];
                                         more.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
@@ -888,37 +948,38 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                         RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);
 
                                         mContentRecyclerView.add(recyclerView);
-                                        if(mDecorateLayout.getChildCount()==0){
+                                        if (mDecorateLayout.getChildCount() == 0) {
                                             divider.setVisibility(View.GONE);
                                         }
                                         mDecorateLayout.addView(clolumnLayout);
-                                        getDecorateContent(module.getAnimated(),module.getOrder_by(),2,columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
+                                        mInterfaceNumber.incrementAndGet();
+                                        getDecorateContent(module.getAnimated(), module.getOrder_by(), 2, columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
 
-                                    }else if (module.getType() == 17){
+                                    } else if (module.getType() == 17) {
                                         //文章
-                                        addInfoStream=false;
+                                        addInfoStream = false;
                                         LayoutInflater inflater = LayoutInflater.from(getContext());
                                         View clolumnLayout = inflater.inflate(R.layout.index_column_item, mDecorateLayout, false);
-                                        SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
+                                        SimpleDraweeView logo = clolumnLayout.findViewById(R.id.logo);
                                         TextView column = clolumnLayout.findViewById(R.id.column);
-                                        TextView more= clolumnLayout.findViewById(R.id.more);
-                                        ImageView divider=clolumnLayout.findViewById(R.id.divider);
+                                        TextView more = clolumnLayout.findViewById(R.id.more);
+                                        ImageView divider = clolumnLayout.findViewById(R.id.divider);
                                         more.setVisibility(View.GONE);
                                         column.setText(module.getTitle());
 
-                                        Station station=MyApplication.getInstance().getStation();
-                                        if(station!=null&&!TextUtils.isEmpty(station.getIcon3())){
+                                        Station station = MyApplication.getInstance().getStation();
+                                        if (station != null && !TextUtils.isEmpty(station.getIcon3())) {
                                             Uri uri = Uri.parse(station.getIcon3());
-                                            int width=CommonUtils.dip2px(9);
-                                            int height=width*2;
-                                            ImageLoader.showThumb(uri,logo,width,height);
-                                        }else{
+                                            int width = CommonUtils.dip2px(9);
+                                            int height = width * 2;
+                                            ImageLoader.showThumb(uri, logo, width, height);
+                                        } else {
                                             logo.setVisibility(View.GONE);
                                         }
 
 
-                                        String[] ids= module.getData_source_id().split(",");
-                                        final String columnId=ids[ids.length-1];
+                                        String[] ids = module.getData_source_id().split(",");
+                                        final String columnId = ids[ids.length - 1];
                                         more.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
@@ -929,37 +990,38 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
                                         mContentRecyclerView.add(recyclerView);
 
-                                        if(mDecorateLayout.getChildCount()==0){
+                                        if (mDecorateLayout.getChildCount() == 0) {
                                             divider.setVisibility(View.GONE);
                                         }
                                         mDecorateLayout.addView(clolumnLayout);
-                                        getDecorateContent(module.getAnimated(),module.getOrder_by(),3,columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
+                                        mInterfaceNumber.incrementAndGet();
+                                        getDecorateContent(module.getAnimated(), module.getOrder_by(), 3, columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
 
-                                    }else if (module.getType() == 18){
+                                    } else if (module.getType() == 18) {
                                         //图集
-                                        addInfoStream=false;
+                                        addInfoStream = false;
                                         LayoutInflater inflater = LayoutInflater.from(getContext());
                                         View clolumnLayout = inflater.inflate(R.layout.index_column_item, mDecorateLayout, false);
-                                        SimpleDraweeView logo=clolumnLayout.findViewById(R.id.logo);
+                                        SimpleDraweeView logo = clolumnLayout.findViewById(R.id.logo);
                                         TextView column = clolumnLayout.findViewById(R.id.column);
-                                        TextView more= clolumnLayout.findViewById(R.id.more);
-                                        ImageView divider=clolumnLayout.findViewById(R.id.divider);
+                                        TextView more = clolumnLayout.findViewById(R.id.more);
+                                        ImageView divider = clolumnLayout.findViewById(R.id.divider);
                                         more.setVisibility(View.GONE);
                                         column.setText(module.getTitle());
 
-                                        Station station=MyApplication.getInstance().getStation();
-                                        if(station!=null&&!TextUtils.isEmpty(station.getIcon3())){
+                                        Station station = MyApplication.getInstance().getStation();
+                                        if (station != null && !TextUtils.isEmpty(station.getIcon3())) {
                                             Uri uri = Uri.parse(station.getIcon3());
-                                            int width=CommonUtils.dip2px(9);
-                                            int height=width*2;
-                                            ImageLoader.showThumb(uri,logo,width,height);
-                                        }else{
+                                            int width = CommonUtils.dip2px(9);
+                                            int height = width * 2;
+                                            ImageLoader.showThumb(uri, logo, width, height);
+                                        } else {
                                             logo.setVisibility(View.GONE);
                                         }
 
 
-                                        String[] ids= module.getData_source_id().split(",");
-                                        final String columnId=ids[ids.length-1];
+                                        String[] ids = module.getData_source_id().split(",");
+                                        final String columnId = ids[ids.length - 1];
                                         more.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
@@ -969,21 +1031,17 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                         RecyclerView recyclerView = clolumnLayout.findViewById(R.id.recyclerView);
 
                                         mContentRecyclerView.add(recyclerView);
-                                        if(mDecorateLayout.getChildCount()==0){
+                                        if (mDecorateLayout.getChildCount() == 0) {
                                             divider.setVisibility(View.GONE);
                                         }
                                         mDecorateLayout.addView(clolumnLayout);
-                                        getDecorateContent(module.getAnimated(),module.getOrder_by(),7,columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
+                                        mInterfaceNumber.incrementAndGet();
+                                        getDecorateContent(module.getAnimated(), module.getOrder_by(), 7, columnId, "" + module.getContent_number(), mContentRecyclerView.size() - 1);
 
                                     }
 
 
-
-
-
-
                                 }
-
 
 
                                 mAdapter.addDecorateLayout(mDecorateLayout);
@@ -991,7 +1049,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                             }
 
                         }
-                        if(addInfoStream==true){
+                        if (addInfoStream == true) {
                             getContent(GetContent.Normal);
                             refreshLayout.setEnableLoadMore(true);
                             refreshLayout.setOnRefreshListener(new OnRefreshListener() {
@@ -1001,7 +1059,12 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                     getContent(GetContent.Refresh);
                                 }
                             });
-                        }else{
+                        } else {
+                            if (mInterfaceNumber.decrementAndGet() == 0) {
+                                if (mShouldHide) {
+                                    mSkeletonScreen.hide();
+                                }
+                            }
                             refreshLayout.setEnableLoadMore(false);
                             refreshLayout.setOnRefreshListener(new OnRefreshListener() {
                                 @Override
@@ -1013,56 +1076,59 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                         }
 
 
-
+                    } else {
+                        if (mShouldHide) {
+                            mSkeletonScreen.hide();
+                        }
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
-            case MSG_GET_TYPE_CONTENT:{
+            case MSG_GET_TYPE_CONTENT: {
                 try {
                     String result = (String) msg.obj;
                     JSONObject jo = JSONObject.parseObject(result);
                     int position = msg.getData().getInt("position");
-                    int animated=msg.getData().getInt("animated");
-                    int type=msg.getData().getInt("type");
+                    int animated = msg.getData().getInt("animated");
+                    int type = msg.getData().getInt("type");
 
-                    if(type==4){
+                    if (type == 4) {
                         if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
                             List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
-                            if(animated==3){
+                            if (animated == 3) {
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
-                                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)recyclerView.getLayoutParams();
-                                lp.leftMargin=CommonUtils.dip2px(5);
-                                lp.rightMargin=CommonUtils.dip2px(5);
+                                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) recyclerView.getLayoutParams();
+                                lp.leftMargin = CommonUtils.dip2px(5);
+                                lp.rightMargin = CommonUtils.dip2px(5);
                                 recyclerView.setLayoutParams(lp);
                                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
-                                ColumnDecorateVideoContentAdapter adapter = new ColumnDecorateVideoContentAdapter(getContext(), recyclerView,columnContents);
+                                ColumnDecorateVideoContentAdapter adapter = new ColumnDecorateVideoContentAdapter(getContext(), recyclerView, columnContents);
                                 recyclerView.setAdapter(adapter);
-                            }else if(animated==4){
+                            } else if (animated == 4) {
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
-                                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)recyclerView.getLayoutParams();
-                                lp.leftMargin=CommonUtils.dip2px(5);
-                                lp.rightMargin=CommonUtils.dip2px(5);
+                                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) recyclerView.getLayoutParams();
+                                lp.leftMargin = CommonUtils.dip2px(5);
+                                lp.rightMargin = CommonUtils.dip2px(5);
                                 recyclerView.setLayoutParams(lp);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
                                 recyclerView.setLayoutManager(manager);
-                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
-                                final ColumnDecorateVideoContentAdapter adapter = new ColumnDecorateVideoContentAdapter(getContext(),recyclerView, columnContents);
+                                final ColumnDecorateVideoContentAdapter adapter = new ColumnDecorateVideoContentAdapter(getContext(), recyclerView, columnContents);
                                 manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                                     @Override
                                     public int getSpanSize(int position) {
                                         int size = adapter.getItemCount();
-                                        if ((position+1) %2== 0) {
+                                        if ((position + 1) % 2 == 0) {
                                             return 1;
-                                        } else if((position+1)==size){
+                                        } else if ((position + 1) == size) {
                                             return 2;
-                                        }else {
+                                        } else {
                                             return 1;
                                         }
                                     }
@@ -1070,57 +1136,57 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
                                 recyclerView.setAdapter(adapter);
 
-                            }else if(animated==7){
+                            } else if (animated == 7) {
                                 //1+4
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
-                                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)recyclerView.getLayoutParams();
-                                lp.leftMargin=CommonUtils.dip2px(5);
-                                lp.rightMargin=CommonUtils.dip2px(5);
+                                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) recyclerView.getLayoutParams();
+                                lp.leftMargin = CommonUtils.dip2px(5);
+                                lp.rightMargin = CommonUtils.dip2px(5);
                                 recyclerView.setLayoutParams(lp);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 2);
                                 recyclerView.setLayoutManager(manager);
-                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
-                                final ColumnDecorateVideoContentAdapter adapter = new ColumnDecorateVideoContentAdapter(getContext(),recyclerView, columnContents);
+                                final ColumnDecorateVideoContentAdapter adapter = new ColumnDecorateVideoContentAdapter(getContext(), recyclerView, columnContents);
                                 manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                                     @Override
                                     public int getSpanSize(int position) {
                                         int size = adapter.getItemCount();
-                                        int page=size/5;
-                                        if (page>0&&(position+1)<=5*page) {
-                                            if((position+1)%5==1){
+                                        int page = size / 5;
+                                        if (page > 0 && (position + 1) <= 5 * page) {
+                                            if ((position + 1) % 5 == 1) {
                                                 return 2;
-                                            }else{
+                                            } else {
                                                 return 1;
                                             }
-                                        } else{
-                                            if(size%5==1){
-                                                if((position+1)%5==1){
+                                        } else {
+                                            if (size % 5 == 1) {
+                                                if ((position + 1) % 5 == 1) {
                                                     return 2;
                                                 }
-                                            }else if(size%5==2){
-                                                if((position+1)%5==1){
+                                            } else if (size % 5 == 2) {
+                                                if ((position + 1) % 5 == 1) {
                                                     return 2;
-                                                }else if((position+1)%5==2){
+                                                } else if ((position + 1) % 5 == 2) {
                                                     return 2;
                                                 }
-                                            }else if(size%5==3){
-                                                if((position+1)%5==1){
+                                            } else if (size % 5 == 3) {
+                                                if ((position + 1) % 5 == 1) {
                                                     return 2;
-                                                }else if((position+1)%5==2){
+                                                } else if ((position + 1) % 5 == 2) {
                                                     return 1;
-                                                }else if((position+1)%5==3){
+                                                } else if ((position + 1) % 5 == 3) {
                                                     return 1;
                                                 }
-                                            }else if(size%5==4){
-                                                if((position+1)%5==1){
+                                            } else if (size % 5 == 4) {
+                                                if ((position + 1) % 5 == 1) {
                                                     return 2;
-                                                }else if((position+1)%5==2){
+                                                } else if ((position + 1) % 5 == 2) {
                                                     return 1;
-                                                }else if((position+1)%5==3){
+                                                } else if ((position + 1) % 5 == 3) {
                                                     return 1;
-                                                }else if((position+1)%5==4){
+                                                } else if ((position + 1) % 5 == 4) {
                                                     return 2;
                                                 }
                                             }
@@ -1130,16 +1196,16 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                 });
 
                                 recyclerView.setAdapter(adapter);
-                            }else if(animated==8){
+                            } else if (animated == 8) {
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
                                 LayoutInflater inflater = LayoutInflater.from(getContext());
                                 View anchorLayout = inflater.inflate(R.layout.index_scrollview_column_layout, null, false);
-                                LinearLayout videoLayout= anchorLayout.findViewById(R.id.contentLayout);
+                                LinearLayout videoLayout = anchorLayout.findViewById(R.id.contentLayout);
 
                                 for (int i = 0; i < columnContents.size(); i++) {
                                     final ColumnContent content = columnContents.get(i);
 
-                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((CommonUtils.getScreenWidth()-CommonUtils.dip2px(10))*2/5, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((CommonUtils.getScreenWidth() - CommonUtils.dip2px(10)) * 2 / 5, LinearLayout.LayoutParams.WRAP_CONTENT);
 
 //                                int margin = CommonUtils.dip2px(10);
 //                                params.setMargins(margin, margin, margin, margin);
@@ -1149,14 +1215,14 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                     TextView duration = anchorView.findViewById(R.id.duration);
 
                                     videoTitle.setText(content.getTitle());
-                                    if(content.getVideo()!=null&&!TextUtils.isEmpty(content.getVideo().getDuration())){
+                                    if (content.getVideo() != null && !TextUtils.isEmpty(content.getVideo().getDuration())) {
                                         duration.setText(CommonUtils.getShowTime((long) Float.parseFloat(content.getVideo().getDuration()) * 1000));
-                                    }else{
+                                    } else {
                                         duration.setText("00:00");
                                     }
                                     if (!TextUtils.isEmpty(content.getCover())) {
                                         Uri uri = Uri.parse(content.getCover());
-                                        int width = (CommonUtils.getScreenWidth()-CommonUtils.dip2px(10))*2/5;
+                                        int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(10)) * 2 / 5;
                                         int height = (int) (2f * width / 3f);
                                         ImageLoader.showThumb(uri, logo, width, height);
                                     }
@@ -1171,15 +1237,15 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                     });
 
 
-                                    videoLayout.addView(anchorView,  params);
+                                    videoLayout.addView(anchorView, params);
                                 }
 
                                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
 
-                                ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView);
+                                ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), recyclerView);
                                 adapter.addHeaderView(anchorLayout);
                                 recyclerView.setAdapter(adapter);
 
@@ -1187,7 +1253,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
 
                         }
-                    }else if(type==3){
+                    } else if (type == 3) {
                         //文章
                         if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
                             List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
@@ -1196,11 +1262,11 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                             DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
                             divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                             recyclerView.addItemDecoration(divider);
-                            ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView, columnContents);
+                            ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), recyclerView, columnContents);
                             recyclerView.setAdapter(adapter);
                         }
 
-                    }else if(type==7){
+                    } else if (type == 7) {
                         //图集
                         if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
                             List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
@@ -1209,26 +1275,26 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                             DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
                             divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                             recyclerView.addItemDecoration(divider);
-                            ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView, columnContents);
+                            ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), recyclerView, columnContents);
                             recyclerView.setAdapter(adapter);
                         }
 
-                    }else if(type==2){
+                    } else if (type == 2) {
                         //音频
                         if (jo.getIntValue("code") == 100000 && jo.getJSONArray("data") != null) {
                             List<ColumnContent> columnContents = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), ColumnContent.class);
 
-                            if(animated==8){
+                            if (animated == 8) {
                                 //单行
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
                                 LayoutInflater inflater = LayoutInflater.from(getContext());
                                 View anchorLayout = inflater.inflate(R.layout.index_scrollview_column_layout, null, false);
-                                LinearLayout albumLayout= anchorLayout.findViewById(R.id.contentLayout);
+                                LinearLayout albumLayout = anchorLayout.findViewById(R.id.contentLayout);
 
                                 for (int i = 0; i < columnContents.size(); i++) {
                                     final ColumnContent content = columnContents.get(i);
 
-                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((CommonUtils.getScreenWidth()-CommonUtils.dip2px(10))*2/7, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((CommonUtils.getScreenWidth() - CommonUtils.dip2px(10)) * 2 / 7, LinearLayout.LayoutParams.WRAP_CONTENT);
 
 //                                int margin = CommonUtils.dip2px(10);
 //                                params.setMargins(margin, margin, margin, margin);
@@ -1241,7 +1307,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
 
                                     if (!TextUtils.isEmpty(content.getCover())) {
                                         Uri uri = Uri.parse(content.getCover());
-                                        int width = (CommonUtils.getScreenWidth()-CommonUtils.dip2px(10))*2/7;
+                                        int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(10)) * 2 / 7;
                                         int height = width;
                                         ImageLoader.showThumb(uri, logo, width, height);
                                     }
@@ -1257,26 +1323,26 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                     });
 
 
-                                    albumLayout.addView(anchorView,  params);
+                                    albumLayout.addView(anchorView, params);
                                 }
 
 
                                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
 
-                                ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(),recyclerView);
+                                ColumnContentAdapter adapter = new ColumnContentAdapter(getContext(), recyclerView);
                                 adapter.addHeaderView(anchorLayout);
                                 recyclerView.setAdapter(adapter);
 
-                            }else if(animated==5){
+                            } else if (animated == 5) {
                                 //三图
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
                                 recyclerView.setLayoutManager(manager);
-                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
                                 final ColumnAlbumContentAdapter adapter = new ColumnAlbumContentAdapter(getContext(), columnContents);
                                 manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -1296,14 +1362,13 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                 recyclerView.setAdapter(adapter);
 
 
-
-                            }else if(animated==9){
+                            } else if (animated == 9) {
                                 //三图+5图
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
                                 recyclerView.setLayoutManager(manager);
-                                DividerItemDecoration divider = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-                                divider.setDrawable(ContextCompat.getDrawable(getContext(),R.drawable.recycleview_divider_drawable));
+                                DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+                                divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
                                 final ColumnAlbumContentAdapter adapter = new ColumnAlbumContentAdapter(getContext(), columnContents);
                                 manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -1311,22 +1376,22 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                     public int getSpanSize(int position) {
 
                                         int size = adapter.getItemCount();
-                                        int page=size/8;
-                                        if (page>0&&(position+1)<=8*page) {
-                                            if((position+1)%8>0&&(position+1)%8<=3){
+                                        int page = size / 8;
+                                        if (page > 0 && (position + 1) <= 8 * page) {
+                                            if ((position + 1) % 8 > 0 && (position + 1) % 8 <= 3) {
                                                 return 1;
-                                            }else{
+                                            } else {
                                                 return 3;
                                             }
-                                        }else{
-                                            if(size%8==1||size%8==2){
+                                        } else {
+                                            if (size % 8 == 1 || size % 8 == 2) {
                                                 return 3;
-                                            }else if(size%8==3){
+                                            } else if (size % 8 == 3) {
                                                 return 1;
-                                            }else{
-                                                if((position+1)%8<=3&&(position+1)%8>0){
+                                            } else {
+                                                if ((position + 1) % 8 <= 3 && (position + 1) % 8 > 0) {
                                                     return 1;
-                                                }else {
+                                                } else {
                                                     return 3;
                                                 }
                                             }
@@ -1341,7 +1406,6 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                         }
 
                     }
-
 
 
                 } catch (Exception e) {

@@ -18,6 +18,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
@@ -295,7 +296,7 @@ public class RecommendContentAdapter extends RecyclerView.Adapter implements Vie
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, ArticleDetailActivity.class);
+                    Intent it = new Intent(mContext, ArticleDetailActivity02.class);
                     it.putExtra("articleId", content.getId());
                     mContext.startActivity(it);
                 }

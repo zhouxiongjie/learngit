@@ -113,7 +113,14 @@ public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Ca
             @Override
             public void onClick(View v) {
                 if(mAlbum!=null){
-                    showShare(mAlbum.getTitle(),mAlbum.getDes(),mAlbum.getCover(),ServerInfo.h5IP+"/albums/"+mAlbumId);
+                    String url;
+                    if(User.getInstance()!=null){
+                        url=ServerInfo.h5IP+"/albums/"+mAlbumId+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP+"/albums/"+mAlbumId;
+                    }else{
+                        url=ServerInfo.h5IP+"/albums/"+mAlbumId+"?from_url="+ServerInfo.h5IP+"/albums/"+mAlbumId;
+                    }
+
+                    showShare(mAlbum.getTitle(),mAlbum.getDes(),mAlbum.getCover(),url);
                     //shareTest();
                 }
 
@@ -240,7 +247,10 @@ public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Ca
                             @Override
                             public void onClick(View v) {
                                 if (User.getInstance() == null) {
-                                    startActivityForResult(new Intent(AlbumDetailActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
+                                    Intent it=new Intent(AlbumDetailActivity.this, NewLoginActivity.class);
+                                    it.putExtra("jump_url",ServerInfo.h5IP + "/albums/"+mAlbumId);
+                                    startActivityForResult(it, REQUEST_LOGIN);
+
                                 } else {
                                     subscribe(mAlbum.getIs_sub() == 0);
                                 }

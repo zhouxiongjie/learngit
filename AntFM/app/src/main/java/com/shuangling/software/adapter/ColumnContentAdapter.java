@@ -536,7 +536,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, ArticleDetailActivity.class);
+                    Intent it = new Intent(mContext, ArticleDetailActivity02.class);
                     it.putExtra("articleId", content.getId());
                     mContext.startActivity(it);
                 }
@@ -605,7 +605,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, ArticleDetailActivity.class);
+                    Intent it = new Intent(mContext, ArticleDetailActivity02.class);
                     it.putExtra("articleId", content.getId());
                     mContext.startActivity(it);
                 }

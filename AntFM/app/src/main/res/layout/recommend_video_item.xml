@@ -114,8 +114,8 @@
                     android:maxLines="1"
                     android:textColor="@color/textColorThree"
                     android:textSize="@dimen/font_size_24px"
-                    tools:text="5.2万次播放"
-                    android:visibility="invisible"/>
+                    android:visibility="invisible"
+                    tools:text="5.2万次播放" />
 
                 <!--<TextView-->
                     <!--android:id="@+id/publishTime"-->

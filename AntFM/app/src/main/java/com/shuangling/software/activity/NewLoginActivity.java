@@ -112,6 +112,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
 
     private String mUseProtocolTitle;
     private String mClauseTitle;
+    private String mJumpUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +132,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
 
     private void init() {
         //getUseProtocol();
-
+        mJumpUrl = getIntent().getStringExtra("jump_url");
         bindPhone = getIntent().getBooleanExtra("bindPhone", false);
         if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getH5_logo())) {
             Uri uri = Uri.parse(MyApplication.getInstance().getStation().getH5_logo());
@@ -351,6 +352,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                             it.putExtra("headimgurl", weixinHeadimgurl);
                             it.putExtra("openid", weixinOpenid);
                             it.putExtra("unionid", weixinUnionid);
+                            it.putExtra("jump_url", mJumpUrl);
                             startActivity(it);
 
                             ToastUtils.show("登录成功");
@@ -428,6 +430,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
                         Intent it = new Intent(this, NewVerifyCodeLoginActivity.class);
+                        it.putExtra("jump_url", mJumpUrl);
                         it.putExtra("PhoneNumber", mPhoneNumber);
                         startActivity(it);
 
@@ -474,6 +477,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                         it.putExtra("headimgurl", weixinHeadimgurl);
                         it.putExtra("openid", weixinOpenid);
                         it.putExtra("unionid", weixinUnionid);
+                        it.putExtra("jump_url", mJumpUrl);
                         startActivity(it);
 
                     } else {
@@ -546,6 +550,9 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
         params.put("headimgurl", headimgurl);
         params.put("openid", openid);
         params.put("unionid", unionid);
+        params.put("from_url", SharedPreferencesUtils.getStringValue("from_url",null));
+        params.put("from_user_id", SharedPreferencesUtils.getStringValue("from_user_id",null));
+        params.put("jump_url", mJumpUrl);
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
             @Override
@@ -585,7 +592,9 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
         params.put("type", "1");
         params.put("phone", phone);
         params.put("verification_code", verifyCode);
-
+        params.put("from_url", SharedPreferencesUtils.getStringValue("from_url",null));
+        params.put("from_user_id", SharedPreferencesUtils.getStringValue("from_user_id",null));
+        params.put("jump_url", mJumpUrl);
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
             @Override
@@ -616,7 +625,9 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
         params.put("type", "0");
         params.put("phone", "" + phone);
         params.put("password", pwd);
-
+        params.put("from_url", SharedPreferencesUtils.getStringValue("from_url",null));
+        params.put("from_user_id", SharedPreferencesUtils.getStringValue("from_user_id",null));
+        params.put("jump_url", mJumpUrl);
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
             @Override

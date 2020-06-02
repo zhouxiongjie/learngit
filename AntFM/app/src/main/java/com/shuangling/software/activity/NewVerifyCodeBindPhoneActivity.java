@@ -66,7 +66,7 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
     private String weixinOpenid;
     private String weixinNickname;
     private String weixinHeadimgurl;
-
+    private String mJumpUrl;
     private boolean hasLogined;
 
     @Override
@@ -89,6 +89,7 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
         weixinNickname = getIntent().getStringExtra("nickname");
         weixinHeadimgurl = getIntent().getStringExtra("headimgurl");
         mPhoneNumber = getIntent().getStringExtra("PhoneNumber");
+        mJumpUrl= getIntent().getStringExtra("jump_url");
         phoneNum.setText(mPhoneNumber);
         mCountDownTimer = new CountDownTimer(60 * 1000, 500) {
             @Override
@@ -272,6 +273,9 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
         params.put("headimgurl", headimgurl);
         params.put("openid", openid);
         params.put("unionid", unionid);
+        params.put("from_url", SharedPreferencesUtils.getStringValue("from_url",null));
+        params.put("from_user_id", SharedPreferencesUtils.getStringValue("from_user_id",null));
+        params.put("jump_url", mJumpUrl);
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
             @Override

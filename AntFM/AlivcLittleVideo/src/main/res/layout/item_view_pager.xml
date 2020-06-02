@@ -108,14 +108,14 @@
 
                     <TextView
                         android:id="@+id/tv_attention"
-                        android:enabled="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="8dp"
-                        android:background="@drawable/attention_button_bg01"
+                        android:background="@drawable/attention_button_bg_blue"
                         android:gravity="center"
-                        android:text="关注"
+                        android:text="已关注"
+                        android:visibility="invisible"
                         android:textColor="#ffffff"
                         android:textSize="14sp"
                         android:textStyle="bold" />

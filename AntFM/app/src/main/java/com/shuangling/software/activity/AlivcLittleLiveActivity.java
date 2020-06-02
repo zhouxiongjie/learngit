@@ -594,9 +594,11 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
                                     if(videoDetail.getIs_follow() == 1) {
                                         holder.getmTvAttention().setText("已关注");
                                         holder.getmTvAttention().setSelected(false);
+                                        holder.getmTvAttention().setVisibility(View.VISIBLE);
                                     }else{
                                         holder.getmTvAttention().setText("关注");
                                         holder.getmTvAttention().setSelected(true);
+                                        holder.getmTvAttention().setVisibility(View.VISIBLE);
                                     }
 
                                     if(videoDetail.getIs_likes() == 1) {

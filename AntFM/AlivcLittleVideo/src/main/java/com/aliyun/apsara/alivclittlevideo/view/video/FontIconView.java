@@ -22,7 +22,6 @@ public class FontIconView extends AppCompatTextView {
     }
     private void init(Context context) {
 //        设置字体图标
-
-        this.setTypeface(Typeface.createFromAsset(context.getAssets(),"iconfont.ttf"));
+        this.setTypeface(Typeface.createFromAsset(context.getAssets(),"littlevideoiconfont.ttf"));
     }
 }

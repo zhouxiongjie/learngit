@@ -3,12 +3,13 @@
 buildscript {
     
     repositories {
-        maven { url "https://maven.google.com" }
 
+        google()
+        jcenter()
         maven { url "http://mvn.mob.com/android" }
         maven { url 'https://dl.bintray.com/umsdk/release' }
 
-        maven { url 'https://jitpack.io' }
+
 
 
         maven {
@@ -22,8 +23,11 @@ buildscript {
         }
 
 
-        google()
-        jcenter()
+        maven { url 'https://jitpack.io' }
+        maven { url "https://maven.google.com" }
+
+
+
 
     }
 
@@ -46,8 +50,9 @@ buildscript {
 
 allprojects {
     repositories {
-        maven { url "https://maven.google.com" }
 
+        google()
+        jcenter()
         maven { url "http://mvn.mob.com/android" }
         maven { url 'https://dl.bintray.com/umsdk/release' }
         maven {
@@ -59,9 +64,10 @@ allprojects {
         maven {
             url 'https://maven.aliyun.com/repository/google'
         }
+
+        maven { url "https://maven.google.com" }
         maven { url 'https://jitpack.io' }
-        google()
-        jcenter()
+
 
     }
 }

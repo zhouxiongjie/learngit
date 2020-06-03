@@ -239,6 +239,14 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     it.putExtra("url", ServerInfo.h5HttpsIP + "/anchors/" + Integer.parseInt(uri.getQueryParameter("id")));
                     startActivity(it);
+                }else if(type.equals("12")){
+                    //短视频
+                    Intent intent = new Intent(this, AlivcLittleLiveActivity.class);
+                    intent.putExtra("startType",  AlivcLittleLiveActivity.START_TYPE_H5_SCHEME);
+                    intent.putExtra("original_id",  Integer.parseInt(uri.getQueryParameter("original_id")));
+                    intent.putExtra("play_id",  Integer.parseInt(uri.getQueryParameter("play_id")));
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(it);
                 }
 
 

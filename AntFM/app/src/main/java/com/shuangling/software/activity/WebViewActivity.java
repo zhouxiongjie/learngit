@@ -29,12 +29,14 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONObject;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.Column;
+import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
@@ -55,6 +57,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -615,6 +618,28 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
         }
 
 
+
+
+        //播放小视频
+        @JavascriptInterface
+        public void litteVideoEvent(final String position,final String data) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Intent intent = new Intent(WebViewActivity.this, AlivcLittleLiveActivity.class);
+                        JSONObject jsonObject = JSONObject.parseObject(data);
+                        List<ColumnContent> columnContents= JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), ColumnContent.class);
+                        intent.putExtra("position",  AlivcLittleLiveActivity.START_TYPE_H5_WEBVIEW);
+                        intent.putExtra("smallVideos", (Serializable) columnContents);
+                        intent.putExtra("position",  Integer.parseInt(position));
+                        startActivityForResult(intent,1);
+                    } catch (Exception e) {
+
+                    }
+                }
+            });
+        }
     }
 
     @Override

@@ -160,16 +160,26 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
 //                intent.putExtra("smallVideos", (Serializable) mColumnContents);
 //                intent.putExtra("position",  position);
 //                startActivity(intent);
-
+                //   intent.putExtra("sts", (Serializable)  mStsInfo);
 
                 Intent intent = new Intent(getContext(), AlivcLittleLiveActivity.class);
+                intent.putExtra("startType",  AlivcLittleLiveActivity.START_TYPE_NORMAL);
                 intent.putExtra("smallVideos", (Serializable) mColumnContents);
                 intent.putExtra("Column", (Serializable) mColumn);
                 intent.putExtra("position",  position);
-             //   intent.putExtra("sts", (Serializable)  mStsInfo);
-                //startActivity(intent);
-
                 startActivityForResult(intent,1);
+
+
+//                Intent intent = new Intent(getContext(), AlivcLittleLiveActivity.class);
+//                ColumnContent columnContent = mColumnContents.get(position);
+//                intent.putExtra("startType",  AlivcLittleLiveActivity.START_TYPE_H5_SCHEME);
+//                intent.putExtra("original_id",  columnContent.getId());
+//                intent.putExtra("play_id",  columnContent.getId());
+//                startActivity(intent);
+
+
+
+                //
 
             }
 

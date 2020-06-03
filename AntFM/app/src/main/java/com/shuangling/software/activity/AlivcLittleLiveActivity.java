@@ -38,6 +38,7 @@ import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.SmallVideoRecyclerViewAdapter;
+import com.shuangling.software.adapter.VideoRecyclerAdapter;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.LiveInfo;
@@ -83,17 +84,31 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
     public static final int REQUEST_LOGIN = 0x1;
 
 
+    //跳转进入短视频详情的几种方式
+    public static final int START_TYPE_NORMAL  =  1; //短视频列表点击进入
+    public static final int START_TYPE_H5_SCHEME = 2;   //通过H5网页跳转 APP
+    public static final int START_TYPE_H5_WEBVIEW = 3;       //通过WebView h5网页调起
+
+    private int mStartType  = 1;//调用方式
+
     private AlivcVideoPlayView videoPlayView;
     private Column mColumn;
 
     private List<ColumnContent> mColumnContents = new ArrayList<>();
-    private int mPageIndex = 1;
-    private int mVideoPosition = 0;
-
-    private List< SmallVideoBean> mDatas;
+    private int mPageIndex = 1;     //当前请求的页
+    private int mVideoPosition = 0; //当前视频播放的位置
+    private List<SmallVideoBean> mDatas;
 
     private int mRequestCount = 0;
-    private StsInfo mStsInfo;
+    private StsInfo mStsInfo = null;
+    //是否获取了
+    private int mIsRelatedPostsGot = 0;  // -1 请求失败， 0 未请求 1 请求成功
+
+
+    /*---------- H5 Scheme 调用 App -----------*/
+    private int mOrignalId; //原视频的id
+    private int mPlayId;  //当前播放的视频id
+
 
     float oldX = 0;
     float currentX = 0;
@@ -109,13 +124,30 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
 
         setContentView(R.layout.alivc_little_activity_video_detail);
         initView();
-        //loadPlayList(mPageIndex);
-       // newGuest();
-        mColumnContents.addAll((List<ColumnContent>) getIntent().getSerializableExtra("smallVideos"));
-        mVideoPosition = getIntent().getIntExtra("position",0);
-        mColumn = (Column) getIntent().getSerializableExtra("Column");
-        getSts();
+
+
+        mStartType = getIntent().getIntExtra("startType",1);
+
+        if(mStartType == START_TYPE_NORMAL ) {
+            //普通模式调用
+            mColumnContents.addAll((List<ColumnContent>) getIntent().getSerializableExtra("smallVideos"));
+            mVideoPosition = getIntent().getIntExtra("position",0);
+            mColumn = (Column) getIntent().getSerializableExtra("Column");
+        } else  if(mStartType == START_TYPE_H5_SCHEME ) {
+            //H5 Scheme 调用
+            mOrignalId = getIntent().getIntExtra("original_id",0);
+            mPlayId = getIntent().getIntExtra("play_id",0);
+        }else if(mStartType == START_TYPE_H5_WEBVIEW ) {
+            //普通模式调用
+            mColumnContents.addAll((List<ColumnContent>) getIntent().getSerializableExtra("smallVideos"));
+            mVideoPosition = getIntent().getIntExtra("position",0);
+        }
+
+        requestData();
+
     }
+
+
     protected void initView() {
         videoPlayView = findViewById(R.id.video_play_detail_view);
         findViewById(R.id.fl_video_detail_back).setOnClickListener(new View.OnClickListener() {
@@ -126,26 +158,21 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
         });
 
         videoPlayView.setOnRefreshDataListener(new MyRefreshDataListener(this));
-
         videoPlayView.setOnItemBtnClick(new LittleVideoListAdapter.OnItemBtnClick() {
             @Override
             public void onDownloadClick(int position) {
 
             }
 
+
             @Override
             public void onPraiseClick(int position) {
-
-
                 if (User.getInstance() == null) {
                     startActivityForResult(new Intent(AlivcLittleLiveActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                     return;
                 }
 
-
                 ColumnContent columnContent = mColumnContents.get(position);
-
-
                 LittleVideoListAdapter.MyHolder holder =  videoPlayView.getPlayPager();
                 if(holder != null) {
 
@@ -177,36 +204,34 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
 
             @Override
             public void onShareClick(int position) {
-
-
                 ColumnContent columnContent =   mColumnContents.get(position);
-
-
                 //http://www-cms-c.review.slradio.cn/share
                 if(columnContent.getVideo() != null){
                     String url =  ServerInfo.h5IP + "/share/" + columnContent.getVideo().getPost_id();
                     Log.d("Share",url);
                     showShare(columnContent.getTitle(),columnContent.getDes(),columnContent.getCover(),url);
                 }
-
-
             }
 
+            //关闭按钮
             @Override
             public void onCloseClick(int position) {
                 out();
             }
 
+            //查看评论
             @Override
             public void onCommentClick(int position) {
 
             }
 
+            //发评论
             @Override
             public void onSendCommentClick(int position) {
 
             }
 
+            //点击关注/已关注
             @Override
             public void onSendAttentionClick(int position) {
 
@@ -217,7 +242,6 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
 
                 LittleVideoListAdapter.MyHolder holder =  videoPlayView.getPlayPager();
                 if(holder != null) {
-
                     if(holder.getmTvAttention().getText() == "已关注") {
                         holder.getmTvAttention().setText("关注");
                         holder.getmTvAttention().setSelected(true);
@@ -227,9 +251,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
                         holder.getmTvAttention().setSelected(false);
                         attention(position,true);
                     }
-
                 }
-
             }
         });
 
@@ -285,7 +307,6 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
             }
             AlivcLittleLiveActivity activity = weakReference.get();
             if (activity != null) {
-                activity.loadPlayList(activity.mPageIndex = 1);
                 activity.isRefreshData = true;
             }
         }
@@ -298,8 +319,10 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
             }
             AlivcLittleLiveActivity activity = weakReference.get();
             if (activity != null) {
-                activity.getMoreContent();
-                activity.isRefreshData = false;
+                if(activity.mStartType == AlivcLittleLiveActivity.START_TYPE_NORMAL) {
+                    activity.getMoreContent();
+                    activity.isRefreshData = false;
+                }
             }
         }
 
@@ -342,113 +365,87 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
         return super.dispatchTouchEvent(ev);
     }
 
-    /**
-     * 生成新用户
-     */
-    private void newGuest() {
 
-        LittleUserInfo userInfo = AlivcLittleUserManager.getInstance().getUserInfo(this);
-
-        if(userInfo == null) {
-            LittleHttpManager.getInstance().newGuest(
-                    new HttpEngine.HttpResponseResultCallback<LittleHttpResponse.LittleUserInfoResponse>() {
-                        @Override
-                        public void onResponse(boolean result, String message, LittleHttpResponse.LittleUserInfoResponse data) {
-                            if (result && data != null && data.data != null) {
-                                LittleUserInfo userInfo = data.data;
-                                AlivcLittleUserManager.getInstance().setUserInfo(AlivcLittleLiveActivity.this,
-                                        userInfo);
-
-                                loadPlayList(mPageIndex);
-
-                            } else {
-                               // ToastUtils.show(AlivcLittleLiveActivity.this, message);
-                            }
-                        }
-                    });
-        }else{
-            loadPlayList(mPageIndex);
+    private void requestData(){
+        if(mStartType == START_TYPE_NORMAL ) {
+            getSts();
+        } else  if(mStartType == START_TYPE_H5_SCHEME ) {
+            getSts();
+            getRelatedPosts();
+        }else if(mStartType == START_TYPE_H5_WEBVIEW ) {
+            getSts();
         }
-
     }
 
-    private void loadPlayList(int pageIndex) {
-        Log.e("AlivcLittleLiveActivity", "id:" + pageIndex);
-        LittleUserInfo userInfo = AlivcLittleUserManager.getInstance().getUserInfo(this);
-        if (userInfo == null) {
-            Toast.makeText(this, "R.string.alivc_little_no_user:" + com.aliyun.apsara.alivclittlevideo.R.string.alivc_little_tip_no_user, Toast.LENGTH_SHORT)
-            .show();
-            return;
-        }
-        LittleHttpManager.getInstance().requestLiveVideoList(userInfo.getToken(), pageIndex, AlivcLittleHttpConfig.DEFAULT_PAGE_SIZE,
-        new HttpEngine.HttpResponseResultCallback<LittleHttpResponse.LittleLiveListResponse>() {
-            @Override
-            public void onResponse(final boolean result, String message,
-                                   final LittleHttpResponse.LittleLiveListResponse data) {
+    //处理请求结果
+    private void handleRequestFinish(){
 
-                if (result) {
-                    mPageIndex++;
-                    if (isRefreshData) {
-                        videoPlayView.refreshVideoList(data.data.getLiveList());
-                    } else {
-                        videoPlayView.addMoreData(data.data.getLiveList());
-                    }
-                    Log.e("AlivcLittleLiveActivity", "isRefreshData:" + isRefreshData);
-                } else {
-                    if (videoPlayView != null) {
-                        videoPlayView.loadFailure();
-                    }
-                   // ToastUtils.show(AlivcLittleLiveActivity.this, message );
-                }
 
+
+        if(mStartType == START_TYPE_NORMAL) {
+            if(mStsInfo != null) {
+                setData(mColumnContents);
+                getVideoDetail(mVideoPosition);
             }
-        });
+        }else if(mStartType == START_TYPE_H5_SCHEME) {
+            if(mStsInfo != null && mIsRelatedPostsGot != 0) {
+                mVideoPosition = getThePosition();
+                setData(mColumnContents);
+                getVideoDetail(mVideoPosition);
+            }
+        }else if(mStartType == START_TYPE_H5_WEBVIEW) {
+            if(mStsInfo != null) {
+                setData(mColumnContents);
+                getVideoDetail(mVideoPosition);
+            }
+        }
+
     }
 
 
-    public void getSts() {
+    //获取当前播放视频所在的位置
+    private int getThePosition(){
+        int position = 0;
+        for(int i=0; i<mColumnContents.size(); i++){
+            ColumnContent columnContent = mColumnContents.get(i);
+            if(mPlayId == columnContent.getId()) {
+                position = i;
+                break;
+            }
+        }
+        return  position;
+    }
 
+
+
+
+    //获取Sts授权
+    public void getSts() {
         //String url = "http://api-vms.review.slradio.cn" + ServerInfo.ossSts  ;
         String url =  ServerInfo.vms + ServerInfo.ossSts  ;
         Map<String, String> params = new HashMap<String, String>();
-        //OkHttpUtils.getNotAuthorization();
         OkHttpUtils.get(url, params, new OkHttpCallback(AlivcLittleLiveActivity.this) {
-
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Log.d("OSS",response);
-                handleSTS(response);
-            }
+                try {
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        mStsInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), StsInfo.class);
+                        handleRequestFinish();
+                    } else if (jsonObject != null) {
+                        ToastUtils.show(jsonObject.getString("msg"));
+                    }
+                } catch (Exception e) {
 
+                }
+            }
             @Override
             public void onFailure(Call call, Exception exception) {
                 Log.d("OSS",exception.getLocalizedMessage());
 
             }
         });
-
     }
-
-    public void handleSTS( String result) {
-        try {
-            JSONObject jsonObject = JSONObject.parseObject(result);
-            if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                mStsInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), StsInfo.class);
-                setData(mColumnContents);
-                getVideoDetail(mVideoPosition);
-
-            } else if (jsonObject != null) {
-                ToastUtils.show(jsonObject.getString("msg"));
-            }
-        } catch (Exception e) {
-
-        }
-
-    }
-
-
-
-
 
 
     //获取更多数据
@@ -468,8 +465,6 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
-
-
                 try {
                     String result = response;
                     Log.d("content",result);
@@ -484,26 +479,16 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
                             }
                         }
 
-
                         if(columnContents.size()<10){
                             //没有更多
                         }
-
                         setData(columnContents);
                         mColumnContents.addAll(columnContents);
-
-
-
-
-
                     }else{
 
                     }
-
-
                 } catch (Exception e) {
                     e.printStackTrace();
-
                 }
 
             }
@@ -517,9 +502,49 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
     }
 
 
+
+
+    //获取关联的数据
+    private void getRelatedPosts() {
+        String url = ServerInfo.serviceIP + ServerInfo.getRelatedRecommend;
+        Map<String, String> params = new HashMap<>();
+        params.put("post_id", "" + mOrignalId);
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                mIsRelatedPostsGot = -1;
+
+                try {
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                       List<ColumnContent> datas = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), ColumnContent.class);
+                       mColumnContents.addAll(datas);
+                        mIsRelatedPostsGot = 1;
+                    }
+                    handleRequestFinish();
+                } catch (Exception e) {
+                    e.printStackTrace();
+
+                    handleRequestFinish();
+                }
+
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+    }
+
+
     private void setData(List<ColumnContent> columnContents){
         mDatas = new ArrayList<SmallVideoBean>();
-        mRequestCount = columnContents.size() ;
         for(int i = 0; i<columnContents.size(); i++) {
             ColumnContent columnContent = columnContents.get(i);
             if(columnContent.getVideo() != null && mStsInfo != null ){
@@ -531,10 +556,12 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
                 vidSts.setSecurityToken(mStsInfo.getSecurityToken());
                 vidSts.setRegion("cn-shanghai");
                 SmallVideoBean data = new SmallVideoBean();
-                data.setSourceId(""  + columnContent.getVideo().getSource_id());
+                data.setSourceId(columnContent.getVideo().getVideo_id());
                 data.setmVidSts(vidSts);
                 data.setIs_like(columnContent.getIs_like());
                 data.setTitle(columnContent.getTitle());
+
+
                 if(columnContent.getAuthor_info() != null && columnContent.getAuthor_info().getMerchant() != null ) {
                     BaseVideoSourceModel.UserBean userBean = new BaseVideoSourceModel.UserBean();
                     userBean.setAvatarUrl(columnContent.getAuthor_info().getMerchant().getLogo());
@@ -566,7 +593,9 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
 
     //通过获取视频详情来获取点赞数，是否关注，
     private void getVideoDetail(int position){
-
+        if(position>=mColumnContents.size()){
+            return;
+        }
         ColumnContent columnContent= mColumnContents.get(position);
         String url = ServerInfo.serviceIP + ServerInfo.getVideoDetail + columnContent.getId();
         Map<String, String> params = new HashMap<>();

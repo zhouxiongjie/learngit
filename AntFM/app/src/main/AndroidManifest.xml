@@ -264,8 +264,10 @@
             android:theme="@style/Theme.AppCompat.NoActionBar">
         </activity>
 
-        <activity android:name=".activity.AlivcLittleLiveActivity"
-            android:screenOrientation="portrait"
+        <activity android:name=".activity.AlivcLittleVideoActivity"
+            android:screenOrientation="fullSensor"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/Theme.AppCompat.NoActionBar"/>
 
         <activity

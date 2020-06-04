@@ -117,6 +117,7 @@ public class LittleVideoListAdapter extends BaseVideoListAdapter<LittleVideoList
         });
 
 
+
         //myHolder.mVideoInfoView.setVideoInfo(list.get(position));
 
         BaseVideoSourceModel video = list.get(position);

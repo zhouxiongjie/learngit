@@ -2,58 +2,37 @@ package com.shuangling.software.activity;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.sdk.android.utils.AlicloudTracker;
-import com.aliyun.apsara.alivclittlevideo.constants.AlivcLittleHttpConfig;
-import com.aliyun.apsara.alivclittlevideo.net.HttpEngine;
-import com.aliyun.apsara.alivclittlevideo.net.LittleHttpManager;
-import com.aliyun.apsara.alivclittlevideo.net.data.LittleHttpResponse;
-import com.aliyun.apsara.alivclittlevideo.net.data.LittleLiveVideoInfo;
-import com.aliyun.apsara.alivclittlevideo.net.data.LittleUserInfo;
-import com.aliyun.apsara.alivclittlevideo.view.mine.AlivcLittleUserManager;
 import com.aliyun.apsara.alivclittlevideo.view.video.AlivcVideoPlayView;
 import com.aliyun.apsara.alivclittlevideo.view.video.BaseVideoSourceModel;
 import com.aliyun.apsara.alivclittlevideo.view.video.LittleVideoListAdapter;
 import com.aliyun.apsara.alivclittlevideo.view.video.videolist.AlivcVideoListView;
 import com.aliyun.player.source.VidAuth;
 import com.aliyun.player.source.VidSts;
-import com.aliyun.vodplayerview.widget.AliyunVodPlayerPortraitView;
-import com.ethanhua.skeleton.Skeleton;
 import com.hjq.toast.ToastUtils;
-import com.scwang.smartrefresh.layout.constant.RefreshState;
-import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
-import com.shuangling.software.adapter.SmallVideoRecyclerViewAdapter;
-import com.shuangling.software.adapter.VideoRecyclerAdapter;
+import com.shuangling.software.dialog.SmallVideoCommentContentBottomDialog;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
-import com.shuangling.software.entity.LiveInfo;
 import com.shuangling.software.entity.ResAuthInfo;
 import com.shuangling.software.entity.SmallVideoBean;
 import com.shuangling.software.entity.StsInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.entity.VideoDetail;
-import com.shuangling.software.fragment.SmallVideoFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
-import com.shuangling.software.utils.ACache;
-import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Constant;
-import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 
 
@@ -79,7 +58,7 @@ import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 
 
-public class AlivcLittleLiveActivity extends AppCompatActivity {
+public class AlivcLittleVideoActivity extends AppCompatActivity {
 
     public static final int REQUEST_LOGIN = 0x1;
 
@@ -87,8 +66,8 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
     //跳转进入短视频详情的几种方式
     public static final int START_TYPE_NORMAL  =  1; //短视频列表点击进入
     public static final int START_TYPE_H5_SCHEME = 2;   //通过H5网页跳转 APP
-    public static final int START_TYPE_H5_WEBVIEW = 3;       //通过WebView h5网页调起
-
+    public static final int START_TYPE_H5_WEBVIEW = 3;       //通过WebView h5网页调起，关联视频
+    public static final int START_TYPE_H5_WEBVIEW_CURRENT = 4;       //通过WebView h5网页调起,当前视频
     private int mStartType  = 1;//调用方式
 
     private AlivcVideoPlayView videoPlayView;
@@ -103,7 +82,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
     private StsInfo mStsInfo = null;
     //是否获取了
     private int mIsRelatedPostsGot = 0;  // -1 请求失败， 0 未请求 1 请求成功
-
+    private int mIsVideoDetailGot = 0;  // -1 请求失败， 0 未请求 1 请求成功
 
     /*---------- H5 Scheme 调用 App -----------*/
     private int mOrignalId; //原视频的id
@@ -114,39 +93,57 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
     float currentX = 0;
     float oldY = 0;
     float currentY = 0;
+
     /**
      * 是否重新加载数据
      */
     private boolean isRefreshData = true;
+
+    //评论框
+    SmallVideoCommentContentBottomDialog mSmallVideoCommentContentBottomDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.alivc_little_activity_video_detail);
         initView();
+        onLoad();
+    }
 
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+
+        isRefreshData = true;
+        onLoad();
+
+    }
+
+    private  void onLoad(){
         mStartType = getIntent().getIntExtra("startType",1);
-
         if(mStartType == START_TYPE_NORMAL ) {
             //普通模式调用
-            mColumnContents.addAll((List<ColumnContent>) getIntent().getSerializableExtra("smallVideos"));
+            mColumnContents.addAll((List<ColumnContent>) getIntent().getSerializableExtra("littleVideos"));
             mVideoPosition = getIntent().getIntExtra("position",0);
             mColumn = (Column) getIntent().getSerializableExtra("Column");
         } else  if(mStartType == START_TYPE_H5_SCHEME ) {
             //H5 Scheme 调用
             mOrignalId = getIntent().getIntExtra("original_id",0);
             mPlayId = getIntent().getIntExtra("play_id",0);
+        }else  if(mStartType == START_TYPE_H5_WEBVIEW_CURRENT ) {
+            //H5 Scheme 调用
+            mOrignalId = getIntent().getIntExtra("original_id",0);
+            mPlayId = getIntent().getIntExtra("play_id",0);
         }else if(mStartType == START_TYPE_H5_WEBVIEW ) {
             //普通模式调用
-            mColumnContents.addAll((List<ColumnContent>) getIntent().getSerializableExtra("smallVideos"));
+            mColumnContents.addAll((List<ColumnContent>) getIntent().getSerializableExtra("littleVideos"));
             mVideoPosition = getIntent().getIntExtra("position",0);
         }
 
         requestData();
-
     }
-
 
     protected void initView() {
         videoPlayView = findViewById(R.id.video_play_detail_view);
@@ -168,7 +165,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
             @Override
             public void onPraiseClick(int position) {
                 if (User.getInstance() == null) {
-                    startActivityForResult(new Intent(AlivcLittleLiveActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
+                    startActivityForResult(new Intent(AlivcLittleVideoActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                     return;
                 }
 
@@ -222,13 +219,13 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
             //查看评论
             @Override
             public void onCommentClick(int position) {
-
+                onCommentButtonClick();
             }
 
             //发评论
             @Override
             public void onSendCommentClick(int position) {
-
+                onCommentAndInputClick();
             }
 
             //点击关注/已关注
@@ -236,7 +233,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
             public void onSendAttentionClick(int position) {
 
                 if (User.getInstance() == null) {
-                    startActivityForResult(new Intent(AlivcLittleLiveActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
+                    startActivityForResult(new Intent(AlivcLittleVideoActivity.this, NewLoginActivity.class), REQUEST_LOGIN);
                     return;
                 }
 
@@ -291,60 +288,13 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
         //super.onBackPressed();
     }
 
-    private static class MyRefreshDataListener implements AlivcVideoListView.OnRefreshDataListener {
-        WeakReference<AlivcLittleLiveActivity> weakReference;
 
-        MyRefreshDataListener(AlivcLittleLiveActivity activity) {
-            weakReference = new WeakReference<>(activity);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQUEST_LOGIN && resultCode == RESULT_OK) {
+            getVideoDetail(mVideoPosition);
         }
 
-        @Override
-        public void onRefresh() {
-            Log.e("AlivcLittlePlayer", "onRefresh");
-
-            if (weakReference == null) {
-                return;
-            }
-            AlivcLittleLiveActivity activity = weakReference.get();
-            if (activity != null) {
-                activity.isRefreshData = true;
-            }
-        }
-
-        @Override
-        public void onLoadMore() {
-            Log.e("AlivcLittlePlayer", "onLoadMore");
-            if (weakReference == null) {
-                return;
-            }
-            AlivcLittleLiveActivity activity = weakReference.get();
-            if (activity != null) {
-                if(activity.mStartType == AlivcLittleLiveActivity.START_TYPE_NORMAL) {
-                    activity.getMoreContent();
-                    activity.isRefreshData = false;
-                }
-            }
-        }
-
-        @Override
-        public void onExitVideo() {
-
-            AlivcLittleLiveActivity activity = weakReference.get();
-            if (activity != null) {
-               // activity.willExitVideo();
-            }
-
-        }
-
-
-        @Override
-        public void onPlayAtPosition(int position) {
-
-            AlivcLittleLiveActivity activity = weakReference.get();
-            if (activity != null) {
-                activity.onPlayAtPosition(position);
-            }
-        }
     }
 
     @Override
@@ -360,12 +310,67 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
                 handleTouch();
                 break;
         }
-
-
         return super.dispatchTouchEvent(ev);
     }
 
+    private static class MyRefreshDataListener implements AlivcVideoListView.OnRefreshDataListener {
+        WeakReference<AlivcLittleVideoActivity> weakReference;
 
+        MyRefreshDataListener(AlivcLittleVideoActivity activity) {
+            weakReference = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void onRefresh() {
+            Log.e("AlivcLittlePlayer", "onRefresh");
+
+            if (weakReference == null) {
+                return;
+            }
+            AlivcLittleVideoActivity activity = weakReference.get();
+            if (activity != null) {
+                activity.isRefreshData = true;
+            }
+        }
+
+        @Override
+        public void onLoadMore() {
+            Log.e("AlivcLittlePlayer", "onLoadMore");
+            if (weakReference == null) {
+                return;
+            }
+            AlivcLittleVideoActivity activity = weakReference.get();
+            if (activity != null) {
+                if(activity.mStartType == AlivcLittleVideoActivity.START_TYPE_NORMAL) {
+                    activity.getMoreContent();
+                    activity.isRefreshData = false;
+                }
+            }
+        }
+
+        @Override
+        public void onExitVideo() {
+
+            AlivcLittleVideoActivity activity = weakReference.get();
+            if (activity != null) {
+               // activity.willExitVideo();
+            }
+
+        }
+
+        @Override
+        public void onPlayAtPosition(int position) {
+
+            AlivcLittleVideoActivity activity = weakReference.get();
+            if (activity != null) {
+                activity.onPlayAtPosition(position);
+            }
+        }
+    }
+
+
+    //<editor-fold desc="数据请求相关">
+    //请求数据
     private void requestData(){
         if(mStartType == START_TYPE_NORMAL ) {
             getSts();
@@ -374,14 +379,14 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
             getRelatedPosts();
         }else if(mStartType == START_TYPE_H5_WEBVIEW ) {
             getSts();
+        }else if(mStartType == START_TYPE_H5_WEBVIEW_CURRENT ) {
+            getSts();
+            getVideoDetail(mOrignalId + "");
         }
     }
 
     //处理请求结果
     private void handleRequestFinish(){
-
-
-
         if(mStartType == START_TYPE_NORMAL) {
             if(mStsInfo != null) {
                 setData(mColumnContents);
@@ -397,6 +402,10 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
             if(mStsInfo != null) {
                 setData(mColumnContents);
                 getVideoDetail(mVideoPosition);
+            }
+        }else if(mStartType == START_TYPE_H5_WEBVIEW_CURRENT) {
+            if(mStsInfo != null && mIsVideoDetailGot != 0) {
+                setData(mColumnContents);
             }
         }
 
@@ -417,14 +426,12 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
     }
 
 
-
-
     //获取Sts授权
     public void getSts() {
         //String url = "http://api-vms.review.slradio.cn" + ServerInfo.ossSts  ;
         String url =  ServerInfo.vms + ServerInfo.ossSts  ;
         Map<String, String> params = new HashMap<String, String>();
-        OkHttpUtils.get(url, params, new OkHttpCallback(AlivcLittleLiveActivity.this) {
+        OkHttpUtils.get(url, params, new OkHttpCallback(AlivcLittleVideoActivity.this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
                 try {
@@ -461,7 +468,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
         //params.put("mobile_source", "app");
         params.put("order_by", "1");
 
-        OkHttpUtils.get(url, params, new OkHttpCallback(AlivcLittleLiveActivity.this) {
+        OkHttpUtils.get(url, params, new OkHttpCallback(AlivcLittleVideoActivity.this) {
 
             @Override
             public void onResponse(Call call, String response) throws IOException {
@@ -526,12 +533,8 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
                     handleRequestFinish();
                 } catch (Exception e) {
                     e.printStackTrace();
-
                     handleRequestFinish();
                 }
-
-
-
             }
 
             @Override
@@ -556,7 +559,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
                 vidSts.setSecurityToken(mStsInfo.getSecurityToken());
                 vidSts.setRegion("cn-shanghai");
                 SmallVideoBean data = new SmallVideoBean();
-                data.setSourceId(columnContent.getVideo().getVideo_id());
+                data.setSourceId(columnContent.getId() + "");
                 data.setmVidSts(vidSts);
                 data.setIs_like(columnContent.getIs_like());
                 data.setTitle(columnContent.getTitle());
@@ -576,7 +579,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
             }
         }
 
-        AlivcLittleLiveActivity.this.runOnUiThread(new Runnable() {
+        AlivcLittleVideoActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (isRefreshData) {
@@ -615,7 +618,7 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
                         //点赞数
                         videoDetail.getLike();
 
-                        AlivcLittleLiveActivity.this.runOnUiThread(new Runnable() {
+                        AlivcLittleVideoActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 LittleVideoListAdapter.MyHolder holder =  videoPlayView.getPlayPager();
@@ -660,6 +663,77 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
     }
 
 
+
+    private void getVideoDetail(String  videoId){
+
+        String url = ServerInfo.serviceIP + ServerInfo.getVideoDetail +videoId;
+        Map<String, String> params = new HashMap<>();
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                mIsVideoDetailGot = -1;
+
+
+                try{
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        final ColumnContent columnContent = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), ColumnContent.class);
+                        mColumnContents.add(columnContent);
+                        mIsVideoDetailGot = 1;
+                        handleRequestFinish();
+
+                        final VideoDetail videoDetail = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), VideoDetail.class);
+
+                        //是否关注
+                        videoDetail.getIs_follow();
+                        //点赞数
+                        videoDetail.getLike();
+
+                        AlivcLittleVideoActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                LittleVideoListAdapter.MyHolder holder =  videoPlayView.getPlayPager();
+                                if(holder != null){
+                                    if(videoDetail.getIs_follow() == 1) {
+                                        holder.getmTvAttention().setText("已关注");
+                                        holder.getmTvAttention().setSelected(false);
+                                        holder.getmTvAttention().setVisibility(View.VISIBLE);
+                                    }else{
+                                        holder.getmTvAttention().setText("关注");
+                                        holder.getmTvAttention().setSelected(true);
+                                        holder.getmTvAttention().setVisibility(View.VISIBLE);
+                                    }
+
+                                    if(videoDetail.getIs_likes() == 1) {
+                                        holder.getmFivPrase().setTextColor(Color.parseColor("#F54C68"));
+                                    }else{
+                                        holder.getmFivPrase().setTextColor(Color.parseColor("#ffffff"));
+                                    }
+
+                                    holder.getmTvLikes().setText( "" + videoDetail.getLike());
+                                }
+                            }
+                        });
+
+
+                    }
+                } catch (Exception e) {
+
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+
+    }
 
     //关注，取消关注
     public void attention(int index,final boolean follow) {
@@ -728,82 +802,12 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
             }
         });
     }
+    //</editor-fold>
 
 
 
 
-
-
-
-    //获取视频播放权限
-    private void getVideoAuth(final ColumnContent columnContent) {
-
-        int sourceId = columnContent.getVideo().getSource_id();
-        String url = ServerInfo.vms + "/v1/sources/" + sourceId + "/playAuth";
-        Map<String, String> params = new HashMap<>();
-        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-            @Override
-            public void onResponse(Call call, String response) throws IOException {
-                handleGetAuth(columnContent,response);
-            }
-
-            @Override
-            public void onFailure(Call call, Exception exception) {
-                mRequestCount -- ;
-            }
-        });
-    }
-
-
-
-    public void handleGetAuth( ColumnContent columnContent, String result) {
-        try {
-            JSONObject jsonObject = JSONObject.parseObject(result);
-            if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                ResAuthInfo resAuthInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), ResAuthInfo.class);
-                VidAuth vidAuth = new VidAuth();
-                vidAuth.setPlayAuth(resAuthInfo.getPlay_auth());
-                vidAuth.setVid(resAuthInfo.getVideo_id());
-                vidAuth.setRegion("cn-shanghai");
-                SmallVideoBean data = new SmallVideoBean();
-                data.setSourceId(""  + columnContent.getVideo().getSource_id());
-                data.setCoverUrl(columnContent.getCover());
-                data.setTitle(columnContent.getTitle());
-                mDatas.add(data);
-
-                mRequestCount -- ;
-                if(mRequestCount == 0) {
-                    AlivcLittleLiveActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            if (isRefreshData) {
-                                videoPlayView.refreshVideoList(mDatas);
-                            } else {
-                                videoPlayView.addMoreData(mDatas);
-                            }
-                        }
-                    });
-                }
-
-
-
-
-
-
-
-            } else if (jsonObject != null) {
-                ToastUtils.show(jsonObject.getString("msg"));
-            }
-        } catch (Exception e) {
-
-        }
-
-    }
-
-
-
-
+    //<editor-fold desc="Function">
     private void showShare(final String title, final String desc, final String logo, final String url) {
         final String cover;
         if (logo.startsWith("http://")) {
@@ -902,7 +906,6 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
 
 
     public void shareStatistics(String channel, String postId, String shardUrl) {
-
         String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
         Map<String, String> params = new HashMap<>();
         if (User.getInstance() != null) {
@@ -929,15 +932,13 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
 
     }
 
+
     //当前播放视频的位置
     public void onPlayAtPosition(int position){
         mVideoPosition = position;
         Log.d("SmallVideo","position = " + position);
         getVideoDetail(position);
-
     }
-
-
 
 
     //判断上下滑动
@@ -950,9 +951,6 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
-
-
                 if(Math.abs(currentX- oldX) < Math.abs(currentY- oldY)){
                     handleVerticalTouch();
                 }else{
@@ -961,8 +959,6 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
                        handleHorizontalTouch();
                    }
                 }
-
-
             }
         }).start();
     }
@@ -986,30 +982,11 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
         }
     }
 
-//    public void willExitVideo(){
-//
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(200);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                if (currentX - oldX > 200) {
-//                    Message message = new Message();
-//                    message.what = 1;
-//                    handler.sendMessage(message);
-//                }
-//            }
-//        }).start();
-//    }
-
     // 退出动画
     public void out() {
 
         Intent intent = new Intent();
-        intent.putExtra("smallVideos", (Serializable) mColumnContents);
+        intent.putExtra("littleVideos", (Serializable) mColumnContents);
         intent.putExtra("position",  mVideoPosition);
         setResult(RESULT_OK, intent);
 
@@ -1027,12 +1004,27 @@ public class AlivcLittleLiveActivity extends AppCompatActivity {
     });
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_LOGIN && resultCode == RESULT_OK) {
-           getVideoDetail(mVideoPosition);
-        }
 
+    //评论
+    public void onCommentButtonClick() {
+        mSmallVideoCommentContentBottomDialog =
+                new SmallVideoCommentContentBottomDialog();
+        mSmallVideoCommentContentBottomDialog.show(getSupportFragmentManager(),"dialog");
     }
+
+   //评论并且输入
+    public void onCommentAndInputClick() {
+        mSmallVideoCommentContentBottomDialog =
+                new SmallVideoCommentContentBottomDialog();
+        mSmallVideoCommentContentBottomDialog.show(getSupportFragmentManager(),"DialogAndInput");
+    }
+
+
+    //</editor-fold>
+
+
+
+
+
 
 }

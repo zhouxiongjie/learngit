@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -16,10 +15,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.alibaba.fastjson.JSONObject;
-import com.aliyun.player.source.VidAuth;
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
 import com.ethanhua.skeleton.Skeleton;
-import com.hjq.toast.ToastUtils;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.RefreshState;
@@ -27,17 +24,11 @@ import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.shuangling.software.R;
-import com.shuangling.software.activity.AlivcLittleLiveActivity;
-import com.shuangling.software.activity.SmallVideoContentActivity;
-import com.shuangling.software.adapter.SmallVideoRecyclerViewAdapter;
-import com.shuangling.software.adapter.SmallVideoRecyclerViewAdapter;
+import com.shuangling.software.activity.AlivcLittleVideoActivity;
+import com.shuangling.software.adapter.LittleVideoRecyclerViewAdapter;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
-import com.shuangling.software.entity.ResAuthInfo;
-import com.shuangling.software.entity.SmallVideo;
-import com.shuangling.software.entity.SmallVideoBean;
 import com.shuangling.software.entity.StsInfo;
-import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
@@ -63,7 +54,7 @@ import butterknife.Unbinder;
 import okhttp3.Call;
 
 
-public class SmallVideoFragment extends Fragment implements Handler.Callback {
+public class LittleVideoFragment extends Fragment implements Handler.Callback {
 
 
     public static final int MSG_UPDATE_LIST = 0x1;
@@ -84,7 +75,7 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
     private String mOrderBy = "1";
     private StsInfo mStsInfo;
     private List<ColumnContent> mColumnContents=new ArrayList<>();
-    private SmallVideoRecyclerViewAdapter mAdapter;
+    private LittleVideoRecyclerViewAdapter mAdapter;
     private Handler mHandler;
     private boolean addInfoStream;
     private boolean hasDecorate=false;
@@ -113,21 +104,31 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
 
 
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mColumnContents.clear();
-        mColumnContents.addAll((List<ColumnContent>) data.getSerializableExtra("smallVideos"));
-        mVideoPosition = data.getIntExtra("position",0);
-        mAdapter.notifyDataSetChanged();
-        mRecyclerView.scrollToPosition(mVideoPosition);
-        super.onActivityResult(requestCode, resultCode, data);
+
+        try {
+            //如果LittleVideoActivity已经打开了， 从 H5 Scheme调用时会关掉 Activity ,这个时候 result是没有数据的
+            List<ColumnContent> columnContents = (List<ColumnContent>) data.getSerializableExtra("littleVideos");
+            if(columnContents == null){
+                return;
+            }
+            mColumnContents.clear();
+            mColumnContents.addAll(columnContents);
+            mVideoPosition = data.getIntExtra("position",0);
+            mAdapter.notifyDataSetChanged();
+            mRecyclerView.scrollToPosition(mVideoPosition);
+            super.onActivityResult(requestCode, resultCode, data);
+        }catch (Exception e) {
+
+        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_small_video, null);
+        View view = inflater.inflate(R.layout.fragment_little_video, null);
         unbinder = ButterKnife.bind(this, view);
 
         //添加自定义分割线
@@ -147,24 +148,24 @@ public class SmallVideoFragment extends Fragment implements Handler.Callback {
         });
 
         mGridLayoutManager = new GridLayoutManager(getActivity(),2);
-        mAdapter = new SmallVideoRecyclerViewAdapter(getActivity(),mColumnContents);
+        mAdapter = new LittleVideoRecyclerViewAdapter(getActivity(),mColumnContents);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener(new SmallVideoRecyclerViewAdapter.OnItemClickListener() {
+        mAdapter.setOnItemClickListener(new LittleVideoRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
 
 //                List<SmallVideo> currentList = new ArrayList<>();
 //                Intent intent = new Intent(getContext(), SmallVideoContentActivity.class);
-//                intent.putExtra("smallVideos", (Serializable) mColumnContents);
+//                intent.putExtra("littleVideos", (Serializable) mColumnContents);
 //                intent.putExtra("position",  position);
 //                startActivity(intent);
                 //   intent.putExtra("sts", (Serializable)  mStsInfo);
 
-                Intent intent = new Intent(getContext(), AlivcLittleLiveActivity.class);
-                intent.putExtra("startType",  AlivcLittleLiveActivity.START_TYPE_NORMAL);
-                intent.putExtra("smallVideos", (Serializable) mColumnContents);
+                Intent intent = new Intent(getContext(), AlivcLittleVideoActivity.class);
+                intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_NORMAL);
+                intent.putExtra("littleVideos", (Serializable) mColumnContents);
                 intent.putExtra("Column", (Serializable) mColumn);
                 intent.putExtra("position",  position);
                 startActivityForResult(intent,1);

@@ -19,19 +19,17 @@ import com.shuangling.software.utils.ImageLoader;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-
 /**
  * Created by 你是我的 on 2019/1/7.
  */
-public class SmallVideoRecyclerViewAdapter extends RecyclerView.Adapter<SmallVideoRecyclerViewAdapter.ViewHolder> {
+public class LittleVideoRecyclerViewAdapter extends RecyclerView.Adapter<LittleVideoRecyclerViewAdapter.ViewHolder> {
     Context context;
     List<ColumnContent> smallVideos = new ArrayList<>();
     LayoutInflater layoutInflater;
     OnItemClickListener onItemClickListener;
 
 
-    public SmallVideoRecyclerViewAdapter(Context context, List<ColumnContent> smallVideos) {
+    public LittleVideoRecyclerViewAdapter(Context context, List<ColumnContent> smallVideos) {
         this.context = context;
         this.smallVideos = smallVideos;
         layoutInflater = LayoutInflater.from(context);

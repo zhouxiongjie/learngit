@@ -19,7 +19,7 @@ public class ServerInfo {
 	public static String vms="http://api-vms.staging.slradio.cn";
 
 
-
+//
 //	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
 //
 //	public static String h5IP="http://www-cms-c.review.slradio.cn";

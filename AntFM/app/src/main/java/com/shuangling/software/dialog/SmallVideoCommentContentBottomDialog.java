@@ -69,7 +69,7 @@ public class SmallVideoCommentContentBottomDialog extends DialogFragment
         recyclerView = view.findViewById(R.id.recycler_view_small_video_comment_content);
         layoutCommentInput = view.findViewById(R.id.layout_small_video_comment_input);
         ivExitCommentContentDialog = view.findViewById(R.id.iv_exit_comment_content);
-        ivExpressionEmojiInput = view.findViewById(R.id.iv_expresstion_emoji_input);
+
 
         commentRecyclerViewAdapter = new CommentRecyclerViewAdapter(commentList, getActivity());
         manager = new LinearLayoutManager(getActivity());
@@ -171,9 +171,7 @@ public class SmallVideoCommentContentBottomDialog extends DialogFragment
                 break;
             case R.id.layout_small_video_comment_input:
                 commentDialog.show(getChildFragmentManager(), "smallVideosoftInput");
-                break;
-            case R.id.iv_expresstion_emoji_input:
-                commentDialog.show(getChildFragmentManager(), "smallVideoemojiInput");
+
                 break;
         }
     }

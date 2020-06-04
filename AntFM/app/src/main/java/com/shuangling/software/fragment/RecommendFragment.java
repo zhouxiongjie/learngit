@@ -27,7 +27,6 @@ import com.kcrason.dynamicpagerindicatorlibrary.DynamicPagerIndicator;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
-import com.shuangling.software.activity.ArticleDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.BindPhoneActivity;
@@ -718,9 +717,9 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                 return contentFragment;
             } else {
                 if (mColumns.get(position).getPost_type() == 12) {
-                    SmallVideoFragment smallVideoFragment = new SmallVideoFragment();
-                    smallVideoFragment.setArguments(data);
-                    return smallVideoFragment;
+                    LittleVideoFragment littleVideoFragment = new LittleVideoFragment();
+                    littleVideoFragment.setArguments(data);
+                    return littleVideoFragment;
                 }else{
                     ContentFragment contentFragment = new ContentFragment();
                     contentFragment.setArguments(data);

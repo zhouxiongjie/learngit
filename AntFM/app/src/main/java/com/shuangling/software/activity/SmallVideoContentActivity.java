@@ -60,7 +60,7 @@ public class SmallVideoContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_small_video_content);
 
-        smallVideos.addAll((List<ColumnContent>) getIntent().getSerializableExtra("smallVideos"));
+        smallVideos.addAll((List<ColumnContent>) getIntent().getSerializableExtra("littleVideos"));
         videoPosition = getIntent().getIntExtra("position",0);
 
         initView();

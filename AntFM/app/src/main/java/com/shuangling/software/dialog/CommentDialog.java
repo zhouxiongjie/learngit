@@ -40,9 +40,7 @@ public class CommentDialog extends DialogFragment implements View.OnClickListene
     Dialog dialog;
     EditText editText;
     TextView tvIssueSend;
-    CheckBox checkBox;
-    ImageView ivAlbum;
-    ImageView ivAite;
+
     CheckBox expressionInputIcon;
     CircleIndicator circleIndicator;
     ViewPager viewPager;
@@ -50,6 +48,18 @@ public class CommentDialog extends DialogFragment implements View.OnClickListene
     private EmotionInputDetector detector;
     NestedScrollView nestedScrollView;
    View contentView;
+
+
+    private DismissListener mListener;
+
+    public void setDismissListener(DismissListener listener) {
+        this.mListener = listener;
+    }
+
+    public interface DismissListener {
+        void onDismiss();
+    }
+
 
     @NonNull
     @Override
@@ -74,11 +84,7 @@ public class CommentDialog extends DialogFragment implements View.OnClickListene
         window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 
         editText = contentView.findViewById(R.id.edit_text);
-        expressionInputIcon = contentView.findViewById(R.id.expression_input_icon);
         tvIssueSend = contentView.findViewById(R.id.tv_issue);
-        circleIndicator = contentView.findViewById(R.id.circle_indicator_2);
-        viewPager = contentView.findViewById(R.id.view_pager_2);
-        llEmojiInput = contentView.findViewById(R.id.ll_emoji_input_2);
         assert dialogType != null;
         if (dialogType.contains("video")){
          //   nestedScrollView = getActivity().findViewById(R.id.nested_scroll_view_video);
@@ -91,66 +97,30 @@ public class CommentDialog extends DialogFragment implements View.OnClickListene
         editText.requestFocus();
 
         final Handler handler = new Handler();
-        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        KeyBordUtil.hideInput(getActivity(),contentView);
-                    }
-                },200);
-            }
-        });
 
-
-        // 判断是否是 smallvideo活动中弹出的评价弹窗，这下面写的的代码是真的烂！！！！
-        if (dialogType.contains("small")){
-            RecyclerView recyclerView = getActivity().findViewById(R.id.recycler_view_small_video_content);
-            if (dialogType.contains("softInput")) {// 直接显示软键盘
-                detector = EmotionInputDetector.with(getActivity())
-                        .bindSendButton(tvIssueSend)
-                        .bindToEditText(editText)
-                        .setEmotionView(llEmojiInput)
-                        .bindToContent(recyclerView)
-                        .bindToEmotionButton3(expressionInputIcon);
-            }else if (dialogType.contains("emojiInput")){// 直接显示自定义表情软件盘
-                detector = EmotionInputDetector.with(getActivity())
-                        .bindSendButton(tvIssueSend)
-                        .bindToEditText(editText)
-                        .setEmotionView(llEmojiInput)
-                        .bindToContent(recyclerView)
-                        .bindToEmotionButton4(expressionInputIcon)
-                ;
-            }
-        }else if (dialogType.contains("softInput")) {
-            detector = EmotionInputDetector.with(getActivity())
-                    .bindSendButton(tvIssueSend)
-                    .bindToEditText(editText)
-                    .setEmotionView(llEmojiInput)
-                    .bindToContent(nestedScrollView)
-                    .bindToEmotionButton(expressionInputIcon);
-        }else if (dialogType.contains("emojiInput")){
-            detector = EmotionInputDetector.with(getActivity())
-                    .bindSendButton(tvIssueSend)
-                    .bindToEditText(editText)
-                    .setEmotionView(llEmojiInput)
-                    .bindToContent(nestedScrollView)
-                    .bindToEmotionButton1(expressionInputIcon)
-                    ;
-        }
-
-        // 绑定判断父布局
-        if (dialogType.contains("video")){
-            detector.bindParentLayout("RelativeLayout");
-        }else {
-            detector.bindParentLayout("CoordinatorLayout");
-        }
-
-        EmojiHelper emojiHelper = new EmojiHelper(1,getActivity(),editText);
-        EmojiViewPagerAdapter adapter = new EmojiViewPagerAdapter(emojiHelper.getPagers());
-        viewPager.setAdapter(adapter);
-        circleIndicator.setViewPager(viewPager);
+//        //关掉dialog 关掉键盘
+//        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//            @Override
+//            public void onCancel(DialogInterface dialogInterface) {
+//                handler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        KeyBordUtil.hideInput(getActivity(),contentView);
+//                    }
+//                },200);
+//            }
+//        });
+//        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//            @Override
+//            public void onDismiss(DialogInterface dialog) {
+//                handler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        KeyBordUtil.hideInput(getActivity(),contentView);
+//                    }
+//                },200);
+//            }
+//        });
 
         tvIssueSend.setOnClickListener(this);
 
@@ -198,6 +168,10 @@ public class CommentDialog extends DialogFragment implements View.OnClickListene
     // 重写 dismiss 设置延迟，否则会又残留dialog不能及时关闭
     @Override
     public void dismiss() {
+
+        if (mListener != null){
+            mListener.onDismiss();
+        }
         new Thread(){
             @Override
             public void run() {
@@ -215,5 +189,19 @@ public class CommentDialog extends DialogFragment implements View.OnClickListene
             }
         };
         editText.setText("");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mListener != null){
+            mListener.onDismiss();
+        }
+
+        super.onDestroy();
     }
 }

@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -24,6 +25,7 @@ import android.widget.RelativeLayout;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.CommentRecyclerViewAdapter;
 import com.shuangling.software.entity.CommentBean;
+import com.shuangling.software.utils.KeyBordUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,14 +39,17 @@ public class SmallVideoCommentContentBottomDialog extends DialogFragment
     private BottomSheetBehavior<FrameLayout> behavior;
     RecyclerView recyclerView;
     RelativeLayout layoutCommentInput;
-    ImageView ivExpressionEmojiInput;
     ImageView ivExitCommentContentDialog;
     List<CommentBean> commentList = new ArrayList<>();
     CommentRecyclerViewAdapter commentRecyclerViewAdapter;
     LinearLayoutManager manager;
     CommentDialog commentDialog;
+
+    View mContentView;
     // 顶部向下偏移量
     private int topOffest = 610;
+
+    final Handler handler = new Handler();
 
     @NonNull
     @Override
@@ -58,9 +63,9 @@ public class SmallVideoCommentContentBottomDialog extends DialogFragment
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.small_video_comment_content_bottom_dialog, container, false);
-        initView(view);
-        return view;
+        mContentView = inflater.inflate(R.layout.small_video_comment_content_bottom_dialog, container, false);
+        initView(mContentView);
+        return mContentView;
     }
 
     private void initView(View view) {
@@ -103,8 +108,22 @@ public class SmallVideoCommentContentBottomDialog extends DialogFragment
             }
         });
 
+        //半年Dialog时关掉键盘
+        commentDialog.setDismissListener(new CommentDialog.DismissListener() {
+            @Override
+            public void onDismiss() {
+
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        KeyBordUtil.hideInput((getActivity()),mContentView);
+                    }
+                },50);
+            }
+        });
+
         ivExitCommentContentDialog.setOnClickListener(this);
-        ivExpressionEmojiInput.setOnClickListener(this);
+       // ivExpressionEmojiInput.setOnClickListener(this);
         layoutCommentInput.setOnClickListener(this);
     }
 

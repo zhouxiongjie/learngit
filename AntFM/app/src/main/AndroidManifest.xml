@@ -265,7 +265,7 @@
         </activity>
 
         <activity android:name=".activity.AlivcLittleVideoActivity"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/Theme.AppCompat.NoActionBar"/>

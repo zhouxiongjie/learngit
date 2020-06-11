@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="1dp"
     android:layout_marginLeft="1dp"
@@ -16,8 +16,8 @@
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/iv_small_video_face_pic"
-        android:layout_width="210dp"
-        android:layout_height="250dp"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -43,14 +43,12 @@
             android:id="@+id/video_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="8.5dp"
+            android:padding="8.5dp"
+            android:maxHeight="200dp"
             android:text="小视频标题123131312312311"
             android:textColor="#ffffff"
             android:textSize="17sp"
-
             />
-
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -59,31 +57,59 @@
             android:paddingTop="8.5dp"
             android:paddingBottom="8.5dp"
             >
-            <com.facebook.drawee.view.SimpleDraweeView
-                android:id="@+id/iv_author_logo"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                app:actualImageScaleType="centerCrop"
-                app:placeholderImage="@drawable/ic_user4"
-                app:placeholderImageScaleType="centerCrop"
-                app:failureImage="@drawable/ic_user4"
-                app:failureImageScaleType="centerCrop"
-                app:viewAspectRatio="1"
-                app:roundAsCircle="true"
-                app:roundingBorderWidth="0dp"
-                app:roundingBorderColor="@color/white"
-                android:visibility="visible"/>
-            <TextView
-                android:id="@+id/tv_author_name"
-                android:layout_width="wrap_content"
+            <LinearLayout android:layout_weight="0.6"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="伊金媒体中心"
-                android:textColor="#ffffff"
-                android:textSize="11sp"
-                android:layout_centerVertical="true"
-                android:paddingLeft="3.5dp"></TextView>
+                >
+
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/iv_author_logo"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    app:actualImageScaleType="centerCrop"
+                    app:placeholderImage="@drawable/ic_user4"
+                    app:placeholderImageScaleType="centerCrop"
+                    app:failureImage="@drawable/ic_user4"
+                    app:failureImageScaleType="centerCrop"
+                    app:viewAspectRatio="1"
+                    app:roundAsCircle="true"
+                    app:roundingBorderWidth="0dp"
+                    app:roundingBorderColor="@color/white"
+                    android:visibility="visible"/>
+                <TextView
+                    android:id="@+id/tv_author_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="伊金媒体中心"
+                    android:textColor="#ffffff"
+                    android:textSize="11sp"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="3.5dp"></TextView>
+
+
+            </LinearLayout>
+
+                <LinearLayout
+                    android:layout_weight="0.4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    >
+                    <TextView
+                        android:id="@+id/tv_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="10万次播放"
+                        android:textColor="#ffffff"
+                        android:textSize="11sp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="10dp"
+                        android:paddingLeft="3.5dp"/>
+                </LinearLayout>
+
+
 
         </LinearLayout>
 

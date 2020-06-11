@@ -15,6 +15,7 @@ import com.shuangling.software.R;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
+import com.shuangling.software.utils.NumberUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,15 @@ public class LittleVideoRecyclerViewAdapter extends RecyclerView.Adapter<LittleV
             }
         });
 
+        if ( smallVideo.getView() >0){
+            viewHolder.tvViews.setVisibility(View.VISIBLE);
+            viewHolder.tvViews.setText(NumberUtil.formatNum(smallVideo.getView()  + "",false)+"次播放");
+        }else{
+            viewHolder.tvViews.setVisibility(View.GONE);
+        }
+
+
+
     }
 
     @Override
@@ -96,7 +106,7 @@ public class LittleVideoRecyclerViewAdapter extends RecyclerView.Adapter<LittleV
 
         TextView smallVideoTitle;
         TextView authorName;
-
+        TextView tvViews;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -104,6 +114,7 @@ public class LittleVideoRecyclerViewAdapter extends RecyclerView.Adapter<LittleV
             smallVideoTitle = itemView.findViewById(R.id.video_title);
             authorIcon = itemView.findViewById(R.id.iv_author_logo);
             authorName = itemView.findViewById(R.id.tv_author_name);
+            tvViews = itemView.findViewById(R.id.tv_view);
         }
     }
 

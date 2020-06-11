@@ -200,6 +200,8 @@
     <color name="red_500">#ef4836</color>
     <color name="bg_focus">#dddddd</color>
 
+    <color name="mask_color">#66000000</color>
+
 </resources>
 
 

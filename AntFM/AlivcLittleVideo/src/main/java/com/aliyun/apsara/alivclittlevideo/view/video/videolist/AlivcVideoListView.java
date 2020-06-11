@@ -191,16 +191,29 @@ public class AlivcVideoListView extends FrameLayout {
                 List<TrackInfo> trackInfos = mediaInfo.getTrackInfos();
                 int size = trackInfos.size();
                 for (TrackInfo trackInfo : trackInfos) {
-                    if (trackInfo.getVodDefinition().equals(VideoQuality.PLAY.getValue())) {
-                        float aspectRatio = (float)trackInfo.getVideoWidth() / trackInfo.getVideoHeight();
-                        if (aspectRatio < 9f / 15f) {
-                            mListPlayer.setScaleMode(IPlayer.ScaleMode.SCALE_ASPECT_FILL);
-                        } else {
-                            mListPlayer.setScaleMode(IPlayer.ScaleMode.SCALE_ASPECT_FIT);
-                        }
-                        break;
-                    }
+//                    if (trackInfo.getVodDefinition().equals(VideoQuality.PLAY.getValue())) {
+//                        float aspectRatio = (float)trackInfo.getVideoWidth() / trackInfo.getVideoHeight();
+//                        if (aspectRatio < 9f / 16f) {
+//                            mListPlayer.setScaleMode(IPlayer.ScaleMode.SCALE_ASPECT_FILL);
+//                        } else {
+//                            mListPlayer.setScaleMode(IPlayer.ScaleMode.SCALE_ASPECT_FIT);
+//                        }
+//
+//
+//                        break;
+//                    }
+
+                   float width =    (float)trackInfo.getVideoWidth();
+                   float height =  (float)trackInfo.getVideoHeight();
+                   if(width > height) {
+                       mListPlayer.setScaleMode(IPlayer.ScaleMode.SCALE_ASPECT_FIT);
+                   }else{
+                       mListPlayer.setScaleMode(IPlayer.ScaleMode.SCALE_ASPECT_FILL);
+                   }
                 }
+
+                mListPlayer.setScaleMode(IPlayer.ScaleMode.SCALE_ASPECT_FIT);
+
                 if (!isPause && !isOnBackground) {
                     mListPlayer.start();
                 }
@@ -290,8 +303,6 @@ public class AlivcVideoListView extends FrameLayout {
                     }else{
                         progress  = infoBean.getExtraValue()* 100/mAllTime ;
                     }
-
-
                     BaseVideoListAdapter.BaseHolder holder = (BaseVideoListAdapter.BaseHolder) recycler.findViewHolderForLayoutPosition(mCurrentPosition);
                     if (holder != null) {
                         holder.getPlayProgressBar().setProgress((int)progress);
@@ -368,6 +379,7 @@ public class AlivcVideoListView extends FrameLayout {
                     BaseVideoListAdapter.BaseHolder holder = (BaseVideoListAdapter.BaseHolder) recycler.findViewHolderForLayoutPosition(position);
                     if (holder != null) {
                         holder.getCoverView().setVisibility(VISIBLE);
+                        holder.getPlayProgressBar().setProgress(0);
                         if(holder.getPlayIcon() != null){
                             holder.getPlayIcon().setVisibility(View.GONE);
                         }

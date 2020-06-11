@@ -18,21 +18,25 @@
         android:layout_alignParentTop="true"
         >
 
-        <ImageView
-            android:id="@+id/iv_exit_comment_content"
+        <com.shuangling.software.customview.FontIconView
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
+            android:text="&#xe612;"
+            android:textColor="#7F7F7F"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:textSize="17sp"
             android:layout_marginLeft="10dp"
-            android:src="@drawable/float_close_icon" />
+            android:id="@+id/iv_exit_comment_content"/>
 
         <TextView
             android:id="@+id/commentNumber"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical|center_horizontal"
-            android:text=""
+            android:text="评论详情"
             android:textColor="#333333"
             android:textSize="16sp"></TextView>
 
@@ -44,24 +48,15 @@
     </RelativeLayout>
 
 
-    <com.scwang.smartrefresh.layout.SmartRefreshLayout
-        android:id="@+id/refreshLayout"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_small_video_comment_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="5dp"
         android:layout_above="@id/layout_bottom"
-        android:layout_below="@id/relativtyLayout_1"
-        android:layout_marginTop="-2dp"
-        android:layout_marginBottom="2dp"
-        fresco:srlEnableLoadMore="true"
-        fresco:srlEnableRefresh="false">
+        android:layout_below="@id/relativtyLayout_1"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view_small_video_comment_content"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="5dp" />
 
-    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
     <RelativeLayout
             android:layout_width="match_parent"
@@ -69,9 +64,6 @@
             android:layout_marginBottom="0dp"
             android:orientation="vertical"
             android:id="@+id/layout_bottom"
-
-
-
             android:layout_alignParentBottom="true">
 
             <View
@@ -89,6 +81,7 @@
                 android:layout_marginBottom="9dp"
                 android:background="@drawable/layout_small_video_comment_background">
 
+
                 <com.shuangling.software.customview.FontIconView
                     android:layout_width="23dp"
                     android:layout_height="25dp"
@@ -100,6 +93,7 @@
                     android:textSize="17sp"
                     android:layout_marginLeft="10dp"
                     android:id="@+id/iv_1"/>
+
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -119,9 +113,7 @@
         </RelativeLayout>
 
 
-    <FrameLayout android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/container"/>
+
 
 
 

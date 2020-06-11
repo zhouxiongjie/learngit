@@ -47,7 +47,7 @@ public class SearchActivity extends AppCompatActivity {
 
     public static final String TAG = "SearchActivity";
 
-    private static final int[] searchCategory = new int[]{R.string.all,R.string.article,R.string.video,R.string.audio,R.string.album,R.string.photo,R.string.special,R.string.organization,R.string.anchor,R.string.tv,R.string.radio};
+    private static final int[] searchCategory = new int[]{R.string.all,R.string.article,R.string.video,R.string.little_video,R.string.audio,R.string.album,R.string.photo,R.string.special,R.string.organization,R.string.anchor,R.string.tv,R.string.radio};
 
     @BindView(R.id.searchCancel)
     TextView searchCancel;

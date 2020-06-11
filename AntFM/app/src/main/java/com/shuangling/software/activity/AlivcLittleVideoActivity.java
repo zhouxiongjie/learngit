@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +22,9 @@ import com.aliyun.apsara.alivclittlevideo.view.video.videolist.AlivcVideoListVie
 import com.aliyun.player.source.VidAuth;
 import com.aliyun.player.source.VidSts;
 import com.hjq.toast.ToastUtils;
+import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.dialog.CommentDialog;
 import com.shuangling.software.dialog.SmallVideoCommentContentBottomDialog;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
@@ -32,7 +35,10 @@ import com.shuangling.software.entity.User;
 import com.shuangling.software.entity.VideoDetail;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Constant;
+import com.shuangling.software.utils.KeyBordUtil;
+import com.shuangling.software.utils.NumberUtil;
 import com.shuangling.software.utils.ServerInfo;
 
 
@@ -61,6 +67,13 @@ import okhttp3.Call;
 public class AlivcLittleVideoActivity extends AppCompatActivity {
 
     public static final int REQUEST_LOGIN = 0x1;
+
+
+    public static final int PAN_DOWN = 1;
+    public static final int PAN_UP = 2;
+    public static final int PAN_LEFT = 3;
+    public static final int PAN_RIGHT = 4;
+
 
 
     //跳转进入短视频详情的几种方式
@@ -101,6 +114,7 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
 
     //评论框
     SmallVideoCommentContentBottomDialog mSmallVideoCommentContentBottomDialog;
+    CommentDialog mCommentDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +160,9 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
     }
 
     protected void initView() {
+
+        setTheme(MyApplication.getInstance().getCurrentTheme());
+
         videoPlayView = findViewById(R.id.video_play_detail_view);
         findViewById(R.id.fl_video_detail_back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,14 +192,17 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
 
                     String likes =  holder.getmTvLikes().getText() + "";
                     int nLikes = 0;
-                    nLikes = Integer.parseInt(likes);
+
+                    if(!likes.equals("点赞")){
+                        nLikes = Integer.parseInt(likes);
+                    }
 
                     if(columnContent.getIs_like() == 1) {
                         holder.getmFivPrase().setTextColor(Color.parseColor("#ffffff"));
                         praise(position,false);
                         nLikes --;
                         if(nLikes<=0){
-                            holder.getmTvLikes().setText("0");
+                            holder.getmTvLikes().setText("点赞");
                         }else {
                             holder.getmTvLikes().setText("" + nLikes);
                         }
@@ -241,13 +261,25 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                 if(holder != null) {
                     if(holder.getmTvAttention().getText() == "已关注") {
                         holder.getmTvAttention().setText("关注");
+                        holder.getmTvAttention().setTextColor(Color.parseColor("#FFFFFF"));
                         holder.getmTvAttention().setSelected(true);
                         attention(position,false);
                     }else{
                         holder.getmTvAttention().setText("已关注");
+                        holder.getmTvAttention().setTextColor(Color.parseColor("#88FFFFFF"));
                         holder.getmTvAttention().setSelected(false);
                         attention(position,true);
                     }
+                }
+            }
+
+            @Override
+            public void onHeadClick(int position) {
+                ColumnContent columnContent =   mColumnContents.get(position);
+                if (columnContent.getAuthor_info() != null && columnContent.getAuthor_info().getMerchant() != null) {
+                    Intent it = new Intent(AlivcLittleVideoActivity.this, WebViewActivity.class);
+                    it.putExtra("url", ServerInfo.h5HttpsIP + "/orgs/" + columnContent.getAuthor_info().getMerchant().getId());
+                    startActivity(it);
                 }
             }
         });
@@ -563,12 +595,14 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                 data.setmVidSts(vidSts);
                 data.setIs_like(columnContent.getIs_like());
                 data.setTitle(columnContent.getTitle());
-
+                data.setView(columnContent.getView());
+                data.setComment(columnContent.getComment());
 
                 if(columnContent.getAuthor_info() != null && columnContent.getAuthor_info().getMerchant() != null ) {
                     BaseVideoSourceModel.UserBean userBean = new BaseVideoSourceModel.UserBean();
                     userBean.setAvatarUrl(columnContent.getAuthor_info().getMerchant().getLogo());
                     userBean.setUserName(columnContent.getAuthor_info().getMerchant().getName());
+                    userBean.setType(columnContent.getAuthor_info().getMerchant().getType());
                     data.setUser(userBean);
                 }
 
@@ -600,6 +634,7 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
             return;
         }
         ColumnContent columnContent= mColumnContents.get(position);
+        addPlayTimes(columnContent.getId());
         String url = ServerInfo.serviceIP + ServerInfo.getVideoDetail + columnContent.getId();
         Map<String, String> params = new HashMap<>();
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
@@ -626,10 +661,12 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                                     if(videoDetail.getIs_follow() == 1) {
                                         holder.getmTvAttention().setText("已关注");
                                         holder.getmTvAttention().setSelected(false);
+                                        holder.getmTvAttention().setTextColor(Color.parseColor("#88FFFFFF"));
                                         holder.getmTvAttention().setVisibility(View.VISIBLE);
                                     }else{
                                         holder.getmTvAttention().setText("关注");
                                         holder.getmTvAttention().setSelected(true);
+                                        holder.getmTvAttention().setTextColor(Color.parseColor("#FFFFFF"));
                                         holder.getmTvAttention().setVisibility(View.VISIBLE);
                                     }
 
@@ -639,7 +676,25 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                                         holder.getmFivPrase().setTextColor(Color.parseColor("#ffffff"));
                                     }
 
-                                    holder.getmTvLikes().setText( "" + videoDetail.getLike());
+
+                                    ColumnContent columnContent = mColumnContents.get(mVideoPosition);
+                                    if(videoDetail.getComment()>columnContent.getComment()){
+                                        columnContent.setComment(videoDetail.getComment());
+                                    }else{
+                                        videoDetail.setComment(columnContent.getComment());
+                                    }
+
+                                    if(videoDetail.getComment()>0){
+                                        holder.getmTvComment().setText(""+ videoDetail.getComment());
+                                    }else{
+                                        holder.getmTvComment().setText("点评");
+                                    }
+
+                                    if(videoDetail.getLike()>0){
+                                        holder.getmTvLikes().setText(NumberUtil.formatNum( "" + videoDetail.getLike(),false));
+                                    }else{
+                                        holder.getmTvLikes().setText("点赞");
+                                    }
                                 }
                             }
                         });
@@ -699,12 +754,15 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                                     if(videoDetail.getIs_follow() == 1) {
                                         holder.getmTvAttention().setText("已关注");
                                         holder.getmTvAttention().setSelected(false);
+                                        holder.getmTvAttention().setTextColor(Color.parseColor("#88FFFFFF"));
                                         holder.getmTvAttention().setVisibility(View.VISIBLE);
                                     }else{
                                         holder.getmTvAttention().setText("关注");
                                         holder.getmTvAttention().setSelected(true);
+                                        holder.getmTvAttention().setTextColor(Color.parseColor("#FFFFFF"));
                                         holder.getmTvAttention().setVisibility(View.VISIBLE);
                                     }
+
 
                                     if(videoDetail.getIs_likes() == 1) {
                                         holder.getmFivPrase().setTextColor(Color.parseColor("#F54C68"));
@@ -802,6 +860,73 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    private void addPlayTimes(int id) {
+        String url = ServerInfo.serviceIP + ServerInfo.addPlayTimes + id;
+        Map<String, String> params = new HashMap<>();
+        OkHttpUtils.put(url, params, new OkHttpCallback(getApplicationContext()) {
+
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.i("test", response);
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+            }
+        });
+    }
+
+
+    private void writeComments(String content, String parentId, String topCommentId ,int postId) {
+        String url = ServerInfo.serviceIP + ServerInfo.getComentList;
+        Map<String, String> params = new HashMap<>();
+        params.put("post_id", "" + postId);
+        params.put("type", "1");
+        params.put("content", content);
+        params.put("parent_id", parentId);
+        params.put("base_comment_id", topCommentId);
+        params.put("source_type", "3");
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                try {
+                    String result = response;
+                    JSONObject jsonObject = JSONObject.parseObject(result);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        ToastUtils.show("发表成功");
+
+                        ColumnContent columnContent = mColumnContents.get(mVideoPosition);
+                        columnContent.setComment( columnContent.getComment() +1);
+                        getVideoDetail(mVideoPosition);
+
+                    }else{
+                        String message =  jsonObject.getString("msg");
+                        if(message != null) {
+                            ToastUtils.show("发表失败" + message);
+                        }else{
+                            ToastUtils.show("发表失败");
+                        }
+                    }
+                } catch (Exception e) {
+                    ToastUtils.show("发表失败");
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                ToastUtils.show("发表失败，网络错误");
+            }
+        });
+    }
+
     //</editor-fold>
 
 
@@ -874,7 +999,8 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                     }
                 }
 
-                //shareStatistics(chanel, "" + mVideoDetail.getId(), url);
+                ColumnContent columnContent = mColumnContents.get(mVideoPosition);
+                shareStatistics(chanel, "" + columnContent.getId(), url);
             }
         });
         oks.setCallback(new PlatformActionListener() {
@@ -946,6 +1072,8 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
+
+                Looper.prepare();
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
@@ -959,6 +1087,8 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                        handleHorizontalTouch();
                    }
                 }
+
+                Looper.loop();
             }
         }).start();
     }
@@ -966,9 +1096,13 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
 
     //垂直方向
     public void handleVerticalTouch() {
-        if (currentY - oldY > 200) {
+        if (currentY - oldY > 200) {//从上往下
             Message message = new Message();
-            message.what = 1;
+            message.what = PAN_DOWN;
+            handler.sendMessage(message);
+        }else if (currentY - oldY < -200) {//从下往上滑
+            Message message = new Message();
+            message.what = PAN_UP;
             handler.sendMessage(message);
         }
     }
@@ -977,7 +1111,7 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
     public void handleHorizontalTouch(){
         if (currentX - oldX > 200) {
             Message message = new Message();
-            message.what = 1;
+            message.what = PAN_RIGHT;
             handler.sendMessage(message);
         }
     }
@@ -989,7 +1123,6 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
         intent.putExtra("littleVideos", (Serializable) mColumnContents);
         intent.putExtra("position",  mVideoPosition);
         setResult(RESULT_OK, intent);
-
         finish();
         overridePendingTransition(0, R.anim.out);
     }
@@ -998,7 +1131,12 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
     Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            out();
+            if(msg.what == PAN_DOWN || msg.what == PAN_RIGHT){
+                out();
+            }else if (msg.what == PAN_UP){
+                onCommentButtonClick();
+            }
+
             return false;
         }
     });
@@ -1007,16 +1145,67 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
 
     //评论
     public void onCommentButtonClick() {
+
+        ColumnContent columnContent = mColumnContents.get(mVideoPosition);
         mSmallVideoCommentContentBottomDialog =
                 new SmallVideoCommentContentBottomDialog();
+        mSmallVideoCommentContentBottomDialog.setVideoId(columnContent.getId());
         mSmallVideoCommentContentBottomDialog.show(getSupportFragmentManager(),"dialog");
     }
 
    //评论并且输入
     public void onCommentAndInputClick() {
-        mSmallVideoCommentContentBottomDialog =
-                new SmallVideoCommentContentBottomDialog();
-        mSmallVideoCommentContentBottomDialog.show(getSupportFragmentManager(),"DialogAndInput");
+
+
+        final ColumnContent columnContent = mColumnContents.get(mVideoPosition);
+        //判断是否登录
+        if (User.getInstance() == null) {
+            Intent it = new Intent(AlivcLittleVideoActivity.this, NewLoginActivity.class);
+            it.putExtra("bindPhone", true);
+            it.putExtra("jump_url", ServerInfo.h5IP + "/videos/" + columnContent.getId());
+            startActivityForResult(it, REQUEST_LOGIN);
+        } else if (User.getInstance() != null && TextUtils.isEmpty(User.getInstance().getPhone())) {
+            Intent it = new Intent(AlivcLittleVideoActivity.this, BindPhoneActivity.class);
+            startActivity(it);
+        } else {
+
+            if(columnContent.getComment()>0 ) {
+                mSmallVideoCommentContentBottomDialog =
+                        new SmallVideoCommentContentBottomDialog();
+                mSmallVideoCommentContentBottomDialog.setVideoId(columnContent.getId());
+                mSmallVideoCommentContentBottomDialog.show(getSupportFragmentManager(), "DialogAndInput");
+            }else{
+
+                mCommentDialog = new CommentDialog();
+                mCommentDialog.show(getSupportFragmentManager(), "smallVideosoftInput");
+                mCommentDialog.setSendListener(new CommentDialog.SendListener() {
+                    @Override
+                    public void sendComment(String inputText) {
+                        writeComments(inputText, "" + "0", "" + "0",columnContent.getId());
+                        mCommentDialog.dismiss();
+                    }
+                },null);
+
+                mCommentDialog.setDismissListener(new CommentDialog.DismissListener() {
+                    @Override
+                    public void onDismiss() {
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                CommonUtils.hideInput(AlivcLittleVideoActivity.this );
+                            }
+                        }, 50);
+                    }
+                });
+            }
+        }
+
+
+
+
+
+
+
     }
 
 

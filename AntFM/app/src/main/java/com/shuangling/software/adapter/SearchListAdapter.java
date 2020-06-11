@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,15 +14,14 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
-import com.shuangling.software.activity.AnchorDetailActivity;
-import com.shuangling.software.activity.ArticleDetailActivity;
+import com.shuangling.software.activity.AlivcLittleVideoActivity;
 import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
-import com.shuangling.software.activity.OrganizationDetailActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.TvDetailActivity;
@@ -30,6 +30,7 @@ import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.entity.SearchResult;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
+import com.shuangling.software.utils.NumberUtil;
 import com.shuangling.software.utils.ServerInfo;
 
 import java.util.List;
@@ -56,10 +57,16 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
     public static final int TYPE_TV = 7;                //电视台
     public static final int TYPE_GALLERIE = 8;          //图集
     public static final int TYPE_ORGANIZATION = 9;       //机构
+    public static final int TYPE_LITTLE_VIDEO = 11;     //短视频
     private Context mContext;
     private List<SearchResult> mSearchResults;
     private LayoutInflater inflater;
 
+    private int mSearchType; //当前正在搜索的类型 由于 视频 /短视频 两个其实是同一台，加一个搜索参数区分
+
+    public void setSearchType(int searchType) {
+        this.mSearchType = searchType;
+    }
 
     private OnItemClickListener onItemClickListener;
 
@@ -104,6 +111,8 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             return new ArticleViewHolder(inflater.inflate(R.layout.search_article_item, parent, false));
         } else if (viewType == TYPE_VIDEO) {
             return new VideoViewHolder(inflater.inflate(R.layout.search_video_item, parent, false));
+        } else if (viewType == TYPE_LITTLE_VIDEO) {
+            return new LittleVideoViewHolder(inflater.inflate(R.layout.small_video_recycler_view_item, parent, false));
         } else if (viewType == TYPE_SPECIAL) {
             return new SpecialViewHolder(inflater.inflate(R.layout.search_special_item, parent, false));
         } else if (viewType == TYPE_RADIO) {
@@ -181,6 +190,8 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                 }
             });
         } else if (itemViewType == TYPE_VIDEO) {
+
+            //视频
             VideoViewHolder videoViewHolder = (VideoViewHolder) holder;
 
             if (!TextUtils.isEmpty(content.getCover())) {
@@ -204,6 +215,84 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                 }
             });
 
+
+
+        }else if (itemViewType == TYPE_LITTLE_VIDEO) { //短视频
+            //当前搜索的是全部，显示为视频单元
+            if (mSearchType != R.string.little_video) {
+                //视频
+                VideoViewHolder videoViewHolder = (VideoViewHolder) holder;
+
+                if (!TextUtils.isEmpty(content.getCover())) {
+                    Uri uri = Uri.parse(content.getCover());
+                    int width = CommonUtils.dip2px(70);
+                    int height = width;
+                    ImageLoader.showThumb(uri, videoViewHolder.logo, width, height);
+                }
+                videoViewHolder.title.setText(content.getTitle());
+                if (!TextUtils.isEmpty(content.getDuration())) {
+                    videoViewHolder.duration.setText(CommonUtils.getShowTime((long) Float.parseFloat(content.getDuration())));
+                } else {
+                    videoViewHolder.duration.setText("00:00");
+                }
+                videoViewHolder.root.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(mContext, AlivcLittleVideoActivity.class);
+                        intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_WEBVIEW_CURRENT);
+                        intent.putExtra("original_id",  content.getId());
+                        intent.putExtra("play_id",  content.getId());
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+                    }
+                });
+            } else {//选的是短视频分类
+
+                LittleVideoViewHolder videoViewHolder = (LittleVideoViewHolder) holder;
+
+                if (!TextUtils.isEmpty(content.getCover())) {
+                    Uri uri = Uri.parse(content.getCover());
+                    int width = CommonUtils.dip2px(160);
+                    int height = width;
+                    ImageLoader.showThumb(uri, videoViewHolder.mIvSmallVideoFacePic, width, height);
+                }
+                videoViewHolder.mVideoTitle.setText(content.getTitle());
+
+                //作者信息
+                if(content.getMerchant() != null){
+                    if (!TextUtils.isEmpty(content.getMerchant().getLogo())) {
+                        Uri uri = Uri.parse(content.getMerchant().getLogo());
+                        int width = CommonUtils.dip2px(20);
+                        int height = width;
+                        ImageLoader.showThumb(uri, videoViewHolder.mIvAuthorLogo, width, height);
+                    }
+                    videoViewHolder.mTvAuthorName.setText(content.getMerchant().getName());
+                }
+
+                //播放次数
+                if(content.getPlays()>0 ) {
+                    videoViewHolder.mTvViews.setText(NumberUtil.formatNum(content.getPlays() + "",false)+ "次播放");
+                    videoViewHolder.mTvViews.setVisibility(View.VISIBLE);
+                }else{
+                    videoViewHolder.mTvViews.setText( "");
+                    videoViewHolder.mTvViews.setVisibility(View.GONE);
+                }
+
+                videoViewHolder.mIvSmallVideoFacePic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        Intent intent = new Intent(mContext, AlivcLittleVideoActivity.class);
+                        intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_WEBVIEW_CURRENT);
+                        intent.putExtra("original_id",  content.getId());
+                        intent.putExtra("play_id",  content.getId());
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        mContext.startActivity(intent);
+
+                    }
+                });
+
+            }
         } else if (itemViewType == TYPE_SPECIAL) {
             SpecialViewHolder specialViewHolder = (SpecialViewHolder) holder;
 
@@ -258,7 +347,7 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             }
 
             anchorViewHolder.title.setText(content.getName());
-            anchorViewHolder.fanNum.setText(content.getFollows()+"粉丝");
+            anchorViewHolder.fanNum.setText(content.getFollows() + "粉丝");
             if (content.getIs_follow() == 0) {
                 anchorViewHolder.attention.setActivated(true);
                 anchorViewHolder.attention.setText("关注");
@@ -273,7 +362,7 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
 //                    it.putExtra("anchorId", content.getId());
 //                    mContext.startActivity(it);
                     Intent it = new Intent(mContext, WebViewActivity.class);
-                    it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+content.getId());
+                    it.putExtra("url", ServerInfo.h5HttpsIP + "/anchors/" + content.getId());
                     mContext.startActivity(it);
                 }
             });
@@ -333,7 +422,7 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             }
 
             organizationViewHolder.title.setText(content.getName());
-            organizationViewHolder.fanNum.setText(content.getFollows()+"粉丝");
+            organizationViewHolder.fanNum.setText(content.getFollows() + "粉丝");
             if (content.getIs_follow() == 0) {
                 organizationViewHolder.attention.setActivated(true);
                 organizationViewHolder.attention.setText("关注");
@@ -349,7 +438,7 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
 //                    mContext.startActivity(it);
 
                     Intent it = new Intent(mContext, WebViewActivity.class);
-                    it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+content.getId());
+                    it.putExtra("url", ServerInfo.h5HttpsIP + "/orgs/" + content.getId());
                     mContext.startActivity(it);
                 }
             });
@@ -451,6 +540,28 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             ButterKnife.bind(this, view);
         }
     }
+
+
+    //短视频
+    public class LittleVideoViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.iv_small_video_face_pic)
+        SimpleDraweeView mIvSmallVideoFacePic;
+        @BindView(R.id.video_title)
+        TextView mVideoTitle;
+        @BindView(R.id.iv_author_logo)
+        SimpleDraweeView mIvAuthorLogo;
+        @BindView(R.id.tv_author_name)
+        TextView mTvAuthorName;
+
+        @BindView(R.id.tv_view)
+        TextView mTvViews;
+
+        public LittleVideoViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
+    }
+
 
     public class ArticleViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.logo)
@@ -590,6 +701,8 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
             return TYPE_ANCHOR;
         } else if (mSearchResults.get(position).getSearch_type() == 6) {
             return TYPE_VIDEO;
+        } else if (mSearchResults.get(position).getSearch_type() == 11) {
+            return TYPE_LITTLE_VIDEO;
         } else if (mSearchResults.get(position).getSearch_type() == 7) {
             return TYPE_TV;
         } else if (mSearchResults.get(position).getSearch_type() == 8) {
@@ -601,7 +714,6 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
         }
 
     }
-
 
 
 }

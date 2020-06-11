@@ -1,7 +1,6 @@
 package com.shuangling.software.dialog;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -9,32 +8,24 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-
-import com.aliyun.svideo.common.utils.ToastUtils;
 import com.shuangling.software.R;
-import com.shuangling.software.adapter.EmojiViewPagerAdapter;
 import com.shuangling.software.customview.CircleIndicator;
-import com.shuangling.software.utils.EmojiHelper;
 import com.shuangling.software.utils.EmotionInputDetector;
 import com.shuangling.software.utils.KeyBordUtil;
 
-import java.util.Objects;
-
 /**
- * Created by 你是我的 on 2018/12/30.
+ * 评论详情
  */
-public class CommentDialog extends DialogFragment implements View.OnClickListener {
+public class CommentDetailDialog extends DialogFragment implements View.OnClickListener {
     //点击发表，内容不为空时的回调
     public SendListener sendListener;
 
@@ -48,10 +39,7 @@ public class CommentDialog extends DialogFragment implements View.OnClickListene
     LinearLayout llEmojiInput;
     private EmotionInputDetector detector;
     NestedScrollView nestedScrollView;
-
-    View contentView;
-
-    String mUserName;
+   View contentView;
 
 
     private DismissListener mListener;
@@ -100,13 +88,6 @@ public class CommentDialog extends DialogFragment implements View.OnClickListene
         editText.setFocusableInTouchMode(true);
         editText.requestFocus();
 
-
-        if(mUserName != null ) {
-            editText.setHint("@" + mUserName);
-        }else{
-            editText.setHint("优质评论将会被优先展示");
-        }
-
         final Handler handler = new Handler();
 
 //        //关掉dialog 关掉键盘
@@ -144,11 +125,6 @@ public class CommentDialog extends DialogFragment implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.tv_issue:
-
-                if(editText.getText().length()==0){
-                    ToastUtils.show(getContext(),"评论不能为空");
-                    return;
-                }
                 sendListener.sendComment(editText.getText().toString());
                 break;
         }
@@ -160,21 +136,9 @@ public class CommentDialog extends DialogFragment implements View.OnClickListene
         void sendComment(String inputText);
     }
 
-    public void setSendListener(SendListener sendListener,String userName) {
+    public void setSendListener(SendListener sendListener) {
         this.sendListener = sendListener;
-        mUserName = userName;
-
-        if(editText != null) {
-            if(userName != null ) {
-                editText.setHint("@" + userName);
-            }else{
-                editText.setHint("优质评论将会被优先展示");
-            }
-        }
-
     }
-
-
 
 
     // 监听软件盘是否关闭的接口 ： 没有用到

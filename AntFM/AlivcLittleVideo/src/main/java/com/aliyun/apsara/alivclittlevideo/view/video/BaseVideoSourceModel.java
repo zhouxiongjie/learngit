@@ -47,6 +47,9 @@ public abstract class BaseVideoSourceModel implements IVideoSourceModel {
 
     protected int is_like = 0;
 
+    protected int view = 0;
+    protected int comment = 0;
+
     /**
      * 封面url
      */
@@ -121,6 +124,22 @@ public abstract class BaseVideoSourceModel implements IVideoSourceModel {
 
     public void setIs_like(int is_like) {
         this.is_like = is_like;
+    }
+
+    public int getView() {
+        return view;
+    }
+
+    public void setView(int view) {
+        this.view = view;
+    }
+
+    public int getComment() {
+        return comment;
+    }
+
+    public void setComment(int comment) {
+        this.comment = comment;
     }
 
     public String getDescription() {
@@ -215,6 +234,7 @@ public abstract class BaseVideoSourceModel implements IVideoSourceModel {
         private String userId;
         private String userName;
         private String avatarUrl;
+        private int type;
         private int is_like;
 
         public UserBean(String userId, String nickName, String avatarUrl) {
@@ -243,6 +263,14 @@ public abstract class BaseVideoSourceModel implements IVideoSourceModel {
             return avatarUrl;
         }
 
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
+        }
 
         public int getIs_like() {
             return is_like;

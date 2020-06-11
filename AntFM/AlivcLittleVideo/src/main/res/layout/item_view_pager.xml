@@ -13,19 +13,19 @@
         android:layout_height="match_parent"
         android:clickable="false"
         android:clipChildren="false"
-        android:focusable="false">
+        android:focusable="false"
+        >
 
         <ImageView
             android:id="@+id/img_thumb"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
+            android:adjustViewBounds="false"
             android:clickable="false"
-
             android:focusable="false"
-            android:scaleType="fitXY"
-            android:visibility="gone" />
+            android:scaleType="fitCenter"
+            android:visibility="visible"
+           />
 
         <ImageView
             android:id="@+id/iv_play_icon"
@@ -41,7 +41,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="260dp"
         android:layout_gravity="bottom"
         android:orientation="horizontal"
         android:layout_marginBottom="47.5dp">
@@ -80,22 +80,36 @@
                     android:paddingBottom="8.5dp"
                     android:gravity="center_vertical"
                     >
-                    <com.facebook.drawee.view.SimpleDraweeView
-                        android:id="@+id/iv_author_logo"
-                        android:layout_width="38dp"
-                        android:layout_height="38dp"
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        app:actualImageScaleType="centerCrop"
-                        app:placeholderImage="@drawable/ic_user4"
-                        app:placeholderImageScaleType="centerCrop"
-                        app:failureImage="@drawable/ic_user4"
-                        app:failureImageScaleType="centerCrop"
-                        app:viewAspectRatio="1"
-                        app:roundAsCircle="true"
-                        app:roundingBorderWidth="1dp"
-                        app:roundingBorderColor="#ffffff"
-                        android:visibility="visible"/>
+                        android:layout_centerVertical="true">
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/iv_author_logo"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            app:actualImageScaleType="centerCrop"
+                            app:placeholderImage="@drawable/ic_user4"
+                            app:placeholderImageScaleType="centerCrop"
+                            app:failureImage="@drawable/ic_user4"
+                            app:failureImageScaleType="centerCrop"
+                            app:viewAspectRatio="1"
+                            app:roundAsCircle="true"
+                            app:roundingBorderWidth="1dp"
+                            app:roundingBorderColor="#ffffff"
+                            android:visibility="visible"/>
+                        <ImageView
+                            android:id="@+id/authenticationLogo"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_alignEnd="@+id/iv_author_logo"
+                            android:layout_alignBottom="@+id/iv_author_logo"
+                            android:background="@drawable/ic_authentication" />
+                    </RelativeLayout>
+
+
                     <TextView
                         android:id="@+id/tv_author_name"
                         android:layout_width="wrap_content"
@@ -108,7 +122,7 @@
 
                     <TextView
                         android:id="@+id/tv_attention"
-                        android:layout_width="wrap_content"
+                        android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="8dp"
@@ -117,8 +131,7 @@
                         android:text="已关注"
                         android:visibility="invisible"
                         android:textColor="#ffffff"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textSize="14sp" />
 
                 </LinearLayout>
 
@@ -132,14 +145,16 @@
             android:layout_width="60dp"
             android:layout_height="300dp"
             android:orientation="vertical"
-            android:layout_alignParentRight="true">
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center_vertical|center_horizontal"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:id="@+id/layout_prase">
 
 
 
@@ -157,8 +172,9 @@
                     android:textColor="#ffffff"
                     android:textSize="14sp"
                     android:layout_gravity="center"
-                    android:text="0"
-                    android:layout_height="wrap_content"></TextView>
+                    android:text="点赞"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"></TextView>
 
 
             </LinearLayout>
@@ -167,7 +183,8 @@
               android:layout_height="match_parent"
               android:layout_weight="1"
               android:gravity="center_vertical|center_horizontal"
-              android:orientation="vertical">
+              android:orientation="vertical"
+              android:id="@+id/layout_comment">
 
               <com.aliyun.apsara.alivclittlevideo.view.video.FontIconView
                   android:id="@+id/fiv_comment"
@@ -179,13 +196,15 @@
                   android:textSize="28sp"/>
 
               <TextView
+                  android:id="@+id/tv_comment"
                   android:layout_width="wrap_content"
                   android:gravity="center"
                   android:textColor="#ffffff"
                   android:textSize="14sp"
                   android:paddingTop="5dp"
-                  android:text="125"
-                  android:layout_height="wrap_content"></TextView>
+                  android:text="评论"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="3dp"></TextView>
 
 
           </LinearLayout>
@@ -195,7 +214,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center_vertical|center_horizontal"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:id="@+id/layout_share">
 
                 <com.aliyun.apsara.alivclittlevideo.view.video.FontIconView
                     android:id="@+id/fiv_share"
@@ -210,6 +230,7 @@
                     android:textColor="#ffffff"
                     android:textSize="14sp"
                     android:text="分享"
+                    android:layout_marginTop="3dp"
                     android:layout_height="wrap_content"></TextView>
 
 
@@ -250,7 +271,7 @@
     <com.aliyun.apsara.alivclittlevideo.view.video.FontIconView
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:layout_marginLeft="16dp"
         android:id="@+id/fiv_close"
         android:text="&#xe62a;"
@@ -263,7 +284,7 @@
         android:id="@+id/iv_share_more"
         android:layout_width="28dp"
         android:layout_height="28dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="12dp"
         android:layout_gravity="right|top"
         app:srcCompat="@drawable/small_video_share_more_icon" />
@@ -336,7 +357,7 @@
 
                 android:textColor="#ffffff"
                 android:textSize="14sp"
-                android:text="写下你要想说的评论..." ></TextView>
+                android:text="写评论..." ></TextView>
 
         </LinearLayout>
 

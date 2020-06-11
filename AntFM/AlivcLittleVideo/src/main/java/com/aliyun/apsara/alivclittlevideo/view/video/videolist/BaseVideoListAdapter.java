@@ -64,30 +64,30 @@ public abstract class BaseVideoListAdapter<VH extends BaseVideoListAdapter.BaseH
 
             @Override
             public boolean onResourceReady(Bitmap resource, boolean isFirstResource) {
-                float aspectRatio = (float)resource.getWidth() / resource.getHeight();
-                float screenRatio = mScreenPoint.x / (float)mScreenPoint.y;
-                Log.d(TAG, "aspectRatio : " + aspectRatio + " ,screenRatio : " + screenRatio + "\n mScreenPoint : " + mScreenPoint.toString());
-                if (aspectRatio <= (9f / 16f + 0.01) && aspectRatio >= (9f / 16f - 0.01) //考虑到float值不精确的原因取一个范围值 视频比例 = 9/16
-                        && (screenRatio < 9f / 16f - 0.01) //屏幕宽高比例小于9/16(长手机)
-                   ) {
-                    float height = holder.getContainerView().getHeight();
-                    float width = height * resource.getWidth() / resource.getHeight();
-                    ViewGroup.LayoutParams layoutParams = iv.getLayoutParams();
-                    layoutParams.width = (int)width;
-                    layoutParams.height = (int)height;
-                    iv.setLayoutParams(layoutParams);
-
-                } else {
-                    //获取屏幕宽度
-                    float screenWith = mScreenPoint.x;
-                    ViewGroup.LayoutParams layoutParams = iv.getLayoutParams();
-                    //获取imageview的高度
-                    float height = screenWith * resource.getHeight() / resource.getWidth();
-                    layoutParams.width = (int)screenWith;
-                    layoutParams.height = (int)height;
-                    iv.setLayoutParams(layoutParams);
-                    Log.d(TAG, "bitmap width : " + screenWith + " height : " + height);
-                }
+//                float aspectRatio = (float)resource.getWidth() / resource.getHeight();
+//                float screenRatio = mScreenPoint.x / (float)mScreenPoint.y;
+//                Log.d(TAG, "aspectRatio : " + aspectRatio + " ,screenRatio : " + screenRatio + "\n mScreenPoint : " + mScreenPoint.toString());
+//                if (aspectRatio <= (9f / 16f + 0.01) && aspectRatio >= (9f / 16f - 0.01) //考虑到float值不精确的原因取一个范围值 视频比例 = 9/16
+//                        && (screenRatio < 9f / 16f - 0.01) //屏幕宽高比例小于9/16(长手机)
+//                   ) {
+//                    float height = holder.getContainerView().getHeight();
+//                    float width = height * resource.getWidth() / resource.getHeight();
+//                    ViewGroup.LayoutParams layoutParams = iv.getLayoutParams();
+//                    layoutParams.width = (int)width;
+//                    layoutParams.height = (int)height;
+//                    iv.setLayoutParams(layoutParams);
+//
+//                } else {
+//                    //获取屏幕宽度
+//                    float screenWith = mScreenPoint.x;
+//                    ViewGroup.LayoutParams layoutParams = iv.getLayoutParams();
+//                    //获取imageview的高度
+//                    float height = screenWith * resource.getHeight() / resource.getWidth();
+//                    layoutParams.width = (int)screenWith;
+//                    layoutParams.height = (int)height;
+//                    iv.setLayoutParams(layoutParams);
+//                    Log.d(TAG, "bitmap width : " + screenWith + " height : " + height);
+//                }
                 return false;
             }
         }).into(iv);

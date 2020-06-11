@@ -366,8 +366,6 @@ public class LittleVideoFragment extends Fragment implements Handler.Callback {
                             }
                         }
 
-
-
                         if (msg.arg1 == GetContent.Refresh.ordinal()) {
                             //mColumnContents.clear();
                             mColumnContents.addAll(0, columnContents);
@@ -386,7 +384,6 @@ public class LittleVideoFragment extends Fragment implements Handler.Callback {
                                 }
 
                             }
-
 
                         } else {
                             mColumnContents.addAll(columnContents);

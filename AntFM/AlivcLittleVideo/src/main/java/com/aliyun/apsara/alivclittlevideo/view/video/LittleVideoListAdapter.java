@@ -3,6 +3,7 @@ package com.aliyun.apsara.alivclittlevideo.view.video;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.telephony.PhoneNumberUtils;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -67,7 +69,7 @@ public class LittleVideoListAdapter extends BaseVideoListAdapter<LittleVideoList
                 }
             }
         });
-        myHolder.mFivPrase.setOnClickListener(new View.OnClickListener() {
+        myHolder.mLayoutPrase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mItemBtnClick!=null){
@@ -75,7 +77,7 @@ public class LittleVideoListAdapter extends BaseVideoListAdapter<LittleVideoList
                 }
             }
         });
-        myHolder.mFivComment.setOnClickListener(new View.OnClickListener() {
+        myHolder.mLayoutComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mItemBtnClick!=null){
@@ -83,7 +85,7 @@ public class LittleVideoListAdapter extends BaseVideoListAdapter<LittleVideoList
                 }
             }
         });
-        myHolder.mFivShare.setOnClickListener(new View.OnClickListener() {
+        myHolder.mLayoutShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mItemBtnClick!=null){
@@ -107,15 +109,15 @@ public class LittleVideoListAdapter extends BaseVideoListAdapter<LittleVideoList
                 }
             }
         });
-        myHolder.mTvSendComment.setOnClickListener(new View.OnClickListener() {
+
+        myHolder.mSdvAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mItemBtnClick!=null){
-                    mItemBtnClick.onSendCommentClick(position);
+                    mItemBtnClick.onHeadClick(position);
                 }
             }
         });
-
 
 
         //myHolder.mVideoInfoView.setVideoInfo(list.get(position));
@@ -135,6 +137,12 @@ public class LittleVideoListAdapter extends BaseVideoListAdapter<LittleVideoList
         }
 
 
+        if(video.getComment()>0){
+            myHolder.mTvComment.setText(video.getComment() + "");
+        }else{
+            myHolder.mTvComment.setText("点评");
+        }
+
         myHolder.mTvVideoTitle.setText(video.getTitle());
         if(video.getUser()!=null) {
             myHolder.mTvAuthorName.setText(video.getUser().getUserName());
@@ -142,17 +150,18 @@ public class LittleVideoListAdapter extends BaseVideoListAdapter<LittleVideoList
                 int width = 76;
                 int height = width;
                 ImageLoader.showThumb(uri, myHolder.mSdvAvatar, width, height);
-        }
-//
-//
-//                    && !TextUtils.isEmpty(smallVideo.getAuthor_info().getMerchant().getLogo())) {
-//                Uri uri = Uri.parse(smallVideo.getAuthor_info().getMerchant().getLogo());
-//                int width = CommonUtils.dip2px(16);
-//                int height = width;
-//                ImageLoader.showThumb(uri, myHolder, width, height);
-//
-//        }
+                if(video.getUser().getType() == 1){//机构
+                    myHolder.mAuthenticationLogo.setVisibility(View.VISIBLE);
+                    myHolder.mAuthenticationLogo.setBackgroundResource(R.drawable.ic_org_authentication);
+                }else if(video.getUser().getType() == 11){//主播
+                    myHolder.mAuthenticationLogo.setVisibility(View.VISIBLE);
+                    myHolder.mAuthenticationLogo.setBackgroundResource(R.drawable.ic_authentication);
+                }else{
+                    myHolder.mAuthenticationLogo.setVisibility(View.GONE);
+                }
 
+
+        }
 
     }
 
@@ -172,13 +181,17 @@ public class LittleVideoListAdapter extends BaseVideoListAdapter<LittleVideoList
         private TextView mTvLikes; //点赞数
         private FontIconView mFivComment;//查看评论
         private FontIconView mFivShare;//分享
+        private LinearLayout mLayoutShare;
+        private LinearLayout mLayoutComment;
+        private LinearLayout mLayoutPrase;
         private TextView mTvSendComment;//发评论
         private TextView mTvAttention;//关注
         private TextView mTvVideoTitle;//标题
         private TextView mTvAuthorName;//作者名字
+        private TextView mTvComment; //
         private SimpleDraweeView mSdvAvatar; //作者的头像
         private ProgressBar mPlayProgressBar; //播放进度
-
+        private ImageView mAuthenticationLogo; //播放进度
 
         public FontIconView getmFivPrase() {
             return mFivPrase;
@@ -188,8 +201,13 @@ public class LittleVideoListAdapter extends BaseVideoListAdapter<LittleVideoList
             return mTvAttention;
         }
 
+
         public TextView getmTvLikes() {
             return mTvLikes;
+        }
+
+        public TextView getmTvComment() {
+            return mTvComment;
         }
 
         MyHolder(@NonNull View itemView) {
@@ -208,14 +226,22 @@ public class LittleVideoListAdapter extends BaseVideoListAdapter<LittleVideoList
             mFivPrase = itemView.findViewById(R.id.fiv_prase);
             mTvLikes =  itemView.findViewById(R.id.tv_likes);
             mFivComment = itemView.findViewById(R.id.fiv_comment);
+            mTvComment = itemView.findViewById(R.id.tv_comment);
             mFivShare = itemView.findViewById(R.id.fiv_share);
             mFivClose = itemView.findViewById(R.id.fiv_close);
+            mLayoutPrase = itemView.findViewById(R.id.layout_prase);
+            mLayoutComment = itemView.findViewById(R.id.layout_comment);
+            mLayoutShare = itemView.findViewById(R.id.layout_share);
+
             mTvSendComment = itemView.findViewById(R.id.tv_send_comment);
             mTvAttention = itemView.findViewById(R.id.tv_attention);
             mTvVideoTitle = itemView.findViewById(R.id.tv_video_title);
             mTvAuthorName = itemView.findViewById(R.id.tv_author_name);
             mSdvAvatar =  itemView.findViewById(R.id.iv_author_logo);
             mPlayProgressBar = itemView.findViewById(R.id.pb_play_bar);
+
+            mAuthenticationLogo = itemView.findViewById(R.id.authenticationLogo);//V标
+
         }
 
         @Override
@@ -253,6 +279,8 @@ public class LittleVideoListAdapter extends BaseVideoListAdapter<LittleVideoList
         void onSendCommentClick(int position);
         //关注
         void onSendAttentionClick(int position);
+        //主播/机构头像
+        void onHeadClick(int position);
 
 
     }

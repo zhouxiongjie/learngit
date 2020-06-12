@@ -265,6 +265,7 @@ public class ColumnContent  implements Serializable {
             return merchant;
         }
 
+
         public void setMerchant(MerchantBean merchant) {
             this.merchant = merchant;
         }

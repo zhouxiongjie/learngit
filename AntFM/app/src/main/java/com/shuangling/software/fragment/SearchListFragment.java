@@ -128,7 +128,7 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
         Map<String, String> params = new HashMap<String, String>();
         switch (mSearchType){
             case R.string.all:
-                params.put("search_type", "0");
+                params.put("search_type", "-2");
                 break;
             case R.string.article:
                 params.put("search_type", "2");

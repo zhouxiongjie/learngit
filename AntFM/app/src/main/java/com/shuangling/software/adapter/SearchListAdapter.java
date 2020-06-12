@@ -27,12 +27,15 @@ import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.TvDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.activity.WebViewActivity;
+import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.SearchResult;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.NumberUtil;
 import com.shuangling.software.utils.ServerInfo;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -112,7 +115,13 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
         } else if (viewType == TYPE_VIDEO) {
             return new VideoViewHolder(inflater.inflate(R.layout.search_video_item, parent, false));
         } else if (viewType == TYPE_LITTLE_VIDEO) {
-            return new LittleVideoViewHolder(inflater.inflate(R.layout.small_video_recycler_view_item, parent, false));
+            if (mSearchType != R.string.little_video) {
+                //综合搜索显示的是视频的视图
+                return new VideoViewHolder(inflater.inflate(R.layout.search_video_item, parent, false));
+            }else{
+                return new LittleVideoViewHolder(inflater.inflate(R.layout.small_video_recycler_view_item, parent, false));
+            }
+
         } else if (viewType == TYPE_SPECIAL) {
             return new SpecialViewHolder(inflater.inflate(R.layout.search_special_item, parent, false));
         } else if (viewType == TYPE_RADIO) {
@@ -244,6 +253,7 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                         intent.putExtra("play_id",  content.getId());
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mContext.startActivity(intent);
+
                     }
                 });
             } else {//选的是短视频分类
@@ -281,11 +291,34 @@ public class SearchListAdapter extends RecyclerView.Adapter implements View.OnCl
                 videoViewHolder.mIvSmallVideoFacePic.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        List<ColumnContent> columnContents = new ArrayList<ColumnContent>();
+                        for(int i=0;i<mSearchResults.size();i++){
+                            SearchResult content = mSearchResults.get(i);
+                            ColumnContent columnContent = new ColumnContent();
+                            columnContent.setId(content.getId());
+                            columnContent.setTitle(content.getTitle());
+                            columnContent.setCover(content.getCover());
+                            columnContent.setView(content.getPlays());
+                            ColumnContent.AuthorInfoBean.MerchantBean merchantBean = new ColumnContent.AuthorInfoBean.MerchantBean();
+                            ColumnContent.VideoBean videoBean = new ColumnContent.VideoBean();
+                            videoBean.setVideo_id(content.getVideo_id());
+                            videoBean.setDuration(content.getDuration());
+                            columnContent.setVideo(videoBean);
+                            ColumnContent.AuthorInfoBean authorInfoBean = new ColumnContent.AuthorInfoBean();
+                            if(content.getMerchant() != null){
+                                merchantBean.setId(content.getMerchant().getId());
+                                merchantBean.setName(content.getMerchant().getName());
+                                merchantBean.setLogo(content.getMerchant().getLogo());
+                            }
+                            authorInfoBean.setMerchant(merchantBean);
+                            columnContent.setAuthor_info(authorInfoBean);
+                            columnContents.add(columnContent);
+                        }
 
                         Intent intent = new Intent(mContext, AlivcLittleVideoActivity.class);
-                        intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_WEBVIEW_CURRENT);
-                        intent.putExtra("original_id",  content.getId());
-                        intent.putExtra("play_id",  content.getId());
+                        intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_WEBVIEW);
+                        intent.putExtra("littleVideos", (Serializable) columnContents);
+                        intent.putExtra("position",  position);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         mContext.startActivity(intent);
 

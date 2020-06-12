@@ -341,6 +341,8 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     String play_id = uri.getQueryParameter("play_id");
                     String id = uri.getQueryParameter("id");
 
+
+                    Intent intent = new Intent(this, AlivcLittleVideoActivity.class);
                     if(id == null) {
                         //播放的是关联视频
                         if(original_id == null || play_id == null ){
@@ -348,16 +350,17 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                         }
                     }else{
                         //播放的是当前视频
-                        original_id = id;
-                        play_id = id;
+                        if(original_id ==null || play_id == null){
+                            original_id = id;
+                            play_id = id;
+                            intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_WEBVIEW_CURRENT);
+                        }else{
+                            intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_SCHEME);
+                        }
+
                     }
 
-                    Intent intent = new Intent(this, AlivcLittleVideoActivity.class);
-                    if(id==null){
-                        intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_SCHEME);
-                    }else{
-                        intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_WEBVIEW_CURRENT);
-                    }
+
                     intent.putExtra("original_id",  Integer.parseInt(original_id));
                     intent.putExtra("play_id",  Integer.parseInt(play_id));
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

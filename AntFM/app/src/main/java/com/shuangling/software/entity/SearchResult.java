@@ -30,6 +30,8 @@ public class SearchResult {
     private int follows;
     private int plays;
 
+    private String video_id;
+
 
     public int getPlays() {
         return plays;
@@ -121,6 +123,13 @@ public class SearchResult {
         this.follows = follows;
     }
 
+    public String getVideo_id() {
+        return video_id;
+    }
+
+    public void setVideo_id(String video_id) {
+        this.video_id = video_id;
+    }
 
     public MerchantBean getMerchant() {
         return merchant;

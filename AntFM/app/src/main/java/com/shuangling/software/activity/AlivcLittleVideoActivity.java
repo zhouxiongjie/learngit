@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -106,6 +107,10 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
     float currentX = 0;
     float oldY = 0;
     float currentY = 0;
+
+    int  mLastVideoPosition = 0;
+
+    Boolean   mCancelVerticalMove =  false;
 
     /**
      * 是否重新加载数据
@@ -329,17 +334,42 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
 
     }
 
+
+
+
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+
+        Boolean result;
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 oldX = ev.getX();// 点击时的坐标
                 oldY = ev.getY();
+                mLastVideoPosition = mVideoPosition;
+                mCancelVerticalMove = false;
                 break;
             case MotionEvent.ACTION_UP:
                 currentX = ev.getX();// 抬起时的坐标
                 currentY = ev.getY();
                 handleTouch();
+                break;
+            case MotionEvent.ACTION_MOVE:
+
+//                index = ev.findPointerIndex(mActivePointerId);
+//                int secondaryIndex = MotionEventCompat.findPointerIndex(event,mSecondaryPointerId);
+//                final float x = MotionEventCompat.getX(event,index);
+//                final float y = MotionEventCompat.getY(event,index);
+//                final float secondX = MotionEventCompat.getX(event,secondaryIndex);
+//                final float secondY = MotionEventCompat.getY(event,secondaryIndex);
+
+                currentX = ev.getX();//移动时操过200
+                currentY = ev.getY();
+
+                if( Math.abs(currentX - oldX)>100) {
+                    mCancelVerticalMove = true;
+                }
+
                 break;
         }
         return super.dispatchTouchEvent(ev);
@@ -1096,6 +1126,14 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
 
     //垂直方向
     public void handleVerticalTouch() {
+
+        if(mCancelVerticalMove == true){
+            return;
+        }
+
+        if (mVideoPosition != mLastVideoPosition){
+            return;
+        }
         if (currentY - oldY > 200) {//从上往下
             Message message = new Message();
             message.what = PAN_DOWN;

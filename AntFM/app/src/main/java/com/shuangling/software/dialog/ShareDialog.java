@@ -6,6 +6,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -68,7 +69,7 @@ public class ShareDialog extends BaseCircleDialog {
     @BindView(R.id.copyLink)
     LinearLayout copyLink;
     @BindView(R.id.otherLayout)
-    LinearLayout otherLayout;
+    HorizontalScrollView otherLayout;
     @BindView(R.id.collectBtn)
     ImageView collectBtn;
     private float mAppFontSize;

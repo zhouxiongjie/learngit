@@ -1558,7 +1558,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         Random rand = new Random();
         int randNum = rand.nextInt(1000);
         final String childPath =  CommonUtils.getCurrentTimeString()+randNum+".png";
-        final String filePath =  CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES) +  childPath;
+
 
 
 
@@ -1572,9 +1572,9 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         public void accept(Boolean granted) throws Exception {
                             if(granted){
 
-                                File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), childPath);
+                                final  File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), childPath);
                                 CommonUtils.saveBitmapToPNG(tempFile.getAbsolutePath(), saveBitmap);
-                                ToastUtils.show("图片保存成功");
+                                //ToastUtils.show("图片保存成功");
 
                                 //发送广播更新相册
                                 Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
@@ -1590,7 +1590,8 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                                     public void onShare(Platform platform, final  Platform.ShareParams paramsToShare) {
 
                                         paramsToShare.setShareType(Platform.SHARE_IMAGE);
-                                        paramsToShare.setImageData(bitmap);
+                                       // paramsToShare.setImageData(bitmap);
+                                        paramsToShare.setImagePath(tempFile.getAbsolutePath());
 
                                     }
                                 });

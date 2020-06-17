@@ -102,6 +102,12 @@ public class AlivcVideoListView extends FrameLayout {
     private RecyclerView.RecycledViewPool mRecycledViewPool;
     private ImageView mPlayIcon;
 
+    float oldX = 0;
+    float currentX = 0;
+    float oldY = 0;
+    float currentY = 0;
+
+
     public AlivcVideoListView(@NonNull Context context) {
         super(context);
         this.mContext = context;
@@ -758,4 +764,37 @@ public class AlivcVideoListView extends FrameLayout {
             mListPlayer.moveTo(uid,stsInfo);
         }
     }
+
+
+//    @Override
+//    public boolean onInterceptHoverEvent(MotionEvent ev) {
+//
+//        Boolean result = false;
+//        switch (ev.getAction()) {
+//            case MotionEvent.ACTION_DOWN:
+//                oldX = ev.getX();// 点击时的坐标
+//                oldY = ev.getY();
+//                result= super.onInterceptTouchEvent(ev);//false手势传递给子控件
+//                break;
+//            case MotionEvent.ACTION_UP:
+//                currentX = ev.getX();// 抬起时的坐标
+//                currentY = ev.getY();
+//                break;
+//            case MotionEvent.ACTION_MOVE:
+//
+//
+//                currentX = ev.getX();//移动时操过200
+//                currentY = ev.getY();
+//
+//                if( Math.abs(currentY - oldY)>200) {
+//                    result =true;//不传给子控件，自己水平滑动
+//                }
+//
+//                break;
+//        }
+//
+//
+//
+//        return result;
+//    }
 }

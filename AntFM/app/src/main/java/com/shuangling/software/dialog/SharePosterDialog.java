@@ -181,6 +181,7 @@ public class SharePosterDialog extends BaseCircleDialog {
 
         Bitmap bitmap = ViewBitmapUtils.getViewBitmap(mLayoutPoster);
 
+
         if(bitmap == null) {
             ToastUtils.show(getContext(),"生成图片失败");
             return;

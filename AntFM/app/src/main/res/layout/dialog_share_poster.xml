@@ -1,10 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:background="@color/black"
     android:orientation="vertical">
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/layout_poster"
+        android:layout_width="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/selections_poster_bg">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+
+            android:id="@+id/iv_cover"
+            android:layout_width="match_parent"
+            android:layout_height="224dp"
+
+            fresco:roundTopLeft="true"
+            fresco:roundTopRight="true"
+            fresco:roundBottomLeft="false"
+            fresco:roundBottomRight="false"
+            fresco:roundedCornerRadius="10dp">
+
+
+        </com.facebook.drawee.view.SimpleDraweeView>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_title"
+            android:text="聚焦下沉市场家庭教育场景，互联网教育平台「观书学到」获数百万元天使轮融资"
+            android:textColor="#ff333333"
+            android:textSize="18sp"
+            android:layout_margin="15dp"
+
+            />
+
+        <TextView
+            android:id="@+id/tv_des"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="    「观书学到」定位互联网教育平台，希望将社交新零售和在线知识付费形式相结合，用OMO模式为家庭提供..."
+            android:textColor="#ff999999"
+            android:textSize="11sp"
+
+
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            />
+
+        <RelativeLayout
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:orientation="vertical"
+                android:layout_toLeftOf="@+id/iv_qr_code"
+                android:layout_marginBottom="15dp">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <com.facebook.drawee.view.SimpleDraweeView
+
+                        fresco:roundTopLeft="true"
+                        fresco:roundTopRight="true"
+                        fresco:roundBottomLeft="true"
+                        fresco:roundBottomRight="true"
+                        fresco:roundedCornerRadius="4dp"
+                        android:id="@+id/iv_app_icon"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@mipmap/ic_launcher"
+                        ></com.facebook.drawee.view.SimpleDraweeView>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:text="@string/application_name"
+                        android:textColor="#ff333333"
+                        android:textSize="13sp"
+                        />
+                </LinearLayout>
+                <TextView
+                    android:layout_alignParentBottom ="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="长按识别二维码，阅读文章详情"
+                    android:textColor="#ff999999"
+                    android:textSize="11sp"
+
+                    />
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/iv_qr_code"
+
+                android:layout_width="60dp"
+                android:layout_alignParentRight ="true"
+                android:layout_height="60dp" ></ImageView>
+
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/selectionsLayout"
@@ -25,7 +142,7 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
-                    android:id="@+id/post"
+                    android:id="@+id/download"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -35,13 +152,13 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_gravity="center_horizontal"
-                        android:background="@drawable/share_post" />
+                        android:background="@drawable/share_download" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:text="分享海报"
+                        android:text="保存图片"
                         android:textColor="#222222"
                         android:textSize="@dimen/font_size_24px" />
 
@@ -201,115 +318,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <LinearLayout
-                android:id="@+id/otherLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:id="@+id/fontSize"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="15dp">
-
-                    <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="center_horizontal"
-                        android:background="@drawable/share_font_size" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:text="字号调整"
-                        android:textColor="#222222"
-                        android:textSize="@dimen/font_size_24px" />
-
-                </LinearLayout>
-
-
-
-                <LinearLayout
-                    android:id="@+id/refresh"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="15dp">
-
-                    <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="center_horizontal"
-                        android:background="@drawable/share_refresh" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:text="刷新"
-                        android:textColor="#222222"
-                        android:textSize="@dimen/font_size_24px" />
-
-                </LinearLayout>
-
-
-                <LinearLayout
-                    android:id="@+id/collect"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="15dp">
-
-                    <ImageView
-                        android:id="@+id/collectBtn"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="center_horizontal"
-                        android:background="@drawable/collect_btn_selector" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:text="收藏"
-                        android:textColor="#222222"
-                        android:textSize="@dimen/font_size_24px" />
-
-                </LinearLayout>
-
-
-                <LinearLayout
-                    android:id="@+id/copyLink"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="15dp">
-
-                    <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="center_horizontal"
-                        android:background="@drawable/share_copy_link" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:text="复制链接"
-                        android:textColor="#222222"
-                        android:textSize="@dimen/font_size_24px" />
-
-                </LinearLayout>
-
-
-            </LinearLayout>
-
-
-
-
 
 
             <!--<com.shuangling.software.customview.TextRatingBar-->

@@ -1,11 +1,13 @@
 package com.shuangling.software.activity;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -61,6 +63,7 @@ import com.shuangling.software.R;
 import com.shuangling.software.adapter.ArticleRecyclerAdapter;
 import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.dialog.ShareDialog;
+import com.shuangling.software.dialog.SharePosterDialog;
 import com.shuangling.software.entity.Article;
 import com.shuangling.software.entity.ArticleVoicesInfo;
 import com.shuangling.software.entity.AudioInfo;
@@ -76,21 +79,28 @@ import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ImageLoader;
+import com.shuangling.software.utils.MyGlideEngine;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.shuangling.software.utils.TimeUtil;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -107,8 +117,10 @@ import cn.sharesdk.tencent.qq.QQ;
 import cn.sharesdk.wechat.favorite.WechatFavorite;
 import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
+import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
+import static android.os.Environment.DIRECTORY_PICTURES;
 import static com.shuangling.software.service.AudioPlayerService.PLAY_ORDER;
 import static com.shuangling.software.utils.CommonUtils.NETWORKTYPE_WIFI;
 
@@ -315,6 +327,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
                 if (mArticle != null) {
                     ShareDialog dialog = ShareDialog.getInstance(mArticle.getIs_collection() == 0 ? false : true);
+                    dialog.setIsShowPosterButton(true);
                     dialog.setShareHandler(new ShareDialog.ShareHandler() {
                         @Override
                         public void onShare(String platform) {
@@ -335,6 +348,11 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
                             }
 
+                        }
+
+                        @Override
+                        public void poster() {
+                            showPosterShare();
                         }
 
                         @Override
@@ -1457,6 +1475,173 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    private void showPosterShare(){
+
+        SharePosterDialog dialog =  SharePosterDialog.getInstance(mArticle);
+        dialog.setShareHandler(new SharePosterDialog.ShareHandler() {
+            @Override
+            public void onShare(String platform,Bitmap bitmap) {
+                showShareImage(platform,bitmap);
+
+            }
+
+            @Override
+            public void download(Bitmap bitmap) {
+
+                final Bitmap saveBitmap =bitmap;
+
+                //获取写文件权限
+                RxPermissions rxPermissions = new RxPermissions(ArticleDetailActivity02.this);
+                rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .subscribe(new Consumer<Boolean>() {
+                            @Override
+                            public void accept(Boolean granted) throws Exception {
+                                if(granted){
+                                    Random rand = new Random();
+                                    int randNum = rand.nextInt(1000);
+                                    File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), CommonUtils.getCurrentTimeString()+randNum+".png");
+                                    CommonUtils.saveBitmapToPNG(tempFile.getAbsolutePath(), saveBitmap);
+                                    ToastUtils.show("图片保存成功");
+
+                                    //发送广播更新相册
+                                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                                    Uri uri = Uri.fromFile(tempFile);
+                                    intent.setData(uri);
+                                    ArticleDetailActivity02.this.sendBroadcast(intent);
+
+                                }else{
+                                    ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
+                                }
+                            }
+                        });
+
+            }
+
+
+        });
+        dialog.show(getSupportFragmentManager(), "ShareDialog");
+
+    }
+
+
+
+
+
+
+    private void showShareImage(String platform, final Bitmap bitmap) {
+
+
+
+        final Bitmap saveBitmap =bitmap;
+
+
+
+
+
+        final  OnekeyShare oks = new OnekeyShare();
+        //关闭sso授权
+        oks.disableSSOWhenAuthorize();
+        oks.setPlatform(platform);
+        final Platform qq = ShareSDK.getPlatform(QQ.NAME);
+        if (!qq.isClientValid()) {
+            oks.addHiddenPlatform(QQ.NAME);
+        }
+        final Platform sina = ShareSDK.getPlatform(SinaWeibo.NAME);
+        if (!sina.isClientValid()) {
+            oks.addHiddenPlatform(SinaWeibo.NAME);
+        }
+
+
+        Random rand = new Random();
+        int randNum = rand.nextInt(1000);
+        final String childPath =  CommonUtils.getCurrentTimeString()+randNum+".png";
+        final String filePath =  CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES) +  childPath;
+
+
+
+        if(QQ.NAME.equals(platform)){
+
+            //获取写文件权限
+            RxPermissions rxPermissions = new RxPermissions(ArticleDetailActivity02.this);
+            rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    .subscribe(new Consumer<Boolean>() {
+                        @Override
+                        public void accept(Boolean granted) throws Exception {
+                            if(granted){
+
+                                File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), childPath);
+                                CommonUtils.saveBitmapToPNG(tempFile.getAbsolutePath(), saveBitmap);
+                                ToastUtils.show("图片保存成功");
+
+                                //发送广播更新相册
+                                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                                Uri uri = Uri.fromFile(tempFile);
+                                intent.setData(uri);
+                                ArticleDetailActivity02.this.sendBroadcast(intent);
+
+                               // oks.setImagePath(filePath);
+
+                                oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+                                    //自定义分享的回调想要函数
+                                    @Override
+                                    public void onShare(Platform platform, final  Platform.ShareParams paramsToShare) {
+
+                                        paramsToShare.setShareType(Platform.SHARE_IMAGE);
+                                        paramsToShare.setImageData(bitmap);
+
+                                    }
+                                });
+
+
+                            }else{
+                                ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
+                            }
+                        }
+                    });
+
+
+
+
+        }else{
+            oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+                //自定义分享的回调想要函数
+                @Override
+                public void onShare(Platform platform, final  Platform.ShareParams paramsToShare) {
+                    paramsToShare.setShareType(Platform.SHARE_IMAGE);
+                    paramsToShare.setImageData(bitmap);
+                }
+            });
+
+        }
+
+
+
+        oks.setCallback(new PlatformActionListener() {
+            @Override
+            public void onError(Platform arg0, int arg1, Throwable arg2) {
+                Message msg = Message.obtain();
+                msg.what = SHARE_FAILED;
+                msg.obj = arg2.getMessage();
+                mHandler.sendMessage(msg);
+            }
+
+            @Override
+            public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
+                Message msg = Message.obtain();
+                msg.what = SHARE_SUCCESS;
+                mHandler.sendMessage(msg);
+            }
+
+            @Override
+            public void onCancel(Platform arg0, int arg1) {
+
+            }
+        });
+        // 启动分享GUI
+        oks.show(this);
     }
 
 

@@ -40,7 +40,8 @@ public class ShareDialog extends BaseCircleDialog {
 
     public static final String FONT_SIZE = "font_size";
 
-
+    @BindView(R.id.post)
+    LinearLayout poster; //海报
     @BindView(R.id.weiXin)
     LinearLayout weiXin;
     @BindView(R.id.weiXinFriends)
@@ -55,8 +56,7 @@ public class ShareDialog extends BaseCircleDialog {
     LinearLayout weibo;
     @BindView(R.id.fontSize)
     LinearLayout fontSize;
-    //    @BindView(R.id.refresh)
-//    LinearLayout refresh;
+
     @BindView(R.id.cancel)
     TextView cancel;
     @BindView(R.id.fontSizeBar)
@@ -76,6 +76,8 @@ public class ShareDialog extends BaseCircleDialog {
 
     private boolean mIsCollected;
 
+    private boolean mIsShowPosterButton = false;
+
     public interface ShareHandler {
         void onShare(String platform);
 
@@ -84,8 +86,18 @@ public class ShareDialog extends BaseCircleDialog {
         void refresh();
 
         void collectContent();
+
+        void poster();
     }
 
+
+    public boolean isIsShowPosterButton() {
+        return mIsShowPosterButton;
+    }
+
+    public void setIsShowPosterButton(boolean mIsShowPosterButton) {
+        this.mIsShowPosterButton = mIsShowPosterButton;
+    }
 
     public void setShareHandler(ShareHandler shareHandler) {
         this.mShareHandler = shareHandler;
@@ -101,6 +113,7 @@ public class ShareDialog extends BaseCircleDialog {
         dialogFragment.setGravity(Gravity.BOTTOM);
         dialogFragment.setWidth(1f);
         dialogFragment.mIsCollected = isCollected;
+        dialogFragment.mIsShowPosterButton = false;
         return dialogFragment;
     }
 
@@ -170,6 +183,12 @@ public class ShareDialog extends BaseCircleDialog {
             collectBtn.setSelected(false);
         }
 
+        if(mIsShowPosterButton){
+            poster.setVisibility(View.VISIBLE);
+        }else{
+            poster.setVisibility(View.GONE);
+        }
+
 //        fontSizeBar.setOnRatingListener(new TextRatingBar.OnRatingListener() {
 //            @Override
 //            public void onRating(int rating) {
@@ -201,9 +220,17 @@ public class ShareDialog extends BaseCircleDialog {
     }
 
 
-    @OnClick({R.id.weiXin, R.id.weiXinCollect, R.id.weiXinFriends, R.id.weibo, R.id.qq, R.id.qqZone, R.id.fontSize, R.id.fontSizeBar, R.id.cancel, R.id.copyLink, R.id.collect, R.id.refresh})
+    @OnClick({R.id.post,R.id.weiXin, R.id.weiXinCollect, R.id.weiXinFriends, R.id.weibo, R.id.qq, R.id.qqZone, R.id.fontSize, R.id.fontSizeBar, R.id.cancel, R.id.copyLink, R.id.collect, R.id.refresh})
     public void onViewClicked(View view) {
         switch (view.getId()) {
+
+            case R.id.post:
+                if (mShareHandler != null) {
+                    mShareHandler.poster();
+                }
+                dismiss();
+
+                break;
             case R.id.weiXin:
                 if (mShareHandler != null) {
                     mShareHandler.onShare(Wechat.NAME);

@@ -109,8 +109,6 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
         Normal
     }
 
-    ;
-
     private RecyclerViewSkeletonScreen mSkeletonScreen;
 
     private List<RecyclerView> mContentRecyclerView = new ArrayList<>();
@@ -154,6 +152,45 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
         mAdapter = new ColumnDecorateContentAdapter(this, null);
         recyclerView.setAdapter(mAdapter);
         //getContent(GetContent.Normal);
+
+        if (mColumn.getChildren() != null && mColumn.getChildren().size() > 0) {
+
+            ViewGroup secondColumn = (ViewGroup) getLayoutInflater().inflate(R.layout.second_column_layout, recyclerView, false);
+            LinearLayout columnContent = secondColumn.findViewById(R.id.columnContent);
+            for (int i = 0; i < mColumn.getChildren().size(); i++) {
+                final Column column = mColumn.getChildren().get(i);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.leftMargin = CommonUtils.dip2px(10);
+                params.rightMargin = CommonUtils.dip2px(10);
+                View secondColumnItem = getLayoutInflater().inflate(R.layout.second_column_item_layout, secondColumn, false);
+                TextView columnTextView = secondColumnItem.findViewById(R.id.text);
+                SimpleDraweeView indicator = secondColumnItem.findViewById(R.id.logo);
+                columnTextView.setText(column.getName());
+                if (!TextUtils.isEmpty(column.getIcon())) {
+                    Uri uri = Uri.parse(column.getIcon());
+                    int width = CommonUtils.dip2px(20);
+                    int height = width;
+                    ImageLoader.showThumb(uri, indicator, width, height);
+                } else {
+                    indicator.setVisibility(View.GONE);
+                }
+                secondColumnItem.setTag(column);
+                secondColumnItem.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        Intent it = new Intent(ContentActivity.this, ContentActivity.class);
+                        it.putExtra("column", column);
+                        startActivity(it);
+                    }
+                });
+                columnContent.addView(secondColumnItem, i, params);
+            }
+
+            mAdapter.addHeaderView(secondColumn);
+
+        }
         columnDecorateContent(GetContent.Normal);
     }
 

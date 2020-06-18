@@ -24,6 +24,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -56,6 +57,7 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.dialog.InformationDialog;
+import com.shuangling.software.dialog.NotificationDialog;
 import com.shuangling.software.dialog.UpdateDialog;
 import com.shuangling.software.entity.BottomMenu;
 import com.shuangling.software.entity.City;
@@ -64,6 +66,8 @@ import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.UpdateInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
+import com.shuangling.software.fragment.ColumnFragment;
+import com.shuangling.software.fragment.ContentFragment;
 import com.shuangling.software.fragment.DiscoverFragment;
 import com.shuangling.software.fragment.PersonalCenterFragment;
 import com.shuangling.software.fragment.PersonalCenterFragment01;
@@ -120,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     private Fragment recommendFragment;
     private Fragment discoverFragment;
     private Fragment personalCenterFragment;
+    private Fragment columnFragment;
 
 
     private Handler mHandler;
@@ -772,7 +777,31 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            InformationDialog.getInstance().show(getSupportFragmentManager(), "InformationDialog");;
+                            InformationDialog.getInstance().show(getSupportFragmentManager(), "InformationDialog");
+
+                            NotificationManagerCompat manager = NotificationManagerCompat.from(MainActivity.this);
+                            boolean pushMessage = manager.areNotificationsEnabled();
+
+                            //boolean pushMessage = sp.getBoolean(PUSH_MESSAGE, true);
+                            if (!pushMessage) {
+                                NotificationDialog.getInstance().setOnOkClickListener(new NotificationDialog.OnOkClickListener() {
+                                    @Override
+                                    public void openNoticafition() {
+                                        Intent localIntent = new Intent();
+                                        localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        if (Build.VERSION.SDK_INT >= 9) {
+                                            localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+                                            localIntent.setData(Uri.fromParts("package", getPackageName(), null));
+                                        } else if (Build.VERSION.SDK_INT <= 8) {
+                                            localIntent.setAction(Intent.ACTION_VIEW);
+                                            localIntent.setClassName("com.android.settings", "com.android.settings.InstalledAppDetails");
+                                            localIntent.putExtra("com.android.settings.ApplicationPkgName", getPackageName());
+                                        }
+                                        startActivity(localIntent);
+                                    }
+                                }).show(getSupportFragmentManager(), "NotificationDialog");
+                            }
+
                         }
                     });
 
@@ -902,6 +931,30 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
                     if(firstRun){
                         InformationDialog.getInstance().show(getSupportFragmentManager(), "InformationDialog");;
+
+                        NotificationManagerCompat manager = NotificationManagerCompat.from(MainActivity.this);
+                        boolean pushMessage = manager.areNotificationsEnabled();
+
+                        //boolean pushMessage = sp.getBoolean(PUSH_MESSAGE, true);
+                        if (!pushMessage) {
+                            NotificationDialog.getInstance().setOnOkClickListener(new NotificationDialog.OnOkClickListener() {
+                                @Override
+                                public void openNoticafition() {
+                                    Intent localIntent = new Intent();
+                                    localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    if (Build.VERSION.SDK_INT >= 9) {
+                                        localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+                                        localIntent.setData(Uri.fromParts("package", getPackageName(), null));
+                                    } else if (Build.VERSION.SDK_INT <= 8) {
+                                        localIntent.setAction(Intent.ACTION_VIEW);
+                                        localIntent.setClassName("com.android.settings", "com.android.settings.InstalledAppDetails");
+                                        localIntent.putExtra("com.android.settings.ApplicationPkgName", getPackageName());
+                                    }
+                                    startActivity(localIntent);
+                                }
+                            }).show(getSupportFragmentManager(), "NotificationDialog");
+                        }
+
                     }
 
 
@@ -979,6 +1032,10 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                                 transaction.hide(radioListFragment);
                                             }
 
+                                            if(columnFragment!=null&&!columnFragment.isHidden()){
+                                                transaction.hide(columnFragment);
+                                            }
+
                                             transaction.commitAllowingStateLoss();
                                         }
                                     });
@@ -1017,6 +1074,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             }
                                             if(radioListFragment!=null&&!radioListFragment.isHidden()){
                                                 transaction.hide(radioListFragment);
+                                            }
+                                            if(columnFragment!=null&&!columnFragment.isHidden()){
+                                                transaction.hide(columnFragment);
                                             }
                                             transaction.commitAllowingStateLoss();
                                         }
@@ -1062,6 +1122,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             }
                                             if(radioListFragment!=null&&!radioListFragment.isHidden()){
                                                 transaction.hide(radioListFragment);
+                                            }
+                                            if(columnFragment!=null&&!columnFragment.isHidden()){
+                                                transaction.hide(columnFragment);
                                             }
                                             transaction.commitAllowingStateLoss();
 
@@ -1111,6 +1174,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             if(radioListFragment!=null&&!radioListFragment.isHidden()){
                                                 transaction.hide(radioListFragment);
                                             }
+                                            if(columnFragment!=null&&!columnFragment.isHidden()){
+                                                transaction.hide(columnFragment);
+                                            }
                                             transaction.commitAllowingStateLoss();
                                         }
                                     });
@@ -1155,6 +1221,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             if(radioListFragment!=null&&!radioListFragment.isHidden()){
                                                 transaction.hide(radioListFragment);
                                             }
+                                            if(columnFragment!=null&&!columnFragment.isHidden()){
+                                                transaction.hide(columnFragment);
+                                            }
                                             transaction.commitAllowingStateLoss();
                                         }
                                     });
@@ -1195,6 +1264,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             }
                                             if(radioListFragment!=null&&!radioListFragment.isHidden()){
                                                 transaction.hide(radioListFragment);
+                                            }
+                                            if(columnFragment!=null&&!columnFragment.isHidden()){
+                                                transaction.hide(columnFragment);
                                             }
                                             transaction.commitAllowingStateLoss();
                                         }
@@ -1240,6 +1312,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             if(radioListFragment!=null&&!radioListFragment.isHidden()){
                                                 transaction.hide(radioListFragment);
                                             }
+                                            if(columnFragment!=null&&!columnFragment.isHidden()){
+                                                transaction.hide(columnFragment);
+                                            }
                                             transaction.commitAllowingStateLoss();
                                         }
                                     });
@@ -1284,6 +1359,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                                 }
                                                 if(discoverFragment!=null&&!discoverFragment.isHidden()){
                                                     transaction.hide(discoverFragment);
+                                                }
+                                                if(columnFragment!=null&&!columnFragment.isHidden()){
+                                                    transaction.hide(columnFragment);
                                                 }
 
                                                 transaction.commitAllowingStateLoss();
@@ -1339,6 +1417,9 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                                 if(discoverFragment!=null&&!discoverFragment.isHidden()){
                                                     transaction.hide(discoverFragment);
                                                 }
+                                                if(columnFragment!=null&&!columnFragment.isHidden()){
+                                                    transaction.hide(columnFragment);
+                                                }
 
                                                 transaction.commitAllowingStateLoss();
                                             }
@@ -1352,20 +1433,37 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                 } else if (bottomMenu.getType() == 10) {
                                     //资讯分类
 
+
+
+
                                     bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_news));
                                     bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
 
-                                            bottomMenuHolder.name.setSelected(true);
-                                            bottomMenuHolder.icon.setSelected(true);
-                                            for(int i=0;i<mMenus.size();i++){
-                                                BottomMenuHolder holder=mMenus.get(i);
-                                                if(holder!=bottomMenuHolder){
-                                                    holder.name.setSelected(false);
-                                                    holder.icon.setSelected(false);
+                                            Column column=null;
+                                            int columnId=Integer.parseInt(bottomMenu.getSource_id());
+                                            List<Column> allColumns = JSONObject.parseArray(SharedPreferencesUtils.getStringValue("all_column", null), Column.class);
+
+                                            for(int i=0;allColumns!=null&&i<allColumns.size();i++){
+                                                if(allColumns.get(i).getId()==columnId){
+                                                    column=allColumns.get(i);
+                                                    break;
                                                 }
+
                                             }
+                                            if(column==null){
+                                                column=new Column();
+                                                column.setId(Integer.parseInt(bottomMenu.getSource_id()));
+                                                column.setName(bottomMenu.getName());
+                                            }
+
+
+//                                            Intent it = new Intent(MainActivity.this, ContentActivity.class);
+//                                            it.putExtra("column", column);
+//                                            startActivity(it);
+
+
 
 
                                             bottomMenuHolder.name.setSelected(true);
@@ -1379,11 +1477,19 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                             }
 
                                             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                            if (recommendFragment == null) {
-                                                recommendFragment = new RecommendFragment();
-                                                transaction.add(R.id.content, recommendFragment);
+                                            if (columnFragment == null) {
+                                                columnFragment = new ColumnFragment();
+                                                Bundle bundle = new Bundle();
+                                                bundle.putSerializable("Column", column);
+
+                                                columnFragment.setArguments(bundle);
+                                                transaction.add(R.id.content, columnFragment);
                                             } else {
-                                                transaction.show(recommendFragment);
+                                                transaction.show(columnFragment);
+                                            }
+
+                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
+                                                transaction.hide(recommendFragment);
                                             }
                                             if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
                                                 transaction.hide(personalCenterFragment);
@@ -1406,10 +1512,10 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 
 
 
-                                            Column column=new Column();
-                                            column.setId(Integer.parseInt(bottomMenu.getSource_id()));
-                                            column.setName(bottomMenu.getName());
-                                            ((RecommendFragment)recommendFragment).switchColumn(column);
+//                                            Column column=new Column();
+//                                            column.setId(Integer.parseInt(bottomMenu.getSource_id()));
+//                                            column.setName(bottomMenu.getName());
+//                                            ((RecommendFragment)recommendFragment).switchColumn(column);
                                         }
                                     });
                                 }

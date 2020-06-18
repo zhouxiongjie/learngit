@@ -13,8 +13,11 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.bumptech.glide.request.Request;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.previewlibrary.loader.IZoomMediaLoader;
@@ -38,20 +41,50 @@ public class MyImageLoader implements IZoomMediaLoader {
               //  .placeholder(android.R.color.darker_gray)
                 .fitCenter()
                 //.centerCrop()
-                .into(new SimpleTarget<Bitmap>() {
+                //.into(imageView)
+                .listener(new RequestListener<Bitmap>() {
                     @Override
-                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                        simpleTarget.onLoadFailed(errorDrawable);
-                        super.onLoadFailed(errorDrawable);
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                        simpleTarget.onLoadFailed(null);
+
+                        return false;
                     }
 
                     @Override
-                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                    public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
                         simpleTarget.onResourceReady();
-                        imageView.setImageBitmap(resource);
+//                        imageView.setImageBitmap(resource);
+                        return false;
                     }
+                })
 
-                });
+                .into(imageView);
+//                .into(new CustomTarget<Bitmap>() {
+//                    @Override
+//                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onLoadCleared(@Nullable Drawable placeholder) {
+//
+//                    }
+//                });
+                //.into(imageView);
+//                .into(new SimpleTarget<Bitmap>() {
+//                    @Override
+//                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+//                        simpleTarget.onLoadFailed(errorDrawable);
+//                        super.onLoadFailed(errorDrawable);
+//                    }
+//
+//                    @Override
+//                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+//                        simpleTarget.onResourceReady();
+//                        imageView.setImageBitmap(resource);
+//                    }
+//
+//                });
     }
 
     @Override

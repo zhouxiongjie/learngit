@@ -7,6 +7,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -229,7 +230,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         EventBus.getDefault().register(this);
-
+        mArticleId = getIntent().getIntExtra("articleId", 0);
         init();
 
     }
@@ -238,7 +239,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     @Override
     protected void onNewIntent(Intent intent) {
 
-//        mArticleId = getIntent().getIntExtra("articleId", 0);
+        mArticleId = intent.getIntExtra("articleId", 0);
 //        getArticleDetail();
         init();
         super.onNewIntent(intent);
@@ -298,7 +299,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
         mHandler = new Handler(this);
 
-        mArticleId = getIntent().getIntExtra("articleId", 0);
+        //mArticleId = intent.getIntExtra("articleId", 0);
 
         getArticleDetail();
 
@@ -577,13 +578,14 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                     for (int i = 0; i < ja.size(); i++) {
                         ImageInfo image = new ImageInfo((String) ja.get(i));
                         images.add(image);
-//                        Rect bounds = new Rect();
-//                        image.setBounds(bounds);
+                        Rect bounds = new Rect(CommonUtils.getScreenWidth()/2,CommonUtils.getScreenHeight()/2,CommonUtils.getScreenWidth()/2,CommonUtils.getScreenHeight()/2);
+                        image.setBounds(bounds);
                     }
                     GPreviewBuilder.from(ArticleDetailActivity02.this)
                             .setData(images)
                             .setCurrentIndex(index)
                             .setDrag(true, 0.6f)
+                            .setSingleFling(true)
                             .setType(GPreviewBuilder.IndicatorType.Number)
                             .start();
 

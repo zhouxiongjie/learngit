@@ -8,8 +8,7 @@
     <RelativeLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content" >
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/topBackground"
             android:layout_width="match_parent"

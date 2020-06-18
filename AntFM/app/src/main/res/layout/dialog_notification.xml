@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <RelativeLayout
+        android:id="@+id/a"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_notification_bg">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            app:actualImageScaleType="fitCenter"
+            app:failureImage="@drawable/notification_bg"
+            app:failureImageScaleType="fitCenter"
+            app:placeholderImage="@drawable/notification_bg"
+            app:placeholderImageScaleType="fitCenter"
+            app:roundingBorderColor="@color/white"
+            app:roundingBorderWidth="0dp"
+            app:viewAspectRatio="1.09" />
+
+
+
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_alignBottom="@+id/a">
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/font_size_36px"
+            android:textColor="#333333"
+            android:layout_marginLeft="15dp"
+            android:text="您还没有开通消息推送哦"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="15dp"
+            android:textStyle="bold"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/font_size_26px"
+            android:textColor="#999999"
+            android:layout_marginLeft="15dp"
+            android:text="开启通知后能第一时间获得精彩提醒"
+             />
+
+        <TextView
+            android:id="@+id/openNotification"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:textSize="@dimen/font_size_28px"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:text="立即开启"
+            android:background="@drawable/attention_bg"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="20dp"/>
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

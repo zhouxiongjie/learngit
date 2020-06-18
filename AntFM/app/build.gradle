@@ -26,7 +26,7 @@ android {
 
     MtjCirclePluginConfig {
 
-        appkey = "8a3086f16e"
+        appkey = "53c6df4e68"
         // 设置debug 开关，如果需要查看日志则打开开关，为避免影响性能建议上线前关闭（设置为false）
         debug = false
         // 默认启动此插件，如果开发者不需要可以禁用（设置为false）
@@ -62,6 +62,13 @@ android {
             keyAlias "fcg"
             keyPassword "123456"
         }
+        mgfb {
+            storeFile file("../keystore/mgfb.jks")
+            storePassword "123456"
+            keyAlias "mingguang"
+            keyPassword "123456"
+        }
+
 
 
     }
@@ -113,6 +120,18 @@ android {
             manifestPlaceholders = [
                     GD_KEY: "e2b638dd8d5507018ca114460cd5f624",
                     APP_SCHEME:"fcgapp"
+            ]
+
+
+        }
+
+        mgfb {
+            applicationId "com.shuangling.software.mgfb"
+            signingConfig signingConfigs.mgfb         //配置签名
+            String bdtjAppkey = "53c6df4e68"
+            manifestPlaceholders = [
+                    GD_KEY: "8fec8bb792b0f96fae170fb46ec91778",
+                    APP_SCHEME:"mgfbapp"
             ]
 
 

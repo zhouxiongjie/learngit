@@ -211,4 +211,6 @@ public class ServerInfo {
 	public static String articleVoices="/v2/article_voices/";					//c端获取语音播报配置
 
 	public static String playAuth="/v1/playAuth";								//c端获取语音播报配置
+
+	public static String commentReplay ="/v2/parent_comments";
 }

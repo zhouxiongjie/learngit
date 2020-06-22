@@ -1546,6 +1546,8 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                                 columnFragment.setArguments(bundle);
                                                 transaction.add(R.id.content, columnFragment);
                                             } else {
+
+                                                ((ColumnFragment)columnFragment).setColumn(column);
                                                 transaction.show(columnFragment);
                                             }
 

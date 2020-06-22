@@ -6,6 +6,12 @@ import android.util.Log;
 
 import com.alibaba.sdk.android.push.MessageReceiver;
 import com.alibaba.sdk.android.push.notification.CPushMessage;
+import com.shuangling.software.activity.AlbumDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity02;
+import com.shuangling.software.activity.AudioDetailActivity;
+import com.shuangling.software.activity.GalleriaActivity;
+import com.shuangling.software.activity.SpecialDetailActivity;
+import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.activity.WebViewBackActivity;
 
 import com.alibaba.fastjson.JSONObject;
@@ -44,11 +50,47 @@ public class MyAliPushMessageReceiver extends MessageReceiver {
     protected void onNotificationClickedWithNoAction(Context context, String title, String summary, String extraMap) {
         Log.e("MyMessageReceiver", "onNotificationClickedWithNoAction, title: " + title + ", summary: " + summary + ", extraMap:" + extraMap);
         JSONObject jsonObject = JSONObject.parseObject(extraMap);
-        Intent intent = new Intent(context,WebViewBackActivity.class);
-        intent.putExtra("title",title);
-        intent.putExtra("url",jsonObject.getString("url"));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+//        Intent intent = new Intent(context,WebViewBackActivity.class);
+//        intent.putExtra("title",title);
+//        intent.putExtra("url",jsonObject.getString("url"));
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        context.startActivity(intent);
+        String type=jsonObject.getString("post_type");
+        String id=jsonObject.getString("id");
+
+
+
+        if(type.equals("2")){
+            //专辑
+            Intent intent = new Intent(context, AlbumDetailActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("albumId", Integer.parseInt(id));
+            context.startActivity(intent);
+        }else if(type.equals("3")){
+            //文章
+            Intent intent = new Intent(context, ArticleDetailActivity02.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("articleId", Integer.parseInt(id));
+            context.startActivity(intent);
+        }else if(type.equals("4")){
+            //视频
+            Intent intent = new Intent(context, VideoDetailActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("videoId", Integer.parseInt(id));
+            context.startActivity(intent);
+        }else if(type.equals("5")){
+            //专题
+            Intent intent = new Intent(context, SpecialDetailActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("specialId", Integer.parseInt(id));
+            context.startActivity(intent);
+        }else if(type.equals("6")){
+            //图集
+            Intent intent = new Intent(context, GalleriaActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("galleriaId", Integer.parseInt(id));
+            context.startActivity(intent);
+        }
 
     }
     @Override

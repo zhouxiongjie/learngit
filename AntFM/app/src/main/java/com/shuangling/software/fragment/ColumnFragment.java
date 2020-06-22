@@ -279,6 +279,82 @@ public class ColumnFragment extends SimpleImmersionFragment implements Handler.C
         return view;
     }
 
+
+
+    public void setColumn(Column col){
+        mColumn=col;
+        activtyTitle.setTitleText(mColumn.getName());
+        refreshLayout.setEnableLoadMore(false);
+
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RefreshLayout refreshLayout) {
+                getContent(GetContent.LoadMore);
+            }
+        });
+
+        mAdapter = new ColumnDecorateContentAdapter(getContext());
+        if (mColumn.getPost_type() == 4) {
+            DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+            divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_video_divider_drawable));
+            recyclerView.addItemDecoration(divider);
+            mAdapter.setIsVideo(true);
+        } else if (mColumn.getPost_type() == 9) {
+            DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+            divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
+            recyclerView.addItemDecoration(divider);
+            mAdapter.setIsActivity(true);
+        } else {
+            DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+            divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
+            recyclerView.addItemDecoration(divider);
+        }
+        recyclerView.setAdapter(mAdapter);
+
+        if (mColumn.getChildren() != null && mColumn.getChildren().size() > 0) {
+
+            ViewGroup secondColumn = (ViewGroup) getLayoutInflater().inflate(R.layout.second_column_layout, recyclerView, false);
+            LinearLayout columnContent = secondColumn.findViewById(R.id.columnContent);
+            for (int i = 0; i < mColumn.getChildren().size(); i++) {
+                final Column column = mColumn.getChildren().get(i);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.leftMargin = CommonUtils.dip2px(10);
+                params.rightMargin = CommonUtils.dip2px(10);
+                View secondColumnItem = getLayoutInflater().inflate(R.layout.second_column_item_layout, secondColumn, false);
+                TextView columnTextView = secondColumnItem.findViewById(R.id.text);
+                SimpleDraweeView indicator = secondColumnItem.findViewById(R.id.logo);
+                columnTextView.setText(column.getName());
+                if (!TextUtils.isEmpty(column.getIcon())) {
+                    Uri uri = Uri.parse(column.getIcon());
+                    int width = CommonUtils.dip2px(20);
+                    int height = width;
+                    ImageLoader.showThumb(uri, indicator, width, height);
+                } else {
+                    indicator.setVisibility(View.GONE);
+                }
+                secondColumnItem.setTag(column);
+                secondColumnItem.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        Intent it = new Intent(getContext(), ContentActivity.class);
+                        it.putExtra("column", column);
+                        startActivity(it);
+                    }
+                });
+                columnContent.addView(secondColumnItem, i, params);
+            }
+
+            mAdapter.addHeaderView(secondColumn);
+
+        }
+
+        columnDecorateContent(GetContent.Normal);
+
+
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getEventBus(CommonEvent event) {
         if (event.getEventName().equals("onFontSizeChanged")) {

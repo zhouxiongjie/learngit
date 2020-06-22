@@ -257,4 +257,6 @@ public class ServerInfo {
 	public static String playAuth="/v1/playAuth";								//c端获取语音播报配置
 
 	public static String commentReplay ="/v2/parent_comments";
+
+	public static String ossSts ="/v1/vod_play_auth";
 }

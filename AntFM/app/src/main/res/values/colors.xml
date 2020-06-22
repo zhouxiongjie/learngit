@@ -194,6 +194,14 @@
     <color name="text_sky_blue">#0C82FF</color>
     <color name="text_gray">#C4C4C4</color>
 
+
+
+
+    <color name="red_500">#ef4836</color>
+    <color name="bg_focus">#dddddd</color>
+
+    <color name="mask_color">#66000000</color>
+
 </resources>
 
 

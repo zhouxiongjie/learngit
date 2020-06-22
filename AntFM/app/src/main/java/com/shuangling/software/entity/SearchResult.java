@@ -1,5 +1,7 @@
 package com.shuangling.software.entity;
 
+import java.io.Serializable;
+
 public class SearchResult {
 
 
@@ -26,6 +28,20 @@ public class SearchResult {
     private String duration;
     private int is_follow;
     private int follows;
+    private int plays;
+
+    private String video_id;
+
+
+    public int getPlays() {
+        return plays;
+    }
+
+    public void setPlays(int plays) {
+        this.plays = plays;
+    }
+
+    private MerchantBean merchant;
 
     public int getId() {
         return id;
@@ -105,5 +121,79 @@ public class SearchResult {
 
     public void setFollows(int follows) {
         this.follows = follows;
+    }
+
+    public String getVideo_id() {
+        return video_id;
+    }
+
+    public void setVideo_id(String video_id) {
+        this.video_id = video_id;
+    }
+
+    public MerchantBean getMerchant() {
+        return merchant;
+    }
+
+    public void setMerchant(MerchantBean merchant) {
+        this.merchant = merchant;
+    }
+
+
+
+    public static class MerchantBean implements Serializable {
+        /**
+         * id : 4
+         * name : 黄庚的机构勿删勿改
+         * logo : http://sl-ucenter.static.slradio.cn/merchants/4/imges/s3neE6NZzbQ7Cc6kD7J9mFk64QAaT8kC1555641918048.png
+         * type : 1
+         * parent_id : 0
+         */
+
+        private int id;
+        private String name;
+        private String logo;
+        private int type;
+        private int parent_id;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getLogo() {
+            return logo;
+        }
+
+        public void setLogo(String logo) {
+            this.logo = logo;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
+        }
+
+        public int getParent_id() {
+            return parent_id;
+        }
+
+        public void setParent_id(int parent_id) {
+            this.parent_id = parent_id;
+        }
     }
 }

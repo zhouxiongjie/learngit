@@ -66,6 +66,7 @@
     <string name="audio">音频</string>
     <string name="article">文章</string>
     <string name="video">视频</string>
+    <string name="little_video">短视频</string>
     <string name="special">专题</string>
     <string name="photo">图集</string>
     <string name="all">全部</string>

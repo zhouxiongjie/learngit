@@ -27,7 +27,6 @@ import com.kcrason.dynamicpagerindicatorlibrary.DynamicPagerIndicator;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
-import com.shuangling.software.activity.ArticleDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.BindPhoneActivity;
@@ -601,6 +600,8 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
         Map<String, String> params = new HashMap<>();
         params.put("page", "1");
         params.put("page_size", "" + Integer.MAX_VALUE);
+        params.put("source", "" + "mobile");
+
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
 
             @Override
@@ -715,9 +716,16 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
                 contentFragment.setArguments(data);
                 return contentFragment;
             } else {
-                ContentFragment contentFragment = new ContentFragment();
-                contentFragment.setArguments(data);
-                return contentFragment;
+                if (mColumns.get(position).getPost_type() == 12) {
+                    LittleVideoFragment littleVideoFragment = new LittleVideoFragment();
+                    littleVideoFragment.setArguments(data);
+                    return littleVideoFragment;
+                }else{
+                    ContentFragment contentFragment = new ContentFragment();
+                    contentFragment.setArguments(data);
+                    return contentFragment;
+                }
+
             }
 
         }

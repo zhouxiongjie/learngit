@@ -44,6 +44,15 @@ public class ColumnContent  implements Serializable {
     private LiveBean live;
     private List<CategoriesBean> categories;
     private TopBean top;
+    private int is_like;
+
+    public int getIs_like() {
+        return is_like;
+    }
+
+    public void setIs_like(int is_like) {
+        this.is_like = is_like;
+    }
 
     public int getId() {
         return id;
@@ -205,7 +214,7 @@ public class ColumnContent  implements Serializable {
         this.top = top;
     }
 
-    public static class AuthorInfoBean {
+    public static class AuthorInfoBean implements Serializable{
         /**
          * id : 5
          * merchant_id : 4
@@ -256,11 +265,12 @@ public class ColumnContent  implements Serializable {
             return merchant;
         }
 
+
         public void setMerchant(MerchantBean merchant) {
             this.merchant = merchant;
         }
 
-        public static class MerchantBean {
+        public static class MerchantBean implements Serializable{
             /**
              * id : 4
              * name : 黄庚的机构勿删勿改
@@ -317,7 +327,7 @@ public class ColumnContent  implements Serializable {
         }
     }
 
-    public static class ArticleBean {
+    public static class ArticleBean implements Serializable{
         /**
          * id : 550
          * post_id : 1373
@@ -373,7 +383,7 @@ public class ColumnContent  implements Serializable {
         }
     }
 
-    public static class GallerieBean {
+    public static class GallerieBean implements Serializable{
         /**
          * id : 9
          * post_id : 1568
@@ -429,7 +439,7 @@ public class ColumnContent  implements Serializable {
         }
     }
 
-    public static class SpecialBean {
+    public static class SpecialBean implements Serializable{
         /**
          * id : 68
          * post_id : 1324
@@ -475,7 +485,7 @@ public class ColumnContent  implements Serializable {
         }
     }
 
-    public static class TopBean{
+    public static class TopBean implements Serializable{
         private int id;
         private int post_id;
         private int position;
@@ -516,7 +526,7 @@ public class ColumnContent  implements Serializable {
 
 
 
-    public static class AlbumsBean {
+    public static class AlbumsBean implements Serializable{
         /**
          * id : 237
          * post_id : 1060
@@ -572,7 +582,7 @@ public class ColumnContent  implements Serializable {
         }
     }
 
-    public static class VideoBean {
+    public static class VideoBean implements Serializable{
         /**
          * post_id : 1658
          * duration : 42.518
@@ -689,7 +699,7 @@ public class ColumnContent  implements Serializable {
     }
 
 
-    public static class ActivitiyBean{
+    public static class ActivitiyBean implements Serializable{
 
         /**
          * id : 21
@@ -796,7 +806,7 @@ public class ColumnContent  implements Serializable {
         }
     }
 
-    public static class LiveBean{
+    public static class LiveBean implements Serializable{
 
         /**
          * id : 2
@@ -933,7 +943,7 @@ public class ColumnContent  implements Serializable {
         }
     }
 
-    public static class CategoriesBean {
+    public static class CategoriesBean implements Serializable{
         /**
          * category_id : 8
          * name : 相声

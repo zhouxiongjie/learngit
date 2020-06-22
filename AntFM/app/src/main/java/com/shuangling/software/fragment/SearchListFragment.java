@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -78,11 +79,20 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_content, container, false);
         unbinder = ButterKnife.bind(this, view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        //recyclerView.addItemDecoration(new MyItemDecoration());
-        DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-        divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
-        recyclerView.addItemDecoration(divider);
+
+        if(mSearchType ==  R.string.little_video) {//短视频显示两列
+            GridLayoutManager GridLayoutManager = new GridLayoutManager(getActivity(),2);
+            recyclerView.setLayoutManager(GridLayoutManager);
+        }else{
+            //其它显示一列
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+            //recyclerView.addItemDecoration(new MyItemDecoration());
+            DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+            divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
+            recyclerView.addItemDecoration(divider);
+        }
+
+
         //refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
         //((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
         refreshLayout.setEnableLoadMore(false);
@@ -118,13 +128,16 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
         Map<String, String> params = new HashMap<String, String>();
         switch (mSearchType){
             case R.string.all:
-                params.put("search_type", "0");
+                params.put("search_type", "-2");
                 break;
             case R.string.article:
                 params.put("search_type", "2");
                 break;
             case R.string.video:
                 params.put("search_type", "6");
+                break;
+            case R.string.little_video:
+                params.put("search_type", "11");
                 break;
             case R.string.audio:
                 params.put("search_type", "1");
@@ -219,7 +232,6 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
                         }
 
                         mSearchList.addAll(JSONArray.parseArray(jsonObject.getJSONObject("data").getJSONArray("list").toJSONString(), SearchResult.class));
-
                         if (mSearchList.size() == 0) {
                             noData.setVisibility(View.VISIBLE);
                         } else {
@@ -228,9 +240,8 @@ public class SearchListFragment extends Fragment implements Handler.Callback {
 
                         if (mAdapter == null) {
                             mAdapter = new SearchListAdapter(getContext(), mSearchList);
+                            mAdapter.setSearchType(mSearchType);
                             mAdapter.setOnItemClickListener(new SearchListAdapter.OnItemClickListener() {
-
-
                                 @Override
                                 public void onItemClick(View view, SearchResult content) {
 

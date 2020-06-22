@@ -1,0 +1,87 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ptr="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:clickable="true">
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        layout="@layout/network_error" />
+
+
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        ptr:srlEnableLoadMore="true"
+        ptr:srlEnableScrollContentWhenLoaded="true"
+        ptr:srlEnableFooterFollowWhenLoadFinished="true">
+
+        <!--<com.scwang.smartrefresh.layout.header.ClassicsHeader-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--ptr:srlAccentColor="@android:color/black"-->
+        <!--ptr:srlClassicsSpinnerStyle="FixedBehind"-->
+        <!--ptr:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
+        <!--ptr:srlDrawableProgressSize="20dp"-->
+        <!--ptr:srlPrimaryColor="@color/transparent"/>-->
+<!--        <android.support.v4.widget.NestedScrollView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:fillViewport="true" >-->
+            <android.support.v7.widget.RecyclerView
+
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white" />
+
+<!--        </android.support.v4.widget.NestedScrollView>-->
+
+        <!--<com.scwang.smartrefresh.layout.footer.ClassicsFooter-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--ptr:srlAccentColor="@android:color/black"-->
+        <!--ptr:srlClassicsSpinnerStyle="Translate"-->
+        <!--ptr:srlDrawableProgressSize="20dp"-->
+
+        <!--ptr:srlPrimaryColor="@color/white" />-->
+
+
+        <!--ptr:srlAccentColor="@android:color/black"-->
+
+        <!--ptr:srlDrawableProgressSize="20dp"-->
+        <!--ptr:srlPrimaryColor="@color/transparent"-->
+        <!--ptr:srlClassicsSpinnerStyle="Translate"-->
+        <!--ptr:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
+
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
+
+    <LinearLayout
+        android:id="@+id/noData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/no_data" />
+
+        <TextView
+            android:id="@+id/noScriptText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="暂无数据" />
+
+
+    </LinearLayout>
+</RelativeLayout>

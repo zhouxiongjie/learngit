@@ -3,8 +3,6 @@ package com.shuangling.software.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -13,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -27,14 +24,13 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
-import com.gyf.immersionbar.ImmersionBar;
+import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
-import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.Column;
+import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
@@ -46,15 +42,14 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
-import com.zhihu.matisse.engine.impl.GlideEngine;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -615,6 +610,28 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
         }
 
 
+
+
+        //播放小视频
+        @JavascriptInterface
+        public void litteVideoEvent(final String position,final String data) {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Intent intent = new Intent(WebViewActivity.this, AlivcLittleVideoActivity.class);
+
+                        List<ColumnContent> columnContents= JSONObject.parseArray(data, ColumnContent.class);
+                        intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_WEBVIEW);
+                        intent.putExtra("littleVideos", (Serializable) columnContents);
+                        intent.putExtra("position",  Integer.parseInt(position));
+                        startActivity(intent);
+                    } catch (Exception e) {
+
+                    }
+                }
+            });
+        }
     }
 
     @Override

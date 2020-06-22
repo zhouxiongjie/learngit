@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/alivc_common_bg_black"
+    >
+
+    <FrameLayout
+        android:id="@+id/player_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:clipChildren="false"
+        android:focusable="false"
+        >
+
+        <ImageView
+            android:id="@+id/img_thumb"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="false"
+            android:clickable="false"
+            android:focusable="false"
+            android:scaleType="fitCenter"
+            android:visibility="visible"
+           />
+
+        <ImageView
+            android:id="@+id/iv_play_icon"
+            android:layout_width="57dp"
+            android:layout_height="57dp"
+            android:layout_gravity="center"
+            android:background="@drawable/aliyun_little_video_backgroud_circle_shape"
+            android:padding="15dp"
+            android:src="@mipmap/alivc_little_video_play" />
+
+    </FrameLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:layout_marginBottom="47.5dp">
+
+        <RelativeLayout android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:layout_toLeftOf="@+id/liner_right">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="15dp"
+
+                app:layout_constraintVertical_bias="1" >
+
+                <TextView
+                    android:id="@+id/tv_video_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8.5dp"
+                    android:text="小视频标题123131312312311"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp"
+
+                    />
+
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8.5dp"
+                    android:paddingTop="8.5dp"
+                    android:paddingBottom="8.5dp"
+                    android:gravity="center_vertical"
+                    >
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true">
+                        <com.facebook.drawee.view.SimpleDraweeView
+                            android:id="@+id/iv_author_logo"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            app:actualImageScaleType="centerCrop"
+                            app:placeholderImage="@drawable/ic_user4"
+                            app:placeholderImageScaleType="centerCrop"
+                            app:failureImage="@drawable/ic_user4"
+                            app:failureImageScaleType="centerCrop"
+                            app:viewAspectRatio="1"
+                            app:roundAsCircle="true"
+                            app:roundingBorderWidth="1dp"
+                            app:roundingBorderColor="#ffffff"
+                            android:visibility="visible"/>
+                        <ImageView
+                            android:id="@+id/authenticationLogo"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_alignEnd="@+id/iv_author_logo"
+                            android:layout_alignBottom="@+id/iv_author_logo"
+                            android:background="@drawable/ic_authentication" />
+                    </RelativeLayout>
+
+
+                    <TextView
+                        android:id="@+id/tv_author_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="伊金媒体中心"
+                        android:textColor="#ffffff"
+                        android:textSize="15sp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="8dp"></TextView>
+
+                    <TextView
+                        android:id="@+id/tv_attention"
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="8dp"
+                        android:background="@drawable/attention_button_bg_blue"
+                        android:gravity="center"
+                        android:text="已关注"
+                        android:visibility="invisible"
+                        android:textColor="#ffffff"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/liner_right"
+            android:layout_width="60dp"
+            android:layout_height="300dp"
+            android:orientation="vertical"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="vertical"
+                android:id="@+id/layout_prase">
+
+
+
+                <com.aliyun.apsara.alivclittlevideo.view.video.FontIconView
+                    android:id="@+id/fiv_prase"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:text="&#xe61d;"
+                    android:textColor="#ffffff"
+                    android:gravity="center"
+                    android:textSize="28sp"/>
+                <TextView
+                    android:id="@+id/tv_likes"
+                    android:layout_width="wrap_content"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp"
+                    android:layout_gravity="center"
+                    android:text="点赞"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"></TextView>
+
+
+            </LinearLayout>
+          <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_weight="1"
+              android:gravity="center_vertical|center_horizontal"
+              android:orientation="vertical"
+              android:id="@+id/layout_comment">
+
+              <com.aliyun.apsara.alivclittlevideo.view.video.FontIconView
+                  android:id="@+id/fiv_comment"
+                  android:layout_width="30dp"
+                  android:layout_height="30dp"
+                  android:text="&#xe6b3;"
+                  android:gravity="center"
+                  android:textColor="#ffffff"
+                  android:textSize="28sp"/>
+
+              <TextView
+                  android:id="@+id/tv_comment"
+                  android:layout_width="wrap_content"
+                  android:gravity="center"
+                  android:textColor="#ffffff"
+                  android:textSize="14sp"
+                  android:paddingTop="5dp"
+                  android:text="评论"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="3dp"></TextView>
+
+
+          </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="vertical"
+                android:id="@+id/layout_share">
+
+                <com.aliyun.apsara.alivclittlevideo.view.video.FontIconView
+                    android:id="@+id/fiv_share"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:text="&#xe6b2;"
+                    android:textColor="#ffffff"
+                    android:gravity="center"
+                    android:textSize="28sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp"
+                    android:text="分享"
+                    android:layout_marginTop="3dp"
+                    android:layout_height="wrap_content"></TextView>
+
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+
+
+
+    </RelativeLayout>
+
+
+    <ImageView
+        android:id="@+id/iv_download"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="@dimen/alivc_common_margin_88"
+        android:layout_marginRight="@dimen/alivc_common_keyline_15"
+        android:layout_gravity="right|bottom"
+        android:padding="@dimen/alivc_common_padding_10"
+        android:visibility="gone"
+        android:src="@mipmap/alivc_little_icon_share"/>
+    <!--窄带高清提示标志-->
+    <ImageView
+        android:id="@+id/iv_narrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/alivc_common_margin_37"
+        android:layout_marginLeft="@dimen/alivc_common_keyline_15"
+        android:layout_gravity="left|top"
+        android:visibility="gone"
+
+        android:src="@mipmap/alivc_little_icon_narrowband"/>
+
+
+
+    <com.aliyun.apsara.alivclittlevideo.view.video.FontIconView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:id="@+id/fiv_close"
+        android:text="&#xe62a;"
+        android:textColor="#ffffff"
+        android:gravity="center"
+        layout_gravity="left|top"
+        android:textSize="20sp"/>
+
+    <ImageView
+        android:id="@+id/iv_share_more"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="12dp"
+        android:layout_gravity="right|top"
+        app:srcCompat="@drawable/small_video_share_more_icon" />
+
+    <ImageView
+        android:id="@+id/iv_live"
+        android:layout_width="@dimen/alivc_common_size_icon_40"
+        android:layout_height="@dimen/alivc_common_size_icon_40"
+        android:layout_marginTop="@dimen/alivc_common_margin_37"
+        android:layout_marginRight="@dimen/alivc_common_keyline_15"
+        android:src="@mipmap/alivc_little_icon_live"
+        android:visibility="gone"
+        android:layout_gravity="right|top"/>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/alivc_common_margin_74"
+        android:layout_marginLeft="@dimen/alivc_common_keyline_15"
+        android:layout_gravity="left|bottom">
+        <com.aliyun.apsara.alivclittlevideo.view.video.VideoInfoView
+            android:id="@+id/content_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="47.5dp"
+        android:layout_gravity="bottom">
+
+        <ProgressBar
+            android:id="@+id/pb_play_bar"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="2dp"
+            android:indeterminateOnly="false"
+            android:layout_gravity="top"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/common_progress_bg" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="top"
+            android:background="#88ffffff"
+            android:visibility="invisible"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+      >
+            <com.aliyun.apsara.alivclittlevideo.view.video.FontIconView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:text="&#xe631;"
+                android:textColor="#ffffff"
+                android:gravity="center"
+                android:layout_gravity="center_vertical"
+                android:textSize="14sp"
+                android:layout_marginLeft="10dp"/>
+            <TextView
+                android:id="@+id/tv_send_comment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+
+                android:textColor="#ffffff"
+                android:textSize="14sp"
+                android:text="写评论..." ></TextView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+</FrameLayout>

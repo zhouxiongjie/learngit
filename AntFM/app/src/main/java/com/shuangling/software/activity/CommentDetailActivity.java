@@ -234,8 +234,6 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
                     mReplyComment = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONObject("reply").getJSONArray("data").toJSONString(), Comment.class);
                     recyclerView.setHasFixedSize(true);
 
-
-
                     if (mCommentListAdapter == null) {
                         mCommentListAdapter = new LevelTwoCommentAdapter(this, mReplyComment);
                         mCommentListAdapter.setTopComment(mComment);

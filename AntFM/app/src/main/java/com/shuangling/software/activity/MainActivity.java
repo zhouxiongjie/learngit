@@ -20,12 +20,10 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -40,8 +38,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
-import com.aliyun.vodplayerview.activity.AliyunPlayerSkinActivity;
-import com.aliyun.vodplayerview.utils.FixedToastUtils;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
@@ -62,14 +58,11 @@ import com.shuangling.software.dialog.UpdateDialog;
 import com.shuangling.software.entity.BottomMenu;
 import com.shuangling.software.entity.City;
 import com.shuangling.software.entity.Column;
-import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.UpdateInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.fragment.ColumnFragment;
-import com.shuangling.software.fragment.ContentFragment;
 import com.shuangling.software.fragment.DiscoverFragment;
-import com.shuangling.software.fragment.PersonalCenterFragment;
 import com.shuangling.software.fragment.PersonalCenterFragment01;
 import com.shuangling.software.fragment.RadioListFragment;
 import com.shuangling.software.fragment.RecommendFragment;
@@ -100,7 +93,6 @@ import butterknife.ButterKnife;
 import cn.jake.share.frdialog.dialog.FRDialog;
 import cn.jake.share.frdialog.interfaces.FRDialogClickListener;
 import io.reactivex.functions.Consumer;
-import io.sentry.Sentry;
 import okhttp3.Call;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
@@ -192,9 +184,16 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                 String type=uri.getQueryParameter("type");
                 String fromUrl=uri.getQueryParameter("from_url");
                 String fromUserId=uri.getQueryParameter("from_user_id");
+                String post_type = uri.getQueryParameter("post_type");
+
                 //保存fromUrl fromUserId到SharedPreferences
                 SharedPreferencesUtils.putPreferenceTypeValue("from_url", SharedPreferencesUtils.PreferenceType.String,fromUrl);
                 SharedPreferencesUtils.putPreferenceTypeValue("from_user_id", SharedPreferencesUtils.PreferenceType.String,fromUserId);
+
+
+                if(type == null){
+                    return;
+                }
                 if(type.equals("1")){
                     //音频
                     Intent intent = new Intent(this, AudioDetailActivity.class);
@@ -239,11 +238,36 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     startActivity(it);
                 }else if(type.equals("99")){
                     //主播
-
                     Intent intent = new Intent(this, WebViewBackActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     it.putExtra("url", ServerInfo.h5HttpsIP + "/anchors/" + Integer.parseInt(uri.getQueryParameter("id")));
                     startActivity(it);
+                }else if(type.equals("12")){//短视频
+                    String original_id = uri.getQueryParameter("original_id");
+                    String play_id = uri.getQueryParameter("play_id");
+                    String id =  uri.getQueryParameter("play_id");
+
+                    if(id == null) {
+                        //播放的是关联视频
+                        if(original_id == null || play_id == null ){
+                           return;
+                        }
+                    }else{
+                        //播放的是当前视频
+                        original_id = id;
+                        play_id = id;
+                    }
+
+                    Intent intent = new Intent(this, AlivcLittleVideoActivity.class);
+                    if(id==null){
+                        intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_SCHEME);
+                    }else{
+                        intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_WEBVIEW_CURRENT);
+                    }
+                    intent.putExtra("original_id",  Integer.parseInt(original_id));
+                    intent.putExtra("play_id",  Integer.parseInt(play_id));
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                 }
 
 
@@ -267,13 +291,19 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
 //                        + "|type-" + uri.getQueryParameter("type")
 //                        + "|id-" + uri.getQueryParameter("id"));
 
-
                 String type=uri.getQueryParameter("type");
                 String fromUrl=uri.getQueryParameter("from_url");
                 String fromUserId=uri.getQueryParameter("from_user_id");
+                String post_type = uri.getQueryParameter("post_type");
                 //保存fromUrl fromUserId到SharedPreferences
                 SharedPreferencesUtils.putPreferenceTypeValue("from_url", SharedPreferencesUtils.PreferenceType.String,fromUrl);
                 SharedPreferencesUtils.putPreferenceTypeValue("from_user_id", SharedPreferencesUtils.PreferenceType.String,fromUserId);
+
+
+                if(type == null){
+                    return;
+                }
+
                 if(type.equals("1")){
                     //音频
                     Intent intent = new Intent(this, AudioDetailActivity.class);
@@ -310,7 +340,38 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra("galleriaId", Integer.parseInt(uri.getQueryParameter("id")));
                     startActivity(intent);
+                }else if(type.equals("12")) {
+                    String original_id = uri.getQueryParameter("original_id");
+                    String play_id = uri.getQueryParameter("play_id");
+                    String id = uri.getQueryParameter("id");
+
+
+                    Intent intent = new Intent(this, AlivcLittleVideoActivity.class);
+                    if(id == null) {
+                        //播放的是关联视频
+                        if(original_id == null || play_id == null ){
+                            return;
+                        }
+                    }else{
+                        //播放的是当前视频
+                        if(original_id ==null || play_id == null){
+                            original_id = id;
+                            play_id = id;
+                            intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_WEBVIEW_CURRENT);
+                        }else{
+                            intent.putExtra("startType",  AlivcLittleVideoActivity.START_TYPE_H5_SCHEME);
+                        }
+
+                    }
+
+
+                    intent.putExtra("original_id",  Integer.parseInt(original_id));
+                    intent.putExtra("play_id",  Integer.parseInt(play_id));
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                 }
+
+
 
 
             }

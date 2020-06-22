@@ -147,7 +147,7 @@ public class LittleVideoListAdapter extends BaseVideoListAdapter<LittleVideoList
         if(video.getUser()!=null) {
             myHolder.mTvAuthorName.setText(video.getUser().getUserName());
                 Uri uri = Uri.parse(video.getUser().getAvatarUrl());
-                int width = 76;
+                int width = 114;
                 int height = width;
                 ImageLoader.showThumb(uri, myHolder.mSdvAvatar, width, height);
                 if(video.getUser().getType() == 1){//机构

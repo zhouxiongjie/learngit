@@ -31,6 +31,7 @@ import com.aliyun.player.source.StsInfo;
 import java.util.ArrayList;
 import java.util.List;
 import com.aliyun.apsara.alivclittlevideo.utils.DensityUtils;
+import com.aliyun.player.source.VidSts;
 
 
 /**
@@ -44,6 +45,18 @@ public class AlivcVideoPlayView extends FrameLayout {
     private static final String TAG = "AlivcVideoPlayView";
     private Context context;
     private AlivcVideoListView videoListView;
+
+    private StsInfo stsInfo;
+
+
+    public StsInfo getStsInfo() {
+        return stsInfo;
+    }
+
+    public void setStsInfo(StsInfo stsInfo) {
+        this.stsInfo = stsInfo;
+        videoListView.setStsInfo(stsInfo);
+    }
 
     private LittleVideoListAdapter.OnItemBtnClick onItemBtnClick;
 
@@ -137,6 +150,13 @@ public class AlivcVideoPlayView extends FrameLayout {
             public void onExitVideo() {
                 if (onRefreshDataListener != null) {
                     onRefreshDataListener.onExitVideo();
+                }
+            }
+
+            @Override
+            public void onSTSExpired() {
+                if (onRefreshDataListener != null) {
+                    onRefreshDataListener.onSTSExpired();
                 }
             }
 

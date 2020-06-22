@@ -97,7 +97,7 @@
                             app:failureImageScaleType="centerCrop"
                             app:viewAspectRatio="1"
                             app:roundAsCircle="true"
-                            app:roundingBorderWidth="1dp"
+                            app:roundingBorderWidth="0dp"
                             app:roundingBorderColor="#ffffff"
                             android:visibility="visible"/>
                         <ImageView

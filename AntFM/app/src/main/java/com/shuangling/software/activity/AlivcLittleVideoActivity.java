@@ -271,7 +271,7 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                         attention(position,false);
                     }else{
                         holder.getmTvAttention().setText("已关注");
-                        holder.getmTvAttention().setTextColor(Color.parseColor("#88FFFFFF"));
+                        holder.getmTvAttention().setTextColor(Color.parseColor("#999999"));
                         holder.getmTvAttention().setSelected(false);
                         attention(position,true);
                     }
@@ -352,6 +352,9 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
             case MotionEvent.ACTION_UP:
                 currentX = ev.getX();// 抬起时的坐标
                 currentY = ev.getY();
+                if( Math.abs(currentX - oldX)>50) {
+                    mCancelVerticalMove = true;
+                }
                 handleTouch();
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -366,9 +369,7 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                 currentX = ev.getX();//移动时操过200
                 currentY = ev.getY();
 
-                if( Math.abs(currentX - oldX)>100) {
-                    mCancelVerticalMove = true;
-                }
+
 
                 break;
         }
@@ -416,6 +417,16 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
             AlivcLittleVideoActivity activity = weakReference.get();
             if (activity != null) {
                // activity.willExitVideo();
+            }
+
+        }
+
+        @Override
+        public void onSTSExpired() {
+
+            AlivcLittleVideoActivity activity = weakReference.get();
+            if (activity != null) {
+                 activity.getSts();
             }
 
         }
@@ -500,6 +511,14 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         mStsInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), StsInfo.class);
+
+
+                        com.aliyun.player.source.StsInfo stsInfo = new com.aliyun.player.source.StsInfo();
+                        stsInfo.setAccessKeyId(mStsInfo.getAccessKeyId());
+                        stsInfo.setAccessKeySecret(mStsInfo.getAccessKeySecret());
+                        stsInfo.setRegion("cn-shanghai");
+                        stsInfo.setSecurityToken(mStsInfo.getSecurityToken());
+                        videoPlayView.setStsInfo(stsInfo);
                         handleRequestFinish();
                     } else if (jsonObject != null) {
                         ToastUtils.show(jsonObject.getString("msg"));
@@ -691,7 +710,7 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                                     if(videoDetail.getIs_follow() == 1) {
                                         holder.getmTvAttention().setText("已关注");
                                         holder.getmTvAttention().setSelected(false);
-                                        holder.getmTvAttention().setTextColor(Color.parseColor("#88FFFFFF"));
+                                        holder.getmTvAttention().setTextColor(Color.parseColor("#999999"));
                                         holder.getmTvAttention().setVisibility(View.VISIBLE);
                                     }else{
                                         holder.getmTvAttention().setText("关注");
@@ -784,7 +803,7 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                                     if(videoDetail.getIs_follow() == 1) {
                                         holder.getmTvAttention().setText("已关注");
                                         holder.getmTvAttention().setSelected(false);
-                                        holder.getmTvAttention().setTextColor(Color.parseColor("#88FFFFFF"));
+                                        holder.getmTvAttention().setTextColor(Color.parseColor("#999999"));
                                         holder.getmTvAttention().setVisibility(View.VISIBLE);
                                     }else{
                                         holder.getmTvAttention().setText("关注");

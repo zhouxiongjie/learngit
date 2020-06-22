@@ -58,6 +58,18 @@ public class AlivcVideoListView extends FrameLayout {
     private PagerLayoutManager pagerLayoutManager;
 
     private View mPlayerViewContainer;
+
+    private StsInfo stsInfo;
+
+
+    public StsInfo getStsInfo() {
+        return stsInfo;
+    }
+
+    public void setStsInfo(StsInfo stsInfo) {
+        this.stsInfo = stsInfo;
+    }
+
     /**
      * 数据是否到达最后一页
      */
@@ -270,9 +282,11 @@ public class AlivcVideoListView extends FrameLayout {
                     if (mTimeExpiredErrorListener != null) {
                         mTimeExpiredErrorListener.onTimeExpiredError();
                         Log.i(TAG, "刷新鉴权");
+
+                        onRefreshDataListener.onSTSExpired();
                     }
                 }
-                ToastUtils.show(getContext(), errorInfo.getMsg() );
+                ToastUtils.show(getContext(), "播放失败" );
             }
         });
 
@@ -422,6 +436,10 @@ public class AlivcVideoListView extends FrameLayout {
             public void onExitVideo() {
                 onRefreshDataListener.onExitVideo();
             }
+
+
+
+
         });
 
     }
@@ -641,6 +659,9 @@ public class AlivcVideoListView extends FrameLayout {
          */
         void onExitVideo();
 
+
+        void onSTSExpired();
+
         void onPlayAtPosition(int position);
     }
 
@@ -761,7 +782,12 @@ public class AlivcVideoListView extends FrameLayout {
      */
     public void moveTo(String uid, StsInfo stsInfo){
         if(mListPlayer != null){
-            mListPlayer.moveTo(uid,stsInfo);
+            if(this.stsInfo != null) {
+                mListPlayer.moveTo(uid,this.stsInfo);
+            }else{
+                mListPlayer.moveTo(uid,stsInfo);
+            }
+
         }
     }
 

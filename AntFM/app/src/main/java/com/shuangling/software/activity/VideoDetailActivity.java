@@ -1,6 +1,9 @@
 package com.shuangling.software.activity;
 
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
@@ -54,6 +57,7 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.VideoRecyclerAdapter;
 import com.shuangling.software.customview.TopTitleBar;
+import com.shuangling.software.dialog.ShareDialog;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.Comment;
 import com.shuangling.software.entity.ResAuthInfo;
@@ -281,7 +285,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                         url = ServerInfo.h5IP + "/videos/" + mVideoId + "?from_url=" + ServerInfo.h5IP + "/videos/" + mVideoId;
                     }
 
-                    showShare(mVideoDetail.getTitle(), mVideoDetail.getDes(), mVideoDetail.getCover(), url);
+                    showShareDialog(mVideoDetail.getTitle(), mVideoDetail.getDes(), mVideoDetail.getCover(), url);
                     //shareTest();
                 }
 
@@ -1513,7 +1517,56 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
         }
     }
 
-    private void showShare(final String title, final String desc, final String logo, final String url) {
+
+
+
+
+
+
+    private  void showShareDialog(final String title, final String desc, final String logo, final String url) {
+
+        ShareDialog dialog = ShareDialog.getInstance(false);
+        dialog.setIsShowPosterButton(false);
+        dialog.setIsHideSecondGroup(true);
+        dialog.setShareHandler(new ShareDialog.ShareHandler() {
+            @Override
+            public void onShare(String platform) {
+
+                showShare(platform,title, desc, logo, url);
+
+            }
+
+            @Override
+            public void poster() {
+
+            }
+
+            @Override
+            public void copyLink() {
+
+                //获取剪贴板管理器：
+                ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                // 创建普通字符型ClipData
+                ClipData clipData = ClipData.newPlainText("Label", url);
+                // 将ClipData内容放到系统剪贴板里。
+                cm.setPrimaryClip(clipData);
+                ToastUtils.show("复制成功，可以发给朋友们了。");
+
+            }
+
+            @Override
+            public void refresh() {
+            }
+
+            @Override
+            public void collectContent() {
+
+            }
+        });
+        dialog.show(getSupportFragmentManager(), "ShareDialog");
+    }
+
+    private void showShare(String platform, final String title, final String desc, final String logo, final String url) {
         final String cover;
         if (logo.startsWith("http://")) {
             cover = logo.replace("http://", "https://");
@@ -1523,6 +1576,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
         oks.disableSSOWhenAuthorize();
+        oks.setPlatform(platform);
         final Platform qq = ShareSDK.getPlatform(QQ.NAME);
         if (!qq.isClientValid()) {
             oks.addHiddenPlatform(QQ.NAME);
@@ -1538,8 +1592,8 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                 //点击新浪微博
                 String chanel = "1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
-                    //限制微博分享的文字不能超过20
                     chanel = "2";
+                    //限制微博分享的文字不能超过20
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
@@ -1578,31 +1632,20 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                         paramsToShare.setImageUrl(cover);
                     }
                 }
-
-                shareStatistics(chanel, "" + mVideoDetail.getId(), url);
+                shareStatistics(chanel, "" + mVideoDetail.getId(), ServerInfo.h5IP + ServerInfo.getArticlePage + mVideoDetail.getId() + "?app=android");
             }
         });
         oks.setCallback(new PlatformActionListener() {
             @Override
             public void onError(Platform arg0, int arg1, Throwable arg2) {
-                Message msg = Message.obtain();
-                msg.what = SHARE_FAILED;
-                msg.obj = arg2.getMessage();
-                mHandler.sendMessage(msg);
             }
 
             @Override
             public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
-                Message msg = Message.obtain();
-                msg.what = SHARE_SUCCESS;
-                mHandler.sendMessage(msg);
-
-
             }
 
             @Override
             public void onCancel(Platform arg0, int arg1) {
-
             }
         });
         // 启动分享GUI

@@ -58,6 +58,9 @@ public class ShareDialog extends BaseCircleDialog {
     @BindView(R.id.fontSize)
     LinearLayout fontSize;
 
+    @BindView(R.id.layout_second_group)
+    LinearLayout secondGroupLayout;
+
     @BindView(R.id.cancel)
     TextView cancel;
     @BindView(R.id.fontSizeBar)
@@ -78,6 +81,7 @@ public class ShareDialog extends BaseCircleDialog {
     private boolean mIsCollected;
 
     private boolean mIsShowPosterButton = false;
+    private boolean mIsHideSecondGroup = false;
 
     public interface ShareHandler {
         void onShare(String platform);
@@ -100,6 +104,14 @@ public class ShareDialog extends BaseCircleDialog {
         this.mIsShowPosterButton = mIsShowPosterButton;
     }
 
+    public boolean isIsHideSecondGroup() {
+        return mIsHideSecondGroup;
+    }
+
+    public void setIsHideSecondGroup(boolean mIsHideSecondGroup) {
+        this.mIsHideSecondGroup = mIsHideSecondGroup;
+    }
+
     public void setShareHandler(ShareHandler shareHandler) {
         this.mShareHandler = shareHandler;
     }
@@ -115,6 +127,7 @@ public class ShareDialog extends BaseCircleDialog {
         dialogFragment.setWidth(1f);
         dialogFragment.mIsCollected = isCollected;
         dialogFragment.mIsShowPosterButton = false;
+        dialogFragment.mIsHideSecondGroup = false;
         return dialogFragment;
     }
 
@@ -188,6 +201,13 @@ public class ShareDialog extends BaseCircleDialog {
             poster.setVisibility(View.VISIBLE);
         }else{
             poster.setVisibility(View.GONE);
+        }
+
+
+        if(mIsHideSecondGroup) {
+            secondGroupLayout.setVisibility(View.GONE);
+        }else{
+            secondGroupLayout.setVisibility(View.VISIBLE);
         }
 
 //        fontSizeBar.setOnRatingListener(new TextRatingBar.OnRatingListener() {

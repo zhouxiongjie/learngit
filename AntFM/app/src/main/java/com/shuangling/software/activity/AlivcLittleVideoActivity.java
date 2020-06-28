@@ -1,5 +1,8 @@
 package com.shuangling.software.activity;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -26,6 +29,7 @@ import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.dialog.CommentDialog;
+import com.shuangling.software.dialog.ShareDialog;
 import com.shuangling.software.dialog.SmallVideoCommentContentBottomDialog;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
@@ -229,9 +233,15 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                 ColumnContent columnContent =   mColumnContents.get(position);
                 //http://www-cms-c.review.slradio.cn/share
                 if(columnContent.getVideo() != null){
-                    String url =  ServerInfo.h5IP + "/share/" + columnContent.getVideo().getPost_id();
+                    String url = "";
+                    if(User.getInstance()!=null){
+                        url=ServerInfo.h5IP + "/share/" + columnContent.getVideo().getPost_id() + "?from_user_id="+User.getInstance().getId();
+                    }else{
+                        url=ServerInfo.h5IP + "/share/" + columnContent.getVideo().getPost_id() +"?from_url=" + ServerInfo.h5IP + "/share/" + columnContent.getVideo().getPost_id() ;
+                    }
                     Log.d("Share",url);
-                    showShare(columnContent.getTitle(),columnContent.getDes(),columnContent.getCover(),url);
+                    showShareDialog(columnContent.getTitle(),columnContent.getDes(),columnContent.getCover(),url);
+
                 }
             }
 
@@ -980,9 +990,55 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
 
 
 
-
     //<editor-fold desc="Function">
-    private void showShare(final String title, final String desc, final String logo, final String url) {
+
+
+
+
+    private  void showShareDialog(final String title, final String desc, final String logo, final String url) {
+
+        ShareDialog dialog = ShareDialog.getInstance(false);
+        dialog.setIsShowPosterButton(false);
+        dialog.setIsHideSecondGroup(true);
+        dialog.setShareHandler(new ShareDialog.ShareHandler() {
+            @Override
+            public void onShare(String platform) {
+
+                showShare(platform,title, desc, logo, url);
+
+            }
+
+            @Override
+            public void poster() {
+
+            }
+
+            @Override
+            public void copyLink() {
+
+                //获取剪贴板管理器：
+                ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                // 创建普通字符型ClipData
+                ClipData clipData = ClipData.newPlainText("Label", url);
+                // 将ClipData内容放到系统剪贴板里。
+                cm.setPrimaryClip(clipData);
+                ToastUtils.show("复制成功，可以发给朋友们了。");
+
+            }
+
+            @Override
+            public void refresh() {
+            }
+
+            @Override
+            public void collectContent() {
+
+            }
+        });
+        dialog.show(getSupportFragmentManager(), "ShareDialog");
+    }
+
+    private void showShare(String platform, final String title, final String desc, final String logo, final String url) {
         final String cover;
         if (logo.startsWith("http://")) {
             cover = logo.replace("http://", "https://");
@@ -992,6 +1048,7 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
         oks.disableSSOWhenAuthorize();
+        oks.setPlatform(platform);
         final Platform qq = ShareSDK.getPlatform(QQ.NAME);
         if (!qq.isClientValid()) {
             oks.addHiddenPlatform(QQ.NAME);
@@ -1007,8 +1064,8 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                 //点击新浪微博
                 String chanel = "1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
-                    //限制微博分享的文字不能超过20
                     chanel = "2";
+                    //限制微博分享的文字不能超过20
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
@@ -1049,35 +1106,26 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                 }
 
                 ColumnContent columnContent = mColumnContents.get(mVideoPosition);
-                shareStatistics(chanel, "" + columnContent.getId(), url);
+                shareStatistics(chanel, "" + columnContent.getId(), ServerInfo.h5IP + "/share/" + columnContent.getId() + "?app=android");
             }
         });
         oks.setCallback(new PlatformActionListener() {
             @Override
             public void onError(Platform arg0, int arg1, Throwable arg2) {
-                Message msg = Message.obtain();
-//                msg.what = SHARE_FAILED;
-//                msg.obj = arg2.getMessage();
-//                mHandler.sendMessage(msg);
             }
 
             @Override
             public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
-                Message msg = Message.obtain();
-//                msg.what = SHARE_SUCCESS;
-//                mHandler.sendMessage(msg);
-
-
             }
 
             @Override
             public void onCancel(Platform arg0, int arg1) {
-
             }
         });
         // 启动分享GUI
         oks.show(this);
     }
+
 
 
     public void shareStatistics(String channel, String postId, String shardUrl) {

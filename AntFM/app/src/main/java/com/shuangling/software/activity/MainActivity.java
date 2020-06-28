@@ -400,22 +400,47 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
     }
 
     public void switchRecommend(Column column) {
-//        settingBackgound(recommend);
-//        settingBackgound(recommendIcon);
-//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//        if (recommendFragment == null) {
-//            recommendFragment = new RecommendFragment();
-//            Bundle bundle = new Bundle();
-//            bundle.putSerializable("column", column);
-//            recommendFragment.setArguments(bundle);
-//            transaction.add(R.id.content, recommendFragment);
-//        } else {
-//
-//            transaction.show(recommendFragment);
-//            ((RecommendFragment) recommendFragment).switchColumn(column);
-//        }
-//        hideFragments(transaction);
-//        transaction.commit();
+
+
+        mMenus.get(0).name.setSelected(true);
+        mMenus.get(0).icon.setSelected(true);
+        for(int i=1;i<mMenus.size();i++){
+            BottomMenuHolder holder=mMenus.get(i);
+            holder.name.setSelected(false);
+            holder.icon.setSelected(false);
+
+        }
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (recommendFragment == null) {
+            recommendFragment = new RecommendFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("column", column);
+            recommendFragment.setArguments(bundle);
+            transaction.add(R.id.content, recommendFragment);
+        } else {
+            transaction.show(recommendFragment);
+            ((RecommendFragment) recommendFragment).switchColumn(column);
+        }
+
+        if(personalCenterFragment!=null&&!personalCenterFragment.isHidden()){
+            transaction.hide(personalCenterFragment);
+        }
+        if(serverFragment!=null&&!serverFragment.isHidden()){
+            transaction.hide(serverFragment);
+        }
+        if(discoverFragment!=null&&!discoverFragment.isHidden()){
+            transaction.hide(discoverFragment);
+        }
+        if(radioListFragment!=null&&!radioListFragment.isHidden()){
+            transaction.hide(radioListFragment);
+        }
+
+        if(columnFragment!=null&&!columnFragment.isHidden()){
+            transaction.hide(columnFragment);
+        }
+
+        transaction.commitAllowingStateLoss();
     }
 
 
@@ -833,42 +858,77 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
             public void onFailure(Call call, Exception exception) {
 
 
-                if(firstRun){
+                String lastVersion=SharedPreferencesUtils.getStringValue("lastVersion",null);
+                if(TextUtils.isEmpty(lastVersion)||!lastVersion.equals(getVersionName())){
+                    /**
+                     * 如果第一次使用或者更新后第一次使用，则弹出通知对话框
+                     */
+                    SharedPreferencesUtils.putPreferenceTypeValue("lastVersion", SharedPreferencesUtils.PreferenceType.String,getVersionName());
+                    NotificationManagerCompat manager = NotificationManagerCompat.from(MainActivity.this);
+                    boolean pushMessage = manager.areNotificationsEnabled();
 
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            InformationDialog.getInstance().show(getSupportFragmentManager(), "InformationDialog");
-
-                            NotificationManagerCompat manager = NotificationManagerCompat.from(MainActivity.this);
-                            boolean pushMessage = manager.areNotificationsEnabled();
-
-                            //boolean pushMessage = sp.getBoolean(PUSH_MESSAGE, true);
-                            if (!pushMessage) {
-                                NotificationDialog.getInstance().setOnOkClickListener(new NotificationDialog.OnOkClickListener() {
-                                    @Override
-                                    public void openNoticafition() {
-                                        Intent localIntent = new Intent();
-                                        localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        if (Build.VERSION.SDK_INT >= 9) {
-                                            localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
-                                            localIntent.setData(Uri.fromParts("package", getPackageName(), null));
-                                        } else if (Build.VERSION.SDK_INT <= 8) {
-                                            localIntent.setAction(Intent.ACTION_VIEW);
-                                            localIntent.setClassName("com.android.settings", "com.android.settings.InstalledAppDetails");
-                                            localIntent.putExtra("com.android.settings.ApplicationPkgName", getPackageName());
-                                        }
-                                        startActivity(localIntent);
-                                    }
-                                }).show(getSupportFragmentManager(), "NotificationDialog");
+                    //boolean pushMessage = sp.getBoolean(PUSH_MESSAGE, true);
+                    if (!pushMessage) {
+                        NotificationDialog.getInstance().setOnOkClickListener(new NotificationDialog.OnOkClickListener() {
+                            @Override
+                            public void openNoticafition() {
+                                Intent localIntent = new Intent();
+                                localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                if (Build.VERSION.SDK_INT >= 9) {
+                                    localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+                                    localIntent.setData(Uri.fromParts("package", getPackageName(), null));
+                                } else if (Build.VERSION.SDK_INT <= 8) {
+                                    localIntent.setAction(Intent.ACTION_VIEW);
+                                    localIntent.setClassName("com.android.settings", "com.android.settings.InstalledAppDetails");
+                                    localIntent.putExtra("com.android.settings.ApplicationPkgName", getPackageName());
+                                }
+                                startActivity(localIntent);
                             }
-
-                        }
-                    });
-
-
+                        }).show(getSupportFragmentManager(), "NotificationDialog");
+                    }
 
                 }
+                if(TextUtils.isEmpty(lastVersion)){
+                    InformationDialog.getInstance().show(getSupportFragmentManager(), "InformationDialog");
+                }
+
+
+//                if(firstRun){
+//
+//                    mHandler.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            InformationDialog.getInstance().show(getSupportFragmentManager(), "InformationDialog");
+//
+//                            NotificationManagerCompat manager = NotificationManagerCompat.from(MainActivity.this);
+//                            boolean pushMessage = manager.areNotificationsEnabled();
+//
+//                            //boolean pushMessage = sp.getBoolean(PUSH_MESSAGE, true);
+//                            if (!pushMessage) {
+//                                NotificationDialog.getInstance().setOnOkClickListener(new NotificationDialog.OnOkClickListener() {
+//                                    @Override
+//                                    public void openNoticafition() {
+//                                        Intent localIntent = new Intent();
+//                                        localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                                        if (Build.VERSION.SDK_INT >= 9) {
+//                                            localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+//                                            localIntent.setData(Uri.fromParts("package", getPackageName(), null));
+//                                        } else if (Build.VERSION.SDK_INT <= 8) {
+//                                            localIntent.setAction(Intent.ACTION_VIEW);
+//                                            localIntent.setClassName("com.android.settings", "com.android.settings.InstalledAppDetails");
+//                                            localIntent.putExtra("com.android.settings.ApplicationPkgName", getPackageName());
+//                                        }
+//                                        startActivity(localIntent);
+//                                    }
+//                                }).show(getSupportFragmentManager(), "NotificationDialog");
+//                            }
+//
+//                        }
+//                    });
+//
+//
+//
+//                }
 
 
             }
@@ -988,11 +1048,18 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                             }
                         }
 
+
+
+
+
                     }
 
-                    if(firstRun){
-                        InformationDialog.getInstance().show(getSupportFragmentManager(), "InformationDialog");;
-
+                    String lastVersion=SharedPreferencesUtils.getStringValue("lastVersion",null);
+                    if(TextUtils.isEmpty(lastVersion)||!lastVersion.equals(getVersionName())){
+                        /**
+                         * 如果第一次使用或者更新后第一次使用，则弹出通知对话框
+                         */
+                        SharedPreferencesUtils.putPreferenceTypeValue("lastVersion", SharedPreferencesUtils.PreferenceType.String,getVersionName());
                         NotificationManagerCompat manager = NotificationManagerCompat.from(MainActivity.this);
                         boolean pushMessage = manager.areNotificationsEnabled();
 
@@ -1017,6 +1084,18 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                         }
 
                     }
+                    if(TextUtils.isEmpty(lastVersion)){
+                        InformationDialog.getInstance().show(getSupportFragmentManager(), "InformationDialog");
+                    }
+
+
+
+//                    if(firstRun){
+//                        InformationDialog.getInstance().show(getSupportFragmentManager(), "InformationDialog");;
+//
+//
+//
+//                    }
 
 
 

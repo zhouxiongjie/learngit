@@ -191,7 +191,7 @@ public class ArticleDetailActivity extends BaseAudioActivity implements Handler.
         getArticleDetail();
         String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
         int size = 1;
-        int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 1);
+        int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 0);
         if (netLoad == 0 || CommonUtils.getNetWorkType(this) == NETWORKTYPE_WIFI) {
             size = 2;
         }
@@ -648,7 +648,7 @@ public class ArticleDetailActivity extends BaseAudioActivity implements Handler.
         if (requestCode == LOGIN_RESULT ) {
             String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
             int size = 1;
-            int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 1);
+            int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 0);
             if (netLoad == 0 || CommonUtils.getNetWorkType(this) == NETWORKTYPE_WIFI) {
                 size = 2;
             }

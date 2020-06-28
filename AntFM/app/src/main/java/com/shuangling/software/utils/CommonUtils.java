@@ -54,7 +54,23 @@ import com.mylhyl.circledialog.res.values.CircleDimen;
 import com.mylhyl.circledialog.view.listener.OnCreateBodyViewListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.activity.AlbumDetailActivity;
+import com.shuangling.software.activity.ArticleDetailActivity02;
+import com.shuangling.software.activity.AudioDetailActivity;
+import com.shuangling.software.activity.BindPhoneActivity;
+import com.shuangling.software.activity.CluesActivity;
+import com.shuangling.software.activity.ContentActivity;
 import com.shuangling.software.activity.FontSizeSettingActivity;
+import com.shuangling.software.activity.GalleriaActivity;
+import com.shuangling.software.activity.NewLoginActivity;
+import com.shuangling.software.activity.RadioDetailActivity;
+import com.shuangling.software.activity.RadioListActivity;
+import com.shuangling.software.activity.SpecialDetailActivity;
+import com.shuangling.software.activity.TvDetailActivity;
+import com.shuangling.software.activity.VideoDetailActivity;
+import com.shuangling.software.activity.WebViewBackActivity;
+import com.shuangling.software.entity.Column;
+import com.shuangling.software.entity.User;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -1186,6 +1202,7 @@ public class CommonUtils {
         }
         return regular.substring(0, index);
     }
+
 
 
 

@@ -120,7 +120,7 @@ public class MessageListActivity extends AppCompatActivity implements Handler.Ca
 
         Map<String, String> params = new HashMap<>();
 
-        params.put("message_type_ids", "2");
+        params.put("message_type_ids", "1,2");
         params.put("page", "" + mCurrentPage);
         params.put("page_size", "" + Integer.MAX_VALUE);
 

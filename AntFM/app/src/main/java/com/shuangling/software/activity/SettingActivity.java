@@ -130,7 +130,7 @@ public class SettingActivity extends AppCompatActivity {
             update.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableRight, null);
         }
 
-        int netLoad = SharedPreferencesUtils.getIntValue(NET_LOAD, 1);
+        int netLoad = SharedPreferencesUtils.getIntValue(NET_LOAD, 0);
         if (netLoad == 0) {
             netLoadDesc.setText("最佳效果(下载大图)");
         } else {

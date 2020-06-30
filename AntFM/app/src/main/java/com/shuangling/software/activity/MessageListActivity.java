@@ -25,10 +25,13 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.MessageListAdapter;
 import com.shuangling.software.customview.TopTitleBar;
+import com.shuangling.software.entity.History;
 import com.shuangling.software.entity.MessageInfo;
+import com.shuangling.software.fragment.HistoryFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
@@ -91,18 +94,20 @@ public class MessageListActivity extends AppCompatActivity implements Handler.Ca
         recyclerView.addItemDecoration(divider);
         //refreshLayout.setPrimaryColorsId(R.color.white, android.R.color.black);
         //((ClassicsHeader) refreshLayout.getRefreshHeader()).setEnableLastTime(false);
-        refreshLayout.setEnableLoadMore(false);
-        refreshLayout.setEnableRefresh(false);
+        refreshLayout.setEnableLoadMore(true);
+        refreshLayout.setEnableRefresh(true);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh(RefreshLayout refreshlayout) {
-
+                mCurrentPage=1;
+                getContent(GetContent.Refresh);
             }
         });
         refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore(RefreshLayout refreshLayout) {
-
+                mCurrentPage++;
+                getContent(GetContent.LoadMore);
             }
         });
 
@@ -122,7 +127,7 @@ public class MessageListActivity extends AppCompatActivity implements Handler.Ca
 
         params.put("message_type_ids", "1,2");
         params.put("page", "" + mCurrentPage);
-        params.put("page_size", "" + Integer.MAX_VALUE);
+        params.put("page_size", "" + Constant.PAGE_SIZE);
 
 
 
@@ -131,19 +136,19 @@ public class MessageListActivity extends AppCompatActivity implements Handler.Ca
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
-                try{
-                    if (getContent == GetContent.Refresh) {
-                        if (refreshLayout.getState() == RefreshState.Refreshing) {
-                            refreshLayout.finishRefresh();
-                        }
-                    } else if (getContent == GetContent.LoadMore) {
-                        if (refreshLayout.getState() == RefreshState.Loading) {
-                            refreshLayout.finishLoadMore();
-                        }
-                    }
-                }catch (Exception e){
-
-                }
+//                try{
+//                    if (getContent == GetContent.Refresh) {
+//                        if (refreshLayout.getState() == RefreshState.Refreshing) {
+//                            refreshLayout.finishRefresh();
+//                        }
+//                    } else if (getContent == GetContent.LoadMore) {
+//                        if (refreshLayout.getState() == RefreshState.Loading) {
+//                            refreshLayout.finishLoadMore();
+//                        }
+//                    }
+//                }catch (Exception e){
+//
+//                }
 
 
                 Message msg = Message.obtain();
@@ -156,19 +161,47 @@ public class MessageListActivity extends AppCompatActivity implements Handler.Ca
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                try{
-                    if (getContent == GetContent.Refresh) {
-                        if (refreshLayout.getState() == RefreshState.Refreshing) {
-                            refreshLayout.finishRefresh();
-                        }
-                    } else if (getContent == GetContent.LoadMore) {
-                        if (refreshLayout.getState() == RefreshState.Loading) {
-                            refreshLayout.finishLoadMore();
-                        }
-                    }
-                }catch (Exception e){
+//                try{
+//                    if (getContent == GetContent.Refresh) {
+//                        if (refreshLayout.getState() == RefreshState.Refreshing) {
+//                            refreshLayout.finishRefresh();
+//                        }
+//                    } else if (getContent == GetContent.LoadMore) {
+//                        if (refreshLayout.getState() == RefreshState.Loading) {
+//                            refreshLayout.finishLoadMore();
+//                        }
+//                    }
+//                }catch (Exception e){
+//
+//                }
 
-                }
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        try {
+                            if (getContent == GetContent.Refresh) {
+                                if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                    refreshLayout.finishRefresh();
+                                }
+                            } else if (getContent == GetContent.LoadMore) {
+                                if (refreshLayout.getState() == RefreshState.Loading) {
+                                    refreshLayout.finishLoadMore();
+                                }
+                            } else {
+//                                if (mSkeletonScreen != null) {
+//                                    mSkeletonScreen.hide();
+//                                }
+//                                networkError.setVisibility(View.VISIBLE);
+                            }
+                        } catch (Exception e) {
+
+                        }
+
+                    }
+                });
+
+
 
             }
         });
@@ -213,13 +246,34 @@ public class MessageListActivity extends AppCompatActivity implements Handler.Ca
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        mMessages= JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), MessageInfo.class);
+                        List<MessageInfo> messages= JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), MessageInfo.class);
+
+                        if (msg.arg1 == GetContent.Refresh.ordinal()) {
+                            mMessages = messages;
+                            if (refreshLayout.getState() == RefreshState.Refreshing) {
+                                refreshLayout.finishRefresh();
+                            }
+                        } else if (msg.arg1 == GetContent.LoadMore.ordinal()) {
+                            mMessages.addAll(messages);
+                            if (refreshLayout.getState() == RefreshState.Loading) {
+                                if (messages == null || messages.size() == 0) {
+                                    //refreshLayout.setEnableLoadMore(false);
+                                    refreshLayout.finishLoadMoreWithNoMoreData();
+                                } else {
+                                    refreshLayout.finishLoadMore();
+                                }
+                            }
+
+                        } else {
+                            mMessages = messages;
+                        }
 
                         if (mMessages.size() == 0) {
                             noData.setVisibility(View.VISIBLE);
                         } else {
                             noData.setVisibility(View.GONE);
                         }
+
 
                         if (mAdapter == null) {
                             mAdapter = new MessageListAdapter(this, mMessages);

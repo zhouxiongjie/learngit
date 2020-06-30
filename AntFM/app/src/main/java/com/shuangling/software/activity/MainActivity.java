@@ -1248,7 +1248,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                                 transaction.add(R.id.content, discoverFragment);
                                             } else {
 
-                                                ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/gover",bottomMenu.getName());
+                                                ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/gover",bottomMenu.getName(),false);
                                                 transaction.show(discoverFragment);
                                             }
                                             if(recommendFragment!=null&&!recommendFragment.isHidden()){
@@ -1299,7 +1299,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                                 transaction.add(R.id.content, discoverFragment);
                                             } else {
 
-                                                ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/interact",bottomMenu.getName());
+                                                ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/interact",bottomMenu.getName(),false);
                                                 transaction.show(discoverFragment);
                                             }
                                             if(recommendFragment!=null&&!recommendFragment.isHidden()){
@@ -1346,7 +1346,7 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                                 transaction.add(R.id.content, discoverFragment);
                                             } else {
 
-                                                ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/guide",bottomMenu.getName());
+                                                ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/guide",bottomMenu.getName(),false);
                                                 transaction.show(discoverFragment);
                                             }
                                             if(recommendFragment!=null&&!recommendFragment.isHidden()){
@@ -1433,11 +1433,12 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                                 Bundle bundle = new Bundle();
                                                 bundle.putString("url", ServerInfo.activity + "activity");
                                                 bundle.putString("title",bottomMenu.getName());
+                                                bundle.putBoolean("showShare",true);
                                                 discoverFragment.setArguments(bundle);
                                                 transaction.add(R.id.content, discoverFragment);
                                             } else {
 
-                                                ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.activity + "activity",bottomMenu.getName());
+                                                ((DiscoverFragment)discoverFragment).jumpTo(ServerInfo.activity + "activity",bottomMenu.getName(),true);
                                                 transaction.show(discoverFragment);
                                             }
                                             if(recommendFragment!=null&&!recommendFragment.isHidden()){

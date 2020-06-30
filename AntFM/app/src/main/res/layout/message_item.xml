@@ -33,11 +33,14 @@
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+id/time"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="10dp"
                 android:layout_centerVertical="true"
                 android:textSize="@dimen/font_size_30px"
                 android:textStyle="bold"
                 android:textColor="@color/textColorTwo"
-                tools:text="【系统提醒】"/>
+                tools:text="【系统提醒】系统提醒系统提醒系统提醒系统提醒系统提醒系统提醒系统提醒系统提醒系统提醒系统提醒系统提醒"/>
 
             <TextView
                 android:id="@+id/time"

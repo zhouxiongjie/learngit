@@ -3,6 +3,9 @@ package com.shuangling.software.fragment;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
@@ -27,6 +30,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.alibaba.fastjson.JSONObject;
 import com.gyf.immersionbar.ImmersionBar;
 import com.gyf.immersionbar.components.SimpleImmersionFragment;
 import com.hjq.toast.ToastUtils;
@@ -44,6 +48,10 @@ import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.customview.TopTitleBar;
+import com.shuangling.software.dialog.ShareDialog;
+import com.shuangling.software.entity.ColumnContent;
+import com.shuangling.software.entity.ShareParameter;
+import com.shuangling.software.entity.UpdateInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
@@ -111,6 +119,7 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
     private String mUrl;
     private String mTitle;
+    private boolean mShowShare;
 
     Unbinder unbinder;
     private Handler mHandler;
@@ -123,6 +132,8 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
         mHandler = new Handler(this);
         mUrl = getArguments().getString("url");
         mTitle=getArguments().getString("title");
+        mShowShare=getArguments().getBoolean("showShare");
+
         EventBus.getDefault().register(this);
     }
 
@@ -137,9 +148,18 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
     }
 
 
-    public void jumpTo(String url,String title) {
-        mUrl = url;
 
+
+
+    public void jumpTo(String url,String title,boolean showShare) {
+        mShowShare=showShare;
+        if(mShowShare){
+            activtyTitle.setMoreVisibility(true);
+        }else {
+            activtyTitle.setMoreVisibility(false);
+        }
+
+        mUrl = url;
         if (User.getInstance() == null) {
             if (MainActivity.sCurrentCity != null) {
                 url = url + "?app=android&city=" + MainActivity.sCurrentCity.getCode();
@@ -161,6 +181,31 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
     private void init() {
         activtyTitle.setTitleText(mTitle);
+        if(mShowShare){
+            activtyTitle.setMoreVisibility(true);
+        }else {
+            activtyTitle.setMoreVisibility(false);
+        }
+        activtyTitle.setMoreAction(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {//sdk>19才有用
+
+                    String script = "javascript:_getShareEventParmas()";
+                    webView.evaluateJavascript(script, new ValueCallback<String>() {
+                        @Override
+                        public void onReceiveValue(String responseJson) {
+                            ShareParameter shareParameter = JSONObject.parseObject(responseJson, ShareParameter.class);
+
+                            showShareDialog(shareParameter.getShareTitle(), shareParameter.getShareDesc(), shareParameter.getShareLogo(), shareParameter.getShareUrl());
+
+                        }
+                    });
+                }
+
+            }
+        });
         TextView tv=activtyTitle.getTitleTextView();
         tv.setTextColor(getResources().getColor(R.color.white));
         activtyTitle.setCanBack(false);
@@ -367,6 +412,51 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
         });
         webView.addJavascriptInterface(new JsToAndroid(), "clientJS");
         webView.loadUrl(url);
+    }
+
+
+
+    private  void showShareDialog(final String title, final String desc, final String logo, final String url) {
+
+        ShareDialog dialog = ShareDialog.getInstance(false);
+        dialog.setIsShowPosterButton(false);
+        dialog.setIsHideSecondGroup(true);
+        dialog.setShareHandler(new ShareDialog.ShareHandler() {
+            @Override
+            public void onShare(String platform) {
+
+                showShare(platform,title, desc, logo, url);
+
+            }
+
+            @Override
+            public void poster() {
+
+            }
+
+            @Override
+            public void copyLink() {
+
+                //获取剪贴板管理器：
+                ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                // 创建普通字符型ClipData
+                ClipData clipData = ClipData.newPlainText("Label", url);
+                // 将ClipData内容放到系统剪贴板里。
+                cm.setPrimaryClip(clipData);
+                ToastUtils.show("复制成功，可以发给朋友们了。");
+
+            }
+
+            @Override
+            public void refresh() {
+            }
+
+            @Override
+            public void collectContent() {
+
+            }
+        });
+        dialog.show(getChildFragmentManager(), "ShareDialog");
     }
 
     @Override
@@ -635,72 +725,171 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
     }
 
 
-    private void showShare(final String id, final String title, final String des,final String url, final String logo) {
+//    private void showShare(final String id, final String title, final String des,final String url, final String logo) {
+//
+//
+//        OnekeyShare oks = new OnekeyShare();
+//        //关闭sso授权
+//        oks.disableSSOWhenAuthorize();
+//        final Platform qq = ShareSDK.getPlatform(QQ.NAME);
+//        if (!qq.isClientValid()) {
+//            oks.addHiddenPlatform(QQ.NAME);
+//        }
+//
+//        final Platform sina = ShareSDK.getPlatform(SinaWeibo.NAME);
+//        if (!sina.isClientValid()) {
+//            oks.addHiddenPlatform(SinaWeibo.NAME);
+//        }
+//
+//
+//        oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+//            //自定义分享的回调想要函数
+//            @Override
+//            public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
+//                String chanel = "1";
+//                //点击新浪微博
+//                if (SinaWeibo.NAME.equals(platform.getName())) {
+//                    //限制微博分享的文字不能超过20
+//                    chanel = "2";
+//                    //paramsToShare.setText(title + ServerInfo.activity + "qaa/game-result/" + id);
+//                    paramsToShare.setText(title + url);
+//                } else if (QQ.NAME.equals(platform.getName())) {
+//                    chanel = "3";
+//                    paramsToShare.setTitle(title);
+//                    if (!TextUtils.isEmpty(logo)) {
+//                        paramsToShare.setImageUrl(logo);
+//                    }
+//                    paramsToShare.setTitleUrl(url);
+//                    paramsToShare.setText(des);
+//
+//                } else if (Wechat.NAME.equals(platform.getName())) {
+//                    paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
+//                    paramsToShare.setTitle(title);
+//                    paramsToShare.setUrl(url);
+//                    if (!TextUtils.isEmpty(logo)) {
+//                        paramsToShare.setImageUrl(logo);
+//                    }
+//                    paramsToShare.setText(des);
+//                } else if (WechatMoments.NAME.equals(platform.getName())) {
+//                    paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
+//                    paramsToShare.setTitle(title);
+//                    paramsToShare.setUrl(url);
+//                    if (!TextUtils.isEmpty(logo)) {
+//                        paramsToShare.setImageUrl(logo);
+//                    }
+//                } else if (WechatFavorite.NAME.equals(platform.getName())) {
+//                    paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
+//                    paramsToShare.setTitle(title);
+//                    paramsToShare.setUrl(url);
+//                    if (!TextUtils.isEmpty(logo)) {
+//                        paramsToShare.setImageUrl(logo);
+//                    }
+//                }
+//                shareStatistics(chanel, "" + id, url);
+//
+//            }
+//        });
+//        oks.setCallback(new PlatformActionListener() {
+//
+//            @Override
+//            public void onError(Platform arg0, int arg1, Throwable arg2) {
+//                Message msg = Message.obtain();
+//                msg.what = SHARE_FAILED;
+//                msg.obj = arg2.getMessage();
+//                mHandler.sendMessage(msg);
+//            }
+//
+//            @Override
+//            public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
+//
+//                Message msg = Message.obtain();
+//                msg.what = SHARE_SUCCESS;
+//                mHandler.sendMessage(msg);
+//
+//            }
+//
+//            @Override
+//            public void onCancel(Platform arg0, int arg1) {
+//
+//            }
+//        });
+//        // 启动分享GUI
+//        oks.show(getContext());
+//
+//    }
 
 
+    private void showShare(String platform, final String title, final String desc, final String logo, final String url) {
+        final String cover;
+        if (logo.startsWith("http://")) {
+            cover = logo.replace("http://", "https://");
+        } else {
+            cover = logo;
+        }
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
         oks.disableSSOWhenAuthorize();
+        oks.setPlatform(platform);
         final Platform qq = ShareSDK.getPlatform(QQ.NAME);
         if (!qq.isClientValid()) {
             oks.addHiddenPlatform(QQ.NAME);
         }
-
         final Platform sina = ShareSDK.getPlatform(SinaWeibo.NAME);
         if (!sina.isClientValid()) {
             oks.addHiddenPlatform(SinaWeibo.NAME);
         }
-
-
         oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
             //自定义分享的回调想要函数
             @Override
             public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
-                String chanel = "1";
                 //点击新浪微博
+                String chanel = "1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
-                    //限制微博分享的文字不能超过20
                     chanel = "2";
-                    //paramsToShare.setText(title + ServerInfo.activity + "qaa/game-result/" + id);
+                    //限制微博分享的文字不能超过20
+                    if (!TextUtils.isEmpty(cover)) {
+                        paramsToShare.setImageUrl(cover);
+                    }
                     paramsToShare.setText(title + url);
                 } else if (QQ.NAME.equals(platform.getName())) {
                     chanel = "3";
                     paramsToShare.setTitle(title);
-                    if (!TextUtils.isEmpty(logo)) {
-                        paramsToShare.setImageUrl(logo);
+                    if (!TextUtils.isEmpty(cover)) {
+                        paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setTitleUrl(url);
-                    paramsToShare.setText(des);
+                    paramsToShare.setText(desc);
 
                 } else if (Wechat.NAME.equals(platform.getName())) {
                     paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                     paramsToShare.setTitle(title);
                     paramsToShare.setUrl(url);
-                    if (!TextUtils.isEmpty(logo)) {
-                        paramsToShare.setImageUrl(logo);
+                    if (!TextUtils.isEmpty(cover)) {
+                        paramsToShare.setImageUrl(cover);
                     }
-                    paramsToShare.setText(des);
+                    paramsToShare.setText(desc);
+
+                    Log.d("ShareSDK", paramsToShare.toMap().toString());
                 } else if (WechatMoments.NAME.equals(platform.getName())) {
                     paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                     paramsToShare.setTitle(title);
                     paramsToShare.setUrl(url);
-                    if (!TextUtils.isEmpty(logo)) {
-                        paramsToShare.setImageUrl(logo);
+                    if (!TextUtils.isEmpty(cover)) {
+                        paramsToShare.setImageUrl(cover);
                     }
                 } else if (WechatFavorite.NAME.equals(platform.getName())) {
                     paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                     paramsToShare.setTitle(title);
                     paramsToShare.setUrl(url);
-                    if (!TextUtils.isEmpty(logo)) {
-                        paramsToShare.setImageUrl(logo);
+                    if (!TextUtils.isEmpty(cover)) {
+                        paramsToShare.setImageUrl(cover);
                     }
                 }
-                shareStatistics(chanel, "" + id, url);
 
+                //shareStatistics(chanel, "" + mArticle.getId(), ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?app=android");
             }
         });
         oks.setCallback(new PlatformActionListener() {
-
             @Override
             public void onError(Platform arg0, int arg1, Throwable arg2) {
                 Message msg = Message.obtain();
@@ -711,11 +900,9 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
             @Override
             public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
-
                 Message msg = Message.obtain();
                 msg.what = SHARE_SUCCESS;
                 mHandler.sendMessage(msg);
-
             }
 
             @Override
@@ -725,7 +912,6 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
         });
         // 启动分享GUI
         oks.show(getContext());
-
     }
 
 

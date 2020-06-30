@@ -16,6 +16,7 @@
         android:background="?attr/themeColor"
         android:layout_below="@+id/statusBar"
         app:canBack="false"
+        app:moreImg="@drawable/ic_more"
         android:visibility="visible"/>
 
 

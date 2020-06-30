@@ -44,6 +44,12 @@ public class MyAliPushMessageReceiver extends MessageReceiver {
 //        intent.putExtra("url",jsonObject.getString("url"));
 //        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //        context.startActivity(intent);
+        long sd=Thread.currentThread().getId();
+
+//        Intent intent = new Intent(context, ArticleDetailActivity02.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        intent.putExtra("articleId", 28210);
+//        context.startActivity(intent);
 
     }
     @Override
@@ -55,10 +61,10 @@ public class MyAliPushMessageReceiver extends MessageReceiver {
 //        intent.putExtra("url",jsonObject.getString("url"));
 //        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //        context.startActivity(intent);
-        String type=jsonObject.getString("post_type");
-        String id=jsonObject.getString("id");
+        String type=jsonObject.getString("target_type");
+        String id=jsonObject.getString("post_id");
 
-
+        long sd=Thread.currentThread().getId();
 
         if(type.equals("2")){
             //专辑

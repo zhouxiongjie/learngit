@@ -18,6 +18,7 @@ import com.shuangling.software.activity.AlbumDetailActivity;
 import com.shuangling.software.entity.MessageInfo;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
+import com.shuangling.software.utils.TimeUtil;
 
 import java.util.List;
 
@@ -82,7 +83,7 @@ public class MessageListAdapter extends RecyclerView.Adapter implements View.OnC
 
 
         albumViewHolder.title.setText("【"+message.getMessage().getContent().getTitle()+"】");
-        albumViewHolder.time.setText(message.getCreated_at());
+        albumViewHolder.time.setText(TimeUtil.formatDateTime(message.getCreated_at()));
         albumViewHolder.description.setText(message.getMessage().getContent().getDescription());
         albumViewHolder.root.setOnClickListener(new View.OnClickListener() {
             @Override

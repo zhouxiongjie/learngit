@@ -31,6 +31,8 @@ android {
         debug = false
         // 默认启动此插件，如果开发者不需要可以禁用（设置为false）
         enabled = true
+
+
     }
 
     signingConfigs {

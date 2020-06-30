@@ -73,6 +73,10 @@ public class  TopTitleBar extends RelativeLayout {
         return findViewById(R.id.title);
     };
 
+    public void setMoreVisibility(boolean visibility) {
+        LinearLayout moreLayout = findViewById(R.id.btn_more);
+        moreLayout.setVisibility(visibility ? VISIBLE : INVISIBLE);
+    }
 
     public void setCanBack(boolean canBack) {
         this.canBack = canBack;

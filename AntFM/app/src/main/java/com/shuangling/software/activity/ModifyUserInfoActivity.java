@@ -35,6 +35,9 @@ import com.alibaba.sdk.android.oss.common.OSSLog;
 import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
 import com.alibaba.sdk.android.oss.model.PutObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectResult;
+import com.alibaba.sdk.android.push.CloudPushService;
+import com.alibaba.sdk.android.push.CommonCallback;
+import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.bigkoo.pickerview.builder.OptionsPickerBuilder;
 import com.bigkoo.pickerview.builder.TimePickerBuilder;
 import com.bigkoo.pickerview.listener.OnOptionsSelectListener;
@@ -678,6 +681,20 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
             case R.id.quit:
                 User.setInstance(null);
                 SharedPreferencesUtils.resetUser();
+                //解绑消息推送账号
+                final CloudPushService pushService = PushServiceFactory.getCloudPushService();
+                pushService.unbindAccount( new CommonCallback() {
+                    @Override
+                    public void onSuccess(String s) {
+                        Log.i("unbindAccount-onSuccess", s);
+                    }
+
+                    @Override
+                    public void onFailed(String s, String s1) {
+                        Log.i("unbindAccount-onFailed", s);
+                        Log.i("unbindAccount-onFailed", s1);
+                    }
+                });
                 finish();
                 EventBus.getDefault().post(new CommonEvent("OnQuitLogin"));
                 //注销用户信息

@@ -68,6 +68,6 @@ ext {
     externalTargetSdkVersion = 26
 
     //230
-    externalVersionCode =247
-    externalVersionName ='2.4.7'
+    externalVersionCode =250
+    externalVersionName ='2.5.0'
 }

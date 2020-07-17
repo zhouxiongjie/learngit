@@ -198,7 +198,10 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
                         public void onReceiveValue(String responseJson) {
                             ShareParameter shareParameter = JSONObject.parseObject(responseJson, ShareParameter.class);
 
-                            showShareDialog(shareParameter.getShareTitle(), shareParameter.getShareDesc(), shareParameter.getShareLogo(), shareParameter.getShareUrl());
+                            if(shareParameter!=null){
+                                showShareDialog(shareParameter.getShareTitle(), shareParameter.getShareDesc(), shareParameter.getShareLogo(), shareParameter.getShareUrl());
+                            }
+
 
                         }
                     });

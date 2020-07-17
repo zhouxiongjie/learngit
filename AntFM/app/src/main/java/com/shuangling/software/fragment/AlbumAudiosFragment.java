@@ -211,6 +211,9 @@ public class AlbumAudiosFragment extends Fragment implements Handler.Callback {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.audioSort:
+                if(mAdapter==null){
+                    return;
+                }
                 if (mSequence == AudioPlayerService.POSITIVE) {
                     mSequence = AudioPlayerService.INVERTED;
                     Drawable drawableLeft = getResources().getDrawable(R.drawable.order_dec);
@@ -231,6 +234,9 @@ public class AlbumAudiosFragment extends Fragment implements Handler.Callback {
                 }
                 break;
             case R.id.audioSelect:
+                if(mAdapter==null){
+                    return;
+                }
                 AudioSelectionsDialog dialog=AudioSelectionsDialog.getInstance(mAudios,mSequence,mSelect);
                 dialog.setSelectAudio(new AudioSelectionsDialog.IselectAudio() {
                     @Override

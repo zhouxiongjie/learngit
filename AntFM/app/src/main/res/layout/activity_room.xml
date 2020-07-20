@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black" >
+
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+
+    <RelativeLayout
+        android:id="@+id/panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/transparent" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:background="@color/black">
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/switchCamera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:padding="5dp"
+                android:layout_centerVertical="true"
+                android:text="&#xe6f4;"
+                android:textColor="#ffffff"
+                android:textSize="@dimen/font_size_36px" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_centerInParent="true">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="#F7F7F7"
+                    android:textSize="@dimen/font_size_34px"
+                    android:text="多人连麦"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="#4CF7F7F7"
+                    android:text="00:00"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#E14C4C"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:layout_alignParentEnd="true"
+                android:padding="5dp"
+                android:textSize="@dimen/font_size_30px"
+                android:text="离开"/>
+
+        </RelativeLayout>
+
+
+
+        <TableLayout
+            android:id="@+id/bottomButtonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="#222426"
+            android:stretchColumns="0,2,4,6,8"
+            android:gravity="bottom">
+            <TableRow
+                android:layout_marginBottom="0dp">
+                <ImageView />
+                <LinearLayout
+                    android:id="@+id/interactChat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:orientation="vertical">
+                    <com.shuangling.software.customview.FontIconView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="&#xe6f7;"
+                        android:textColor="#ffffff"
+                        android:textSize="@dimen/font_size_36px" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="互动聊天"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="@dimen/font_size_20px"
+                        android:textColor="@color/white"/>
+
+                </LinearLayout>
+                <ImageView />
+                <LinearLayout
+                    android:id="@+id/openMute"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:orientation="vertical">
+                    <com.shuangling.software.customview.FontIconView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="&#xe6f1;"
+                        android:textColor="#ffffff"
+                        android:textSize="@dimen/font_size_36px" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="开启禁音"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="@dimen/font_size_20px"
+                        android:textColor="@color/white"/>
+
+                </LinearLayout>
+                <ImageView />
+                <LinearLayout
+                    android:id="@+id/closeVideo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:orientation="vertical">
+                    <com.shuangling.software.customview.FontIconView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="&#xe6f2;"
+                        android:textColor="#ffffff"
+                        android:textSize="@dimen/font_size_36px" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="关闭视频"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="@dimen/font_size_20px"
+                        android:textColor="@color/white"/>
+
+                </LinearLayout>
+                <ImageView />
+                <LinearLayout
+                    android:id="@+id/barrage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:orientation="vertical">
+                    <com.shuangling.software.customview.FontIconView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="&#xe6f9;"
+                        android:textColor="#ffffff"
+                        android:textSize="@dimen/font_size_36px" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="开启弹幕"
+                        android:layout_gravity="center_horizontal"
+                        android:textSize="@dimen/font_size_20px"
+                        android:textColor="@color/white"/>
+
+                </LinearLayout>
+                <ImageView />
+            </TableRow>
+        </TableLayout>
+
+
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

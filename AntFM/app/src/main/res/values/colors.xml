@@ -201,6 +201,16 @@
     <color name="bg_focus">#dddddd</color>
 
     <color name="mask_color">#66000000</color>
+    <color name="cyanBlue">#00FFFF</color>
+
+    <integer-array name="audioBackgroundColors">
+        <item>@color/blue</item>
+        <item>@color/purple</item>
+        <item>@color/yellow</item>
+        <item>@color/green</item>
+        <item>@color/red</item>
+        <item>@color/cyanBlue</item>
+    </integer-array>
 
 </resources>
 

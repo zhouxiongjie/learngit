@@ -4,10 +4,6 @@ public class ServerInfo {
 
 
 
-
-
-
-
 	//防城港
 	public static String serviceIP="http://api-cms.fcgtvb.com";  		//测试环境
 

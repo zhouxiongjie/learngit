@@ -28,6 +28,8 @@ import com.hjq.toast.ToastUtils;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.mob.MobSDK;
 import com.previewlibrary.ZoomMediaLoader;
+import com.qiniu.droid.rtc.QNLogLevel;
+import com.qiniu.droid.rtc.QNRTCEnv;
 import com.scwang.smartrefresh.layout.api.DefaultRefreshFooterCreator;
 import com.scwang.smartrefresh.layout.api.DefaultRefreshHeaderCreator;
 import com.scwang.smartrefresh.layout.api.RefreshFooter;
@@ -130,6 +132,12 @@ public class MyApplication extends MultiDexApplication {
 
 		super.onCreate();
 		sInstance = this;
+        QNRTCEnv.setLogLevel(QNLogLevel.INFO);
+        /**
+         * init must be called before any other func
+         */
+        QNRTCEnv.init(getApplicationContext());
+        QNRTCEnv.setLogFileEnabled(true);
         ZoomMediaLoader.getInstance().init(new MyImageLoader());
         Constant.SYSTEM_FONT_SCALE = getResources().getConfiguration().fontScale;
 //        OkHttpClient okHttpClient=OkHttpUtils.okHttpClient;

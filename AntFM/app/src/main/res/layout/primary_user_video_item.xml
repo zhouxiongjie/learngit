@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.shuangling.software.activity.ui.UserTrackView xmlns:android="http://schemas.android.com/apk/res/android"
+android:id="@+id/userTrackView"
+android:layout_width="match_parent"
+android:layout_height="match_parent" />
+
+<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:id="@+id/userTrackView"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--&gt;-->
+
+
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:gravity="center"-->
+        <!--android:textSize="@dimen/font_size_150px"-->
+        <!--android:textColor="@color/red"-->
+        <!--android:text="你好 吗"/>-->
+<!--</RelativeLayout>-->
+
+
+
+
+
+

@@ -94,6 +94,7 @@ import cn.jake.share.frdialog.dialog.FRDialog;
 import cn.jake.share.frdialog.interfaces.FRDialogClickListener;
 import io.reactivex.functions.Consumer;
 import okhttp3.Call;
+import com.shuangling.software.utils.QNAppServer;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
@@ -1181,44 +1182,71 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
                                     });
                                 } else if (bottomMenu.getType() == 2) {
                                     //个人中心
+
+
                                     bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_personal_center));
                                     bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
-                                            //
-                                            bottomMenuHolder.name.setSelected(true);
-                                            bottomMenuHolder.icon.setSelected(true);
-                                            for(int i=0;i<mMenus.size();i++){
-                                                BottomMenuHolder holder=mMenus.get(i);
-                                                if(holder!=bottomMenuHolder){
-                                                    holder.name.setSelected(false);
-                                                    holder.icon.setSelected(false);
-                                                }
-                                            }
 
-                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                            if (personalCenterFragment == null) {
-                                                personalCenterFragment = new PersonalCenterFragment01();
-                                                transaction.add(R.id.content, personalCenterFragment);
-                                            } else {
-                                                transaction.show(personalCenterFragment);
-                                            }
-                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
-                                                transaction.hide(recommendFragment);
-                                            }
-                                            if(serverFragment!=null&&!serverFragment.isHidden()){
-                                                transaction.hide(serverFragment);
-                                            }
-                                            if(discoverFragment!=null&&!discoverFragment.isHidden()){
-                                                transaction.hide(discoverFragment);
-                                            }
-                                            if(radioListFragment!=null&&!radioListFragment.isHidden()){
-                                                transaction.hide(radioListFragment);
-                                            }
-                                            if(columnFragment!=null&&!columnFragment.isHidden()){
-                                                transaction.hide(columnFragment);
-                                            }
-                                            transaction.commitAllowingStateLoss();
+
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    // 获取连麦所需的 RoomToken，需要您自行实现业务服务器的相关逻辑
+                                                    // 详情请参考【服务端开发说明.RoomToken 签发服务】https://doc.qnsdk.com/rtn/docs/server_overview#1
+                                                    final String token = QNAppServer.getInstance().requestRoomToken(MainActivity.this, "admin", "Kkk");
+
+                                                    runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            if (token == null) {
+
+                                                                return;
+                                                            }
+                                                            Intent intent = new Intent(MainActivity.this, RoomActivity.class);
+                                                            intent.putExtra(RoomActivity.EXTRA_ROOM_ID, "Kkk");
+                                                            intent.putExtra(RoomActivity.EXTRA_ROOM_TOKEN, token);
+                                                            intent.putExtra(RoomActivity.EXTRA_USER_ID, "admin");
+                                                            startActivity(intent);
+                                                        }
+                                                    });
+                                                }
+                                            }).start();
+                                            //
+//                                            bottomMenuHolder.name.setSelected(true);
+//                                            bottomMenuHolder.icon.setSelected(true);
+//                                            for(int i=0;i<mMenus.size();i++){
+//                                                BottomMenuHolder holder=mMenus.get(i);
+//                                                if(holder!=bottomMenuHolder){
+//                                                    holder.name.setSelected(false);
+//                                                    holder.icon.setSelected(false);
+//                                                }
+//                                            }
+//
+//                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//                                            if (personalCenterFragment == null) {
+//                                                personalCenterFragment = new PersonalCenterFragment01();
+//                                                transaction.add(R.id.content, personalCenterFragment);
+//                                            } else {
+//                                                transaction.show(personalCenterFragment);
+//                                            }
+//                                            if(recommendFragment!=null&&!recommendFragment.isHidden()){
+//                                                transaction.hide(recommendFragment);
+//                                            }
+//                                            if(serverFragment!=null&&!serverFragment.isHidden()){
+//                                                transaction.hide(serverFragment);
+//                                            }
+//                                            if(discoverFragment!=null&&!discoverFragment.isHidden()){
+//                                                transaction.hide(discoverFragment);
+//                                            }
+//                                            if(radioListFragment!=null&&!radioListFragment.isHidden()){
+//                                                transaction.hide(radioListFragment);
+//                                            }
+//                                            if(columnFragment!=null&&!columnFragment.isHidden()){
+//                                                transaction.hide(columnFragment);
+//                                            }
+//                                            transaction.commitAllowingStateLoss();
                                         }
                                     });
                                 } else if (bottomMenu.getType() == 3) {

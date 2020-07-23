@@ -48,6 +48,13 @@
     <string name="menus_radio">&#xe61f;</string>
     <string name="menus_news">&#xe670;</string>
 
+    <!--互动直播图标-->
+    <string name="menus_mute">&#xe6f6;</string>
+    <string name="menus_cancel_mute">&#xe6f1;</string>
+
+    <string name="menus_video">&#xe6f2;</string>
+    <string name="menus_cancel_video">&#xe6ef;</string>
+
 
     <string name="view_icon">&#xe66a;</string>
     <string name="comment_icon">&#xe6cb;</string>
@@ -96,5 +103,14 @@
         <item quantity="one">You can only select one media file</item>
         <item quantity="many">You can only select up to %1$d media files</item>
     </plurals>
+
+
+    <string name="channel_error_title">连接错误</string>
+    <string name="ok">OK</string>
+    <string name="connecting_to">正在连接: %1$s</string>
+    <string name="connected_to_room">连接成功</string>
+    <string name="reconnecting_to_room">正在重连……</string>
+
+    <string name="kicked_by_admin">您被管理员踢出房间！！！</string>
 
 </resources>

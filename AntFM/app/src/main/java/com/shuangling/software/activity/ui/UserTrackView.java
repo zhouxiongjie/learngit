@@ -48,6 +48,15 @@ public class UserTrackView extends FrameLayout {
 
     private QNRTCEngine mQNRTCEngine;
     private String mUserId;
+
+    public void setQNAudioTrackInfo(QNTrackInfo mQNAudioTrackInfo) {
+        this.mQNAudioTrackInfo = mQNAudioTrackInfo;
+    }
+
+    public void setQNVideoTrackInfos(List<QNTrackInfo> mQNVideoTrackInfos) {
+        this.mQNVideoTrackInfos = mQNVideoTrackInfos;
+    }
+
     private QNTrackInfo mQNAudioTrackInfo;
     private List<QNTrackInfo> mQNVideoTrackInfos = new ArrayList<>();
 
@@ -72,6 +81,15 @@ public class UserTrackView extends FrameLayout {
         }
         inited = true;
         LayoutInflater.from(getContext()).inflate(getLayout(), this, true);
+
+        mVideoViewLargeParent = findViewById(R.id.qn_surface_view_large_parent);
+        mSurfaceViewLarge = (QNSurfaceView) findViewById(R.id.qn_surface_view_large);
+
+        mVideoViewSmallParent = findViewById(R.id.qn_surface_view_small_parent);
+        mSurfaceViewSmall = (QNSurfaceView) findViewById(R.id.qn_surface_view_small);
+
+        mMicrophoneStateView = (ImageView) findViewById(R.id.microphone_state_view);
+        mAudioView = (TextView) findViewById(R.id.qn_audio_view);
     }
 
     protected int getLayout() {
@@ -357,14 +375,14 @@ public class UserTrackView extends FrameLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mVideoViewLargeParent = findViewById(R.id.qn_surface_view_large_parent);
-        mSurfaceViewLarge = (QNSurfaceView) findViewById(R.id.qn_surface_view_large);
-
-        mVideoViewSmallParent = findViewById(R.id.qn_surface_view_small_parent);
-        mSurfaceViewSmall = (QNSurfaceView) findViewById(R.id.qn_surface_view_small);
-
-        mMicrophoneStateView = (ImageView) findViewById(R.id.microphone_state_view);
-        mAudioView = (TextView) findViewById(R.id.qn_audio_view);
+//        mVideoViewLargeParent = findViewById(R.id.qn_surface_view_large_parent);
+//        mSurfaceViewLarge = (QNSurfaceView) findViewById(R.id.qn_surface_view_large);
+//
+//        mVideoViewSmallParent = findViewById(R.id.qn_surface_view_small_parent);
+//        mSurfaceViewSmall = (QNSurfaceView) findViewById(R.id.qn_surface_view_small);
+//
+//        mMicrophoneStateView = (ImageView) findViewById(R.id.microphone_state_view);
+//        mAudioView = (TextView) findViewById(R.id.qn_audio_view);
     }
 
     @Override

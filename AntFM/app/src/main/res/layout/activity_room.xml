@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,14 +10,34 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
+
+
+    <com.viewpagerindicator.CirclePageIndicator
+        android:id="@+id/indicator"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        app:radius="4dp"
+        app:strokeWidth="0dp"
+        app:strokeColor="@color/gray"
+        app:pageColor="@color/gray"
+        app:fillColor="@color/white"
+        />
+
+    <!--<com.shuangling.software.activity.ui.UserTrackView-->
+        <!--android:id="@+id/userTrackView"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent" />-->
 
 
     <RelativeLayout
         android:id="@+id/panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/transparent" >
+        android:background="@color/transparent">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -48,16 +69,25 @@
                     android:textColor="#F7F7F7"
                     android:textSize="@dimen/font_size_34px"
                     android:text="多人连麦"/>
-                <TextView
+                <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="center_horizontal"-->
+                    <!--android:textColor="#4CF7F7F7"-->
+                    <!--android:text="00:00"/>-->
+                <Chronometer
+                    android:id="@+id/timer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
+                    android:format="%s"
                     android:textColor="#4CF7F7F7"
-                    android:text="00:00"/>
+                    android:layout_gravity="center_horizontal"
+                    />
 
             </LinearLayout>
 
             <TextView
+                android:id="@+id/quit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#E14C4C"
@@ -95,7 +125,7 @@
                         android:layout_gravity="center_horizontal"
                         android:text="&#xe6f7;"
                         android:textColor="#ffffff"
-                        android:textSize="@dimen/font_size_36px" />
+                        android:textSize="@dimen/font_size_50px" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -113,12 +143,13 @@
                     android:padding="5dp"
                     android:orientation="vertical">
                     <com.shuangling.software.customview.FontIconView
+                        android:id="@+id/muteStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:text="&#xe6f1;"
                         android:textColor="#ffffff"
-                        android:textSize="@dimen/font_size_36px" />
+                        android:textSize="@dimen/font_size_50px" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -136,12 +167,13 @@
                     android:padding="5dp"
                     android:orientation="vertical">
                     <com.shuangling.software.customview.FontIconView
+                        android:id="@+id/videoStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:text="&#xe6f2;"
                         android:textColor="#ffffff"
-                        android:textSize="@dimen/font_size_36px" />
+                        android:textSize="@dimen/font_size_50px" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -164,7 +196,7 @@
                         android:layout_gravity="center_horizontal"
                         android:text="&#xe6f9;"
                         android:textColor="#ffffff"
-                        android:textSize="@dimen/font_size_36px" />
+                        android:textSize="@dimen/font_size_50px" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

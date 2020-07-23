@@ -154,6 +154,12 @@
             android:name=".activity.ModifyUserInfoActivity"
             android:screenOrientation="portrait" >
         </activity>
+
+        <activity
+            android:name=".activity.RoomActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
         <activity
             android:name=".activity.SearchActivity"
             android:screenOrientation="portrait" >

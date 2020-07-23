@@ -1,8 +1,8 @@
 apply plugin: 'com.mob.sdk'
 
 MobSDK {
-    appKey "2cf092dea3067"
-    appSecret "864266cc62dbb2faa59328d22cb236db"
+    appKey "2729af9fb637c"
+    appSecret "764accba8cd6964549c0fbb4fd8660ec"
 
     ShareSDK {
 //        version "3.1.2"  //不写的话则默认最新版本
@@ -14,8 +14,8 @@ MobSDK {
             SinaWeibo {
                 id 1
                 sortId 1
-                appKey "1777044038"
-                appSecret "cfc990a9d5fb883197109aa7d9b31d55"
+                appKey "1529366077"
+                appSecret "efec8512f387c5f6e973167fc19a024a"
                 callbackUri "http://www.sharesdk.cn"
                 shareByAppClient true
                 enable true
@@ -33,14 +33,14 @@ MobSDK {
       BypassApproval是绕过审核的标记，设置为true后AppId将被忽略，故不经过
       审核的应用也可以执行分享，但是仅限于分享文字和图片，不能分享其他类型，
       默认值为false。此外，微信收藏不支持此字段。wx4868b35061f87885
-      <!--要分享微信小应用程序时用userName,path-->
-	<!--appId "wxe6d918d43205ceed"
-        appSecret "7e4f273b7e76efac150667ef87c50427"-->*/
+      <!--要分享微信小应用程序时用userName,path-->*/
+
+
             Wechat {
                 id 2
                 sortId 2
-                appId "wxa3166f1cfc90ff08"
-                appSecret "72ca613aa4d98c83ba0c35e154d87f73"
+                appId "wxa12782fd33eea9c5"
+                appSecret "d237938505db0350b6ea797b51ef20ed"
                 userName "gh_afb25ac019c9"
                 path "pages/index/index.html?id=1"
                 bypassApproval false
@@ -53,8 +53,8 @@ MobSDK {
             WechatMoments {
                 id 3
                 sortId 3
-                appId "wxa3166f1cfc90ff08"
-                appSecret "72ca613aa4d98c83ba0c35e154d87f73"
+                appId "wxa12782fd33eea9c5"
+                appSecret "d237938505db0350b6ea797b51ef20ed"
                 bypassApproval false
                 enable true
             }
@@ -63,8 +63,8 @@ MobSDK {
             WechatFavorite {
                 id 4
                 sortId 4
-                appId "wxa3166f1cfc90ff08"
-                appSecret "72ca613aa4d98c83ba0c35e154d87f73"
+                appId "wxa12782fd33eea9c5"
+                appSecret "d237938505db0350b6ea797b51ef20ed"
                 bypassApproval false
                 enable true
             }
@@ -72,8 +72,8 @@ MobSDK {
             QQ {
                 id 5
                 sortId 5
-                appId "101824444"
-                appKey "caccc1b00df5eed90c2f725aedeb79d8"
+                appId "1106758355"
+                appKey "4fiTeIxgqfv8VJj0"
                 shareByAppClient true
                 bypassApproval false
                 enable true

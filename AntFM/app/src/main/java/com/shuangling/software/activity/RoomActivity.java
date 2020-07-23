@@ -3,37 +3,34 @@ package com.shuangling.software.activity;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.ContextCompat;
+import android.os.SystemClock;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
+import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hjq.toast.ToastUtils;
 import com.qiniu.droid.rtc.QNBeautySetting;
 import com.qiniu.droid.rtc.QNCameraSwitchResultCallback;
 import com.qiniu.droid.rtc.QNCustomMessage;
@@ -49,24 +46,25 @@ import com.qiniu.droid.rtc.QNTrackKind;
 import com.qiniu.droid.rtc.QNVideoFormat;
 import com.qiniu.droid.rtc.model.QNAudioDevice;
 import com.qiniu.droid.rtc.model.QNMergeJob;
-import com.qiniu.droid.rtc.model.QNMergeTrackOption;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.UserTrackView;
-import com.shuangling.software.adapter.MoudleGridViewAdapter;
 import com.shuangling.software.customview.FontIconView;
-import com.shuangling.software.customview.MyGridView;
-import com.shuangling.software.entity.DecorModule;
-import com.shuangling.software.fragment.RecommendFragment;
+import com.shuangling.software.utils.Config;
+import com.shuangling.software.utils.QNAppServer;
+import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+import static com.shuangling.software.utils.Config.DEFAULT_BITRATE;
+import static com.shuangling.software.utils.Config.DEFAULT_FPS;
+import static com.shuangling.software.utils.Config.DEFAULT_RESOLUTION;
 
 public class RoomActivity extends Activity implements QNRTCEngineEventListener {
 
@@ -87,7 +85,14 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
     TableLayout bottomButtonLayout;
     @BindView(R.id.panel)
     RelativeLayout panel;
-
+    @BindView(R.id.timer)
+    Chronometer timer;
+    @BindView(R.id.quit)
+    TextView quit;
+    @BindView(R.id.indicator)
+    CirclePageIndicator indicator;
+//    @BindView(R.id.userTrackView)
+//    UserTrackView userTrackView;
 
 
     private static final String TAG = "RoomActivity";
@@ -103,7 +108,10 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
             "android.permission.RECORD_AUDIO",
             "android.permission.INTERNET"
     };
-
+    @BindView(R.id.muteStatus)
+    FontIconView muteStatus;
+    @BindView(R.id.videoStatus)
+    FontIconView videoStatus;
 
 
     private Handler mHandler;
@@ -121,6 +129,9 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
     private boolean mBeautyEnabled = false;
     private boolean mVideoEnabled = true;
     private boolean mSpeakerEnabled = true;
+    private boolean mShowPannel = true;
+
+
     private boolean mIsError = false;
     private boolean mIsAdmin = false;
     private boolean mIsJoinedRoom = false;
@@ -134,7 +145,7 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
     private int mScreenHeight = 0;
     private int mCaptureMode = Config.CAMERA_CAPTURE;
 
-    private TrackWindowMgr mTrackWindowMgr;
+    //private TrackWindowMgr mTrackWindowMgr;
 
     private PagerAdapter mPagerAdapter;
 
@@ -146,11 +157,11 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      * <p>
      * demo 中默认 userId 为 "admin" 的用户可以控制合流布局的配置
      */
-    private MergeLayoutConfigView mMergeLayoutConfigView;
+    //private MergeLayoutConfigView mMergeLayoutConfigView;
     private PopupWindow mPopWindow;
-    private UserListAdapter mUserListAdapter;
-    private RoomUserList mRoomUserList;
-    private RTCUser mChooseUser;
+    //    private UserListAdapter mUserListAdapter;
+//    private RoomUserList mRoomUserList;
+//    private RTCUser mChooseUser;
     private volatile boolean mIsStreaming;
     /**
      * 如果 QNMergeJob 为 null，则表示使用默认合流任务
@@ -161,8 +172,13 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      */
     private QNMergeJob mCurrentMergeJob;
 
-    private Map<String, UserTrackView> mUserWindowMap = new LinkedHashMap<>();
+    //private LinkedHashMap<String, UserTrackView> mUserWindowMap = new LinkedHashMap<>();
 
+    //private ArrayList<UserTrackView> mUserWindowList = new ArrayList<>();
+
+    private ArrayList<UserTrackInfo> mUserTrackInfos = new ArrayList<>();
+
+    private int mCurrentPage=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -194,52 +210,94 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
 
             @Override
             public int getItemPosition(Object object) {
-                return POSITION_NONE;
+
+                if((int)((View)object).getTag()==mCurrentPage){
+                    return POSITION_NONE;
+                }else {
+                   return POSITION_UNCHANGED;
+                }
+
+
             }
 
             @Override
             public void destroyItem(ViewGroup container, int position, Object object) {
-                container.removeView(container.findViewWithTag(position));
+                //container.removeView(container.findViewWithTag(position));
+                container.removeView((View) object);
             }
 
             @Override
             public Object instantiateItem(ViewGroup container, int position) {
-                LayoutInflater inflater = LayoutInflater.from(getActivity());
-                final View v = inflater.inflate(R.layout.index_module_item, moduleViewPager, false);
-                MyGridView gv = v.findViewById(R.id.gridView);
-                gv.setNumColumns(cols);
-                List<DecorModule.ContentsBean> contents = new ArrayList<>();
-                for (int i = position * cols * 2; i < (position + 1) * cols * 2 && i < module.getContents().size(); i++) {
-                    contents.add(module.getContents().get(i));
-                }
-                final MoudleGridViewAdapter adapter = new MoudleGridViewAdapter(getActivity(), contents);
-                gv.setAdapter(adapter);
-                gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        DecorModule.ContentsBean cb = adapter.getItem(position);
-
-                        String url = cb.getSource_url();
-                        String title = cb.getTitle();
-                        ((RecommendFragment) getParentFragment()).jumpTo(url, title);
-
-
-                    }
-                });
-                v.setTag(position);
-                container.addView(v);
                 if (position == 0) {
-                    v.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                    LayoutInflater inflater = LayoutInflater.from(RoomActivity.this);
+                    final View v = inflater.inflate(R.layout.primary_user_video_item, container, false);
+                    UserTrackView userTrackView = v.findViewById(R.id.userTrackView);
+                    UserTrackInfo userTrackInfo = mUserTrackInfos.get(0);
+                    List<QNTrackInfo> trackInfos = new ArrayList<>(userTrackInfo.getQNVideoTrackInfos());
+                    if (userTrackInfo.getQNAudioTrackInfo() != null) {
+                        trackInfos.add(userTrackInfo.getQNAudioTrackInfo());
+                    }
+                    userTrackView.setUserTrackInfo(mEngine, userTrackInfo.getUserId(), trackInfos);
+                    userTrackView.changeViewBackgroundByPos(0);
+                    mUserTrackInfos.get(0).setUserTrackView(userTrackView);
+                    container.addView(v);
+                    v.setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onGlobalLayout() {
-                            int height = v.getHeight();
-                            ViewGroup.LayoutParams lp = moduleViewPager.getLayoutParams();
-                            lp.height = height;
-                            moduleViewPager.setLayoutParams(lp);
+                        public void onClick(View v) {
+
+                            mShowPannel = !mShowPannel;
+                            if (!mShowPannel) {
+                                panel.setVisibility(View.GONE);
+                            } else {
+                                panel.setVisibility(View.VISIBLE);
+                            }
                         }
                     });
+                    v.setTag(position);
+                    return v;
+                } else {
+                    LayoutInflater inflater = LayoutInflater.from(RoomActivity.this);
+                    final View v = inflater.inflate(R.layout.normal_user_video_item, container, false);
+                    int num=0;
+                    for (int i = (position - 1) * 4 + 1; i < mUserTrackInfos.size() && num < 4; i++, num++) {
+                        UserTrackView userTrackView;
+                        if (num == 0) {
+                            userTrackView = v.findViewById(R.id.userTrackView1);
+                        } else if (num == 1) {
+                            userTrackView = v.findViewById(R.id.userTrackView2);
+                        } else if (num == 2) {
+                            userTrackView = v.findViewById(R.id.userTrackView3);
+                        } else {
+                            userTrackView = v.findViewById(R.id.userTrackView4);
+                        }
+
+                        UserTrackInfo userTrackInfo = mUserTrackInfos.get(i);
+                        //ViewGroup.LayoutParams lp = userTrackView.getLayoutParams();
+                        List<QNTrackInfo> trackInfos = new ArrayList<>(userTrackInfo.getQNVideoTrackInfos());
+                        if (userTrackInfo.getQNAudioTrackInfo() != null) {
+                            trackInfos.add(userTrackInfo.getQNAudioTrackInfo());
+                        }
+                        userTrackView.setUserTrackInfo(mEngine, userTrackInfo.getUserId(), trackInfos);
+                        userTrackView.changeViewBackgroundByPos(i);
+                        mUserTrackInfos.get(i).setUserTrackView(userTrackView);
+                    }
+                    if(num==1){
+                        v.findViewById(R.id.userTrackView2).setVisibility(View.INVISIBLE);
+                        v.findViewById(R.id.userTrackView3).setVisibility(View.INVISIBLE);
+                        v.findViewById(R.id.userTrackView4).setVisibility(View.INVISIBLE);
+                    }else if(num==2){
+                        v.findViewById(R.id.userTrackView3).setVisibility(View.INVISIBLE);
+                        v.findViewById(R.id.userTrackView4).setVisibility(View.INVISIBLE);
+                    }else if(num==3){
+                        v.findViewById(R.id.userTrackView4).setVisibility(View.INVISIBLE);
+                    }
+
+                    container.addView(v);
+                    v.setTag(position);
+                    return v;
                 }
-                return v;
+
+
             }
 
             @Override
@@ -249,18 +307,35 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
 
             @Override
             public int getCount() {
-                return (module.getContents().size() + cols * 2 - 1) / (cols * 2);
+                if (mUserTrackInfos.size() == 0) {
+                    return 0;
+                } else {
+                    return (mUserTrackInfos.size() + 2) / 4 + 1;
+                }
+
             }
         };
 
+        viewPager.setAdapter(mPagerAdapter);
+        indicator.setViewPager(viewPager);
+        indicator.setSnap(true);
+        indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
+            }
 
-        // 初始化控制面板
-        mControlFragment = new ControlFragment();
-        mControlFragment.setArguments(intent.getExtras());
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.add(R.id.control_fragment_container, mControlFragment);
-        ft.commitAllowingStateLoss();
+            @Override
+            public void onPageSelected(int position) {
+                mPagerAdapter.notifyDataSetChanged();
+                mCurrentPage=position;
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         // 权限申请
         for (String permission : MANDATORY_PERMISSIONS) {
@@ -279,12 +354,143 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
         // 初始化合流相关配置
         initMergeLayoutConfig();
 
-        mTrackWindowMgr = new TrackWindowMgr(mUserId, mScreenWidth, mScreenHeight, outMetrics.density
-                , mEngine, mTrackWindowFullScreen, mTrackWindowsList);
+//        mTrackWindowMgr = new TrackWindowMgr(mUserId, mScreenWidth, mScreenHeight, outMetrics.density
+//                , mEngine, mTrackWindowFullScreen, mTrackWindowsList);
 
         List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
         localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
-        mTrackWindowMgr.addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+        addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+        //test(mUserId, localTrackListExcludeScreenTrack);
+    }
+
+    public void test(String userId, List<QNTrackInfo> trackInfoList) {
+
+        //userTrackView.setUserTrackInfo(mEngine, userId, trackInfoList);
+
+    }
+
+
+    public void addTrackInfo(String userId, List<QNTrackInfo> trackInfoList) {
+//        if (mTrackCandidateWins.size() == 0) {
+//            Logging.e(TAG, "There were more than 9 published users in the room, with no unUsedWindow to draw.");
+//            return;
+//        }
+        UserTrackInfo userTrackInfo = null;
+        for (int var = 0; var < mUserTrackInfos.size(); var++) {
+            if (mUserTrackInfos.get(var).getUserId().equals(userId)) {
+                userTrackInfo = mUserTrackInfos.get(var);
+                break;
+            }
+
+        }
+        if (userTrackInfo != null) {
+            // user has already displayed in screen
+            userTrackInfo.onAddTrackInfo(trackInfoList);
+            indicator.notifyDataSetChanged();
+        } else {
+            // allocate new track windows
+            userTrackInfo = new UserTrackInfo(userId);
+            userTrackInfo.onAddTrackInfo(trackInfoList);
+
+            mUserTrackInfos.add(userTrackInfo);
+            mPagerAdapter.notifyDataSetChanged();
+            indicator.notifyDataSetChanged();
+            // update whole layout
+            //updateTrackWindowsLayout();
+        }
+    }
+
+
+    public void removeTrackInfo(String userId, List<QNTrackInfo> trackInfoList) {
+        //UserTrackView remoteVideoView = mUserWindowList.get(userId);
+        UserTrackInfo remoteVideoView = null;
+        for (int var = 0; var < mUserTrackInfos.size(); var++) {
+            if (mUserTrackInfos.get(var).getUserId().equals(userId)) {
+                remoteVideoView = mUserTrackInfos.get(var);
+                break;
+            }
+
+        }
+        if (remoteVideoView == null) {
+            return;
+        }
+        boolean trackInfoRemains = remoteVideoView.onRemoveTrackInfo(trackInfoList);
+        if (userId.equals(mUserId)) {
+            // always show myself in screen
+            return;
+        }
+        if (!trackInfoRemains) {
+            // check, if no more tracks for this user. remove it
+            removeTrackWindow(userId);
+        }
+    }
+
+    private void removeTrackWindow(String remoteUserId) {
+        UserTrackInfo remoteVideoView = null;
+        for (int var = 0; var < mUserTrackInfos.size(); var++) {
+            if (mUserTrackInfos.get(var).getUserId().equals(remoteUserId)) {
+                remoteVideoView = mUserTrackInfos.get(var);
+                break;
+            }
+
+        }
+        if (remoteVideoView != null) {
+            boolean removed = mUserTrackInfos.remove(remoteVideoView);
+            if (!removed) {
+                return;
+            }
+        }
+        //从父控件中移除
+//        ViewParent parent = remoteVideoView.getParent();
+//        if (parent != null && parent instanceof ViewGroup) {
+//            ViewGroup group = (ViewGroup) parent;
+//            group.removeView(remoteVideoView);
+//        }
+        mPagerAdapter.notifyDataSetChanged();
+        indicator.notifyDataSetChanged();
+
+    }
+
+
+    public void onTrackInfoMuted(String remoteUserId,List<QNTrackInfo> trackInfoList) {
+        //UserTrackView window = mUserWindowMap.get(remoteUserId);
+        UserTrackInfo userTrackInfo = null;
+        for (int var = 0; var < mUserTrackInfos.size(); var++) {
+            if (mUserTrackInfos.get(var).getUserId().equals(remoteUserId)) {
+                userTrackInfo = mUserTrackInfos.get(var);
+                break;
+            }
+
+        }
+
+        if (userTrackInfo != null) {
+
+            for(QNTrackInfo trackInfo:trackInfoList){
+                if (QNTrackKind.AUDIO.equals(trackInfo.getTrackKind())) {
+                    userTrackInfo.setQNAudioTrackInfo(trackInfo);
+                } else {
+                    for(QNTrackInfo track:userTrackInfo.getQNVideoTrackInfos()){
+                        if(track.getTrackId().equals(trackInfo.getTrackId())){
+                            userTrackInfo.getQNVideoTrackInfos().remove(track);
+                            userTrackInfo.getQNVideoTrackInfos().add(trackInfo);
+                            break;
+                        }
+                    }
+
+                }
+            }
+
+            if(userTrackInfo.getUserTrackView()!=null){
+
+                userTrackInfo.getUserTrackView().setQNAudioTrackInfo(userTrackInfo.getQNAudioTrackInfo());
+                userTrackInfo.getUserTrackView().setQNVideoTrackInfos(userTrackInfo.getQNVideoTrackInfos());
+                userTrackInfo.getUserTrackView().onTracksMuteChanged();
+            }
+
+            //todo
+            //window.onTracksMuteChanged();
+
+        }
     }
 
     /**
@@ -344,7 +550,7 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
                 mLocalTrackList.add(mLocalVideoTrack);
                 break;
             case Config.ONLY_AUDIO_CAPTURE:
-                mControlFragment.setAudioOnly(true);
+                //mControlFragment.setAudioOnly(true);
                 break;
             case Config.SCREEN_CAPTURE:
                 // 创建屏幕录制的视频 Track
@@ -355,7 +561,7 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
                         .setMaster(true)
                         .setTag(UserTrackView.TAG_SCREEN).create();
                 mLocalTrackList.add(mLocalScreenTrack);
-                mControlFragment.setAudioOnly(true);
+                //mControlFragment.setAudioOnly(true);
                 break;
             case Config.MUTI_TRACK_CAPTURE:
                 // 视频通话 + 屏幕共享两路 track
@@ -375,71 +581,71 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
     }
 
     private void initMergeLayoutConfig() {
-        mMergeLayoutConfigView = new MergeLayoutConfigView(this);
-        mMergeLayoutConfigView.setRoomId(mRoomId);
-        mUserListAdapter = new UserListAdapter();
-        mRoomUserList = new RoomUserList();
-        mMergeLayoutConfigView.getUserListView().setAdapter(mUserListAdapter);
-        mMergeLayoutConfigView.setOnClickedListener(new MergeLayoutConfigView.OnClickedListener() {
-            @Override
-            public void onConfirmClicked() {
-                if (mEngine == null) {
-                    return;
-                }
-                if (!mMergeLayoutConfigView.isStreamingEnabled()) {
-                    // 处理停止合流逻辑
-                    if (mIsStreaming) {
-                        // 如果正在推流，则停止之前的合流任务
-                        // 传入 null，则处理默认的合流任务
-                        mEngine.stopMergeStream(mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
-                        mIsStreaming = false;
-                        ToastUtils.s(RoomActivity.this, "停止合流！！！");
-                    } else {
-                        ToastUtils.s(RoomActivity.this, "未开启合流，配置未生效！！！");
-                    }
-                    if (mPopWindow != null) {
-                        mPopWindow.dismiss();
-                    }
-                    return;
-                }
-                if (mMergeLayoutConfigView.isCustomMergeJob()) {
-                    // 处理自定义合流任务的逻辑
-                    QNMergeJob mergeJob = mMergeLayoutConfigView.getCustomMergeJob();
-                    if (mergeJob != null) {
-                        // 如果正在推流，则停止之前的合流任务
-                        if (mIsStreaming) {
-                            mEngine.stopMergeStream(mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
-                        }
-                        mCurrentMergeJob = mergeJob;
-                        // 创建自定义合流任务
-                        mEngine.createMergeJob(mCurrentMergeJob);
-                    }
-                }
-                List<UserTrack> userTracks = mMergeLayoutConfigView.updateMergeOptions();
-                List<QNMergeTrackOption> addedTrackOptions = new ArrayList<>();
-                List<QNMergeTrackOption> removedTrackOptions = new ArrayList<>();
-                for (UserTrack item : userTracks) {
-                    if (item.isTrackInclude()) {
-                        addedTrackOptions.add(item.getQNMergeTrackOption());
-                    } else {
-                        removedTrackOptions.add(item.getQNMergeTrackOption());
-                    }
-                }
-                if (!addedTrackOptions.isEmpty()) {
-                    // 配置对应 tracks 的合流配置信息
-                    mEngine.setMergeStreamLayouts(addedTrackOptions, mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
-                }
-                if (!removedTrackOptions.isEmpty()) {
-                    // 移除对应 tracks 的合流配置，移除后相应 track 的数据将不会参与合流
-                    mEngine.removeMergeStreamLayouts(removedTrackOptions, mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
-                }
-                if (mPopWindow != null) {
-                    mPopWindow.dismiss();
-                }
-                mIsStreaming = true;
-                ToastUtils.s(RoomActivity.this, "已发送合流配置，请等待合流画面生效");
-            }
-        });
+//        mMergeLayoutConfigView = new MergeLayoutConfigView(this);
+//        mMergeLayoutConfigView.setRoomId(mRoomId);
+//        mUserListAdapter = new UserListAdapter();
+//        mRoomUserList = new RoomUserList();
+//        mMergeLayoutConfigView.getUserListView().setAdapter(mUserListAdapter);
+//        mMergeLayoutConfigView.setOnClickedListener(new MergeLayoutConfigView.OnClickedListener() {
+//            @Override
+//            public void onConfirmClicked() {
+//                if (mEngine == null) {
+//                    return;
+//                }
+//                if (!mMergeLayoutConfigView.isStreamingEnabled()) {
+//                    // 处理停止合流逻辑
+//                    if (mIsStreaming) {
+//                        // 如果正在推流，则停止之前的合流任务
+//                        // 传入 null，则处理默认的合流任务
+//                        mEngine.stopMergeStream(mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
+//                        mIsStreaming = false;
+//                        ToastUtils.s(RoomActivity.this, "停止合流！！！");
+//                    } else {
+//                        ToastUtils.s(RoomActivity.this, "未开启合流，配置未生效！！！");
+//                    }
+//                    if (mPopWindow != null) {
+//                        mPopWindow.dismiss();
+//                    }
+//                    return;
+//                }
+//                if (mMergeLayoutConfigView.isCustomMergeJob()) {
+//                    // 处理自定义合流任务的逻辑
+//                    QNMergeJob mergeJob = mMergeLayoutConfigView.getCustomMergeJob();
+//                    if (mergeJob != null) {
+//                        // 如果正在推流，则停止之前的合流任务
+//                        if (mIsStreaming) {
+//                            mEngine.stopMergeStream(mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
+//                        }
+//                        mCurrentMergeJob = mergeJob;
+//                        // 创建自定义合流任务
+//                        mEngine.createMergeJob(mCurrentMergeJob);
+//                    }
+//                }
+//                List<UserTrack> userTracks = mMergeLayoutConfigView.updateMergeOptions();
+//                List<QNMergeTrackOption> addedTrackOptions = new ArrayList<>();
+//                List<QNMergeTrackOption> removedTrackOptions = new ArrayList<>();
+//                for (UserTrack item : userTracks) {
+//                    if (item.isTrackInclude()) {
+//                        addedTrackOptions.add(item.getQNMergeTrackOption());
+//                    } else {
+//                        removedTrackOptions.add(item.getQNMergeTrackOption());
+//                    }
+//                }
+//                if (!addedTrackOptions.isEmpty()) {
+//                    // 配置对应 tracks 的合流配置信息
+//                    mEngine.setMergeStreamLayouts(addedTrackOptions, mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
+//                }
+//                if (!removedTrackOptions.isEmpty()) {
+//                    // 移除对应 tracks 的合流配置，移除后相应 track 的数据将不会参与合流
+//                    mEngine.removeMergeStreamLayouts(removedTrackOptions, mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
+//                }
+//                if (mPopWindow != null) {
+//                    mPopWindow.dismiss();
+//                }
+//                mIsStreaming = true;
+//                ToastUtils.s(RoomActivity.this, "已发送合流配置，请等待合流画面生效");
+//            }
+//        });
     }
 
     @Override
@@ -476,13 +682,13 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
             mEngine.destroy();
             mEngine = null;
         }
-        if (mTrackWindowFullScreen != null) {
-            mTrackWindowFullScreen.dispose();
-        }
-        for (UserTrackView item : mTrackWindowsList) {
-            item.dispose();
-        }
-        mTrackWindowsList.clear();
+//        if (mTrackWindowFullScreen != null) {
+//            mTrackWindowFullScreen.dispose();
+//        }
+//        for (UserTrackView item : mTrackWindowsList) {
+//            item.dispose();
+//        }
+//        mTrackWindowsList.clear();
         mPopWindow = null;
     }
 
@@ -520,84 +726,84 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
         }
     }
 
-    private void showKickoutDialog(final String userId) {
-        if (mKickOutDialog == null) {
-            mKickOutDialog = new AlertDialog.Builder(this)
-                    .setNegativeButton(R.string.negative_dialog_tips, null)
-                    .create();
-        }
-        mKickOutDialog.setMessage(getString(R.string.kickout_tips, userId));
-        mKickOutDialog.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(R.string.positive_dialog_tips),
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mEngine.kickOutUser(userId);
-                    }
-                });
-        mKickOutDialog.show();
-    }
+//    private void showKickoutDialog(final String userId) {
+//        if (mKickOutDialog == null) {
+//            mKickOutDialog = new AlertDialog.Builder(this)
+//                    .setNegativeButton(R.string.negative_dialog_tips, null)
+//                    .create();
+//        }
+//        mKickOutDialog.setMessage(getString(R.string.kickout_tips, userId));
+//        mKickOutDialog.setButton(DialogInterface.BUTTON_POSITIVE, getResources().getString(R.string.positive_dialog_tips),
+//                new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        mEngine.kickOutUser(userId);
+//                    }
+//                });
+//        mKickOutDialog.show();
+//    }
 
-    private void updateRemoteLogText(final String logText) {
-        Log.i(TAG, logText);
-        mControlFragment.updateRemoteLogText(logText);
-    }
+//    private void updateRemoteLogText(final String logText) {
+//        Log.i(TAG, logText);
+//        mControlFragment.updateRemoteLogText(logText);
+//    }
 
-    private void resetMergeStream() {
-        Log.d(TAG, "resetMergeStream()");
-        List<QNMergeTrackOption> configuredMergeTracksOptions = new ArrayList<>();
+//    private void resetMergeStream() {
+//        Log.d(TAG, "resetMergeStream()");
+//        List<QNMergeTrackOption> configuredMergeTracksOptions = new ArrayList<>();
+//
+//        // video tracks merge layout options.
+//        List<UserTrack> remoteVideoTrackInfoList = mRoomUserList.getRTCVideoTracks();
+//        if (!remoteVideoTrackInfoList.isEmpty()) {
+//            List<QNMergeTrackOption> mergeTrackOptions = SplitUtils.split(remoteVideoTrackInfoList.size(),
+//                    mCurrentMergeJob == null ? QNAppServer.STREAMING_WIDTH : mCurrentMergeJob.getWidth(),
+//                    mCurrentMergeJob == null ? QNAppServer.STREAMING_HEIGHT : mCurrentMergeJob.getHeight());
+//            if (mergeTrackOptions.size() != remoteVideoTrackInfoList.size()) {
+//                Log.e(TAG, "split option error.");
+//                return;
+//            }
+//
+//            for (int i = 0; i < mergeTrackOptions.size(); i++) {
+//                UserTrack userTrack = remoteVideoTrackInfoList.get(i);
+//
+//                if (!userTrack.isTrackInclude()) {
+//                    continue;
+//                }
+//                QNMergeTrackOption item = mergeTrackOptions.get(i);
+//                userTrack.updateQNMergeTrackOption(item);
+//                configuredMergeTracksOptions.add(userTrack.getQNMergeTrackOption());
+//            }
+//        }
+//
+//        // audio tracks merge layout options
+//        List<UserTrack> remoteAudioTrackInfoList = mRoomUserList.getRTCAudioTracks();
+//        if (!remoteAudioTrackInfoList.isEmpty()) {
+//            for (UserTrack userTrack : remoteAudioTrackInfoList) {
+//                if (!userTrack.isTrackInclude()) {
+//                    continue;
+//                }
+//                configuredMergeTracksOptions.add(userTrack.getQNMergeTrackOption());
+//            }
+//        }
+//
+//        if (mIsStreaming) {
+//            mEngine.setMergeStreamLayouts(configuredMergeTracksOptions, mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
+//        }
+//    }
 
-        // video tracks merge layout options.
-        List<UserTrack> remoteVideoTrackInfoList = mRoomUserList.getRTCVideoTracks();
-        if (!remoteVideoTrackInfoList.isEmpty()) {
-            List<QNMergeTrackOption> mergeTrackOptions = SplitUtils.split(remoteVideoTrackInfoList.size(),
-                    mCurrentMergeJob == null ? QNAppServer.STREAMING_WIDTH : mCurrentMergeJob.getWidth(),
-                    mCurrentMergeJob == null ? QNAppServer.STREAMING_HEIGHT : mCurrentMergeJob.getHeight());
-            if (mergeTrackOptions.size() != remoteVideoTrackInfoList.size()) {
-                Log.e(TAG, "split option error.");
-                return;
-            }
+//    private void userJoinedForStreaming(String userId, String userData) {
+//        mRoomUserList.onUserJoined(userId, userData);
+//        if (mUserListAdapter != null) {
+//            mUserListAdapter.notifyDataSetChanged();
+//        }
+//    }
 
-            for (int i = 0; i < mergeTrackOptions.size(); i++) {
-                UserTrack userTrack = remoteVideoTrackInfoList.get(i);
-
-                if (!userTrack.isTrackInclude()) {
-                    continue;
-                }
-                QNMergeTrackOption item = mergeTrackOptions.get(i);
-                userTrack.updateQNMergeTrackOption(item);
-                configuredMergeTracksOptions.add(userTrack.getQNMergeTrackOption());
-            }
-        }
-
-        // audio tracks merge layout options
-        List<UserTrack> remoteAudioTrackInfoList = mRoomUserList.getRTCAudioTracks();
-        if (!remoteAudioTrackInfoList.isEmpty()) {
-            for (UserTrack userTrack : remoteAudioTrackInfoList) {
-                if (!userTrack.isTrackInclude()) {
-                    continue;
-                }
-                configuredMergeTracksOptions.add(userTrack.getQNMergeTrackOption());
-            }
-        }
-
-        if (mIsStreaming) {
-            mEngine.setMergeStreamLayouts(configuredMergeTracksOptions, mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
-        }
-    }
-
-    private void userJoinedForStreaming(String userId, String userData) {
-        mRoomUserList.onUserJoined(userId, userData);
-        if (mUserListAdapter != null) {
-            mUserListAdapter.notifyDataSetChanged();
-        }
-    }
-
-    private void userLeftForStreaming(String userId) {
-        mRoomUserList.onUserLeft(userId);
-        if (mUserListAdapter != null) {
-            mUserListAdapter.notifyDataSetChanged();
-        }
-    }
+//    private void userLeftForStreaming(String userId) {
+//        mRoomUserList.onUserLeft(userId);
+//        if (mUserListAdapter != null) {
+//            mUserListAdapter.notifyDataSetChanged();
+//        }
+//    }
 
     @TargetApi(19)
     private static int getSystemUiVisibility() {
@@ -620,28 +826,29 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
         switch (state) {
             case RECONNECTING:
                 logAndToast(getString(R.string.reconnecting_to_room));
-                mControlFragment.stopTimer();
-                if (mIsAdmin) {
-                    mRoomUserList.onTracksUnPublished(mUserId, mLocalTrackList);
-                    userLeftForStreaming(mUserId);
-                }
+                timer.stop();
+//                if (mIsAdmin) {
+//                    mRoomUserList.onTracksUnPublished(mUserId, mLocalTrackList);
+//                    userLeftForStreaming(mUserId);
+//                }
                 break;
             case CONNECTED:
-                if (mIsAdmin) {
-                    userJoinedForStreaming(mUserId, "");
-                }
+//                if (mIsAdmin) {
+//                    userJoinedForStreaming(mUserId, "");
+//                }
                 // 加入房间后可以进行 tracks 的发布
                 mEngine.publishTracks(mLocalTrackList);
                 logAndToast(getString(R.string.connected_to_room));
                 mIsJoinedRoom = true;
-                mControlFragment.startTimer();
+                timer.setBase(SystemClock.elapsedRealtime());
+                timer.start();
                 break;
             case RECONNECTED:
                 logAndToast(getString(R.string.connected_to_room));
-                mControlFragment.startTimer();
-                if (mIsAdmin) {
-                    userJoinedForStreaming(mUserId, "");
-                }
+                timer.stop();
+//                if (mIsAdmin) {
+//                    userJoinedForStreaming(mUserId, "");
+//                }
                 break;
             case CONNECTING:
                 logAndToast(getString(R.string.connecting_to, mRoomId));
@@ -654,7 +861,8 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      */
     @Override
     public void onRoomLeft() {
-
+        //logAndToast("onRoomLeft");
+        Log.i(TAG, "onRoomLeft");
     }
 
     /**
@@ -666,10 +874,12 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      */
     @Override
     public void onRemoteUserJoined(String remoteUserId, String userData) {
-        updateRemoteLogText("onRemoteUserJoined:remoteUserId = " + remoteUserId + " ,userData = " + userData);
-        if (mIsAdmin) {
-            userJoinedForStreaming(remoteUserId, userData);
-        }
+//        updateRemoteLogText("onRemoteUserJoined:remoteUserId = " + remoteUserId + " ,userData = " + userData);
+//        if (mIsAdmin) {
+//            userJoinedForStreaming(remoteUserId, userData);
+//        }
+        //logAndToast("onRemoteUserJoined,remoteUserId="+remoteUserId);
+        Log.i(TAG, "onRemoteUserJoined,remoteUserId=" + remoteUserId);
     }
 
     /**
@@ -679,10 +889,11 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      */
     @Override
     public void onRemoteUserLeft(final String remoteUserId) {
-        updateRemoteLogText("onRemoteUserLeft:remoteUserId = " + remoteUserId);
-        if (mIsAdmin) {
-            userLeftForStreaming(remoteUserId);
-        }
+//        updateRemoteLogText("onRemoteUserLeft:remoteUserId = " + remoteUserId);
+//        if (mIsAdmin) {
+//            userLeftForStreaming(remoteUserId);
+        Log.i(TAG, "onRemoteUserLeft,remoteUserId=" + remoteUserId);
+//        }
     }
 
     /**
@@ -692,12 +903,14 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      */
     @Override
     public void onLocalPublished(List<QNTrackInfo> trackInfoList) {
-        updateRemoteLogText("onLocalPublished");
+        //updateRemoteLogText("onLocalPublished");
+        //logAndToast("onLocalPublished");
+        Log.i(TAG, "onLocalPublished");
         mEngine.enableStatistics();
-        if (mIsAdmin) {
-            mRoomUserList.onTracksPublished(mUserId, mLocalTrackList);
-            resetMergeStream();
-        }
+//        if (mIsAdmin) {
+//            mRoomUserList.onTracksPublished(mUserId, mLocalTrackList);
+//            resetMergeStream();
+//        }
     }
 
     /**
@@ -708,12 +921,13 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      */
     @Override
     public void onRemotePublished(String remoteUserId, List<QNTrackInfo> trackInfoList) {
-        updateRemoteLogText("onRemotePublished:remoteUserId = " + remoteUserId);
-        mRoomUserList.onTracksPublished(remoteUserId, trackInfoList);
-        // 如果希望在远端发布音视频的时候，自动配置合流，则可以在此处重新调用 setMergeStreamLayouts 进行配置
-        if (mIsAdmin) {
-            resetMergeStream();
-        }
+        Log.i(TAG, "onRemotePublished");
+//        updateRemoteLogText("onRemotePublished:remoteUserId = " + remoteUserId);
+//        mRoomUserList.onTracksPublished(remoteUserId, trackInfoList);
+//        // 如果希望在远端发布音视频的时候，自动配置合流，则可以在此处重新调用 setMergeStreamLayouts 进行配置
+//        if (mIsAdmin) {
+//            resetMergeStream();
+//        }
     }
 
     /**
@@ -724,14 +938,16 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      */
     @Override
     public void onRemoteUnpublished(final String remoteUserId, List<QNTrackInfo> trackInfoList) {
-        updateRemoteLogText("onRemoteUnpublished:remoteUserId = " + remoteUserId);
-        if (mTrackWindowMgr != null) {
-            mTrackWindowMgr.removeTrackInfo(remoteUserId, trackInfoList);
-        }
-        mRoomUserList.onTracksUnPublished(remoteUserId, trackInfoList);
-        if (mIsAdmin) {
-            resetMergeStream();
-        }
+        //updateRemoteLogText("onRemoteUnpublished:remoteUserId = " + remoteUserId);
+//        if (mTrackWindowMgr != null) {
+//            mTrackWindowMgr.removeTrackInfo(remoteUserId, trackInfoList);
+//        }
+//        mRoomUserList.onTracksUnPublished(remoteUserId, trackInfoList);
+//        if (mIsAdmin) {
+//            resetMergeStream();
+//        }
+        Log.i(TAG, "onRemoteUnpublished");
+        removeTrackInfo(remoteUserId, trackInfoList);
     }
 
     /**
@@ -742,10 +958,15 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      */
     @Override
     public void onRemoteUserMuted(String remoteUserId, List<QNTrackInfo> trackInfoList) {
-        updateRemoteLogText("onRemoteUserMuted:remoteUserId = " + remoteUserId);
-        if (mTrackWindowMgr != null) {
-            mTrackWindowMgr.onTrackInfoMuted(remoteUserId);
-        }
+//        updateRemoteLogText("onRemoteUserMuted:remoteUserId = " + remoteUserId);
+//        if (mTrackWindowMgr != null) {
+//            mTrackWindowMgr.onTrackInfoMuted(remoteUserId);
+//        }
+        Log.i(TAG, "onRemoteUserMuted");
+
+
+
+        onTrackInfoMuted(remoteUserId,trackInfoList);
     }
 
     /**
@@ -756,10 +977,12 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      */
     @Override
     public void onSubscribed(String remoteUserId, List<QNTrackInfo> trackInfoList) {
-        updateRemoteLogText("onSubscribed:remoteUserId = " + remoteUserId);
-        if (mTrackWindowMgr != null) {
-            mTrackWindowMgr.addTrackInfo(remoteUserId, trackInfoList);
-        }
+//        updateRemoteLogText("onSubscribed:remoteUserId = " + remoteUserId);
+//        if (mTrackWindowMgr != null) {
+//            mTrackWindowMgr.addTrackInfo(remoteUserId, trackInfoList);
+//        }
+        Log.i(TAG, "onSubscribed");
+        addTrackInfo(remoteUserId, trackInfoList);
     }
 
     /**
@@ -769,7 +992,7 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      */
     @Override
     public void onKickedOut(String userId) {
-        ToastUtils.s(RoomActivity.this, getString(R.string.kicked_by_admin));
+        ToastUtils.show(getString(R.string.kicked_by_admin));
         finish();
     }
 
@@ -787,14 +1010,14 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
             if (QNTrackKind.AUDIO.equals(report.trackKind)) {
                 final String log = "音频码率:" + report.audioBitrate / 1000 + "kbps \n" +
                         "音频丢包率:" + report.audioPacketLostRate;
-                mControlFragment.updateLocalAudioLogText(log);
+                //mControlFragment.updateLocalAudioLogText(log);
             } else if (QNTrackKind.VIDEO.equals(report.trackKind)) {
                 final String log = "视频码率:" + report.videoBitrate / 1000 + "kbps \n" +
                         "视频丢包率:" + report.videoPacketLostRate + " \n" +
                         "视频的宽:" + report.width + " \n" +
                         "视频的高:" + report.height + " \n" +
                         "视频的帧率:" + report.frameRate;
-                mControlFragment.updateLocalVideoLogText(log);
+                //mControlFragment.updateLocalVideoLogText(log);
             }
         }
     }
@@ -827,7 +1050,7 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      */
     @Override
     public void onAudioRouteChanged(QNAudioDevice routing) {
-        updateRemoteLogText("onAudioRouteChanged: " + routing.name());
+        //updateRemoteLogText("onAudioRouteChanged: " + routing.name());
     }
 
     /**
@@ -837,7 +1060,7 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
      */
     @Override
     public void onCreateMergeJobSuccess(String mergeJobId) {
-        ToastUtils.s(RoomActivity.this, "合流任务 " + mergeJobId + " 创建成功！");
+        ToastUtils.show("合流任务 " + mergeJobId + " 创建成功！");
     }
 
     /**
@@ -909,11 +1132,11 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
             case QNErrorCode.ERROR_AUTH_FAIL:
             case QNErrorCode.ERROR_RECONNECT_TOKEN_ERROR: {
                 // reset TrackWindowMgr
-                mTrackWindowMgr.reset();
+                reset();
                 // display local videoTrack
                 List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
                 localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
-                mTrackWindowMgr.addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
                 if (errorCode == QNErrorCode.ERROR_RECONNECT_TOKEN_ERROR) {
                     logAndToast("ERROR_RECONNECT_TOKEN_ERROR 即将重连，请注意网络质量！");
                 }
@@ -952,151 +1175,328 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
     }
 
     // Demo control
-    @Override
-    public void onCallHangUp() {
-        if (mEngine != null) {
-            mEngine.leaveRoom();
-        }
-        finish();
-    }
+//    @Override
+//    public void onCallHangUp() {
+//        if (mEngine != null) {
+//            mEngine.leaveRoom();
+//        }
+//        finish();
+//    }
 
-    @Override
-    public void onCameraSwitch() {
-        if (mEngine != null) {
-            mEngine.switchCamera(new QNCameraSwitchResultCallback() {
-                @Override
-                public void onCameraSwitchDone(boolean isFrontCamera) {
+//    @Override
+//    public void onCameraSwitch() {
+//        if (mEngine != null) {
+//            mEngine.switchCamera(new QNCameraSwitchResultCallback() {
+//                @Override
+//                public void onCameraSwitchDone(boolean isFrontCamera) {
+//                }
+//
+//                @Override
+//                public void onCameraSwitchError(String errorMessage) {
+//                }
+//            });
+//        }
+//    }
+
+//    @Override
+//    public boolean onToggleMic() {
+//        if (mEngine != null && mLocalAudioTrack != null) {
+//            mMicEnabled = !mMicEnabled;
+//            mLocalAudioTrack.setMuted(!mMicEnabled);
+//            mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
+//            if (mTrackWindowMgr != null) {
+//                mTrackWindowMgr.onTrackInfoMuted(mUserId);
+//            }
+//        }
+//        return mMicEnabled;
+//    }
+
+//    @Override
+//    public boolean onToggleVideo() {
+//        if (mEngine != null && mLocalVideoTrack != null) {
+//            mVideoEnabled = !mVideoEnabled;
+//            mLocalVideoTrack.setMuted(!mVideoEnabled);
+//            if (mLocalScreenTrack != null) {
+//                mLocalScreenTrack.setMuted(!mVideoEnabled);
+//                mEngine.muteTracks(Arrays.asList(mLocalScreenTrack, mLocalVideoTrack));
+//            } else {
+//                mEngine.muteTracks(Collections.singletonList(mLocalVideoTrack));
+//            }
+//            if (mTrackWindowMgr != null) {
+//                mTrackWindowMgr.onTrackInfoMuted(mUserId);
+//            }
+//        }
+//        return mVideoEnabled;
+//    }
+
+//    @Override
+//    public boolean onToggleSpeaker() {
+//        if (mEngine != null) {
+//            mSpeakerEnabled = !mSpeakerEnabled;
+//            mEngine.muteRemoteAudio(!mSpeakerEnabled);
+//        }
+//        return mSpeakerEnabled;
+//    }
+
+//    @Override
+//    public boolean onToggleBeauty() {
+//        if (mEngine != null) {
+//            mBeautyEnabled = !mBeautyEnabled;
+//            QNBeautySetting beautySetting = new QNBeautySetting(0.5f, 0.5f, 0.5f);
+//            beautySetting.setEnable(mBeautyEnabled);
+//            mEngine.setBeauty(beautySetting);
+//        }
+//        return mBeautyEnabled;
+//    }
+
+//    @Override
+//    public void onCallStreamingConfig() {
+//        if (!mIsAdmin) {
+//            ToastUtils.s(RoomActivity.this, "只有 \"admin\" 用户可以开启推流！！！");
+//            return;
+//        }
+//        //配置页
+//        if (mRoomUserList.size() == 0) {
+//            return;
+//        }
+//        mChooseUser = mRoomUserList.getRoomUserByPosition(0);
+//        mMergeLayoutConfigView.updateConfigInfo(mChooseUser);
+//        mMergeLayoutConfigView.updateMergeJobConfigInfo();
+//        mUserListAdapter.notifyDataSetChanged();
+//
+//        if (mPopWindow == null) {
+//            mPopWindow = new PopupWindow(mMergeLayoutConfigView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+//            mPopWindow.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.popupWindowBackground)));
+//        }
+//        mPopWindow.showAtLocation(getWindow().getDecorView().getRootView(), Gravity.BOTTOM, 0, 0);
+//    }
+
+    @OnClick({R.id.switchCamera, R.id.quit, R.id.openMute, R.id.closeVideo, R.id.panel})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.switchCamera:
+                if (mEngine != null) {
+                    mEngine.switchCamera(new QNCameraSwitchResultCallback() {
+                        @Override
+                        public void onCameraSwitchDone(boolean isFrontCamera) {
+                        }
+
+                        @Override
+                        public void onCameraSwitchError(String errorMessage) {
+                        }
+                    });
                 }
-
-                @Override
-                public void onCameraSwitchError(String errorMessage) {
+                break;
+            case R.id.quit:
+                if (mEngine != null) {
+                    mEngine.leaveRoom();
                 }
-            });
-        }
-    }
+                finish();
+                break;
+            case R.id.openMute:
+                if (mEngine != null && mLocalAudioTrack != null) {
+                    mMicEnabled = !mMicEnabled;
+                    mLocalAudioTrack.setMuted(!mMicEnabled);
+                    mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
+//                    if (mTrackWindowMgr != null) {
+//                        mTrackWindowMgr.onTrackInfoMuted(mUserId);
+//                    }
+                    List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                    localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                    addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                    onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                }
+                muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+                //return mMicEnabled;
 
-    @Override
-    public boolean onToggleMic() {
-        if (mEngine != null && mLocalAudioTrack != null) {
-            mMicEnabled = !mMicEnabled;
-            mLocalAudioTrack.setMuted(!mMicEnabled);
-            mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
-            if (mTrackWindowMgr != null) {
-                mTrackWindowMgr.onTrackInfoMuted(mUserId);
-            }
+                break;
+            case R.id.closeVideo:
+                if (mEngine != null && mLocalVideoTrack != null) {
+                    mVideoEnabled = !mVideoEnabled;
+                    mLocalVideoTrack.setMuted(!mVideoEnabled);
+                    if (mLocalScreenTrack != null) {
+                        mLocalScreenTrack.setMuted(!mVideoEnabled);
+                        mEngine.muteTracks(Arrays.asList(mLocalScreenTrack, mLocalVideoTrack));
+                    } else {
+                        mEngine.muteTracks(Collections.singletonList(mLocalVideoTrack));
+                    }
+//                    if (mTrackWindowMgr != null) {
+//                        mTrackWindowMgr.onTrackInfoMuted(mUserId);
+//                    }
+                    //onTrackInfoMuted(mUserId);
+                    List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                    localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                    addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                    onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                }
+                videoStatus.setText(mVideoEnabled ?  R.string.menus_video:R.string.menus_cancel_video);
+                //return mVideoEnabled;
+                break;
+            case R.id.a:
+                if (mEngine != null) {
+                    mSpeakerEnabled = !mSpeakerEnabled;
+                    mEngine.muteRemoteAudio(!mSpeakerEnabled);
+                }
+                //return mSpeakerEnabled;
+                break;
+            case R.id.aa:
+                if (mEngine != null) {
+                    mBeautyEnabled = !mBeautyEnabled;
+                    QNBeautySetting beautySetting = new QNBeautySetting(0.5f, 0.5f, 0.5f);
+                    beautySetting.setEnable(mBeautyEnabled);
+                    mEngine.setBeauty(beautySetting);
+                }
+                //return mBeautyEnabled;
+                break;
+            case R.id.panel:
+                mShowPannel = !mShowPannel;
+                if (!mShowPannel) {
+                    panel.setVisibility(View.GONE);
+                } else {
+                    panel.setVisibility(View.VISIBLE);
+                }
         }
-        return mMicEnabled;
-    }
-
-    @Override
-    public boolean onToggleVideo() {
-        if (mEngine != null && mLocalVideoTrack != null) {
-            mVideoEnabled = !mVideoEnabled;
-            mLocalVideoTrack.setMuted(!mVideoEnabled);
-            if (mLocalScreenTrack != null) {
-                mLocalScreenTrack.setMuted(!mVideoEnabled);
-                mEngine.muteTracks(Arrays.asList(mLocalScreenTrack, mLocalVideoTrack));
-            } else {
-                mEngine.muteTracks(Collections.singletonList(mLocalVideoTrack));
-            }
-            if (mTrackWindowMgr != null) {
-                mTrackWindowMgr.onTrackInfoMuted(mUserId);
-            }
-        }
-        return mVideoEnabled;
-    }
-
-    @Override
-    public boolean onToggleSpeaker() {
-        if (mEngine != null) {
-            mSpeakerEnabled = !mSpeakerEnabled;
-            mEngine.muteRemoteAudio(!mSpeakerEnabled);
-        }
-        return mSpeakerEnabled;
-    }
-
-    @Override
-    public boolean onToggleBeauty() {
-        if (mEngine != null) {
-            mBeautyEnabled = !mBeautyEnabled;
-            QNBeautySetting beautySetting = new QNBeautySetting(0.5f, 0.5f, 0.5f);
-            beautySetting.setEnable(mBeautyEnabled);
-            mEngine.setBeauty(beautySetting);
-        }
-        return mBeautyEnabled;
-    }
-
-    @Override
-    public void onCallStreamingConfig() {
-        if (!mIsAdmin) {
-            ToastUtils.s(RoomActivity.this, "只有 \"admin\" 用户可以开启推流！！！");
-            return;
-        }
-        //配置页
-        if (mRoomUserList.size() == 0) {
-            return;
-        }
-        mChooseUser = mRoomUserList.getRoomUserByPosition(0);
-        mMergeLayoutConfigView.updateConfigInfo(mChooseUser);
-        mMergeLayoutConfigView.updateMergeJobConfigInfo();
-        mUserListAdapter.notifyDataSetChanged();
-
-        if (mPopWindow == null) {
-            mPopWindow = new PopupWindow(mMergeLayoutConfigView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
-            mPopWindow.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.popupWindowBackground)));
-        }
-        mPopWindow.showAtLocation(getWindow().getDecorView().getRootView(), Gravity.BOTTOM, 0, 0);
     }
 
     /**
      * 合流配置相关
      */
-    private class UserListAdapter extends RecyclerView.Adapter<ViewHolder> {
-        int[] mColor = {
-                Color.parseColor("#588CEE"),
-                Color.parseColor("#F8CF5F"),
-                Color.parseColor("#4D9F67"),
-                Color.parseColor("#F23A48")
-        };
+//    private class UserListAdapter extends RecyclerView.Adapter<ViewHolder> {
+//        int[] mColor = {
+//                Color.parseColor("#588CEE"),
+//                Color.parseColor("#F8CF5F"),
+//                Color.parseColor("#4D9F67"),
+//                Color.parseColor("#F23A48")
+//        };
+//
+//        @Override
+//        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+//            return new ViewHolder(LayoutInflater.from(getApplicationContext()).inflate(R.layout.item_user, parent, false));
+//        }
+//
+//        @Override
+//        public void onBindViewHolder(final ViewHolder holder, int position) {
+//            RTCUser rtcUser = mRoomUserList.getRoomUserByPosition(position);
+//            String userId = rtcUser.getUserId();
+//            holder.username.setText(userId);
+//            holder.username.setCircleColor(mColor[position % 4]);
+//            if (mChooseUser != null && mChooseUser.getUserId().equals(userId)) {
+//                holder.itemView.setBackground(getResources().getDrawable(R.drawable.white_background));
+//            } else {
+//                holder.itemView.setBackgroundResource(0);
+//            }
+//            holder.itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    mChooseUser = mRoomUserList.getRoomUserByPosition(holder.getAdapterPosition());
+//                    mMergeLayoutConfigView.updateConfigInfo(mChooseUser);
+//                    notifyDataSetChanged();
+//                }
+//            });
+//        }
+//
+//        @Override
+//        public int getItemCount() {
+//            return mRoomUserList.size();
+//        }
+//    }
+//
+//    private class ViewHolder extends RecyclerView.ViewHolder {
+//        CircleTextView username;
+//
+//        private ViewHolder(View itemView) {
+//            super(itemView);
+//            username = (CircleTextView) itemView.findViewById(R.id.user_name_text);
+//        }
+//    }
+    public void reset() {
 
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(getApplicationContext()).inflate(R.layout.item_user, parent, false));
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            RTCUser rtcUser = mRoomUserList.getRoomUserByPosition(position);
-            String userId = rtcUser.getUserId();
-            holder.username.setText(userId);
-            holder.username.setCircleColor(mColor[position % 4]);
-            if (mChooseUser != null && mChooseUser.getUserId().equals(userId)) {
-                holder.itemView.setBackground(getResources().getDrawable(R.drawable.white_background));
-            } else {
-                holder.itemView.setBackgroundResource(0);
+        for (int var = 0; var < mUserTrackInfos.size(); var++) {
+            if (!TextUtils.isEmpty(mUserTrackInfos.get(var).getUserId())) {
+                removeTrackWindow(mUserTrackInfos.get(var).getUserId());
             }
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mChooseUser = mRoomUserList.getRoomUserByPosition(holder.getAdapterPosition());
-                    mMergeLayoutConfigView.updateConfigInfo(mChooseUser);
-                    notifyDataSetChanged();
-                }
-            });
         }
 
-        @Override
-        public int getItemCount() {
-            return mRoomUserList.size();
+    }
+
+
+    public static class UserTrackInfo {
+
+
+        private String mUserId;
+        private QNTrackInfo mQNAudioTrackInfo;
+        private List<QNTrackInfo> mQNVideoTrackInfos = new ArrayList<>();
+        private UserTrackView mUserTrackView;
+
+
+        public UserTrackInfo(String mUserId) {
+            this.mUserId = mUserId;
+        }
+
+        public String getUserId() {
+            return mUserId;
+        }
+
+        public void setUserId(String mUserId) {
+            this.mUserId = mUserId;
+        }
+
+        public QNTrackInfo getQNAudioTrackInfo() {
+            return mQNAudioTrackInfo;
+        }
+
+        public void setQNAudioTrackInfo(QNTrackInfo mQNAudioTrackInfo) {
+            this.mQNAudioTrackInfo = mQNAudioTrackInfo;
+        }
+
+        public List<QNTrackInfo> getQNVideoTrackInfos() {
+            return mQNVideoTrackInfos;
+        }
+
+        public void setQNVideoTrackInfos(List<QNTrackInfo> mQNVideoTrackInfos) {
+            this.mQNVideoTrackInfos = mQNVideoTrackInfos;
+        }
+
+        public UserTrackView getUserTrackView() {
+            return mUserTrackView;
+        }
+
+        public void setUserTrackView(UserTrackView mUserTrackView) {
+            this.mUserTrackView = mUserTrackView;
+        }
+
+
+        private void onAddTrackInfo(QNTrackInfo trackInfo) {
+            if (QNTrackKind.AUDIO.equals(trackInfo.getTrackKind())) {
+                mQNAudioTrackInfo = trackInfo;
+            } else {
+                mQNVideoTrackInfos.add(trackInfo);
+            }
+
+        }
+
+        public void onAddTrackInfo(List<QNTrackInfo> trackInfos) {
+            for (QNTrackInfo item : trackInfos) {
+                onAddTrackInfo(item);
+            }
+        }
+
+        public boolean onRemoveTrackInfo(List<QNTrackInfo> trackInfos) {
+            for (QNTrackInfo item : trackInfos) {
+                onRemoveTrackInfo(item, false);
+            }
+            return mQNAudioTrackInfo != null || !mQNVideoTrackInfos.isEmpty();
+        }
+
+        public void onRemoveTrackInfo(QNTrackInfo trackInfo, boolean notify) {
+            if (QNTrackKind.AUDIO.equals(trackInfo.getTrackKind())) {
+                mQNAudioTrackInfo = null;
+            } else {
+                mQNVideoTrackInfos.remove(trackInfo);
+            }
+
         }
     }
 
-    private class ViewHolder extends RecyclerView.ViewHolder {
-        CircleTextView username;
 
-        private ViewHolder(View itemView) {
-            super(itemView);
-            username = (CircleTextView) itemView.findViewById(R.id.user_name_text);
-        }
-    }
 }

@@ -37,10 +37,12 @@ import com.shuangling.software.activity.CollectActivity;
 import com.shuangling.software.activity.CommentDetailActivity;
 import com.shuangling.software.activity.FeedbackActivity;
 import com.shuangling.software.activity.HistoryActivity;
+import com.shuangling.software.activity.MainActivity;
 import com.shuangling.software.activity.MessageListActivity;
 import com.shuangling.software.activity.ModifyUserInfoActivity;
 import com.shuangling.software.activity.MyWalletsActivity;
 import com.shuangling.software.activity.NewLoginActivity;
+import com.shuangling.software.activity.RoomActivity;
 import com.shuangling.software.activity.SettingActivity;
 import com.shuangling.software.activity.SubscribeActivity;
 import com.shuangling.software.activity.WebViewActivity;
@@ -52,6 +54,7 @@ import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
+import com.shuangling.software.utils.QNAppServer;
 import com.shuangling.software.utils.ServerInfo;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -245,6 +248,11 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 }
                 break;
             case R.id.setting:
+
+
+
+
+
 
                 startActivity(new Intent(getContext(), SettingActivity.class));
 

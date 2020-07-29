@@ -267,6 +267,7 @@ dependencies {
     implementation externalGlide
     implementation project(path: ':AlivcLittleVideo')
     implementation project(path: ':AliyunVideoCommon')
+    implementation 'com.github.MrBin99:LaravelEchoAndroid:1.0'
 
     implementation externalGSON
 }

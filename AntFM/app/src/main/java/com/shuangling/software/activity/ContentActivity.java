@@ -1247,14 +1247,14 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
             Intent it=new Intent(this,TvDetailActivity.class);
             it.putExtra("radioId",Integer.parseInt(radioId));
             startActivity(it);
-        }else if(url.startsWith(ServerInfo.h5IP+"/radios")||url.startsWith(ServerInfo.h5HttpsIP+"/radios")){
-            Intent it=new Intent(this,RadioListActivity.class);
-            it.putExtra("type","1");
-            startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/radios/")||url.startsWith(ServerInfo.h5HttpsIP+"/radios/")){
             String radioId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
             Intent it=new Intent(this,RadioDetailActivity.class);
             it.putExtra("radioId",Integer.parseInt(radioId));
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/radios")||url.startsWith(ServerInfo.h5HttpsIP+"/radios")){
+            Intent it=new Intent(this,RadioListActivity.class);
+            it.putExtra("type","1");
             startActivity(it);
         }else if(url.startsWith(ServerInfo.h5IP+"/gover")||url.startsWith(ServerInfo.h5HttpsIP+"/gover")){
             Intent it=new Intent(this,WebViewBackActivity.class);

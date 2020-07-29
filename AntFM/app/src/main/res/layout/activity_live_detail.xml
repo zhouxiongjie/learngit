@@ -1,0 +1,52 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <com.aliyun.vodplayerview.widget.AliyunVodPlayerView
+        android:id="@+id/aliyunVodPlayerView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <TextView
+            android:id="@+id/attention"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="关注"
+            android:textColor="@color/white"
+            android:background="#3183FF"
+            android:textSize="@dimen/font_size_30px"
+            android:padding="10dp"
+            android:layout_alignParentRight="true"
+            />
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabPageIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@+id/attention"
+            app:tabIndicatorColor="?attr/themeColor"
+            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorHeight="2dp"
+            app:tabMode="scrollable"
+            app:tabSelectedTextColor="?attr/themeColor"
+            app:tabTextAppearance="@style/TabTextStyle"
+            app:tabTextColor="@color/black" />
+
+
+    </RelativeLayout>
+
+
+
+
+</LinearLayout>
+
+

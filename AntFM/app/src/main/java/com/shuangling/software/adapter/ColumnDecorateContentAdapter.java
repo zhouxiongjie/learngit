@@ -25,6 +25,7 @@ import com.shuangling.software.activity.ArticleDetailActivity;
 import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
+import com.shuangling.software.activity.LiveDetailActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.activity.WebViewBackActivity;
@@ -971,10 +972,16 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             liveViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, WebViewBackActivity.class);
-                    it.putExtra("url", content.getLive().getUrl());
-                    it.putExtra("title", content.getTitle());
+//                    Intent it = new Intent(mContext, WebViewBackActivity.class);
+//                    it.putExtra("url", content.getLive().getUrl());
+//                    it.putExtra("title", content.getTitle());
+//                    mContext.startActivity(it);
+
+
+
+                    Intent it = new Intent(mContext, LiveDetailActivity.class);
                     mContext.startActivity(it);
+
                 }
             });
 

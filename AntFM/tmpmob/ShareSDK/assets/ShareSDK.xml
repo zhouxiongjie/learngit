@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DevInfor>
-<SinaWeibo Id="1" SortId="1" AppKey="1777044038" AppSecret="cfc990a9d5fb883197109aa7d9b31d55" ShareByAppClient="true" Enable="true" RedirectUrl="http://www.sharesdk.cn" />
+<SinaWeibo Id="1" SortId="1" AppKey="1529366077" AppSecret="efec8512f387c5f6e973167fc19a024a" ShareByAppClient="true" Enable="true" RedirectUrl="http://www.sharesdk.cn" />
 <TencentWeibo Enable="false" />
 <Douban Enable="false" />
 <QZone Enable="false" />
@@ -16,9 +16,9 @@
 <Tumblr Enable="false" />
 <Email Enable="false" />
 <ShortMessage Enable="false" />
-<Wechat Id="2" SortId="2" AppId="wxa3166f1cfc90ff08" AppSecret="72ca613aa4d98c83ba0c35e154d87f73" userName="gh_afb25ac019c9" path="pages/index/index.html?id=1" BypassApproval="false" Enable="true" />
-<WechatMoments Id="3" SortId="3" AppId="wxa3166f1cfc90ff08" AppSecret="72ca613aa4d98c83ba0c35e154d87f73" BypassApproval="false" Enable="true" />
-<QQ Id="5" SortId="5" AppId="101824444" AppKey="caccc1b00df5eed90c2f725aedeb79d8" ShareByAppClient="true" BypassApproval="false" Enable="true" />
+<Wechat Id="2" SortId="2" AppId="wxb30b094b4907ecee" AppSecret="2d501f9a21e06c76a33b1ac0a5528bbd" userName="gh_afb25ac019c9" path="pages/index/index.html?id=1" BypassApproval="false" Enable="true" />
+<WechatMoments Id="3" SortId="3" AppId="wxb30b094b4907ecee" AppSecret="2d501f9a21e06c76a33b1ac0a5528bbd" BypassApproval="false" Enable="true" />
+<QQ Id="5" SortId="5" AppId="101883862" AppKey="898ffabd68b73c328db44e01c7f9d92a" ShareByAppClient="true" BypassApproval="false" Enable="true" />
 <Instapaper Enable="false" />
 <Pocket Enable="false" />
 <YouDao Enable="false" />
@@ -26,7 +26,7 @@
 <Flickr Enable="false" />
 <Dropbox Enable="false" />
 <VKontakte Enable="false" />
-<WechatFavorite Id="4" SortId="4" AppId="wxa3166f1cfc90ff08" AppSecret="72ca613aa4d98c83ba0c35e154d87f73" BypassApproval="false" Enable="true" />
+<WechatFavorite Id="4" SortId="4" AppId="wxb30b094b4907ecee" AppSecret="2d501f9a21e06c76a33b1ac0a5528bbd" BypassApproval="false" Enable="true" />
 <Yixin Enable="false" />
 <YixinMoments Enable="false" />
 <Mingdao Enable="false" />

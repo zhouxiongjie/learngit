@@ -39,7 +39,7 @@ public class ServerInfo {
 
 	public static String h5IP="http://cms.mgfabu.cn";
 
-	public static String h5HttpsIP="http://cms.mgfabu.cn";
+	public static String h5HttpsIP="https://cms.mgfabu.cn";
 
 	public static String activity="http://asc.mgfabu.cn/";
 

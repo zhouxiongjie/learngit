@@ -162,8 +162,13 @@ public class MainActivity extends AppCompatActivity implements AMapLocationListe
         //showFloatWindowPermission();
         //getCityList();
         if (MyApplication.getInstance().getStation() != null && MyApplication.getInstance().getStation().getIs_league() == 0) {
-            sCurrentCity = new City(Integer.parseInt(MyApplication.getInstance().getStation().getCity_info().getCode()), MyApplication.getInstance().getStation().getCity_info().getName(), "#");
-            EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
+            try{
+                sCurrentCity = new City(Integer.parseInt(MyApplication.getInstance().getStation().getCity_info().getCode()), MyApplication.getInstance().getStation().getCity_info().getName(), "#");
+                EventBus.getDefault().post(new CommonEvent("onLocationChanged"));
+            }catch (Exception e){
+
+            }
+
         } else {
             initLocation();
             startLocation();

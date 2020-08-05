@@ -18,7 +18,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
@@ -54,11 +58,21 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.VideoRecyclerAdapter;
 import com.shuangling.software.dialog.ShareDialog;
+import com.shuangling.software.entity.AnchorOrganizationColumn;
+import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.Comment;
+import com.shuangling.software.entity.LiveMenu;
 import com.shuangling.software.entity.ResAuthInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.entity.VideoDetail;
+import com.shuangling.software.event.MessageEvent;
+import com.shuangling.software.event.PlayerEvent;
+import com.shuangling.software.fragment.IndexFragment;
+import com.shuangling.software.fragment.LiveChatFragment;
+import com.shuangling.software.fragment.ProgramAnchorFragment;
+import com.shuangling.software.fragment.ProgramContentFragment;
+import com.shuangling.software.fragment.ProgramRadioFragment;
 import com.shuangling.software.network.MyEcho;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
@@ -75,9 +89,12 @@ import com.shuangling.software.utils.TimeUtil;
 import net.mrbin99.laravelechoandroid.EchoCallback;
 import net.mrbin99.laravelechoandroid.EchoOptions;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -112,9 +129,16 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     TextView attention;
     @BindView(R.id.tabPageIndicator)
     TabLayout tabPageIndicator;
-
+    @BindView(R.id.viewPager)
+    ViewPager viewPager;
 
     private MyEcho echo;
+
+    private int mRoomId;
+    private String mStreamName;
+
+    private List<LiveMenu> mMenus;
+    private FragmentAdapter mFragmentPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,20 +159,22 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
     private void init() {
 
+        mStreamName=getIntent().getStringExtra("streamName");
+        mRoomId=getIntent().getIntExtra("roomId",0);
         initAliyunPlayerView();
 
 
-        getMenus("359");
+        getMenus();
 
-        //getRoomToken("359");
 
-        joinChannel("359");
+
+        //joinChannel();
     }
 
-    private void getMenus(String roomId) {
+    private void getMenus() {
         String url = ServerInfo.live + "/v2/get_room_menus_c";
         Map<String, String> params = new HashMap<>();
-        params.put("room_id",roomId);
+        params.put("room_id",""+mRoomId);
 
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
             @Override
@@ -158,12 +184,28 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        mMenus = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), LiveMenu.class);
+
+                        Iterator<LiveMenu> iterator = mMenus.iterator();
+                        while (iterator.hasNext()) {
+                            LiveMenu liveMenu = iterator.next();
+                            if (liveMenu.getShowtype() != 1) {
+                                iterator.remove();
+                            }
+                        }
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                initFragment();
+                            }
+                        });
 
 
                     }
 
                 }catch (Exception e){
-
+                    e.printStackTrace();
                 }
 
 
@@ -178,6 +220,30 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         });
 
     }
+
+    private void initFragment() {
+
+        try{
+            if (mMenus != null && mMenus.size() > 0) {
+
+                mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager(), mMenus);
+                viewPager.setAdapter(mFragmentPagerAdapter);
+                tabPageIndicator.setupWithViewPager(viewPager);
+
+                if (mMenus.size() > 5) {
+                    tabPageIndicator.setTabMode(TabLayout.MODE_SCROLLABLE);
+                } else {
+                    tabPageIndicator.setTabMode(TabLayout.MODE_FIXED);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+
+    }
+
 
 
     private void initAliyunPlayerView() {
@@ -210,7 +276,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     }
 
 
-    private void joinChannel(String roomId){
+    public void joinChannel(){
         EchoOptions options = new EchoOptions();
         options.host = "http://echo-live.review.slradio.cn";
         options.headers.put("Authorization", User.getInstance().getAuthorization());
@@ -229,14 +295,39 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         });
 
 
-        echo.privateChannel("room.chat." +roomId)
-                .listen("VideoChatEvent_"+"user_"+User.getInstance().getId(), new EchoCallback() {
+        echo.channel("room.chat.common." +mRoomId)
+                .listen("InteractCommonEvent", new EchoCallback() {
                     @Override
                     public void call(Object... args) {
                         // Event thrown.
                         Log.i("test", "args");
 
-                        ToastUtils.show(args.toString());
+                        try{
+                            ToastUtils.show(args[1].toString());
+                            JSONObject jo=JSONObject.parseObject(args[1].toString());
+                            if(jo.getString("type").equals("3")){
+                                //同意或者拒绝连麦申请
+                                if(jo.getJSONObject("data")!=null&&jo.getJSONObject("data").getString("allowed").equals("1")&&jo.getJSONObject("data").getString(" id").equals(""+User.getInstance().getId())){
+                                    //同意连麦
+                                    getRoomToken(""+mRoomId);
+
+                                }else if(jo.getJSONObject("data")!=null&&jo.getJSONObject("data").getString("allowed").equals("0")&&jo.getJSONObject("data").getString(" id").equals(""+User.getInstance().getId())){
+                                    new CircleDialog.Builder()
+                                            .setCanceledOnTouchOutside(false)
+                                            .setCancelable(false)
+                                            .setText("您的连麦请求被拒绝")
+                                            .setPositive("确定", null)
+                                            .show(getSupportFragmentManager());
+
+                                }
+                            }else{
+                                EventBus.getDefault().post(new MessageEvent("message",args[1].toString()));
+                            }
+                        }catch (Exception e){
+
+                        }
+
+
 
                     }
                 });
@@ -448,10 +539,84 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.attention:
+
+
+
+
                 break;
 
 
         }
+    }
+
+
+
+    public class FragmentAdapter extends FragmentStatePagerAdapter {
+
+        private FragmentManager fm;
+        private List<LiveMenu> mMenus;
+
+        public FragmentAdapter(FragmentManager fm) {
+            super(fm);
+            this.fm = fm;
+        }
+
+        public FragmentAdapter(FragmentManager fm, List<LiveMenu> menus) {
+            super(fm);
+            this.fm = fm;
+            mMenus = menus;
+
+        }
+
+        @Override
+        public int getCount() {
+            return mMenus.size();
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+
+            if(mMenus.get(position).getShowtype()==1){
+                //聊天
+                LiveChatFragment liveChatFragment = new LiveChatFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("streamName", mStreamName);
+                bundle.putInt("roomId", mRoomId);
+                liveChatFragment.setArguments(bundle);
+                return liveChatFragment;
+
+            }
+            LiveChatFragment liveChatFragment = new LiveChatFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("streamName", mStreamName);
+            bundle.putInt("roomId", mRoomId);
+            liveChatFragment.setArguments(bundle);
+            return liveChatFragment;
+
+
+
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mMenus.get(position).getMenu_name();
+        }
+
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
+
+
+        @Override
+        public Object instantiateItem(ViewGroup container, final int position) {
+            //得到缓存的fragment
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+
+            return fragment;
+        }
+
     }
 
 

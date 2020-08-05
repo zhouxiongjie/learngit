@@ -979,8 +979,19 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
 
 
 
-                    Intent it = new Intent(mContext, LiveDetailActivity.class);
-                    mContext.startActivity(it);
+                    if(content.getLive()==null){
+                        com.hjq.toast.ToastUtils.show("数据异常");
+                        return;
+                    }
+
+                    String url=content.getLive().getUrl();
+                    if(!TextUtils.isEmpty(url)){
+                        String streamName=url.substring(url.lastIndexOf("=")+1);
+                        Intent it = new Intent(mContext, LiveDetailActivity.class);
+                        it.putExtra("streamName",streamName);
+                        it.putExtra("roomId",content.getLive().getRoom_id());
+                        mContext.startActivity(it);
+                    }
 
                 }
             });

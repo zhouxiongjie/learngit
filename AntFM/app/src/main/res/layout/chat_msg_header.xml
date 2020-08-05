@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+
+    <TextView
+        android:id="@+id/content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/chat_msg_bg"
+        android:padding="5dp"
+        android:text="欢迎来到直播间！菱动直播倡导绿色健康直播。直播内容和评论严禁发布政治、低俗、色情等内容。"
+        android:textColor="#FFBF25"
+        android:textSize="@dimen/font_size_28px" />
+
+
+</LinearLayout>

@@ -30,7 +30,9 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
+import com.mylhyl.circledialog.CircleDialog;
 import com.qiniu.droid.rtc.QNBeautySetting;
 import com.qiniu.droid.rtc.QNCameraSwitchResultCallback;
 import com.qiniu.droid.rtc.QNCustomMessage;
@@ -49,9 +51,16 @@ import com.qiniu.droid.rtc.model.QNMergeJob;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.UserTrackView;
 import com.shuangling.software.customview.FontIconView;
+import com.shuangling.software.entity.User;
+import com.shuangling.software.event.CommonEvent;
+import com.shuangling.software.event.MessageEvent;
 import com.shuangling.software.utils.Config;
 import com.shuangling.software.utils.QNAppServer;
 import com.viewpagerindicator.CirclePageIndicator;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -179,6 +188,12 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
     private ArrayList<UserTrackInfo> mUserTrackInfos = new ArrayList<>();
 
     private int mCurrentPage=0;
+
+    //支持人是否禁言
+    private boolean canSpeak=true;
+    //支持人是否禁止视频
+    private boolean canVideo=true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -187,6 +202,7 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
                 | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                 | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility());
+        EventBus.getDefault().register(this);
         mHandler = new Handler();
 
         final WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
@@ -659,6 +675,86 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
         }
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(MessageEvent event) {
+        if (event.getEventName().equals("message")) {
+            String msg=event.getMessageBody();
+
+            JSONObject jo=JSONObject.parseObject(msg);
+            if(jo.getString("type").equals("99")){
+                JSONObject jsonObject=jo.getJSONObject("data");
+                if(jsonObject!=null){
+                    if(jsonObject.getString("video").equals("1")){
+                        canVideo=true;
+                    }else if(jsonObject.getString("video").equals("0")){
+                        canVideo=false;
+                    }
+                }
+                else if(jo.getJSONObject("data")!=null&&jo.getJSONObject("data").getString("video").equals("0")){
+                    canVideo=true;
+
+                }
+            }else if(jo.getString("type").equals("2")){
+                //切换主屏
+                JSONObject jsonObject=jo.getJSONObject("data");
+                if(jsonObject!=null){
+                    String screenId=jsonObject.getString("userId");
+
+                    for(int i=0;i<mUserTrackInfos.size();i++){
+                        if(mUserTrackInfos.get(i).getUserId().equals(screenId)){
+                            if(i!=0){
+                                UserTrackInfo userTrackInfo=mUserTrackInfos.remove(i);
+                                mUserTrackInfos.add(0,userTrackInfo);
+                                mPagerAdapter.notifyDataSetChanged();
+                                break;
+                            }
+                        }
+                    }
+
+                }
+            }else if(jo.getString("type").equals("2")){
+                //切换主屏
+                JSONObject jsonObject=jo.getJSONObject("data");
+                if(jsonObject!=null){
+                    String screenId=jsonObject.getString("userId");
+
+                    for(int i=0;i<mUserTrackInfos.size();i++){
+                        if(mUserTrackInfos.get(i).getUserId().equals(screenId)){
+                            if(i!=0){
+                                UserTrackInfo userTrackInfo=mUserTrackInfos.remove(i);
+                                mUserTrackInfos.add(0,userTrackInfo);
+                                mPagerAdapter.notifyDataSetChanged();
+                                break;
+                            }
+                        }
+                    }
+
+                }
+            }else if(jo.getString("type").equals("1")){
+                JSONObject jsonObject=jo.getJSONObject("data");
+                if(jsonObject!=null){
+                    if(jsonObject.getString("video").equals("1")){
+                        ToastUtils.show("全体成员视频已开启");
+                        canVideo=true;
+                    }else if(jsonObject.getString("video").equals("2")){
+                        canVideo=false;
+                        if(mVideoEnabled){
+
+                        }
+                    }
+
+                }
+
+
+            }
+
+
+        }
+    }
+
+
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -672,6 +768,7 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().register(this);
         if (mEngine != null) {
             if (mIsAdmin && mIsStreaming) {
                 // 如果当前正在合流，则停止

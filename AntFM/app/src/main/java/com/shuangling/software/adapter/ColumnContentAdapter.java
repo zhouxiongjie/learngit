@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.aliyun.svideo.common.utils.ToastUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
@@ -40,6 +41,7 @@ import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.TimeUtil;
 
 import java.util.List;
+import java.util.Optional;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -1053,9 +1055,20 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
 //                    it.putExtra("url", content.getLive().getUrl());
 //                    it.putExtra("title",content.getTitle());
 //                    mContext.startActivity(it);
+                    if(content.getLive()==null){
+                        com.hjq.toast.ToastUtils.show("数据异常");
+                        return;
+                    }
 
-                    Intent it = new Intent(mContext, LiveDetailActivity.class);
-                    mContext.startActivity(it);
+                    String url=content.getLive().getUrl();
+                    if(!TextUtils.isEmpty(url)){
+                        String streamName=url.substring(url.lastIndexOf("=")+1);
+                        Intent it = new Intent(mContext, LiveDetailActivity.class);
+                        it.putExtra("streamName",streamName);
+                        it.putExtra("roomId",content.getLive().getRoom_id());
+                        mContext.startActivity(it);
+                    }
+
                 }
             });
 

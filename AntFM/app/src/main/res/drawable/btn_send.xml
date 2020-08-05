@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="false">
+        <shape android:shape="rectangle">
+            <!-- 角度 -->
+            <corners android:radius="3dp" />
+            <padding android:bottom="5dp" android:left="8dp" android:right="8dp" android:top="5dp" />
+            <!-- 填充色 -->
+            <solid android:color="?attr/themeColor" />
+            <!-- 描边 设置线宽及颜色 -->
+            <stroke android:width="0dp" android:color="?attr/themeColor" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="3dp" />
+            <padding android:bottom="5dp" android:left="8dp" android:right="8dp" android:top="5dp" />
+            <solid android:color="?attr/translucentThemeColor" />
+            <stroke android:width="0dp" android:color="?attr/translucentThemeColor" />
+        </shape>
+    </item>
+</selector>

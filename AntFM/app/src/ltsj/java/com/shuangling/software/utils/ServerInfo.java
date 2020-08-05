@@ -6,9 +6,9 @@ public class ServerInfo {
 
 //	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
 //
-//	public static String h5IP="http://www-cms-c.staging.slradio.cn";
+//	public static String h5IP="http://cms.staging.slradio.cn";
 //
-//	public static String h5HttpsIP="https://www-cms-c.staging.slradio.cn";
+//	public static String h5HttpsIP="https://cms.staging.slradio.cn";
 //
 //	public static String activity="https://www-asc-c.staging.slradio.cn/";
 //
@@ -17,6 +17,8 @@ public class ServerInfo {
 //    public static String emc="http://api-emc.staging.slradio.cn";
 //
 //	public static String vms="http://api-vms.staging.slradio.cn";
+//
+//	public static String live="http://api-live.staging.slradio.cn";
 
 
 

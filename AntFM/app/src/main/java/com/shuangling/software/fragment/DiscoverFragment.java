@@ -687,7 +687,6 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 //                //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
 //                webView.loadUrl(url);
 //            }
-
 //            String url=initUrl(mUrl);
 //            if(!TextUtils.isEmpty(mJumpUrl)){
 //                url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
@@ -703,6 +702,10 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
                 }
                 webView.loadUrl(url);
             }
+
+
+            //url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android";
+
 
 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

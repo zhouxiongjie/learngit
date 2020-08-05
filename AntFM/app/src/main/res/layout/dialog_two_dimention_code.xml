@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_account_setting_bg"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_gravity="right|top"
+            android:padding="10dp"
+            android:src="@drawable/float_close_icon"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-15dp"
+            android:layout_marginLeft="60dp"
+            android:layout_marginRight="60dp"
+            android:textSize="@dimen/font_size_28px"
+            android:textColor="#232323"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:text="首次提现请扫码关注微信公众号，点击微信公众号底部“提现”菜单进行绑定操作!"/>
+
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/logo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="60dp"
+            android:layout_marginRight="60dp"
+            app:actualImageScaleType="centerCrop"
+            app:failureImage="@drawable/special_placeholder"
+            app:failureImageScaleType="centerCrop"
+            app:placeholderImage="@drawable/special_placeholder"
+            app:placeholderImageScaleType="centerCrop"
+            app:roundAsCircle="false"
+            app:roundingBorderColor="@color/white"
+            app:roundingBorderWidth="0dp"
+            app:viewAspectRatio="1" />
+
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal">
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerInParent="true"
+                app:actualImageScaleType="centerCrop"
+                app:failureImage="@color/textColorEleven"
+                app:failureImageScaleType="centerCrop"
+                app:placeholderImage="@color/textColorEleven"
+                app:placeholderImageScaleType="centerCrop"
+                app:roundAsCircle="false"
+                app:roundingBorderColor="@color/white"
+                app:roundingBorderWidth="0dp"
+                app:viewAspectRatio="1" />
+
+            <com.shuangling.software.customview.FontIconView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="&#xe67f;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_40px" />
+
+
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="保存到手机"
+            android:textSize="@dimen/font_size_24px"
+            android:textColor="#343434"/>
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

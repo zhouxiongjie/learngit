@@ -18,16 +18,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.dialog.AccountSettingDialog;
 import com.shuangling.software.dialog.CashRegularDialog;
-import com.shuangling.software.dialog.UpdateDialog;
 import com.shuangling.software.entity.AccountInfo;
 import com.shuangling.software.entity.CashRegular;
-import com.shuangling.software.entity.User;
 import com.shuangling.software.entity.ZhifubaoAccountInfo;
 import com.shuangling.software.event.CommonEvent;
-import com.shuangling.software.event.PlayerEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
@@ -56,26 +54,42 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
     private static final int MSG_TAKE_CASH = 1;
     private static final int MSG_CASH_REGULAR = 2;
     private static final int MSG_GET_MONEY = 3;
+
     @BindView(R.id.activtyTitle)
     TopTitleBar activtyTitle;
     @BindView(R.id.money)
     TextView money;
+    @BindView(R.id.zfbSelectedIcon)
+    FontIconView zfbSelectedIcon;
+    @BindView(R.id.zfb)
+    RelativeLayout zfb;
+    @BindView(R.id.wxSelectedIcon)
+    FontIconView wxSelectedIcon;
+    @BindView(R.id.wx)
+    RelativeLayout wx;
     @BindView(R.id.allMoney)
     TextView allMoney;
+    @BindView(R.id.allSelectedIcon)
+    FontIconView allSelectedIcon;
+    @BindView(R.id.cashAll)
+    RelativeLayout cashAll;
+    @BindView(R.id.customAmount)
+    EditText customAmount;
+    @BindView(R.id.customSelectedIcon)
+    FontIconView customSelectedIcon;
     @BindView(R.id.account)
     TextView account;
     @BindView(R.id.modifyAccount)
     TextView modifyAccount;
+    @BindView(R.id.accountLayout)
+    RelativeLayout accountLayout;
     @BindView(R.id.cash)
     TextView cash;
     @BindView(R.id.regular)
     LinearLayout regular;
-    @BindView(R.id.cashAll)
-    LinearLayout cashAll;
-    @BindView(R.id.customAmount)
-    EditText customAmount;
-    @BindView(R.id.accountLayout)
-    RelativeLayout accountLayout;
+    @BindView(R.id.customAmountLayout)
+    RelativeLayout customAmountLayout;
+
 
     private int moneySum;
     private Handler mHandler;
@@ -101,26 +115,81 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
         moneySum = getIntent().getIntExtra("money", 0);
         money.setText(String.format("%.2f", (float) moneySum / 100));
         allMoney.setText(String.format("%.2f", (float) moneySum / 100) + "元");
-        cashAll.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        customAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus){
-                   CommonUtils.hideInput(CashActivity.this);
-                   customAmount.setHint("自定义");
-                }else{
+                if (!hasFocus) {
+                    CommonUtils.hideInput(CashActivity.this);
+                    customAmount.setHint("自定义");
+
+                    cashAll.setSelected(true);
+                    customAmountLayout.setSelected(false);
+                    allSelectedIcon.setVisibility(View.VISIBLE);
+                    customSelectedIcon.setVisibility(View.GONE);
+
+                } else {
                     customAmount.setHint("请输入金额");
+                    cashAll.setSelected(false);
+                    customAmountLayout.setSelected(true);
+                    allSelectedIcon.setVisibility(View.GONE);
+                    customSelectedIcon.setVisibility(View.VISIBLE);
+
                 }
             }
         });
-        customAmount.clearFocus();
+        customAmountLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                cashAll.setSelected(false);
+                customAmountLayout.setSelected(true);
+                allSelectedIcon.setVisibility(View.GONE);
+                customSelectedIcon.setVisibility(View.VISIBLE);
+
+                //cashAll.requestFocus();
+//                customAmount.setSelected(false);
+                customAmount.requestFocus();
+                customAmount.setHint("请输入金额");
+            }
+        });
+        //customAmount.clearFocus();
         cashAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cashAll.requestFocus();
+
+                cashAll.setSelected(true);
+                customAmountLayout.setSelected(false);
+                allSelectedIcon.setVisibility(View.VISIBLE);
+                customSelectedIcon.setVisibility(View.GONE);
+
+                CommonUtils.hideInput(CashActivity.this);
+                customAmount.setHint("自定义");
+                //cashAll.requestFocus();
 //                customAmount.setSelected(false);
                 customAmount.clearFocus();
             }
         });
+
+        wx.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wx.setSelected(true);
+                zfb.setSelected(false);
+                wxSelectedIcon.setVisibility(View.VISIBLE);
+                zfbSelectedIcon.setVisibility(View.GONE);
+            }
+        });
+        zfb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wx.setSelected(false);
+                zfb.setSelected(true);
+                wxSelectedIcon.setVisibility(View.GONE);
+                zfbSelectedIcon.setVisibility(View.VISIBLE);
+                getAccountDetail();
+            }
+        });
+
 
 //        customAmount.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -134,7 +203,6 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
 //手动设置其他位数，例如3
         customAmount.addTextChangedListener(new MoneyTextWatcher(customAmount).setDigits(2));
 
-        getAccountDetail();
         getCashRegular();
     }
 
@@ -217,15 +285,13 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
     }
 
 
-
-
     private void takeCash(int money) {
 
         String url = ServerInfo.emc + ServerInfo.requestCash;
         Map<String, String> params = new HashMap<String, String>();
-        params.put("money",""+money);
-        params.put("account",mZhifubaoAccountInfo.getAccount());
-        params.put("name",mZhifubaoAccountInfo.getName());
+        params.put("money", "" + money);
+        params.put("account", mZhifubaoAccountInfo.getAccount());
+        params.put("name", mZhifubaoAccountInfo.getName());
 
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
 
@@ -256,47 +322,46 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.cash:
-                if(mZhifubaoAccountInfo==null){
+                if (mZhifubaoAccountInfo == null) {
                     ToastUtils.show("请先设置提现账号");
-                }else{
-                    if(cashAll.isFocused()){
+                } else {
+                    if (cashAll.isFocused()) {
 
-                        if(mCashRegular!=null){
-                            if(moneySum>=mCashRegular.getMin_money()&&moneySum<=mCashRegular.getMax_money()){
+                        if (mCashRegular != null) {
+                            if (moneySum >= mCashRegular.getMin_money() && moneySum <= mCashRegular.getMax_money()) {
                                 //提现
                                 takeCash(moneySum);
-                            }else if(moneySum<mCashRegular.getMin_money()){
+                            } else if (moneySum < mCashRegular.getMin_money()) {
                                 ToastUtils.show("金额小于最小提现额");
-                            }else if(moneySum>mCashRegular.getMax_money()){
+                            } else if (moneySum > mCashRegular.getMax_money()) {
                                 ToastUtils.show("金额大于最大提现额");
                             }
-                        }else{
+                        } else {
                             ToastUtils.show("提现规则获取失败");
                         }
 
 
-                    }else{
-                        if(TextUtils.isEmpty(customAmount.getText().toString().trim())){
+                    } else {
+                        if (TextUtils.isEmpty(customAmount.getText().toString().trim())) {
                             ToastUtils.show("请输入提现金额");
-                        }else{
-                            if(mCashRegular!=null){
+                        } else {
+                            if (mCashRegular != null) {
 
-                                float money=Float.parseFloat(customAmount.getText().toString().trim());
+                                float money = Float.parseFloat(customAmount.getText().toString().trim());
 
-                                if((int)(money*100)>=mCashRegular.getMin_money()&&(int)(money*100)<=moneySum&&(int)(money*100)<=mCashRegular.getMax_money()){
+                                if ((int) (money * 100) >= mCashRegular.getMin_money() && (int) (money * 100) <= moneySum && (int) (money * 100) <= mCashRegular.getMax_money()) {
                                     //提现
-                                    takeCash((int)(money*100));
-                                }else if((int)(money*100)>moneySum){
+                                    takeCash((int) (money * 100));
+                                } else if ((int) (money * 100) > moneySum) {
                                     ToastUtils.show("余额不足");
-                                }else if((int)(money*100)>mCashRegular.getMax_money()){
+                                } else if ((int) (money * 100) > mCashRegular.getMax_money()) {
                                     ToastUtils.show("金额大于最大提现额");
-                                }else if((int)(money*100)<mCashRegular.getMin_money()){
+                                } else if ((int) (money * 100) < mCashRegular.getMin_money()) {
                                     ToastUtils.show("金额小于最小提现额");
                                 }
-                            }else{
+                            } else {
                                 ToastUtils.show("提现规则获取失败");
                             }
-
 
 
                         }
@@ -308,10 +373,10 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
             case R.id.regular:
 
                 getCashRegular();
-                if(mCashRegular!=null){
-                    String rule=mCashRegular.getRule();
+                if (mCashRegular != null) {
+                    String rule = mCashRegular.getRule();
                     //rule=rule.replace("\\\\n","\\n");
-                    CashRegularDialog.getInstance(rule.replace("\\n","\n")).show(getSupportFragmentManager(), "CashRegularDialog");
+                    CashRegularDialog.getInstance(rule.replace("\\n", "\n")).show(getSupportFragmentManager(), "CashRegularDialog");
                 }
 
 
@@ -327,8 +392,8 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        JSONObject jo=jsonObject.getJSONObject("data");
-                        if(jo==null){
+                        JSONObject jo = jsonObject.getJSONObject("data");
+                        if (jo == null) {
                             account.setText("请输入提现账号");
                             modifyAccount.setText("");
                             accountLayout.setOnClickListener(new View.OnClickListener() {
@@ -344,16 +409,16 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
                                     dialog.show(getSupportFragmentManager(), "AccountSettingDialog");
                                 }
                             });
-                        }else{
+                        } else {
                             mZhifubaoAccountInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), ZhifubaoAccountInfo.class);
 
                             if (mZhifubaoAccountInfo != null) {
 
-                                String acc=mZhifubaoAccountInfo.getAccount();
-                                if(acc.length()>7){
-                                    String sub=acc.substring(3,7);
-                                    account.setText("提现账号" + acc.replace(sub,"****"));
-                                }else{
+                                String acc = mZhifubaoAccountInfo.getAccount();
+                                if (acc.length() > 7) {
+                                    String sub = acc.substring(3, 7);
+                                    account.setText("提现账号" + acc.replace(sub, "****"));
+                                } else {
                                     account.setText("提现账号" + acc);
                                 }
 
@@ -388,14 +453,14 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         EventBus.getDefault().post(new CommonEvent("OnMoneyChanged"));
-                        int requestId=jsonObject.getJSONObject("data").getInteger("id");
-                        Intent it=new Intent(this,CashDetailActivity.class);
-                        it.putExtra("id",requestId);
+                        int requestId = jsonObject.getJSONObject("data").getInteger("id");
+                        Intent it = new Intent(this, CashDetailActivity.class);
+                        it.putExtra("id", requestId);
                         startActivity(it);
 
                     } else if (jsonObject != null) {
                         ToastUtils.show(jsonObject.getString("msg"));
-                    }else {
+                    } else {
                         ToastUtils.show("提现请求失败");
                     }
                 } catch (Exception e) {
@@ -407,15 +472,12 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        mCashRegular =JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), CashRegular.class);
-
-
-
+                        mCashRegular = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), CashRegular.class);
 
 
                     } else if (jsonObject != null) {
                         ToastUtils.show(jsonObject.getString("msg"));
-                    }else {
+                    } else {
                         ToastUtils.show("获取规则说明失败");
                     }
                 } catch (Exception e) {
@@ -423,26 +485,25 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
                 }
                 break;
             case MSG_GET_MONEY:
-                try{
+                try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         final AccountInfo accountInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), AccountInfo.class);
 
-                        if(accountInfo!=null){
+                        if (accountInfo != null) {
                             moneySum = accountInfo.getFree_balance();
                             money.setText(String.format("%.2f", (float) moneySum / 100));
                             allMoney.setText(String.format("%.2f", (float) moneySum / 100) + "元");
 
 
-
                         }
 
 
-                    }else if(jsonObject != null){
+                    } else if (jsonObject != null) {
                         ToastUtils.show(jsonObject.getString("msg"));
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
 
                 }
 

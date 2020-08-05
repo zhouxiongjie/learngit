@@ -71,13 +71,13 @@ public class ServerInfo {
 
 	public static String getGalleriaPage="/atlas/";					    		//图集h5页面
 
-    public static String getGalleriaDetail="/v1/c_galleries/";					//图集详情
+	public static String getGalleriaDetail="/v1/c_galleries/";					//图集详情
 
 	public static String getSpecialPage="/specials/";							//专题h5页面
 
-    public static String getSpecialDetail="/v1/c_special/";						//专题详情
+	public static String getSpecialDetail="/v1/c_special/";						//专题详情
 
-    public static String getAlbumDetail="/v1/c_album/";							//专辑详情
+	public static String getAlbumDetail="/v1/c_album/";							//专辑详情
 
 	public static String getArticleDetail="/v1/c_article/";						//文章详情
 
@@ -106,11 +106,11 @@ public class ServerInfo {
 
 	public static String indexDecorate="/v1/consumer/layouts";					//首页装修
 
-    public static String topPost="/v1/top_posts";			            		//热门置顶
+	public static String topPost="/v1/top_posts";			            		//热门置顶
 
-    public static String marvellousPosts="/v1/marvellousPosts";         		//热门精彩推荐
+	public static String marvellousPosts="/v1/marvellousPosts";         		//热门精彩推荐
 
-    public static String getRadioList="/v1/mobile/channel";    					//电台列表
+	public static String getRadioList="/v1/mobile/channel";    					//电台列表
 
 	public static String getRadioDetail="/v1/mobile/channel/play";    			//电台详情
 
@@ -184,7 +184,7 @@ public class ServerInfo {
 
 	public static String shareStatistics="/v2/share";							//分享添加来记录
 
-    public static String bottomMenus="/v2/consumer/menus";					    //C端获取底部菜单
+	public static String bottomMenus="/v2/consumer/menus";					    //C端获取底部菜单
 
 	public static String indexDecorateContent="/v2/cassify_posts";			    //首页装修内容（c端）
 

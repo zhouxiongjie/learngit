@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/dialog_account_setting_bg"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_gravity="right|top"
+            android:padding="10dp"
+            android:src="@drawable/float_close_icon"/>
+
+        <com.shuangling.software.customview.FontIconView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="&#xe70e;"
+            android:textColor="?attr/themeColor"
+            android:textSize="@dimen/font_size_150px" />
+
+
+        <TextView
+            android:id="@+id/content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="微信账号未绑定"
+            android:textColor="#232323"
+            android:lineSpacingExtra="5dp"
+            android:textSize="@dimen/font_size_36px"
+            android:layout_marginTop="25dp" />
+
+        <TextView
+            android:id="@+id/bind"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:textSize="@dimen/font_size_30px"
+            android:textColor="#FFFFFF"
+            android:gravity="center"
+            android:text="立即绑定"
+            android:background="@drawable/login_button_bg"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="30dp"/>
+
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

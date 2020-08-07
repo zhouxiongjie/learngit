@@ -60,6 +60,10 @@
     <string name="attention_no">&#xe6ac;</string>
     <string name="attention_yes">&#xe6ab;</string>
 
+
+    <string name="ic_zhifubao">&#xe67e;</string>
+    <string name="ic_weixin">&#xe67d;</string>
+
     <string name="radio">电台</string>
     <string name="tv">电视台</string>
     <string name="album">专辑</string>

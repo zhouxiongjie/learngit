@@ -332,6 +332,36 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
         });
     }
 
+    private void weixinTakeCash(int money) {
+
+        String url = ServerInfo.emc + ServerInfo.requestWeixinCash;
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("money", "" + money);
+
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Message msg = mHandler.obtainMessage(MSG_TAKE_CASH);
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        ToastUtils.show("提现请求失败，稍候再试");
+                    }
+                });
+            }
+        });
+    }
+
 
     private void takeCash(int money) {
 
@@ -443,7 +473,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
                             if (mCashRegular != null) {
                                 if (moneySum >= mCashRegular.getMin_money() && moneySum <= mCashRegular.getMax_money()) {
                                     //提现
-                                    takeCash(moneySum);
+                                    weixinTakeCash(moneySum);
                                 } else if (moneySum < mCashRegular.getMin_money()) {
                                     ToastUtils.show("金额小于最小提现额");
                                 } else if (moneySum > mCashRegular.getMax_money()) {
@@ -464,7 +494,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
 
                                     if ((int) (money * 100) >= mCashRegular.getMin_money() && (int) (money * 100) <= moneySum && (int) (money * 100) <= mCashRegular.getMax_money()) {
                                         //提现
-                                        takeCash((int) (money * 100));
+                                        weixinTakeCash((int) (money * 100));
                                     } else if ((int) (money * 100) > moneySum) {
                                         ToastUtils.show("余额不足");
                                     } else if ((int) (money * 100) > mCashRegular.getMax_money()) {

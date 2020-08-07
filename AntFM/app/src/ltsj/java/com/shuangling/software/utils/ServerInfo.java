@@ -211,6 +211,8 @@ public class ServerInfo {
 
 	public static String requestCash="/v1/consumer/transfers";					//发起提现请求
 
+	public static String requestWeixinCash="/v1/consumer/wechat_transfers";		//发起微信提现请求
+
 	public static String getCashDetail="/v1/consumer/transfers/";				//获取提现详情
 
 	public static String getCashRegular="/v1/consumer/transfer_config";			//获取提现设置

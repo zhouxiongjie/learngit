@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -14,6 +15,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.CashDetail;
 import com.shuangling.software.network.OkHttpCallback;
@@ -75,6 +77,10 @@ public class CashDetailActivity extends AppCompatActivity implements Handler.Cal
     TextView failReason;
     @BindView(R.id.failLayout)
     RelativeLayout failLayout;
+    @BindView(R.id.typeIcon)
+    FontIconView typeIcon;
+    @BindView(R.id.typeName)
+    TextView typeName;
 
     private int mId;
     private Handler mHandler;
@@ -163,6 +169,16 @@ public class CashDetailActivity extends AppCompatActivity implements Handler.Cal
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         mCashDetail = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), CashDetail.class);
                         if (mCashDetail != null) {
+                            if (mCashDetail.getType() == 1) {
+                                typeIcon.setText(R.string.ic_zhifubao);
+                                typeIcon.setTextColor(Color.parseColor("#1BA4E5"));
+                                typeName.setText("支付宝");
+                            } else if (mCashDetail.getType() == 2) {
+                                typeIcon.setText(R.string.ic_weixin);
+                                typeIcon.setTextColor(Color.parseColor("#00C901"));
+                                typeName.setText("微信");
+                            }
+
                             money.setText(String.format("%.2f", (float) mCashDetail.getMoney() / 100));
                             if (mCashDetail.getStatus() == 1 || mCashDetail.getStatus() == 2) {
                                 status.setText("处理中");
@@ -239,7 +255,8 @@ public class CashDetailActivity extends AppCompatActivity implements Handler.Cal
                             }
                             orderNumber.setText(mCashDetail.getTrade_no());
                             createTime.setText(mCashDetail.getCreated_at());
-                            account.setText("支付宝(" + mCashDetail.getAccount() + ")");
+                            //account.setText("支付宝(" + mCashDetail.getAccount() + ")");
+                            account.setText( mCashDetail.getAccount() );
 
 
                         }

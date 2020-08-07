@@ -26,7 +26,7 @@ android {
 
     MtjCirclePluginConfig {
 
-        appkey = "53c6df4e68"
+        appkey = "8a3086f16e"
 
         // 设置debug 开关，如果需要查看日志则打开开关，为避免影响性能建议上线前关闭（设置为false）
         debug = false

@@ -990,6 +990,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                         Intent it = new Intent(mContext, LiveDetailActivity.class);
                         it.putExtra("streamName",streamName);
                         it.putExtra("roomId",content.getLive().getRoom_id());
+                        it.putExtra("url",content.getLive().getRtmp_play_url());
                         mContext.startActivity(it);
                     }
 

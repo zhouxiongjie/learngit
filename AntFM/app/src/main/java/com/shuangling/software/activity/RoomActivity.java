@@ -194,6 +194,8 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
     //支持人是否禁止视频
     private boolean canVideo=true;
 
+    private String mScreenUserId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -402,13 +404,22 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
         if (userTrackInfo != null) {
             // user has already displayed in screen
             userTrackInfo.onAddTrackInfo(trackInfoList);
+            if(userId.equals(mScreenUserId)){
+                mUserTrackInfos.remove(userTrackInfo);
+                mUserTrackInfos.add(0,userTrackInfo);
+
+            }
             indicator.notifyDataSetChanged();
         } else {
             // allocate new track windows
             userTrackInfo = new UserTrackInfo(userId);
             userTrackInfo.onAddTrackInfo(trackInfoList);
+            if(userId.equals(mScreenUserId)){
+                mUserTrackInfos.add(0,userTrackInfo);
+            }else {
+                mUserTrackInfos.add(userTrackInfo);
+            }
 
-            mUserTrackInfos.add(userTrackInfo);
             mPagerAdapter.notifyDataSetChanged();
             indicator.notifyDataSetChanged();
             // update whole layout
@@ -689,20 +700,50 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
                         canVideo=true;
                     }else if(jsonObject.getString("video").equals("0")){
                         canVideo=false;
+                        if(mVideoEnabled){
+                            if (mEngine != null && mLocalVideoTrack != null) {
+                                mVideoEnabled = !mVideoEnabled;
+                                mLocalVideoTrack.setMuted(!mVideoEnabled);
+                                if (mLocalScreenTrack != null) {
+                                    mLocalScreenTrack.setMuted(!mVideoEnabled);
+                                    mEngine.muteTracks(Arrays.asList(mLocalScreenTrack, mLocalVideoTrack));
+                                } else {
+                                    mEngine.muteTracks(Collections.singletonList(mLocalVideoTrack));
+                                }
+
+                                List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                                localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                                addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                                onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                            }
+                            videoStatus.setText(mVideoEnabled ?  R.string.menus_video:R.string.menus_cancel_video);
+
+                        }
                     }
-                }
-                else if(jo.getJSONObject("data")!=null&&jo.getJSONObject("data").getString("video").equals("0")){
-                    canVideo=true;
+                    if(jsonObject.getString("audio").equals("1")){
 
-                }
-            }else if(jo.getString("type").equals("2")){
-                //切换主屏
-                JSONObject jsonObject=jo.getJSONObject("data");
-                if(jsonObject!=null){
-                    String screenId=jsonObject.getString("userId");
+                        canSpeak=true;
+                    }else if(jsonObject.getString("audio").equals("2")){
+                        canSpeak=false;
+                        if(mMicEnabled){
+                            if (mEngine != null && mLocalAudioTrack != null) {
+                                mMicEnabled = !mMicEnabled;
+                                mLocalAudioTrack.setMuted(!mMicEnabled);
+                                mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
+                                List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                                localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                                addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                                onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                            }
+                            muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
 
+                        }
+                    }
+
+
+                    mScreenUserId=jsonObject.getString("screenUserId");
                     for(int i=0;i<mUserTrackInfos.size();i++){
-                        if(mUserTrackInfos.get(i).getUserId().equals(screenId)){
+                        if(mUserTrackInfos.get(i).getUserId().equals(mScreenUserId)){
                             if(i!=0){
                                 UserTrackInfo userTrackInfo=mUserTrackInfos.remove(i);
                                 mUserTrackInfos.add(0,userTrackInfo);
@@ -711,16 +752,18 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
                             }
                         }
                     }
-
                 }
+
+
+
             }else if(jo.getString("type").equals("2")){
                 //切换主屏
                 JSONObject jsonObject=jo.getJSONObject("data");
                 if(jsonObject!=null){
-                    String screenId=jsonObject.getString("userId");
+                    mScreenUserId=jsonObject.getString("userId");
 
                     for(int i=0;i<mUserTrackInfos.size();i++){
-                        if(mUserTrackInfos.get(i).getUserId().equals(screenId)){
+                        if(mUserTrackInfos.get(i).getUserId().equals(mScreenUserId)){
                             if(i!=0){
                                 UserTrackInfo userTrackInfo=mUserTrackInfos.remove(i);
                                 mUserTrackInfos.add(0,userTrackInfo);
@@ -739,10 +782,111 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
                         canVideo=true;
                     }else if(jsonObject.getString("video").equals("2")){
                         canVideo=false;
+                        ToastUtils.show("全体成员视频已禁用");
                         if(mVideoEnabled){
+                            if (mEngine != null && mLocalVideoTrack != null) {
+                                mVideoEnabled = !mVideoEnabled;
+                                mLocalVideoTrack.setMuted(!mVideoEnabled);
+                                if (mLocalScreenTrack != null) {
+                                    mLocalScreenTrack.setMuted(!mVideoEnabled);
+                                    mEngine.muteTracks(Arrays.asList(mLocalScreenTrack, mLocalVideoTrack));
+                                } else {
+                                    mEngine.muteTracks(Collections.singletonList(mLocalVideoTrack));
+                                }
+
+                                List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                                localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                                addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                                onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                            }
+                            videoStatus.setText(mVideoEnabled ?  R.string.menus_video:R.string.menus_cancel_video);
 
                         }
                     }
+
+                    if(jsonObject.getString("audio").equals("1")){
+                        ToastUtils.show("全体成员语音已开启");
+                        canSpeak=true;
+                    }else if(jsonObject.getString("audio").equals("2")){
+                        canSpeak=false;
+                        ToastUtils.show("全体成员语音已禁用");
+                        if(mMicEnabled){
+                            if (mEngine != null && mLocalAudioTrack != null) {
+                                mMicEnabled = !mMicEnabled;
+                                mLocalAudioTrack.setMuted(!mMicEnabled);
+                                mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
+                                List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                                localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                                addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                                onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                            }
+                            muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+
+                        }
+                    }
+
+
+
+                }
+
+
+            }else if(jo.getString("type").equals("4")){
+                JSONObject jsonObject=jo.getJSONObject("data");
+                if(jsonObject!=null){
+
+                    if(jsonObject.getString("id").equals(mUserId)){
+                        if(jsonObject.getString("video").equals("1")){
+                            ToastUtils.show("支持人已允许您的视频请求");
+                            canVideo=true;
+                        }else if(jsonObject.getString("video").equals("2")){
+                            canVideo=false;
+                            ToastUtils.show("支持人已禁止您的视频请求");
+                            if(mVideoEnabled){
+                                if (mEngine != null && mLocalVideoTrack != null) {
+                                    mVideoEnabled = !mVideoEnabled;
+                                    mLocalVideoTrack.setMuted(!mVideoEnabled);
+                                    if (mLocalScreenTrack != null) {
+                                        mLocalScreenTrack.setMuted(!mVideoEnabled);
+                                        mEngine.muteTracks(Arrays.asList(mLocalScreenTrack, mLocalVideoTrack));
+                                    } else {
+                                        mEngine.muteTracks(Collections.singletonList(mLocalVideoTrack));
+                                    }
+
+                                    List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                                    localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                                    addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                                    onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                                }
+                                videoStatus.setText(mVideoEnabled ?  R.string.menus_video:R.string.menus_cancel_video);
+
+                            }
+                        }
+
+                        if(jsonObject.getString("audio").equals("1")){
+                            ToastUtils.show("支持人已允许您的语音请求");
+                            canSpeak=true;
+                        }else if(jsonObject.getString("audio").equals("2")){
+                            canSpeak=false;
+                            ToastUtils.show("支持人已禁止您的语音请求");
+                            if(mMicEnabled){
+                                if (mEngine != null && mLocalAudioTrack != null) {
+                                    mMicEnabled = !mMicEnabled;
+                                    mLocalAudioTrack.setMuted(!mMicEnabled);
+                                    mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
+                                    List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                                    localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                                    addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                                    onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                                }
+                                muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+
+                            }
+                        }
+                    }
+
+
+
+
 
                 }
 
@@ -1391,42 +1535,53 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
                 finish();
                 break;
             case R.id.openMute:
-                if (mEngine != null && mLocalAudioTrack != null) {
-                    mMicEnabled = !mMicEnabled;
-                    mLocalAudioTrack.setMuted(!mMicEnabled);
-                    mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
+                if(canSpeak){
+                    if (mEngine != null && mLocalAudioTrack != null) {
+                        mMicEnabled = !mMicEnabled;
+                        mLocalAudioTrack.setMuted(!mMicEnabled);
+                        mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
 //                    if (mTrackWindowMgr != null) {
 //                        mTrackWindowMgr.onTrackInfoMuted(mUserId);
 //                    }
-                    List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
-                    localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
-                    addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
-                    onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                        List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                        localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                        addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                        onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                    }
+                    muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+                }else{
+                    ToastUtils.show("支持人已经禁言");
                 }
-                muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+
+
                 //return mMicEnabled;
 
                 break;
             case R.id.closeVideo:
-                if (mEngine != null && mLocalVideoTrack != null) {
-                    mVideoEnabled = !mVideoEnabled;
-                    mLocalVideoTrack.setMuted(!mVideoEnabled);
-                    if (mLocalScreenTrack != null) {
-                        mLocalScreenTrack.setMuted(!mVideoEnabled);
-                        mEngine.muteTracks(Arrays.asList(mLocalScreenTrack, mLocalVideoTrack));
-                    } else {
-                        mEngine.muteTracks(Collections.singletonList(mLocalVideoTrack));
-                    }
+                if(canVideo){
+                    if (mEngine != null && mLocalVideoTrack != null) {
+                        mVideoEnabled = !mVideoEnabled;
+                        mLocalVideoTrack.setMuted(!mVideoEnabled);
+                        if (mLocalScreenTrack != null) {
+                            mLocalScreenTrack.setMuted(!mVideoEnabled);
+                            mEngine.muteTracks(Arrays.asList(mLocalScreenTrack, mLocalVideoTrack));
+                        } else {
+                            mEngine.muteTracks(Collections.singletonList(mLocalVideoTrack));
+                        }
 //                    if (mTrackWindowMgr != null) {
 //                        mTrackWindowMgr.onTrackInfoMuted(mUserId);
 //                    }
-                    //onTrackInfoMuted(mUserId);
-                    List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
-                    localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
-                    addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
-                    onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                        //onTrackInfoMuted(mUserId);
+                        List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                        localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                        addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                        onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                    }
+                    videoStatus.setText(mVideoEnabled ?  R.string.menus_video:R.string.menus_cancel_video);
+                }else {
+                    ToastUtils.show("支持人已禁止视频");
                 }
-                videoStatus.setText(mVideoEnabled ?  R.string.menus_video:R.string.menus_cancel_video);
+
                 //return mVideoEnabled;
                 break;
             case R.id.a:

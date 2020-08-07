@@ -37,6 +37,7 @@ import android.widget.TextView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.player.IPlayer;
+import com.aliyun.player.source.UrlSource;
 import com.aliyun.player.source.VidAuth;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
@@ -136,6 +137,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
     private int mRoomId;
     private String mStreamName;
+    private String mUrl;
 
     private List<LiveMenu> mMenus;
     private FragmentAdapter mFragmentPagerAdapter;
@@ -149,7 +151,9 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         setContentView(R.layout.activity_live_detail);
         //CommonUtils.setTransparentStatusBar(this);
         //ImmersionBar.with(this).transparentBar().titleBar(activityTitle).init();
-        ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).init();
+        //ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).init();
+        ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).keyboardEnable(true)  //解决软键盘与底部输入框冲突问题，默认为false，还有一个重载方法，可以指定软键盘mode
+                .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE).init();
         //ImmersionBar.with(this).statusBarDarkFont(true);
         ButterKnife.bind(this);
         init();
@@ -161,9 +165,10 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
         mStreamName=getIntent().getStringExtra("streamName");
         mRoomId=getIntent().getIntExtra("roomId",0);
+        mUrl=getIntent().getStringExtra("url");
         initAliyunPlayerView();
 
-
+        setPlaySource(mUrl);
         getMenus();
 
 
@@ -276,6 +281,15 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     }
 
 
+    private void setPlaySource(String url) {
+
+        UrlSource urlSource=new UrlSource();
+        urlSource.setUri(url);
+        aliyunVodPlayerView.setLocalSource(urlSource);
+
+    }
+
+
     public void joinChannel(){
         EchoOptions options = new EchoOptions();
         options.host = "http://echo-live.review.slradio.cn";
@@ -336,7 +350,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
 
 
-    private void getRoomToken(String roomId) {
+    private void getRoomToken(final String roomId) {
         String url = "http://api-live.review.slradio.cn" + "/v4/get_room_token_c";
         Map<String, String> params = new HashMap<>();
         params.put("userId","user_"+User.getInstance().getId());
@@ -350,7 +364,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        String roomToken = jsonObject.getString("data");
+                       final String roomToken = jsonObject.getString("data");
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -532,6 +546,8 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_LOGIN && resultCode == RESULT_OK) {
         }
+        super.onActivityResult(requestCode,resultCode,data);
+
 
     }
 

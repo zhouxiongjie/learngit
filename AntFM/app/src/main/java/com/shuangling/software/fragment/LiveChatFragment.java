@@ -1,7 +1,10 @@
 package com.shuangling.software.fragment;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +27,17 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.sdk.android.oss.ClientConfiguration;
+import com.alibaba.sdk.android.oss.ClientException;
+import com.alibaba.sdk.android.oss.OSS;
+import com.alibaba.sdk.android.oss.OSSClient;
+import com.alibaba.sdk.android.oss.ServiceException;
+import com.alibaba.sdk.android.oss.callback.OSSCompletedCallback;
+import com.alibaba.sdk.android.oss.common.OSSLog;
+import com.alibaba.sdk.android.oss.common.auth.OSSStsTokenCredentialProvider;
+import com.alibaba.sdk.android.oss.model.PutObjectRequest;
+import com.alibaba.sdk.android.oss.model.PutObjectResult;
+import com.aliyun.apsara.alivclittlevideo.utils.Common;
 import com.facebook.common.logging.FLog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
@@ -39,36 +53,49 @@ import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.LiveDetailActivity;
+import com.shuangling.software.activity.ModifyUserInfoActivity;
 import com.shuangling.software.activity.RoomActivity;
 import com.shuangling.software.customview.ChatInput;
 import com.shuangling.software.entity.ChatMessage;
+import com.shuangling.software.entity.OssInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.interf.ChatAction;
 import com.shuangling.software.network.MyEcho;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.oss.OSSAKSKCredentialProvider;
+import com.shuangling.software.oss.OssService;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
+import com.shuangling.software.utils.MyGlideEngine;
 import com.shuangling.software.utils.ServerInfo;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 import net.mrbin99.laravelechoandroid.EchoCallback;
 import net.mrbin99.laravelechoandroid.EchoOptions;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
 
-public class LiveChatFragment extends Fragment implements ChatAction {
+public class LiveChatFragment extends Fragment implements ChatAction ,OSSCompletedCallback<PutObjectRequest, PutObjectResult> {
 
+    private static final int CHOOSE_PHOTO = 0x0;
 
-    private String postMessageUrl = ServerInfo.live + "/v1/push_message_c";
+    private String postMessageUrl = ServerInfo.live + "/v3/push_message";
 
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
@@ -86,6 +113,10 @@ public class LiveChatFragment extends Fragment implements ChatAction {
 
     private ChatMessageListAdapter mChatMessageListAdapter;
     private HashMap<String, String> mMessageMap = new HashMap<>();
+
+    private String mUploadFilePath;
+    private OssInfo mOssInfo;
+    private OssService mOssService;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -163,13 +194,48 @@ public class LiveChatFragment extends Fragment implements ChatAction {
         if (echo != null) {
             echo.disconnect();
         }
-        cancelInteract(""+mRoomId);
+        if(hasApply){
+            cancelInteract(""+mRoomId);
+        }
+
+
         unbinder.unbind();
     }
 
     @Override
     public void sendImage() {
 
+        if(User.getInstance()==null){
+            ToastUtils.show("请先登录");
+        }else{
+
+            RxPermissions rxPermissions = new RxPermissions(getActivity());
+            rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    .subscribe(new Consumer<Boolean>() {
+                        @Override
+                        public void accept(Boolean granted) throws Exception {
+                            if(granted){
+                                String packageName = getActivity().getPackageName();
+                                Matisse.from(LiveChatFragment.this)
+                                        .choose(MimeType.of(MimeType.JPEG,MimeType.PNG)) // 选择 mime 的类型
+                                        .countable(false)
+                                        .maxSelectable(1) // 图片选择的最多数量
+                                        .spanCount(4)
+                                        .capture(true)
+                                        .captureStrategy(new CaptureStrategy(true,packageName+".fileprovider"))
+                                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                                        .thumbnailScale(1.0f) // 缩略图的比例
+                                        .theme(R.style.Matisse_Zhihu)
+                                        .imageEngine(new MyGlideEngine()) // 使用的图片加载引擎
+                                        .forResult(CHOOSE_PHOTO); // 设置作为标记的请求码
+                            }else{
+                                ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
+                            }
+                        }
+                    });
+
+
+        }
     }
 
     @Override
@@ -185,22 +251,37 @@ public class LiveChatFragment extends Fragment implements ChatAction {
     @Override
     public void sendText(String str) {
 
+        if(User.getInstance()==null){
+            ToastUtils.show("请先登录");
+        }else{
+            if (TextUtils.isEmpty(str)) return;
+            inputPanel.setText("");
+            mMessageMap.clear();
+            mMessageMap.put("room_id", ""+mRoomId);//直播间ID
+            mMessageMap.put("parent_id","0");
+            mMessageMap.put("user_id", User.getInstance().getId() + "");//用户ID
+            mMessageMap.put("type", "2");//发布端类型：1.主持人   2：用户    3:通知关注  4：通知进入直播间
+            mMessageMap.put("stream_name", mStreamName);//播间推流ID
+            mMessageMap.put("nick_name", User.getInstance().getNickname());//昵称
+            mMessageMap.put("message_type", "1");//消息类型 1.互动消息  2.直播状态更新消息  3.删除消息  4.题目 5.菜单设置 6图文保存  默认1
+            mMessageMap.put("user_logo",User.getInstance().getAvatar());
+            mMessageMap.put("message", str);
+            mMessageMap.put("content_type","1");
+            OkHttpUtils.post(postMessageUrl, mMessageMap, new OkHttpCallback(getContext()) {
+                @Override
+                public void onFailure(Call call, Exception e) {
+                    //Log.e("test",e.getCause().getMessage());
+                }
 
-        if (TextUtils.isEmpty(str)) return;
-        inputPanel.setText("");
+                @Override
+                public void onResponse(Call call, String response) throws IOException {
+                    Log.e("test", response);
+                }
+            });
+        }
 
-        mMessageMap.put("message", str);
-        OkHttpUtils.post(postMessageUrl, mMessageMap, new OkHttpCallback(getContext()) {
-            @Override
-            public void onFailure(Call call, Exception e) {
-                //Log.e("test",e.getCause().getMessage());
-            }
 
-            @Override
-            public void onResponse(Call call, String response) throws IOException {
-                Log.e("test", response);
-            }
-        });
+
 
 
 
@@ -380,18 +461,9 @@ public class LiveChatFragment extends Fragment implements ChatAction {
     private void joinChannel(){
 
 
-        mMessageMap.put("room_id", ""+mRoomId);//直播间ID
-        mMessageMap.put("user_id", User.getInstance().getId() + "");//用户ID
-        mMessageMap.put("message", "");//消息内容
-        mMessageMap.put("type", "2");//发布端类型：1.主持人   2：用户    3:通知关注  4：通知进入直播间
-        mMessageMap.put("stream_name", mStreamName);//播间推流ID
-        mMessageMap.put("nick_name", User.getInstance().getNickname());//昵称
-        mMessageMap.put("message_type", "1");//消息类型 1.互动消息  2.直播状态更新消息  3.删除消息  4.题目 5.菜单设置 6图文保存  默认1
-        mMessageMap.put("user_logo",User.getInstance().getAvatar());
-
         EchoOptions options = new EchoOptions();
         options.host = "http://echo-live.review.slradio.cn";
-        options.headers.put("Authorization", User.getInstance().getAuthorization());
+        //options.headers.put("Authorization", User.getInstance().getAuthorization());
         echo = new MyEcho(options);
         echo.connect(new EchoCallback() {
             @Override
@@ -702,6 +774,140 @@ public class LiveChatFragment extends Fragment implements ChatAction {
     }
 
 
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CHOOSE_PHOTO && resultCode == Activity.RESULT_OK) {
+
+            //List<Uri> selects = Matisse.obtainResult(data);
+            List<String> paths=Matisse.obtainPathResult(data);
+            //List<Uri> selects = Matisse.obtainResult(data);
+            //File file = new File(CommonUtils.getRealFilePath(this, selects.get(0)));
+            mUploadFilePath = paths.get(0);
+            getOSSinfo();
+
+
+        }
+    }
+
+
+
+    public void getOSSinfo() {
+
+        String url = ServerInfo.serviceIP + ServerInfo.appOss;
+
+        Map<String, String> params = new HashMap<>();
+
+
+        OkHttpUtils.get(url, null, new OkHttpCallback(getContext() ) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+
+                String result = response;
+                final JSONObject jsonObject = JSONObject.parseObject(result);
+                if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                    mOssInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), OssInfo.class);
+                    mOssService=initOSS(mOssInfo.getHost(),mOssInfo.getBucket(),mOssInfo.getAccess_key_id(),mOssInfo.getAccess_key_secret(),mOssInfo.getExpiration(),mOssInfo.getSecurity_token());
+                    //mOssService.setCallbackAddress(Config.callbackAddress);
+
+                    // 2.把图片文件file上传到服务器
+                    if(mOssInfo != null&&mOssService!=null){
+                        mOssService.asyncUploadFile(mOssInfo.getDir()+mUploadFilePath.substring(mUploadFilePath.lastIndexOf(File.separator)+1),mUploadFilePath,null,LiveChatFragment.this);
+                    }else{
+                        ToastUtils.show("OSS初始化失败,请稍后再试");
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                Log.e("test",exception.toString());
+            }
+        });
+
+    }
+
+
+    public OssService initOSS(String endpoint, String bucket, String accessKey, String accessKeySecret, String expiration,
+                              String securityToken) {
+
+//        移动端是不安全环境，不建议直接使用阿里云主账号ak，sk的方式。建议使用STS方式。具体参
+//        https://help.aliyun.com/document_detail/31920.html
+//        注意：SDK 提供的 PlainTextAKSKCredentialProvider 只建议在测试环境或者用户可以保证阿里云主账号AK，SK安全的前提下使用。具体使用如下
+//        主账户使用方式
+//        String AK = "******";
+//        String SK = "******";
+//        credentialProvider = new PlainTextAKSKCredentialProvider(AK,SK)
+//        以下是使用STS Sever方式。
+//        如果用STS鉴权模式，推荐使用OSSAuthCredentialProvider方式直接访问鉴权应用服务器，token过期后可以自动更新。
+//        详见：https://help.aliyun.com/document_detail/31920.html
+//        OSSClient的生命周期和应用程序的生命周期保持一致即可。在应用程序启动时创建一个ossClient，在应用程序结束时销毁即可。
+
+        OSSAKSKCredentialProvider oSSAKSKCredentialProvider;
+        //使用自己的获取STSToken的类
+
+        oSSAKSKCredentialProvider = new OSSAKSKCredentialProvider(accessKey,accessKeySecret,securityToken,expiration);
+
+        ClientConfiguration conf = new ClientConfiguration();
+        conf.setConnectionTimeout(15 * 1000); // 连接超时，默认15秒
+        conf.setSocketTimeout(15 * 1000); // socket超时，默认15秒
+        conf.setMaxConcurrentRequest(5); // 最大并发请求书，默认5个
+        conf.setMaxErrorRetry(2); // 失败后最大重试次数，默认2次
+        OSS oss = new OSSClient(getActivity().getApplicationContext(), endpoint,  new OSSStsTokenCredentialProvider(accessKey, accessKeySecret, securityToken), conf);
+        OSSLog.enableLog();
+        return new OssService(oss, bucket);
+
+    }
+
+
+
+    @Override
+    public void onSuccess(PutObjectRequest request, PutObjectResult result) {
+
+        sendPicture(mOssInfo.getHost()+"/"+mOssInfo.getDir()+mUploadFilePath.substring(mUploadFilePath.lastIndexOf(File.separator)+1));
+
+
+
+
+
+    }
+
+    @Override
+    public void onFailure(PutObjectRequest request, ClientException clientException, ServiceException serviceException) {
+
+    }
+
+
+
+    private void sendPicture(String pictureUrl){
+        mMessageMap.clear();
+        mMessageMap.put("room_id", ""+mRoomId);//直播间ID
+        mMessageMap.put("user_id", User.getInstance().getId() + "");//用户ID
+        mMessageMap.put("parent_id","0");
+        mMessageMap.put("type", "2");//发布端类型：1.主持人   2：用户    3:通知关注  4：通知进入直播间
+        mMessageMap.put("stream_name", mStreamName);//播间推流ID
+        mMessageMap.put("nick_name", User.getInstance().getNickname());//昵称
+        mMessageMap.put("message_type", "1");//消息类型 1.互动消息  2.直播状态更新消息  3.删除消息  4.题目 5.菜单设置 6图文保存  默认1
+        mMessageMap.put("user_logo",User.getInstance().getAvatar());
+        mMessageMap.put("message", pictureUrl);
+        mMessageMap.put("content_type","2");
+        OkHttpUtils.post(postMessageUrl, mMessageMap, new OkHttpCallback(getContext()) {
+            @Override
+            public void onFailure(Call call, Exception e) {
+                //Log.e("test",e.getCause().getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.e("test", response);
+            }
+        });
+    }
 
 
 }

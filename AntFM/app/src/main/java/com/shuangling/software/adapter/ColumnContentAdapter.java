@@ -1063,9 +1063,10 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     String url=content.getLive().getUrl();
                     if(!TextUtils.isEmpty(url)){
                         String streamName=url.substring(url.lastIndexOf("=")+1);
-                        Intent it = new Intent(mContext, LiveDetailActivity.class);
+                        Intent it = new Intent(mContext,  LiveDetailActivity.class);
                         it.putExtra("streamName",streamName);
                         it.putExtra("roomId",content.getLive().getRoom_id());
+                        it.putExtra("url",content.getLive().getRtmp_play_url());
                         mContext.startActivity(it);
                     }
 

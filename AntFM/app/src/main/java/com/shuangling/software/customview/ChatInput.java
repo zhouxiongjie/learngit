@@ -207,9 +207,9 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
                 updateView(inputMode == InputMode.MORE ? InputMode.TEXT : InputMode.MORE);
                 break;
             case R.id.btn_image:
-                if (activity != null && requestStorage(activity)) {
+                //if (activity != null && requestStorage(activity)) {
                     chatAction.sendImage();
-                }
+                //}
                 break;
             case R.id.btn_join_room:
                 if (activity != null && requestVideo(activity)) {

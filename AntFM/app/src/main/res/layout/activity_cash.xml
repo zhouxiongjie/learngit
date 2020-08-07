@@ -108,7 +108,7 @@
                     android:layout_gravity="center_vertical"
                     android:text="&#xe67e;"
                     android:textColor="#1BA4E5"
-                    android:textSize="@dimen/font_size_36px" />
+                    android:textSize="@dimen/font_size_50px" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -116,7 +116,7 @@
                     android:layout_gravity="center_vertical"
                     android:text="支付宝"
                     android:textColor="#464746"
-                    android:textSize="@dimen/font_size_28px" />
+                    android:textSize="@dimen/font_size_30px" />
             </LinearLayout>
 
 
@@ -161,7 +161,7 @@
                     android:layout_gravity="center_vertical"
                     android:text="&#xe67d;"
                     android:textColor="#00C901"
-                    android:textSize="@dimen/font_size_30px" />
+                    android:textSize="@dimen/font_size_50px" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -169,7 +169,7 @@
                     android:layout_gravity="center_vertical"
                     android:text="微信"
                     android:textColor="#464746"
-                    android:textSize="@dimen/font_size_28px" />
+                    android:textSize="@dimen/font_size_30px" />
             </LinearLayout>
 
 

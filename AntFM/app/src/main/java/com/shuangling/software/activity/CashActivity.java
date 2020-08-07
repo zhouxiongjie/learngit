@@ -607,12 +607,22 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
 
 
                         JSONArray ja = jsonObject.getJSONArray("data");
-                        if (ja == null) {
-                            account.setText("尚未绑定微信账号");
-                            modifyAccount.setText("");
+                        if (ja == null||ja.size()==0) {
+                            account.setText("提现账号");
+                            modifyAccount.setText("去绑定");
                             accountLayout.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+                                    BindWeixinDialog dialog=BindWeixinDialog.getInstance();
+                                    dialog.setOnBindClickListener(new BindWeixinDialog.OnBindClickListener() {
+                                        @Override
+                                        public void bind() {
+
+                                            getWechatInfo();
+
+                                        }
+                                    });
+                                    dialog.show(getSupportFragmentManager(), "BindWeixinDialog");
 
                                 }
                             });
@@ -621,8 +631,10 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
 
                             if (mWeixinAccountInfo != null) {
 
-                                account.setText("提现账号" + mWeixinAccountInfo.getNickname());
-
+                                account.setText("提现账号");
+                                modifyAccount.setText(mWeixinAccountInfo.getNickname());
+                                //account.setText("提现账号" + mWeixinAccountInfo.getNickname());
+                                accountLayout.setOnClickListener(null);
                             }
                         }
 

@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -33,6 +34,8 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
+import com.mylhyl.circledialog.callback.ConfigButton;
+import com.mylhyl.circledialog.params.ButtonParams;
 import com.qiniu.droid.rtc.QNBeautySetting;
 import com.qiniu.droid.rtc.QNCameraSwitchResultCallback;
 import com.qiniu.droid.rtc.QNCustomMessage;
@@ -54,6 +57,7 @@ import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.event.MessageEvent;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Config;
 import com.shuangling.software.utils.QNAppServer;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -75,7 +79,7 @@ import static com.shuangling.software.utils.Config.DEFAULT_BITRATE;
 import static com.shuangling.software.utils.Config.DEFAULT_FPS;
 import static com.shuangling.software.utils.Config.DEFAULT_RESOLUTION;
 
-public class RoomActivity extends Activity implements QNRTCEngineEventListener {
+public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventListener {
 
 
     @BindView(R.id.viewPager)
@@ -864,6 +868,43 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
 
                         if(jsonObject.getString("audio").equals("1")){
                             ToastUtils.show("支持人已允许您的语音请求");
+                            new CircleDialog.Builder()
+                                    .setCanceledOnTouchOutside(false)
+                                    .setCancelable(false)
+
+                                    .setText("主持人请求解除您的静音")
+                                    .setNegative("保持静音", null)
+                                    .configNegative(new ConfigButton() {
+                                        @Override
+                                        public void onConfig(ButtonParams params) {
+                                            //按钮字体颜色
+                                            params.textColor = CommonUtils.getThemeColor(RoomActivity.this);
+                                        }
+                                    })
+                                    .setPositive("解除静音", new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            if(!mMicEnabled){
+                                                if (mEngine != null && mLocalAudioTrack != null) {
+                                                    mMicEnabled = !mMicEnabled;
+                                                    mLocalAudioTrack.setMuted(!mMicEnabled);
+                                                    mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
+                                                    List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                                                    localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                                                      addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                                                    onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                                                }
+                                                muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+
+
+                                            }
+
+
+                                        }
+                                    })
+                                    .show(getSupportFragmentManager());
+
+
                             canSpeak=true;
                         }else if(jsonObject.getString("audio").equals("2")){
                             canSpeak=false;

@@ -809,7 +809,7 @@ public class RoomActivity extends Activity implements QNRTCEngineEventListener {
                         canSpeak=true;
                     }else if(jsonObject.getString("audio").equals("2")){
                         canSpeak=false;
-                        ToastUtils.show("全体成员语音已禁用");
+                        ToastUtils.show("主持人已将全体成员静音");
                         if(mMicEnabled){
                             if (mEngine != null && mLocalAudioTrack != null) {
                                 mMicEnabled = !mMicEnabled;

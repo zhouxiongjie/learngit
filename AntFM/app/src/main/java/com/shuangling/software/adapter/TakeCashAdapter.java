@@ -72,8 +72,13 @@ public class TakeCashAdapter extends RecyclerView.Adapter implements View.OnClic
 
         final TakeCashViewHolder attentionViewHolder = (TakeCashViewHolder) holder;
 
-        attentionViewHolder.remark.setText("支付宝提现");
+
         attentionViewHolder.time.setText(TimeUtil.formatDateTime(takeCashInfo.getUpdated_at()));
+        if (takeCashInfo.getType()==1){
+            attentionViewHolder.remark.setText("支付宝提现");
+        }else{
+            attentionViewHolder.remark.setText("微信提现");
+        }
         if (takeCashInfo.getStatus() == 1||takeCashInfo.getStatus() == 2) {
             attentionViewHolder.status.setBackgroundResource(R.drawable.process_bg);
             attentionViewHolder.status.setTextColor(Color.parseColor("#EB8C10"));

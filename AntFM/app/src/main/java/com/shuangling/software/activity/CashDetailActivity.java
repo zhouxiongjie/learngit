@@ -173,10 +173,12 @@ public class CashDetailActivity extends AppCompatActivity implements Handler.Cal
                                 typeIcon.setText(R.string.ic_zhifubao);
                                 typeIcon.setTextColor(Color.parseColor("#1BA4E5"));
                                 typeName.setText("支付宝");
+                                account.setText( "支付宝("+mCashDetail.getName()+")");
                             } else if (mCashDetail.getType() == 2) {
                                 typeIcon.setText(R.string.ic_weixin);
                                 typeIcon.setTextColor(Color.parseColor("#00C901"));
                                 typeName.setText("微信");
+                                account.setText( "微信("+mCashDetail.getName()+")");
                             }
 
                             money.setText(String.format("%.2f", (float) mCashDetail.getMoney() / 100));
@@ -256,7 +258,7 @@ public class CashDetailActivity extends AppCompatActivity implements Handler.Cal
                             orderNumber.setText(mCashDetail.getTrade_no());
                             createTime.setText(mCashDetail.getCreated_at());
                             //account.setText("支付宝(" + mCashDetail.getAccount() + ")");
-                            account.setText( mCashDetail.getAccount() );
+
 
 
                         }

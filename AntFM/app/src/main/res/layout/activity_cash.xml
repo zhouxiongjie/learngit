@@ -331,6 +331,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#F5F5F8">
+
+
+        <TextView
+            android:id="@+id/weixinTip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="微信支付需要实名制，非实名用户账号无法进行提现，请确认绑定的微信号已实名认证"
+            android:padding="10dp"
+            android:textSize="@dimen/font_size_22px"
+            android:textColor="#88001426"
+            android:visibility="gone"/>
         
         
         

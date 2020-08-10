@@ -1,6 +1,8 @@
 package com.shuangling.software.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,7 +32,6 @@ import com.shuangling.software.dialog.CashRegularDialog;
 import com.shuangling.software.entity.AccountInfo;
 import com.shuangling.software.entity.BaseModel;
 import com.shuangling.software.entity.CashRegular;
-import com.shuangling.software.entity.UserThirdPlatformModel;
 import com.shuangling.software.entity.WeixinAccountInfo;
 import com.shuangling.software.entity.ZhifubaoAccountInfo;
 import com.shuangling.software.event.CommonEvent;
@@ -55,13 +56,11 @@ import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.framework.PlatformDb;
 import cn.sharesdk.framework.ShareSDK;
-import cn.sharesdk.sina.weibo.SinaWeibo;
-import cn.sharesdk.tencent.qq.QQ;
 import cn.sharesdk.wechat.friends.Wechat;
 import okhttp3.Call;
 
 @EnableDragToClose()
-public class CashActivity extends AppCompatActivity implements Handler.Callback,PlatformActionListener {
+public class CashActivity extends AppCompatActivity implements Handler.Callback, PlatformActionListener {
 
     public static final String TAG = "CashActivity";
 
@@ -69,7 +68,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
     private static final int MSG_TAKE_CASH = 1;
     private static final int MSG_CASH_REGULAR = 2;
     private static final int MSG_GET_MONEY = 3;
-    private static final int MSG_WEIXIN_ACCOUNT_DETAIL=4;
+    private static final int MSG_WEIXIN_ACCOUNT_DETAIL = 4;
 
     private static final int MSG_AUTH_CANCEL = 5;
     private static final int MSG_AUTH_ERROR = 6;
@@ -109,6 +108,8 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
     LinearLayout regular;
     @BindView(R.id.customAmountLayout)
     RelativeLayout customAmountLayout;
+    @BindView(R.id.weixinTip)
+    TextView weixinTip;
 
 
     private int moneySum;
@@ -199,6 +200,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
                 zfb.setSelected(false);
                 wxSelectedIcon.setVisibility(View.VISIBLE);
                 zfbSelectedIcon.setVisibility(View.GONE);
+                weixinTip.setVisibility(View.VISIBLE);
                 getThirdPlatformInfo();
             }
         });
@@ -209,6 +211,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
                 zfb.setSelected(true);
                 wxSelectedIcon.setVisibility(View.GONE);
                 zfbSelectedIcon.setVisibility(View.VISIBLE);
+                weixinTip.setVisibility(View.GONE);
                 getAccountDetail();
             }
         });
@@ -256,8 +259,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
     }
 
 
-
-    private void getThirdPlatformInfo(){
+    private void getThirdPlatformInfo() {
         String url = ServerInfo.serviceIP + ServerInfo.getThirdPlatformInfo;
 
         OkHttpUtils.get(url, null, new OkHttpCallback(this) {
@@ -278,7 +280,6 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
         });
 
     }
-
 
 
     private void getMoney() {
@@ -401,7 +402,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
         switch (view.getId()) {
             case R.id.cash:
 
-                if(zfb.isSelected()){
+                if (zfb.isSelected()) {
                     if (mZhifubaoAccountInfo == null) {
                         ToastUtils.show("请先设置提现账号");
                     } else {
@@ -450,11 +451,11 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
                     }
 
 
-                }else if(wx.isSelected()){
+                } else if (wx.isSelected()) {
                     if (mWeixinAccountInfo == null) {
                         //ToastUtils.show("请先设置提现账号");
                         //显示微信账号绑定
-                        BindWeixinDialog dialog=BindWeixinDialog.getInstance();
+                        BindWeixinDialog dialog = BindWeixinDialog.getInstance();
                         dialog.setOnBindClickListener(new BindWeixinDialog.OnBindClickListener() {
                             @Override
                             public void bind() {
@@ -464,7 +465,6 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
                             }
                         });
                         dialog.show(getSupportFragmentManager(), "BindWeixinDialog");
-
 
 
                     } else {
@@ -513,11 +513,9 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
                     }
 
 
-                }else {
+                } else {
                     ToastUtils.show("请选择提现方式");
                 }
-
-
 
 
                 break;
@@ -547,6 +545,10 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
                         if (jo == null) {
                             account.setText("请输入提现账号");
                             modifyAccount.setText("");
+                            modifyAccount.setTextColor(Color.parseColor("#4690FF"));
+                            Drawable drawableRight = getResources().getDrawable(R.drawable.ic_right);
+                            modifyAccount.setCompoundDrawablesWithIntrinsicBounds(null,null, drawableRight, null);
+
                             accountLayout.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
@@ -574,6 +576,9 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
                                 }
 
                                 modifyAccount.setText("修改");
+                                modifyAccount.setTextColor(Color.parseColor("#4690FF"));
+                                Drawable drawableRight = getResources().getDrawable(R.drawable.ic_right);
+                                modifyAccount.setCompoundDrawablesWithIntrinsicBounds(null,null, drawableRight, null);
                                 modifyAccount.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
@@ -607,23 +612,16 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
 
 
                         JSONArray ja = jsonObject.getJSONArray("data");
-                        if (ja == null||ja.size()==0) {
+                        if (ja == null || ja.size() == 0) {
                             account.setText("提现账号");
                             modifyAccount.setText("去绑定");
+                            Drawable drawableRight = getResources().getDrawable(R.drawable.ic_right);
+                            modifyAccount.setCompoundDrawablesWithIntrinsicBounds(null,null, drawableRight, null);
+                            modifyAccount.setTextColor(Color.parseColor("#4690FF"));
                             accountLayout.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    BindWeixinDialog dialog=BindWeixinDialog.getInstance();
-                                    dialog.setOnBindClickListener(new BindWeixinDialog.OnBindClickListener() {
-                                        @Override
-                                        public void bind() {
-
-                                            getWechatInfo();
-
-                                        }
-                                    });
-                                    dialog.show(getSupportFragmentManager(), "BindWeixinDialog");
-
+                                    getWechatInfo();
                                 }
                             });
                         } else {
@@ -633,18 +631,20 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
 
                                 account.setText("提现账号");
                                 modifyAccount.setText(mWeixinAccountInfo.getNickname());
+                                modifyAccount.setTextColor(Color.parseColor("#E5999999"));
+                                modifyAccount.setCompoundDrawablesWithIntrinsicBounds(null,null, null, null);
                                 //account.setText("提现账号" + mWeixinAccountInfo.getNickname());
                                 accountLayout.setOnClickListener(null);
                             }
                         }
 
 
-                    }else if (jsonObject != null) {
+                    } else if (jsonObject != null) {
                         ToastUtils.show(jsonObject.getString("msg"));
                     }
 
 
-                }catch (Exception e){
+                } catch (Exception e) {
 
                 }
                 break;
@@ -725,9 +725,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
                 ToastUtils.show("授权成功");
                 Platform platform = (Platform) msg.obj;
 
-                bindWechat(platform,"0");
-
-
+                bindWechat(platform, "0");
 
 
             }
@@ -818,8 +816,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
     }
 
 
-
-    private void getWechatInfo(){
+    private void getWechatInfo() {
         Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
         wechat.setPlatformActionListener(this);
         // true不使用SSO授权，false使用SSO授权
@@ -862,7 +859,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
     }
 
 
-    private void bindWechat(final Platform platform , String support){
+    private void bindWechat(final Platform platform, String support) {
 
         PlatformDb platDB = platform.getDb();//获取数平台数据DB
         //通过DB获取各种数据
@@ -873,12 +870,12 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
 
         String url = ServerInfo.serviceIP + ServerInfo.bindWechat;
         Map<String, String> params = new HashMap<>();
-        params.put("type","2");
-        params.put("nickname",weixinNickname);
-        params.put("headimgurl",weixinHeadimgurl);
-        params.put("openid",weixinOpenid);
-        params.put("unionid",weixinUnionid);
-        params.put("support",support);
+        params.put("type", "2");
+        params.put("nickname", weixinNickname);
+        params.put("headimgurl", weixinHeadimgurl);
+        params.put("openid", weixinOpenid);
+        params.put("unionid", weixinUnionid);
+        params.put("support", support);
 
         if (mDialogFragment != null) mDialogFragment.dismiss();
         mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
@@ -889,12 +886,12 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        try{
+                        try {
                             mDialogFragment.dismiss();
                             ToastUtils.show("绑定失败,请稍后再试");
                             Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
                             wechat.removeAccount(true);
-                        }catch (Exception e){
+                        } catch (Exception e) {
 
                         }
 
@@ -905,22 +902,22 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
             @Override
             public void onResponse(Call call, String response) throws IOException {
                 try {
-                    final BaseModel result = JSON.parseObject(response,BaseModel.class);
+                    final BaseModel result = JSON.parseObject(response, BaseModel.class);
 
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            try{
+                            try {
                                 mDialogFragment.dismiss();
-                                if (result.getCode() == 100000){
+                                if (result.getCode() == 100000) {
                                     getThirdPlatformInfo();
                                     ToastUtils.show("绑定成功");
                                     Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
                                     wechat.removeAccount(true);
-                                }else {
+                                } else {
                                     forceBind(platform);
                                 }
-                            }catch (Exception e){
+                            } catch (Exception e) {
 
                             }
 
@@ -928,12 +925,12 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
                         }
                     });
 
-                }catch (Exception e){
+                } catch (Exception e) {
                     try {
                         mDialogFragment.dismiss();
                         Platform wechat = ShareSDK.getPlatform(Wechat.NAME);
                         wechat.removeAccount(true);
-                    }catch (Exception ex){
+                    } catch (Exception ex) {
 
                     }
 
@@ -943,14 +940,14 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
     }
 
 
-    private void forceBind(final Platform platform){
+    private void forceBind(final Platform platform) {
         new CircleDialog.Builder()
                 .setTitle("提示")
                 .setText("该第三方账号已经绑定其他账号，是否重新绑定此账号？")
                 .setPositive("确定", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        bindWechat(platform,"1");
+                        bindWechat(platform, "1");
                     }
                 })
                 .setNegative("取消", new View.OnClickListener() {

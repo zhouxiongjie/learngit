@@ -1,5 +1,6 @@
 package com.shuangling.software.activity;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,6 +33,7 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
@@ -54,26 +57,50 @@ import com.qiniu.droid.rtc.model.QNMergeJob;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.UserTrackView;
 import com.shuangling.software.customview.FontIconView;
+import com.shuangling.software.dialog.ChatDialog;
+import com.shuangling.software.dialog.CustomColumnDialog;
+import com.shuangling.software.entity.ChatMessage;
+import com.shuangling.software.entity.Column;
+import com.shuangling.software.entity.OssInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.event.MessageEvent;
+import com.shuangling.software.fragment.LiveChatFragment;
+import com.shuangling.software.fragment.RecommendFragment;
+import com.shuangling.software.network.OkHttpCallback;
+import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.oss.OssService;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Config;
+import com.shuangling.software.utils.MyGlideEngine;
+import com.shuangling.software.utils.OSSUploadUtils;
 import com.shuangling.software.utils.QNAppServer;
+import com.shuangling.software.utils.ServerInfo;
+import com.shuangling.software.utils.SharedPreferencesUtils;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.viewpagerindicator.CirclePageIndicator;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
+import com.zhihu.matisse.internal.entity.CaptureStrategy;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.functions.Consumer;
+import okhttp3.Call;
 
 import static com.shuangling.software.utils.Config.DEFAULT_BITRATE;
 import static com.shuangling.software.utils.Config.DEFAULT_FPS;
@@ -81,6 +108,7 @@ import static com.shuangling.software.utils.Config.DEFAULT_RESOLUTION;
 
 public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventListener {
 
+    private static final int CHOOSE_PHOTO = 0x0;
 
     @BindView(R.id.viewPager)
     ViewPager viewPager;
@@ -107,7 +135,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 //    @BindView(R.id.userTrackView)
 //    UserTrackView userTrackView;
 
-
+    private String postMessageUrl = ServerInfo.live + "/v3/push_message";
     private static final String TAG = "RoomActivity";
 
     private static final int BITRATE_FOR_SCREEN_VIDEO = (int) (1.5 * 1000 * 1000);
@@ -200,6 +228,13 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 
     private String mScreenUserId;
 
+    private ChatDialog mChatDialog;
+
+    private ArrayList<ChatMessage> mChatMessages=new ArrayList<>();
+
+    private HashMap<String, String> mMessageMap = new HashMap<>();
+    private String mStreamName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -225,6 +260,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
         mRoomToken = intent.getStringExtra(EXTRA_ROOM_TOKEN);
         mUserId = intent.getStringExtra(EXTRA_USER_ID);
         mRoomId = intent.getStringExtra(EXTRA_ROOM_ID);
+        mStreamName=intent.getStringExtra("streamName");
         //mIsAdmin = mUserId.equals(QNAppServer.ADMIN_USER);
 
         mPagerAdapter = new PagerAdapter() {
@@ -926,13 +962,18 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                     }
 
 
-
-
-
                 }
 
 
             }
+//            else{
+//                ChatMessage chatMessage = JSON.parseObject(jo.toString(), ChatMessage.class);
+//                mChatMessages.add(chatMessage);
+//                if(mChatDialog!=null&&mChatDialog.getShowsDialog()){
+//                    mChatDialog.addChatMsg(chatMessage);
+//                }
+//
+//            }
 
 
         }
@@ -953,7 +994,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().register(this);
+        EventBus.getDefault().unregister(this);
         if (mEngine != null) {
             if (mIsAdmin && mIsStreaming) {
                 // 如果当前正在合流，则停止
@@ -1553,7 +1594,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 //        mPopWindow.showAtLocation(getWindow().getDecorView().getRootView(), Gravity.BOTTOM, 0, 0);
 //    }
 
-    @OnClick({R.id.switchCamera, R.id.quit, R.id.openMute, R.id.closeVideo, R.id.panel})
+    @OnClick({R.id.switchCamera, R.id.quit, R.id.openMute, R.id.closeVideo,R.id.interactChat,R.id.panel})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.switchCamera:
@@ -1648,6 +1689,82 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                 } else {
                     panel.setVisibility(View.VISIBLE);
                 }
+                break;
+            case R.id.interactChat:
+                mChatDialog = ChatDialog.getInstance();
+                mChatDialog.setOnChatEventListener(new ChatDialog.OnChatEventListener() {
+                    @Override
+                    public void sendImage() {
+                        if(User.getInstance()==null){
+                            Intent it=new Intent(RoomActivity.this, NewLoginActivity.class);
+                            it.putExtra("jump_url",ServerInfo.h5IP);
+                            startActivity(it);
+                        }else{
+
+                            RxPermissions rxPermissions = new RxPermissions(RoomActivity.this);
+                            rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                    .subscribe(new Consumer<Boolean>() {
+                                        @Override
+                                        public void accept(Boolean granted) throws Exception {
+                                            if(granted){
+                                                String packageName = getPackageName();
+                                                Matisse.from(RoomActivity.this)
+                                                        .choose(MimeType.of(MimeType.JPEG,MimeType.PNG)) // 选择 mime 的类型
+                                                        .countable(false)
+                                                        .maxSelectable(1) // 图片选择的最多数量
+                                                        .spanCount(4)
+                                                        .capture(true)
+                                                        .captureStrategy(new CaptureStrategy(true,packageName+".fileprovider"))
+                                                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                                                        .thumbnailScale(1.0f) // 缩略图的比例
+                                                        .theme(R.style.Matisse_Zhihu)
+                                                        .imageEngine(new MyGlideEngine()) // 使用的图片加载引擎
+                                                        .forResult(CHOOSE_PHOTO); // 设置作为标记的请求码
+                                            }else{
+                                                ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
+                                            }
+                                        }
+                                    });
+
+
+                        }
+                    }
+
+                    @Override
+                    public void sendText(String str) {
+
+
+                        if (TextUtils.isEmpty(str)) return;
+                        mMessageMap.clear();
+                        mMessageMap.put("room_id", ""+mRoomId);//直播间ID
+                        mMessageMap.put("parent_id","0");
+                        mMessageMap.put("user_id", User.getInstance().getId() + "");//用户ID
+                        mMessageMap.put("type", "2");//发布端类型：1.主持人   2：用户    3:通知关注  4：通知进入直播间
+                        mMessageMap.put("stream_name", mStreamName);//播间推流ID
+                        mMessageMap.put("nick_name", User.getInstance().getNickname());//昵称
+                        mMessageMap.put("message_type", "1");//消息类型 1.互动消息  2.直播状态更新消息  3.删除消息  4.题目 5.菜单设置 6图文保存  默认1
+                        mMessageMap.put("user_logo",User.getInstance().getAvatar());
+                        mMessageMap.put("message", str);
+                        mMessageMap.put("content_type","1");
+                        OkHttpUtils.post(postMessageUrl, mMessageMap, new OkHttpCallback(RoomActivity.this) {
+                            @Override
+                            public void onFailure(Call call, Exception e) {
+                                //Log.e("test",e.getCause().getMessage());
+                            }
+
+                            @Override
+                            public void onResponse(Call call, String response) throws IOException {
+                                Log.e("test", response);
+                            }
+                        });
+
+
+                    }
+                });
+
+                mChatDialog.show(getSupportFragmentManager(), "ChatDialog");
+
+                break;
         }
     }
 
@@ -1789,6 +1906,58 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
             }
 
         }
+    }
+
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CHOOSE_PHOTO && resultCode == Activity.RESULT_OK) {
+
+            //List<Uri> selects = Matisse.obtainResult(data);
+            List<String> paths=Matisse.obtainPathResult(data);
+            //List<Uri> selects = Matisse.obtainResult(data);
+            //File file = new File(CommonUtils.getRealFilePath(this, selects.get(0)));
+
+            OSSUploadUtils.getInstance().setOnCallbackListener(new OSSUploadUtils.OnCallbackListener() {
+                @Override
+                public void onSuccess(String url) {
+                    sendPicture(url);
+                }
+
+                @Override
+                public void onFailed() {
+
+                }
+            }).uploadFile(this,paths.get(0));
+
+
+        }
+    }
+
+    private void sendPicture(String pictureUrl){
+        mMessageMap.clear();
+        mMessageMap.put("room_id", ""+mRoomId);//直播间ID
+        mMessageMap.put("user_id", User.getInstance().getId() + "");//用户ID
+        mMessageMap.put("parent_id","0");
+        mMessageMap.put("type", "2");//发布端类型：1.主持人   2：用户    3:通知关注  4：通知进入直播间
+        mMessageMap.put("stream_name", mStreamName);//播间推流ID
+        mMessageMap.put("nick_name", User.getInstance().getNickname());//昵称
+        mMessageMap.put("message_type", "1");//消息类型 1.互动消息  2.直播状态更新消息  3.删除消息  4.题目 5.菜单设置 6图文保存  默认1
+        mMessageMap.put("user_logo",User.getInstance().getAvatar());
+        mMessageMap.put("message", pictureUrl);
+        mMessageMap.put("content_type","2");
+        OkHttpUtils.post(postMessageUrl, mMessageMap, new OkHttpCallback(this) {
+            @Override
+            public void onFailure(Call call, Exception e) {
+                //Log.e("test",e.getCause().getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.e("test", response);
+            }
+        });
     }
 
 

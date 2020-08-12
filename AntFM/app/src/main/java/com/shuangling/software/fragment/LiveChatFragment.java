@@ -55,16 +55,20 @@ import com.shuangling.software.R;
 import com.shuangling.software.activity.LiveDetailActivity;
 import com.shuangling.software.activity.ModifyUserInfoActivity;
 import com.shuangling.software.activity.RoomActivity;
+import com.shuangling.software.adapter.ChatMessageListAdapter;
 import com.shuangling.software.customview.ChatInput;
 import com.shuangling.software.entity.ChatMessage;
 import com.shuangling.software.entity.OssInfo;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.event.CommonEvent;
+import com.shuangling.software.event.MessageEvent;
 import com.shuangling.software.interf.ChatAction;
 import com.shuangling.software.network.MyEcho;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.oss.OSSAKSKCredentialProvider;
 import com.shuangling.software.oss.OssService;
+import com.shuangling.software.utils.ChatMessageManager;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.MyGlideEngine;
@@ -77,9 +81,14 @@ import com.zhihu.matisse.internal.entity.CaptureStrategy;
 import net.mrbin99.laravelechoandroid.EchoCallback;
 import net.mrbin99.laravelechoandroid.EchoOptions;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,8 +142,9 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_live_chat, null);
         unbinder = ButterKnife.bind(this, view);
+        EventBus.getDefault().register(this);
         inputPanel.setChatAction(this );
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        //recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
 //        DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
 //        divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
@@ -176,7 +186,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
             public void onLoadMore(RefreshLayout refreshLayout) {
             }
         });
-
+        getChatHistory();
         joinChannel();
         return view;
     }
@@ -190,7 +200,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
+        EventBus.getDefault().unregister(this);
         if (echo != null) {
             echo.disconnect();
         }
@@ -200,6 +210,17 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
 
 
         unbinder.unbind();
+    }
+
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if(event.getEventName().equals("refreshMessageList")){
+            if(mChatMessageListAdapter!=null){
+                mChatMessageListAdapter.notifyDataSetChanged();
+            }
+        }
     }
 
     @Override
@@ -288,6 +309,49 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
 
     }
 
+
+    private void getChatHistory() {
+        String url = ServerInfo.live + "/v3/chats_history";
+        Map<String, String> params = new HashMap<>();
+
+        params.put("room_id",""+mRoomId);
+        params.put("page","1");
+        params.put("page_size",""+Integer.MAX_VALUE);
+        params.put("state","1");
+        OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                try{
+
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        List<ChatMessage> msgs = JSON.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), ChatMessage.class);
+                        Collections.reverse(msgs);
+                        ChatMessageManager.getInstance().clearMessages();
+                        ChatMessageManager.getInstance().addMessages(msgs);
+
+
+
+                    }
+
+                }catch (Exception e){
+
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                Log.e("test",exception.toString());
+
+            }
+        });
+    }
+
     private void getRoomToken(String roomId) {
         String url = ServerInfo.live + "/v4/get_room_token_c";
         Map<String, String> params = new HashMap<>();
@@ -314,6 +378,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
                                 intent.putExtra(RoomActivity.EXTRA_ROOM_ID, roomId);
                                 intent.putExtra(RoomActivity.EXTRA_ROOM_TOKEN, roomToken);
                                 intent.putExtra(RoomActivity.EXTRA_USER_ID, "user_"+User.getInstance().getId());
+                                intent.putExtra("streamName",mStreamName);
                                 startActivity(intent);
                             }
                         });
@@ -348,13 +413,13 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
             public void onResponse(Call call, String response) throws IOException {
 
                 try{
-
+                    hasApply=true;
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         hasApply=true;
                         ((LiveDetailActivity)getActivity()).joinChannel();
 
-                        //getRoomToken("359");
+                        getRoomToken(""+mRoomId);
 
 
 //                        String roomToken = jsonObject.getString("data");
@@ -400,7 +465,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
 
     //申请连麦
     private void cancelInteract(String roomId) {
-        String url = ServerInfo.live + "/v4/user_apply_interact";
+        String url = ServerInfo.live + "/v4/user_cancel_apply_interact";
         Map<String, String> params = new HashMap<>();
         params.put("userId",""+User.getInstance().getId());
         params.put("roomId",roomId);
@@ -415,7 +480,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
                         hasApply=false;
 
 
-                        //getRoomToken("359");
+                        //getRoomToken(""+mRoomId);
 
 
 //                        String roomToken = jsonObject.getString("data");
@@ -522,7 +587,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
 //        msgLandscapeList.add(msgModel);
 
 
-        mChatMessageListAdapter.showChatMsg(chatMessage);
+        ChatMessageManager.getInstance().addMessage(chatMessage);
         if (recyclerView.canScrollVertically(1)) {//还可以向下滑动（还没到底部）
             //moreMsgBtn.setVisibility(View.VISIBLE);
 
@@ -537,241 +602,6 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
 
 
 
-
-    static class ChatMessageListAdapter extends RecyclerView.Adapter {
-
-        public static final int TYPE_HEADER = 0;
-        public static final int TYPE_TEXT = 1;
-        public static final int TYPE_PICTURE = 2;
-
-        private LayoutInflater inflater;
-        ArrayList<ChatMessage> msgList = new ArrayList<>();
-
-        int directionType = 0; //0竖屏 1横屏
-
-        public void showChatMsg(ChatMessage msg) {
-            msgList.add(msg);
-            //notifyDataSetChanged();
-            notifyItemInserted(msgList.size());
-        }
-
-        public void addChatMsg(ChatMessage msg) {
-
-            msgList.add(msg);
-
-        }
-
-        public ChatMessageListAdapter(Context context, int directionType) {
-            this.directionType = directionType;
-            inflater = LayoutInflater.from(context);
-        }
-
-        @NonNull
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-
-            if (viewType == TYPE_HEADER) {
-                HeaderViewHolder hvh = new HeaderViewHolder(inflater.inflate(R.layout.chat_msg_header, viewGroup, false));
-                if (directionType == 1) {
-                    hvh.content.setBackground(null);
-                }
-                return hvh;
-
-
-            } else if (viewType == TYPE_TEXT) {
-                TextViewHolder tvh = new TextViewHolder(inflater.inflate(R.layout.chat_msg_text, viewGroup, false));
-                if (directionType == 1) {
-                    tvh.layout.setBackground(null);
-                }
-                return tvh;
-            } else {
-                PictureViewHolder pvh = new PictureViewHolder(inflater.inflate(R.layout.chat_msg_picture, viewGroup, false));
-                if (directionType == 1) {
-                    pvh.layout.setBackground(null);
-                }
-                return pvh;
-            }
-
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
-
-            int viewType=getItemViewType(position);
-            if (viewType == TYPE_HEADER) {
-
-            }else if(viewType == TYPE_TEXT){
-                TextViewHolder vh = (TextViewHolder) viewHolder;
-                ChatMessage  msg = msgList.get(position - 1);
-
-                if (!TextUtils.isEmpty(msg.getUserLog())) {
-                    Uri uri = Uri.parse(msg.getUserLog());
-                    int width = CommonUtils.dip2px(25);
-                    int height = width;
-                    ImageLoader.showThumb(uri, vh.head, width, height);
-                }else{
-                    ImageLoader.showThumb( vh.head,R.drawable.ic_user1);
-                }
-
-                if(msg.getType() == 1){
-                    //主持人
-                    vh.emcee.setVisibility(View.VISIBLE);
-                }else{
-                    vh.emcee.setVisibility(View.GONE);
-                }
-                vh.name.setText(msg.getNickName());
-                vh.content.setText(msg.getMsg());
-            }else if(getItemViewType(position) == TYPE_PICTURE){
-                PictureViewHolder vh = (PictureViewHolder) viewHolder;
-                ChatMessage  msg = msgList.get(position - 1);
-
-                if (!TextUtils.isEmpty(msg.getUserLog())) {
-                    Uri uri = Uri.parse(msg.getUserLog());
-                    int width = CommonUtils.dip2px(25);
-                    int height = width;
-                    ImageLoader.showThumb(uri, vh.head, width, height);
-                }else{
-                    ImageLoader.showThumb( vh.head,R.drawable.ic_user1);
-                }
-
-                if(msg.getType() == 1){
-                    //主持人
-                    vh.emcee.setVisibility(View.VISIBLE);
-                }else{
-                    vh.emcee.setVisibility(View.GONE);
-                }
-                vh.name.setText(msg.getNickName());
-
-
-                if(!TextUtils.isEmpty(msg.getMsg())){
-
-                    ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
-                        @Override
-                        public void onFinalImageSet(
-                                String id,
-                                @Nullable ImageInfo imageInfo,
-                                @Nullable Animatable anim) {
-                            if (imageInfo == null) {
-                                return;
-                            }
-                            QualityInfo qualityInfo = imageInfo.getQualityInfo();
-                            FLog.d("Final image received! " +
-                                            "Size %d x %d",
-                                    "Quality level %d, good enough: %s, full quality: %s",
-                                    imageInfo.getWidth(),
-                                    imageInfo.getHeight(),
-                                    qualityInfo.getQuality(),
-                                    qualityInfo.isOfGoodEnoughQuality(),
-                                    qualityInfo.isOfFullQuality());
-                            float ratio=(float) imageInfo.getWidth()/(float)imageInfo.getHeight();
-                            vh.picture.setAspectRatio(ratio);
-
-
-
-
-
-                        }
-
-                        @Override
-                        public void onIntermediateImageSet(String id, @Nullable ImageInfo imageInfo) {
-
-                        }
-
-                        @Override
-                        public void onFailure(String id, Throwable throwable) {
-
-                        }
-                    };
-
-                    Uri uri=Uri.parse(msg.getMsg());
-                    DraweeController controller = Fresco.newDraweeControllerBuilder()
-                            .setControllerListener(controllerListener)
-                            .setUri(uri)
-                            // other setters
-                            .build();
-                    vh.picture.setController(controller);
-
-
-                }
-
-
-
-
-            }
-
-        }
-
-        @Override
-        public int getItemCount() {
-            if (msgList == null || msgList.size() == 0) {
-                return 1;
-            } else {
-                return msgList.size() + 1;
-            }
-
-//            return 10;
-        }
-
-
-        @Override
-        public int getItemViewType(int position) {
-            if (position == 0) {
-                return TYPE_HEADER;
-            } else if (msgList.get(position - 1).getContentType() == 1) {
-                return TYPE_TEXT;
-            } else {
-                return TYPE_PICTURE;
-            }
-        }
-
-
-        static class HeaderViewHolder extends RecyclerView.ViewHolder {
-            @BindView(R.id.content)
-            TextView content;
-
-            HeaderViewHolder(View view) {
-                super(view);
-                ButterKnife.bind(this, view);
-            }
-        }
-
-        static class TextViewHolder extends RecyclerView.ViewHolder {
-            @BindView(R.id.head)
-            SimpleDraweeView head;
-            @BindView(R.id.emcee)
-            TextView emcee;
-            @BindView(R.id.name)
-            TextView name;
-            @BindView(R.id.content)
-            TextView content;
-            @BindView(R.id.layout)
-            LinearLayout layout;
-
-            TextViewHolder(View view) {
-                super(view);
-                ButterKnife.bind(this, view);
-            }
-        }
-
-
-        static class PictureViewHolder extends RecyclerView.ViewHolder {
-            @BindView(R.id.head)
-            SimpleDraweeView head;
-            @BindView(R.id.emcee)
-            TextView emcee;
-            @BindView(R.id.name)
-            TextView name;
-            @BindView(R.id.picture)
-            SimpleDraweeView picture;
-            @BindView(R.id.layout)
-            LinearLayout layout;
-
-            PictureViewHolder(View view) {
-                super(view);
-                ButterKnife.bind(this, view);
-            }
-        }
-    }
 
 
 

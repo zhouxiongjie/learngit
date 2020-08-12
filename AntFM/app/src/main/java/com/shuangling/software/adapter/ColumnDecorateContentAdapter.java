@@ -547,7 +547,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                 articleViewHolder.top.setVisibility(View.GONE);
             }
 
-            if (!TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
+            if (content.getArticle().getCovers()!=null&&content.getArticle().getCovers().size()>0&&!TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
 
                 int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);

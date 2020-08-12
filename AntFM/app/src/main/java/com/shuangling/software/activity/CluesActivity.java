@@ -252,7 +252,7 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
                                 if(granted){
                                     String packageName = getPackageName();
                                     Matisse.from(CluesActivity.this)
-                                            .choose(MimeType.of(MimeType.JPEG,MimeType.PNG)) // 选择 mime 的类型
+                                            .choose(MimeType.of(MimeType.JPEG,MimeType.PNG,MimeType.MP4)) // 选择 mime 的类型
                                             .countable(false)
                                             .maxSelectable(9) // 图片选择的最多数量
                                             .spanCount(4)
@@ -511,7 +511,7 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (requestCode == REQUEST_SELECT_FILE&&resultCode == RESULT_OK && data != null) {
+            if (requestCode == REQUEST_SELECT_FILE&&resultCode == RESULT_OK ) {
                 if (uploadMessage == null)
                     return;
 
@@ -522,6 +522,11 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
                 uploadMessage.onReceiveValue(urls);
                 //uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
                 uploadMessage = null;
+            }else if (requestCode == REQUEST_SELECT_FILE &&resultCode==RESULT_CANCELED) {
+
+                uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                uploadMessage = null;
+                return;
             }
         }
     }

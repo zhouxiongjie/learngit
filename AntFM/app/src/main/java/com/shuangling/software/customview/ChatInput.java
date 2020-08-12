@@ -100,9 +100,9 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
     private void leavingCurrentState() {
         switch (inputMode) {
             case TEXT:
-                View view = ((Activity) getContext()).getCurrentFocus();
+                //View view = ((Activity) getContext()).getCurrentFocus();
                 InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
                 input.clearFocus();
                 break;
             case MORE:
@@ -197,7 +197,13 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
      */
     @Override
     public void onClick(View v) {
-        Activity activity = (Activity) getContext();
+        Activity activity=null;
+        try{
+            activity= (Activity) getContext();
+        }catch (Exception e){
+
+        }
+
         int id = v.getId();
         switch (id) {
             case R.id.btn_send:

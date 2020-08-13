@@ -26,7 +26,7 @@ android {
 
     MtjCirclePluginConfig {
 
-        appkey = "8a3086f16e"
+        appkey = "8bc0e3d645"
 
         // 设置debug 开关，如果需要查看日志则打开开关，为避免影响性能建议上线前关闭（设置为false）
         debug = false
@@ -146,6 +146,8 @@ android {
 
 
     applicationVariants.all {
+
+
         variant ->
             variant.outputs.all {
                 outputFileName = "${variant.productFlavors[0].name}-v${variant.productFlavors[0].versionName}-${releaseTime()}.apk"
@@ -194,6 +196,7 @@ configurations.all {
 //        force 'com.android.support:design:24.2.1'
 //        force 'com.android.support:recyclerview-v7:26.0.0-alpha1'
 //    }
+
 
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         def requested = details.requested

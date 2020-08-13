@@ -176,6 +176,8 @@ public class ServerInfo {
 
 	public static String takeCashDetail="/v1/consumer/transfers";
 
+	public static String requestWeixinCash="/v1/consumer/wechat_transfers";		//发起微信提现请求
+
 	public static String takeCashAccount="/v1/consumer/transfer_alipay";
 
 	public static String bindZhifubao="/v1/consumer/transfer_alipay";			//绑定支付宝

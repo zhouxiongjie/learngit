@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- 角度 -->
+    <corners android:radius="6.5dp"/>
+    <padding
+        android:bottom="4dp"
+        android:left="20dp"
+        android:right="20dp"
+        android:top="4dp"
+        />
+    <!-- 填充色 -->
+    <solid android:color="@color/transparent"/>
+    <!-- 描边 设置线宽及颜色 -->
+    <stroke android:color="#99333333"
+        android:width="0dp"/>
+</shape>

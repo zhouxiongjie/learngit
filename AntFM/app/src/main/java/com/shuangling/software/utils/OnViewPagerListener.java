@@ -13,6 +13,10 @@ public interface OnViewPagerListener {
     // 选中的监听以及判断是否滑动到底部
     void onPageSelected(int position, boolean isBottom);
 
+    void onPageSelected(int position);
+
     // 到最顶部时，右滑退出监听
+
+    void onPageSelected(int position, int totalPage);
     void exitVideo();
 }

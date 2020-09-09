@@ -31,7 +31,7 @@ public class ChatMessage {
     private int audit;
     private int aiAudit;
     private int contentType;
-    private String parentMsgInfo;
+    private ChatMessage parentMsgInfo;
 
     public int getMessageType() {
         return messageType;
@@ -129,11 +129,11 @@ public class ChatMessage {
         this.contentType = contentType;
     }
 
-    public String getParentMsgInfo() {
+    public ChatMessage getParentMsgInfo() {
         return parentMsgInfo;
     }
 
-    public void setParentMsgInfo(String parentMsgInfo) {
+    public void setParentMsgInfo(ChatMessage parentMsgInfo) {
         this.parentMsgInfo = parentMsgInfo;
     }
 }

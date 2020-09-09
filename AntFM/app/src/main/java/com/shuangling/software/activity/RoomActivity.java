@@ -10,22 +10,28 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Chronometer;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -33,12 +39,15 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigButton;
+import com.mylhyl.circledialog.callback.ConfigItems;
 import com.mylhyl.circledialog.params.ButtonParams;
+import com.mylhyl.circledialog.params.ItemsParams;
 import com.qiniu.droid.rtc.QNBeautySetting;
 import com.qiniu.droid.rtc.QNCameraSwitchResultCallback;
 import com.qiniu.droid.rtc.QNCustomMessage;
@@ -47,6 +56,7 @@ import com.qiniu.droid.rtc.QNRTCEngine;
 import com.qiniu.droid.rtc.QNRTCEngineEventListener;
 import com.qiniu.droid.rtc.QNRTCSetting;
 import com.qiniu.droid.rtc.QNRoomState;
+import com.qiniu.droid.rtc.QNScreenCaptureUtil;
 import com.qiniu.droid.rtc.QNSourceType;
 import com.qiniu.droid.rtc.QNStatisticsReport;
 import com.qiniu.droid.rtc.QNTrackInfo;
@@ -54,29 +64,23 @@ import com.qiniu.droid.rtc.QNTrackKind;
 import com.qiniu.droid.rtc.QNVideoFormat;
 import com.qiniu.droid.rtc.model.QNAudioDevice;
 import com.qiniu.droid.rtc.model.QNMergeJob;
+import com.qiniu.droid.rtc.model.QNMergeTrackOption;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.UserTrackView;
 import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.dialog.ChatDialog;
-import com.shuangling.software.dialog.CustomColumnDialog;
+import com.shuangling.software.entity.CandidateInfo;
 import com.shuangling.software.entity.ChatMessage;
-import com.shuangling.software.entity.Column;
-import com.shuangling.software.entity.OssInfo;
 import com.shuangling.software.entity.User;
-import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.event.MessageEvent;
-import com.shuangling.software.fragment.LiveChatFragment;
-import com.shuangling.software.fragment.RecommendFragment;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
-import com.shuangling.software.oss.OssService;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Config;
+import com.shuangling.software.utils.LayoutManger;
 import com.shuangling.software.utils.MyGlideEngine;
 import com.shuangling.software.utils.OSSUploadUtils;
-import com.shuangling.software.utils.QNAppServer;
 import com.shuangling.software.utils.ServerInfo;
-import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.viewpagerindicator.CirclePageIndicator;
 import com.zhihu.matisse.Matisse;
@@ -87,14 +91,12 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -110,8 +112,12 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 
     private static final int CHOOSE_PHOTO = 0x0;
 
+
     @BindView(R.id.viewPager)
     ViewPager viewPager;
+    @BindView(R.id.indicator)
+    CirclePageIndicator indicator;
+
     @BindView(R.id.switchCamera)
     FontIconView switchCamera;
     @BindView(R.id.interactChat)
@@ -120,20 +126,63 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
     LinearLayout openMute;
     @BindView(R.id.closeVideo)
     LinearLayout closeVideo;
-    @BindView(R.id.barrage)
-    LinearLayout barrage;
-    @BindView(R.id.bottomButtonLayout)
-    TableLayout bottomButtonLayout;
-    @BindView(R.id.panel)
-    RelativeLayout panel;
+    @BindView(R.id.topPanel)
+    RelativeLayout topPanel;
+    @BindView(R.id.bottomPanel)
+    LinearLayout bottomPanel;
+    //    @BindView(R.id.panel)
+//    RelativeLayout panel;
     @BindView(R.id.timer)
     Chronometer timer;
     @BindView(R.id.quit)
     TextView quit;
-    @BindView(R.id.indicator)
-    CirclePageIndicator indicator;
-//    @BindView(R.id.userTrackView)
-//    UserTrackView userTrackView;
+    //    @BindView(R.id.pageIndicator)
+//    LinearLayout pageIndicator;
+    @BindView(R.id.loudspeaker)
+    FontIconView loudspeaker;
+    @BindView(R.id.muteStatusText)
+    TextView muteStatusText;
+    @BindView(R.id.videoStatusText)
+    TextView videoStatusText;
+    @BindView(R.id.statusBar)
+    View statusBar;
+    @BindView(R.id.shareDesktopIcon)
+    ImageView shareDesktopIcon;
+    @BindView(R.id.shareDesktopText)
+    TextView shareDesktopText;
+    @BindView(R.id.shareDesktop)
+    LinearLayout shareDesktop;
+    @BindView(R.id.stopShareLayout)
+    RelativeLayout stopShareLayout;
+    @BindView(R.id.stopShare)
+    ImageView stopShare;
+
+//    @BindView(R.id.track_window_0)
+//    UserTrackView trackWindow0;
+//    @BindView(R.id.track_window_1)
+//    UserTrackView trackWindow1;
+//    @BindView(R.id.track_window_3)
+//    UserTrackView trackWindow3;
+//    @BindView(R.id.linearLayout1)
+//    LinearLayout linearLayout1;
+//    @BindView(R.id.track_window_2)
+//    UserTrackView trackWindow2;
+//    @BindView(R.id.track_window_4)
+//    UserTrackView trackWindow4;
+//    @BindView(R.id.linearLayout2)
+//    LinearLayout linearLayout2;
+//    @BindView(R.id.track_window_5)
+//    UserTrackView trackWindow5;
+//    @BindView(R.id.track_window_7)
+//    UserTrackView trackWindow7;
+//    @BindView(R.id.linearLayout5)
+//    LinearLayout linearLayout5;
+//    @BindView(R.id.track_window_6)
+//    UserTrackView trackWindow6;
+//    @BindView(R.id.track_window_8)
+//    UserTrackView trackWindow8;
+//    @BindView(R.id.linearLayout6)
+//    LinearLayout linearLayout6;
 
     private String postMessageUrl = ServerInfo.live + "/v3/push_message";
     private static final String TAG = "RoomActivity";
@@ -143,6 +192,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
     public static final String EXTRA_USER_ID = "USER_ID";
     public static final String EXTRA_ROOM_TOKEN = "ROOM_TOKEN";
     public static final String EXTRA_ROOM_ID = "ROOM_ID";
+    public static final String EXTRA_IS_ADMIN = "IS_ADMIN";
 
     private static final String[] MANDATORY_PERMISSIONS = {
             "android.permission.MODIFY_AUDIO_SETTINGS",
@@ -150,9 +200,9 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
             "android.permission.INTERNET"
     };
     @BindView(R.id.muteStatus)
-    FontIconView muteStatus;
+    ImageView muteStatus;
     @BindView(R.id.videoStatus)
-    FontIconView videoStatus;
+    ImageView videoStatus;
 
 
     private Handler mHandler;
@@ -171,6 +221,9 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
     private boolean mVideoEnabled = true;
     private boolean mSpeakerEnabled = true;
     private boolean mShowPannel = true;
+    private boolean mShareDesktopEnabled = false;
+
+    private boolean mNeedResumeVideo = false;
 
 
     private boolean mIsError = false;
@@ -189,6 +242,8 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
     //private TrackWindowMgr mTrackWindowMgr;
 
     private PagerAdapter mPagerAdapter;
+
+    private ConferenceMemberAdapter mConferenceMemberAdapter;
 
     /**
      * 合流相关
@@ -219,30 +274,46 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 
     private ArrayList<UserTrackInfo> mUserTrackInfos = new ArrayList<>();
 
-    private int mCurrentPage=0;
+    private int mCurrentPage = 0;
 
-    //支持人是否禁言
-    private boolean canSpeak=true;
-    //支持人是否禁止视频
-    private boolean canVideo=true;
+    private LayoutManger mLayoutManger;
 
-    private String mScreenUserId;
+    //主持人是否单独禁言
+    private boolean canSpeak = true;
+    //主持人是否单独禁止视频
+    private boolean canVideo = true;
+    //主持人是否全局禁言
+    private boolean globalCanSpeak = true;
+    //主持人是否全局禁止视频
+    private boolean globalCanVideo = true;
+
+    public static String mScreenUserId;
+
+    public static String mHostId;
 
     private ChatDialog mChatDialog;
 
-    private ArrayList<ChatMessage> mChatMessages=new ArrayList<>();
+    private ArrayList<ChatMessage> mChatMessages = new ArrayList<>();
 
     private HashMap<String, String> mMessageMap = new HashMap<>();
     private String mStreamName;
+
+    private DialogFragment mDialogFragment;
+
+    //绑定用户头像，nickname
+    public static List<CandidateInfo> sCandidateInfos = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                 | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
-        getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility());
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+//                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+//                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        // getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility());
         EventBus.getDefault().register(this);
         mHandler = new Handler();
 
@@ -253,15 +324,24 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
         mScreenHeight = outMetrics.heightPixels;
 
         setContentView(R.layout.activity_room);
+
         ButterKnife.bind(this);
-
-
+        ImmersionBar.with(this).statusBarDarkFont(false).titleBar(statusBar).init();
+        sCandidateInfos.clear();
+        CandidateInfo candidateInfo = new CandidateInfo();
+        candidateInfo.setAvatar(User.getInstance().getAvatar());
+        candidateInfo.setId("" + User.getInstance().getId());
+        candidateInfo.setNickname(User.getInstance().getNickname());
+        sCandidateInfos.add(candidateInfo);
         Intent intent = getIntent();
         mRoomToken = intent.getStringExtra(EXTRA_ROOM_TOKEN);
         mUserId = intent.getStringExtra(EXTRA_USER_ID);
         mRoomId = intent.getStringExtra(EXTRA_ROOM_ID);
-        mStreamName=intent.getStringExtra("streamName");
-        //mIsAdmin = mUserId.equals(QNAppServer.ADMIN_USER);
+        mScreenUserId = mUserId;
+        //MoreActionDialog.screenUserId = mUserId;
+
+        mIsAdmin = intent.getBooleanExtra(EXTRA_IS_ADMIN, false);
+        mStreamName = intent.getStringExtra("streamName");
 
         mPagerAdapter = new PagerAdapter() {
 
@@ -269,11 +349,11 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
             @Override
             public int getItemPosition(Object object) {
 
-                if((int)((View)object).getTag()==mCurrentPage){
-                    return POSITION_NONE;
-                }else {
-                   return POSITION_UNCHANGED;
-                }
+//                if ((int) ((View) object).getTag() == mCurrentPage) {
+                return POSITION_NONE;
+//                } else {
+//                    return POSITION_UNCHANGED;
+//                }
 
 
             }
@@ -295,9 +375,27 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                     if (userTrackInfo.getQNAudioTrackInfo() != null) {
                         trackInfos.add(userTrackInfo.getQNAudioTrackInfo());
                     }
+                    if (userTrackInfo.getUserTrackView() != null) {
+                        userTrackInfo.getUserTrackView().unSetUserTrackInfo();
+
+                        ViewParent parent = userTrackInfo.getUserTrackView().getParent();
+
+                        if (parent != null && parent instanceof ViewGroup) {
+                            ((ViewGroup) parent).removeView(userTrackInfo.getUserTrackView());
+                        }
+                    }
+                    //userTrackView.unSetUserTrackInfo();
                     userTrackView.setUserTrackInfo(mEngine, userTrackInfo.getUserId(), trackInfos);
-                    userTrackView.changeViewBackgroundByPos(0);
-                    mUserTrackInfos.get(0).setUserTrackView(userTrackView);
+                    //userTrackView.changeViewBackgroundByPos(0);
+//                    userTrackView.setOnItemClickListener(new UserTrackView.OnMoreClickListener() {
+//                        @Override
+//                        public void onMoreClick(UserTrackView user) {
+//                            MoreActionDialog moreActionDialog = MoreActionDialog.getInstance(user,mEngine);
+//                            moreActionDialog.show(getSupportFragmentManager(), "MoreActionDialog");
+//
+//                        }
+//                    });
+                    userTrackInfo.setUserTrackView(userTrackView);
                     container.addView(v);
                     v.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -305,9 +403,11 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 
                             mShowPannel = !mShowPannel;
                             if (!mShowPannel) {
-                                panel.setVisibility(View.GONE);
+                                topPanel.setVisibility(View.GONE);
+                                bottomPanel.setVisibility(View.GONE);
                             } else {
-                                panel.setVisibility(View.VISIBLE);
+                                topPanel.setVisibility(View.VISIBLE);
+                                bottomPanel.setVisibility(View.VISIBLE);
                             }
                         }
                     });
@@ -316,7 +416,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                 } else {
                     LayoutInflater inflater = LayoutInflater.from(RoomActivity.this);
                     final View v = inflater.inflate(R.layout.normal_user_video_item, container, false);
-                    int num=0;
+                    int num = 0;
                     for (int i = (position - 1) * 4 + 1; i < mUserTrackInfos.size() && num < 4; i++, num++) {
                         UserTrackView userTrackView;
                         if (num == 0) {
@@ -335,22 +435,52 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                         if (userTrackInfo.getQNAudioTrackInfo() != null) {
                             trackInfos.add(userTrackInfo.getQNAudioTrackInfo());
                         }
+                        if (userTrackInfo.getUserTrackView() != null) {
+                            userTrackInfo.getUserTrackView().unSetUserTrackInfo();
+                            ViewParent parent = userTrackInfo.getUserTrackView().getParent();
+
+                            if (parent != null && parent instanceof ViewGroup) {
+                                ((ViewGroup) parent).removeView(userTrackInfo.getUserTrackView());
+                            }
+                        }
+                        //userTrackView.unSetUserTrackInfo();
                         userTrackView.setUserTrackInfo(mEngine, userTrackInfo.getUserId(), trackInfos);
-                        userTrackView.changeViewBackgroundByPos(i);
-                        mUserTrackInfos.get(i).setUserTrackView(userTrackView);
+                        //userTrackView.changeViewBackgroundByPos(i);
+                        userTrackInfo.setUserTrackView(userTrackView);
+                        userTrackView.setOnItemClickListener(new UserTrackView.OnMoreClickListener() {
+                            @Override
+                            public void onMoreClick(UserTrackView user) {
+
+
+                            }
+                        });
                     }
-                    if(num==1){
+                    if (num == 1) {
                         v.findViewById(R.id.userTrackView2).setVisibility(View.INVISIBLE);
                         v.findViewById(R.id.userTrackView3).setVisibility(View.INVISIBLE);
                         v.findViewById(R.id.userTrackView4).setVisibility(View.INVISIBLE);
-                    }else if(num==2){
+                    } else if (num == 2) {
                         v.findViewById(R.id.userTrackView3).setVisibility(View.INVISIBLE);
                         v.findViewById(R.id.userTrackView4).setVisibility(View.INVISIBLE);
-                    }else if(num==3){
+                    } else if (num == 3) {
                         v.findViewById(R.id.userTrackView4).setVisibility(View.INVISIBLE);
                     }
 
                     container.addView(v);
+                    v.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            mShowPannel = !mShowPannel;
+                            if (!mShowPannel) {
+                                topPanel.setVisibility(View.GONE);
+                                bottomPanel.setVisibility(View.GONE);
+                            } else {
+                                topPanel.setVisibility(View.VISIBLE);
+                                bottomPanel.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
                     v.setTag(position);
                     return v;
                 }
@@ -376,6 +506,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 
         viewPager.setAdapter(mPagerAdapter);
         indicator.setViewPager(viewPager);
+        viewPager.setOffscreenPageLimit(2);
         indicator.setSnap(true);
         indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -385,8 +516,8 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 
             @Override
             public void onPageSelected(int position) {
-                mPagerAdapter.notifyDataSetChanged();
-                mCurrentPage=position;
+                //mPagerAdapter.notifyDataSetChanged();
+                mCurrentPage = position;
             }
 
             @Override
@@ -394,6 +525,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 
             }
         });
+
 
         // 权限申请
         for (String permission : MANDATORY_PERMISSIONS) {
@@ -410,7 +542,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
         // 初始化本地音视频 track
         initLocalTrackInfoList();
         // 初始化合流相关配置
-        initMergeLayoutConfig();
+
 
 //        mTrackWindowMgr = new TrackWindowMgr(mUserId, mScreenWidth, mScreenHeight, outMetrics.density
 //                , mEngine, mTrackWindowFullScreen, mTrackWindowsList);
@@ -418,6 +550,8 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
         List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
         localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
         addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+
+        //initMergeLayoutConfig();
         //test(mUserId, localTrackListExcludeScreenTrack);
     }
 
@@ -433,38 +567,225 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 //            Logging.e(TAG, "There were more than 9 published users in the room, with no unUsedWindow to draw.");
 //            return;
 //        }
+        long id = Thread.currentThread().getId();
+
         UserTrackInfo userTrackInfo = null;
         for (int var = 0; var < mUserTrackInfos.size(); var++) {
+
             if (mUserTrackInfos.get(var).getUserId().equals(userId)) {
                 userTrackInfo = mUserTrackInfos.get(var);
                 break;
+
             }
 
         }
         if (userTrackInfo != null) {
             // user has already displayed in screen
             userTrackInfo.onAddTrackInfo(trackInfoList);
-            if(userId.equals(mScreenUserId)){
-                mUserTrackInfos.remove(userTrackInfo);
-                mUserTrackInfos.add(0,userTrackInfo);
+            if (userId.equals(mScreenUserId)) {
 
+//                if(userTrackInfo.getUserTrackView()!=null){
+//                    userTrackInfo.getUserTrackView().reset();
+//                }
+//                if(mUserTrackInfos.size()>0&&mUserTrackInfos.get(0).getUserTrackView()!=null){
+//                    mUserTrackInfos.get(0).getUserTrackView().reset();
+//                }
+
+                mUserTrackInfos.remove(userTrackInfo);
+                mUserTrackInfos.add(0, userTrackInfo);
+                mPagerAdapter.notifyDataSetChanged();
+
+            }else{
+                if(userTrackInfo.getUserTrackView()!=null){
+
+
+                    List<QNTrackInfo> trackInfos = new ArrayList<>(userTrackInfo.getQNVideoTrackInfos());
+                    if (userTrackInfo.getQNAudioTrackInfo() != null) {
+                        trackInfos.add(userTrackInfo.getQNAudioTrackInfo());
+                    }
+                    userTrackInfo.getUserTrackView().unSetUserTrackInfo();
+                     userTrackInfo.getUserTrackView().setUserTrackInfo(mEngine, userTrackInfo.getUserId(), trackInfos);
+                }
             }
-            indicator.notifyDataSetChanged();
         } else {
             // allocate new track windows
             userTrackInfo = new UserTrackInfo(userId);
             userTrackInfo.onAddTrackInfo(trackInfoList);
-            if(userId.equals(mScreenUserId)){
-                mUserTrackInfos.add(0,userTrackInfo);
-            }else {
+            if (userId.equals(mScreenUserId)) {
+
+                mUserTrackInfos.add(0, userTrackInfo);
+            } else {
+                mUserTrackInfos.add(userTrackInfo);
+            }
+
+            // update whole layout
+            //updateTrackWindowsLayout();
+            mPagerAdapter.notifyDataSetChanged();
+        }
+
+
+        //mConferenceMemberAdapter.notifyDataSetChanged();
+
+        //updateTrackWindowsLayout();
+
+
+    }
+
+
+    public void updateTrackInfo(String userId, List<QNTrackInfo> trackInfoList) {
+
+
+        UserTrackInfo userTrackInfo = null;
+        for (int var = 0; var < mUserTrackInfos.size(); var++) {
+
+            if (mUserTrackInfos.get(var).getUserId().equals(userId)) {
+                userTrackInfo = mUserTrackInfos.get(var);
+                break;
+
+            }
+
+        }
+        if (userTrackInfo != null) {
+            // user has already displayed in screen
+            userTrackInfo.onAddTrackInfo(trackInfoList);
+            if (userId.equals(mScreenUserId)) {
+
+                mUserTrackInfos.remove(userTrackInfo);
+                mUserTrackInfos.add(0, userTrackInfo);
+
+            }
+        } else {
+            // allocate new track windows
+            userTrackInfo = new UserTrackInfo(userId);
+            userTrackInfo.onAddTrackInfo(trackInfoList);
+            if (userId.equals(mScreenUserId)) {
+
+//                if(mUserTrackInfos.size()>0&&mUserTrackInfos.get(0).getUserTrackView()!=null){
+//                    mUserTrackInfos.get(0).getUserTrackView().reset();
+//                }
+
+                mUserTrackInfos.add(0, userTrackInfo);
+            } else {
                 mUserTrackInfos.add(userTrackInfo);
             }
 
             mPagerAdapter.notifyDataSetChanged();
-            indicator.notifyDataSetChanged();
+
             // update whole layout
             //updateTrackWindowsLayout();
         }
+
+        //mConferenceMemberAdapter.notifyDataSetChanged();
+
+        //updateTrackWindowsLayout();
+
+
+    }
+
+
+    private void updateTrackWindowsLayout() {
+
+        int userCountInWindow = mUserTrackInfos.size();
+
+//        switch (userCountInWindow) {
+//
+//            case 1: {
+//                UserTrackInfo userTrackInfo = mUserTrackInfos.get(0);
+//                List<QNTrackInfo> trackInfos = new ArrayList<>(userTrackInfo.getQNVideoTrackInfos());
+//                if (userTrackInfo.getQNAudioTrackInfo() != null) {
+//                    trackInfos.add(userTrackInfo.getQNAudioTrackInfo());
+//                }
+//                trackWindow0.unSetUserTrackInfo();
+//                trackWindow1.unSetUserTrackInfo();
+//                trackWindow2.unSetUserTrackInfo();
+//                trackWindow3.unSetUserTrackInfo();
+//                trackWindow4.unSetUserTrackInfo();
+//                trackWindow5.unSetUserTrackInfo();
+//                trackWindow6.unSetUserTrackInfo();
+//                trackWindow7.unSetUserTrackInfo();
+//                trackWindow8.unSetUserTrackInfo();
+//
+//                ViewGroup.LayoutParams lp=trackWindow0.getLayoutParams();
+//                lp.width = CommonUtils.getScreenWidth();
+//                trackWindow0.setLayoutParams(lp);
+//                trackWindow0.setUserTrackInfo(mEngine, userTrackInfo.getUserId(), trackInfos);
+//
+//
+//                lp=linearLayout1.getLayoutParams();
+//                lp.width=0;
+//                linearLayout1.setLayoutParams(lp);
+//
+//                lp=linearLayout2.getLayoutParams();
+//                lp.width=0;
+//                linearLayout2.setLayoutParams(lp);
+//
+//                lp=linearLayout5.getLayoutParams();
+//                lp.width=0;
+//                linearLayout5.setLayoutParams(lp);
+//
+//                lp=linearLayout6.getLayoutParams();
+//                lp.width=0;
+//                linearLayout6.setLayoutParams(lp);
+//
+//            }
+//            break;
+//            case 2: {
+//                //第一个视图
+//                UserTrackInfo userTrackInfo = mUserTrackInfos.get(0);
+//                List<QNTrackInfo> trackInfos = new ArrayList<>(userTrackInfo.getQNVideoTrackInfos());
+//                if (userTrackInfo.getQNAudioTrackInfo() != null) {
+//                    trackInfos.add(userTrackInfo.getQNAudioTrackInfo());
+//                }
+//
+//                ViewGroup.LayoutParams lp=trackWindow0.getLayoutParams();
+//                lp.width = CommonUtils.getScreenWidth();
+//                trackWindow0.setLayoutParams(lp);
+//                trackWindow0.unSetUserTrackInfo();
+//                trackWindow0.setUserTrackInfo(mEngine, userTrackInfo.getUserId(), trackInfos);
+//                //第二个视图
+//
+//                lp=linearLayout1.getLayoutParams();
+//                lp.width=CommonUtils.getScreenWidth();
+//                linearLayout1.setLayoutParams(lp);
+//
+//                userTrackInfo = mUserTrackInfos.get(1);
+//                trackInfos = new ArrayList<>(userTrackInfo.getQNVideoTrackInfos());
+//                if (userTrackInfo.getQNAudioTrackInfo() != null) {
+//                    trackInfos.add(userTrackInfo.getQNAudioTrackInfo());
+//                }
+//
+//                trackWindow1.unSetUserTrackInfo();
+//                trackWindow1.setUserTrackInfo(mEngine, userTrackInfo.getUserId(), trackInfos);
+//
+//
+//                trackWindow2.unSetUserTrackInfo();
+//                trackWindow3.unSetUserTrackInfo();
+//                trackWindow4.unSetUserTrackInfo();
+//                trackWindow5.unSetUserTrackInfo();
+//                trackWindow6.unSetUserTrackInfo();
+//                trackWindow7.unSetUserTrackInfo();
+//                trackWindow8.unSetUserTrackInfo();
+//
+//
+//                lp=linearLayout2.getLayoutParams();
+//                lp.width=0;
+//                linearLayout2.setLayoutParams(lp);
+//
+//                lp=linearLayout5.getLayoutParams();
+//                lp.width=0;
+//                linearLayout5.setLayoutParams(lp);
+//
+//                lp=linearLayout6.getLayoutParams();
+//                lp.width=0;
+//                linearLayout6.setLayoutParams(lp);
+//
+//            }
+//            break;
+//
+//
+//        }
+
+
     }
 
 
@@ -514,12 +835,12 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 //            group.removeView(remoteVideoView);
 //        }
         mPagerAdapter.notifyDataSetChanged();
-        indicator.notifyDataSetChanged();
+        //mConferenceMemberAdapter.notifyDataSetChanged();
 
     }
 
 
-    public void onTrackInfoMuted(String remoteUserId,List<QNTrackInfo> trackInfoList) {
+    public void onTrackInfoMuted(String remoteUserId, List<QNTrackInfo> trackInfoList) {
         //UserTrackView window = mUserWindowMap.get(remoteUserId);
         UserTrackInfo userTrackInfo = null;
         for (int var = 0; var < mUserTrackInfos.size(); var++) {
@@ -532,12 +853,12 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 
         if (userTrackInfo != null) {
 
-            for(QNTrackInfo trackInfo:trackInfoList){
+            for (QNTrackInfo trackInfo : trackInfoList) {
                 if (QNTrackKind.AUDIO.equals(trackInfo.getTrackKind())) {
                     userTrackInfo.setQNAudioTrackInfo(trackInfo);
                 } else {
-                    for(QNTrackInfo track:userTrackInfo.getQNVideoTrackInfos()){
-                        if(track.getTrackId().equals(trackInfo.getTrackId())){
+                    for (QNTrackInfo track : userTrackInfo.getQNVideoTrackInfos()) {
+                        if (track.getTrackId() != null && track.getTrackId().equals(trackInfo.getTrackId())) {
                             userTrackInfo.getQNVideoTrackInfos().remove(track);
                             userTrackInfo.getQNVideoTrackInfos().add(trackInfo);
                             break;
@@ -547,7 +868,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                 }
             }
 
-            if(userTrackInfo.getUserTrackView()!=null){
+            if (userTrackInfo.getUserTrackView() != null) {
 
                 userTrackInfo.getUserTrackView().setQNAudioTrackInfo(userTrackInfo.getQNAudioTrackInfo());
                 userTrackInfo.getUserTrackView().setQNVideoTrackInfos(userTrackInfo.getQNVideoTrackInfos());
@@ -648,72 +969,64 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
     }
 
     private void initMergeLayoutConfig() {
-//        mMergeLayoutConfigView = new MergeLayoutConfigView(this);
-//        mMergeLayoutConfigView.setRoomId(mRoomId);
-//        mUserListAdapter = new UserListAdapter();
-//        mRoomUserList = new RoomUserList();
-//        mMergeLayoutConfigView.getUserListView().setAdapter(mUserListAdapter);
-//        mMergeLayoutConfigView.setOnClickedListener(new MergeLayoutConfigView.OnClickedListener() {
-//            @Override
-//            public void onConfirmClicked() {
-//                if (mEngine == null) {
-//                    return;
-//                }
-//                if (!mMergeLayoutConfigView.isStreamingEnabled()) {
-//                    // 处理停止合流逻辑
-//                    if (mIsStreaming) {
-//                        // 如果正在推流，则停止之前的合流任务
-//                        // 传入 null，则处理默认的合流任务
-//                        mEngine.stopMergeStream(mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
-//                        mIsStreaming = false;
-//                        ToastUtils.s(RoomActivity.this, "停止合流！！！");
-//                    } else {
-//                        ToastUtils.s(RoomActivity.this, "未开启合流，配置未生效！！！");
-//                    }
-//                    if (mPopWindow != null) {
-//                        mPopWindow.dismiss();
-//                    }
-//                    return;
-//                }
-//                if (mMergeLayoutConfigView.isCustomMergeJob()) {
-//                    // 处理自定义合流任务的逻辑
-//                    QNMergeJob mergeJob = mMergeLayoutConfigView.getCustomMergeJob();
-//                    if (mergeJob != null) {
-//                        // 如果正在推流，则停止之前的合流任务
-//                        if (mIsStreaming) {
-//                            mEngine.stopMergeStream(mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
-//                        }
-//                        mCurrentMergeJob = mergeJob;
-//                        // 创建自定义合流任务
-//                        mEngine.createMergeJob(mCurrentMergeJob);
-//                    }
-//                }
-//                List<UserTrack> userTracks = mMergeLayoutConfigView.updateMergeOptions();
-//                List<QNMergeTrackOption> addedTrackOptions = new ArrayList<>();
-//                List<QNMergeTrackOption> removedTrackOptions = new ArrayList<>();
-//                for (UserTrack item : userTracks) {
-//                    if (item.isTrackInclude()) {
-//                        addedTrackOptions.add(item.getQNMergeTrackOption());
-//                    } else {
-//                        removedTrackOptions.add(item.getQNMergeTrackOption());
-//                    }
-//                }
-//                if (!addedTrackOptions.isEmpty()) {
-//                    // 配置对应 tracks 的合流配置信息
-//                    mEngine.setMergeStreamLayouts(addedTrackOptions, mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
-//                }
-//                if (!removedTrackOptions.isEmpty()) {
-//                    // 移除对应 tracks 的合流配置，移除后相应 track 的数据将不会参与合流
-//                    mEngine.removeMergeStreamLayouts(removedTrackOptions, mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
-//                }
-//                if (mPopWindow != null) {
-//                    mPopWindow.dismiss();
-//                }
-//                mIsStreaming = true;
-//                ToastUtils.s(RoomActivity.this, "已发送合流配置，请等待合流画面生效");
-//            }
-//        });
+        if (mEngine == null) {
+            return;
+        }
+        List<QNMergeTrackOption> addedTrackOptions = new ArrayList<>();
+        List<QNMergeTrackOption> removedTrackOptions = new ArrayList<>();
+        for (int i = 0; i < mUserTrackInfos.size(); i++) {
+            UserTrackInfo userTrackInfo = mUserTrackInfos.get(i);
+            if (userTrackInfo.getUserId().equals(mScreenUserId)) {
+
+                QNMergeTrackOption option = new QNMergeTrackOption();
+                option.setWidth(1920);
+                option.setHeight(1080);
+                for (int j = 0; j < userTrackInfo.getQNVideoTrackInfos().size(); j++) {
+                    if (userTrackInfo.getQNVideoTrackInfos().get(j).getTag().equals(UserTrackView.TAG_CAMERA)) {
+                        option.setTrackId(userTrackInfo.getQNVideoTrackInfos().get(j).getTrackId());
+                        break;
+                    }
+                }
+                option.setX(0);
+                option.setY(0);
+                option.setZ(0);
+
+                addedTrackOptions.add(option);
+            } else {
+                QNMergeTrackOption option = new QNMergeTrackOption();
+                option.setWidth(1920);
+                option.setHeight(1080);
+                for (int j = 0; i < userTrackInfo.getQNVideoTrackInfos().size(); j++) {
+                    if (userTrackInfo.getQNVideoTrackInfos().get(j).getTag().equals(UserTrackView.TAG_CAMERA)) {
+                        option.setTrackId(userTrackInfo.getQNVideoTrackInfos().get(j).getTrackId());
+                        break;
+                    }
+                }
+                option.setX(0);
+                option.setY(0);
+                option.setZ(0);
+                removedTrackOptions.add(option);
+            }
+
+        }
+
+        if (!addedTrackOptions.isEmpty()) {
+            // 配置对应 tracks 的合流配置信息
+            mEngine.setMergeStreamLayouts(addedTrackOptions, mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
+        }
+        if (!removedTrackOptions.isEmpty()) {
+            // 移除对应 tracks 的合流配置，移除后相应 track 的数据将不会参与合流
+            mEngine.removeMergeStreamLayouts(removedTrackOptions, mCurrentMergeJob == null ? null : mCurrentMergeJob.getMergeJobId());
+        }
+        if (mPopWindow != null) {
+            mPopWindow.dismiss();
+        }
+        mIsStreaming = true;
+        ToastUtils.show("已发送合流配置，请等待合流画面生效");
+
+
     }
+
 
     @Override
     protected void onResume() {
@@ -730,17 +1043,17 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getEventBus(MessageEvent event) {
         if (event.getEventName().equals("message")) {
-            String msg=event.getMessageBody();
+            String msg = event.getMessageBody();
 
-            JSONObject jo=JSONObject.parseObject(msg);
-            if(jo.getString("type").equals("99")){
-                JSONObject jsonObject=jo.getJSONObject("data");
-                if(jsonObject!=null){
-                    if(jsonObject.getString("video").equals("1")){
-                        canVideo=true;
-                    }else if(jsonObject.getString("video").equals("0")){
-                        canVideo=false;
-                        if(mVideoEnabled){
+            JSONObject jo = JSONObject.parseObject(msg);
+            if (jo.getString("type").equals("99")) {
+                JSONObject jsonObject = jo.getJSONObject("data");
+                if (jsonObject != null) {
+                    if (jsonObject.getString("video").equals("1")) {
+                        globalCanVideo = true;
+                    } else if (jsonObject.getString("video").equals("2")) {
+                        globalCanVideo = false;
+                        if (mVideoEnabled) {
                             if (mEngine != null && mLocalVideoTrack != null) {
                                 mVideoEnabled = !mVideoEnabled;
                                 mLocalVideoTrack.setMuted(!mVideoEnabled);
@@ -754,18 +1067,20 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                                 List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
                                 localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
                                 addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
-                                onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                                onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
                             }
-                            videoStatus.setText(mVideoEnabled ?  R.string.menus_video:R.string.menus_cancel_video);
+                            //videoStatus.setText(mVideoEnabled ? R.string.menus_video : R.string.menus_cancel_video);
+                            videoStatus.setImageResource(mVideoEnabled ? R.drawable.ic_open_video : R.drawable.ic_close_video);
+                            videoStatusText.setText(mVideoEnabled ? "关闭视频" : "开启视频");
 
                         }
                     }
-                    if(jsonObject.getString("audio").equals("1")){
+                    if (jsonObject.getString("audio").equals("1")) {
 
-                        canSpeak=true;
-                    }else if(jsonObject.getString("audio").equals("2")){
-                        canSpeak=false;
-                        if(mMicEnabled){
+                        globalCanSpeak = true;
+                    } else if (jsonObject.getString("audio").equals("2")) {
+                        globalCanSpeak = false;
+                        if (mMicEnabled) {
                             if (mEngine != null && mLocalAudioTrack != null) {
                                 mMicEnabled = !mMicEnabled;
                                 mLocalAudioTrack.setMuted(!mMicEnabled);
@@ -773,57 +1088,140 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                                 List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
                                 localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
                                 addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
-                                onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                                onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
                             }
-                            muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+                            //muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+                            muteStatus.setImageResource(mMicEnabled ? R.drawable.ic_open_audio : R.drawable.ic_close_audio);
+                            muteStatusText.setText(mMicEnabled ? "静音" : "解除静音");
 
                         }
                     }
 
 
-                    mScreenUserId=jsonObject.getString("screenUserId");
-                    for(int i=0;i<mUserTrackInfos.size();i++){
-                        if(mUserTrackInfos.get(i).getUserId().equals(mScreenUserId)){
-                            if(i!=0){
-                                UserTrackInfo userTrackInfo=mUserTrackInfos.remove(i);
-                                mUserTrackInfos.add(0,userTrackInfo);
+                    mHostId = jsonObject.getString("hostId");
+
+                    mScreenUserId = jsonObject.getString("screenUserId");
+                    for (int i = 0; i < mUserTrackInfos.size(); i++) {
+                        if (mUserTrackInfos.get(i).getUserId().equals(mScreenUserId)) {
+                            if (i != 0) {
+                                UserTrackInfo userTrackInfo = mUserTrackInfos.remove(i);
+                                mUserTrackInfos.add(0, userTrackInfo);
+                                //mConferenceMemberAdapter.notifyDataSetChanged();
                                 mPagerAdapter.notifyDataSetChanged();
+                                //indicator.notifyDataSetChanged();
                                 break;
                             }
                         }
                     }
+
+                    JSONArray ja = jsonObject.getJSONArray("users");
+                    sCandidateInfos.clear();
+                    for (int i = 0; ja != null && i < ja.size(); i++) {
+
+                        CandidateInfo candidateInfo = new CandidateInfo();
+                        candidateInfo.setId(ja.getJSONObject(i).getString("id"));
+                        candidateInfo.setAvatar(ja.getJSONObject(i).getString("avatar"));
+                        candidateInfo.setNickname(ja.getJSONObject(i).getString("nickname"));
+                        sCandidateInfos.add(candidateInfo);
+
+                    }
+
+                    for (int i = 0; i < mUserTrackInfos.size(); i++) {
+                        if (mUserTrackInfos.get(i).getUserTrackView() != null) {
+                            mUserTrackInfos.get(i).getUserTrackView().onUpdateNicknameAndAvatar();
+                        }
+                    }
+
+
                 }
 
 
-
-            }else if(jo.getString("type").equals("2")){
+            } else if (jo.getString("type").equals("2")) {
                 //切换主屏
-                JSONObject jsonObject=jo.getJSONObject("data");
-                if(jsonObject!=null){
-                    mScreenUserId=jsonObject.getString("userId");
+                JSONObject jsonObject = jo.getJSONObject("data");
+                if (jsonObject != null) {
+                    mScreenUserId = jsonObject.getString("userId");
 
-                    for(int i=0;i<mUserTrackInfos.size();i++){
-                        if(mUserTrackInfos.get(i).getUserId().equals(mScreenUserId)){
-                            if(i!=0){
-                                UserTrackInfo userTrackInfo=mUserTrackInfos.remove(i);
-                                mUserTrackInfos.add(0,userTrackInfo);
+                    for (int i = 0; i < mUserTrackInfos.size(); i++) {
+                        if (mUserTrackInfos.get(i).getUserId().equals(mScreenUserId)) {
+                            if (i != 0) {
+                                UserTrackInfo userTrackInfo = mUserTrackInfos.remove(i);
+                                mUserTrackInfos.add(0, userTrackInfo);
                                 mPagerAdapter.notifyDataSetChanged();
+                                //mConferenceMemberAdapter.notifyDataSetChanged();
                                 break;
                             }
                         }
                     }
 
                 }
-            }else if(jo.getString("type").equals("1")){
-                JSONObject jsonObject=jo.getJSONObject("data");
-                if(jsonObject!=null){
-                    if(jsonObject.getString("video").equals("1")){
-                        ToastUtils.show("全体成员视频已开启");
-                        canVideo=true;
-                    }else if(jsonObject.getString("video").equals("2")){
-                        canVideo=false;
-                        ToastUtils.show("全体成员视频已禁用");
-                        if(mVideoEnabled){
+            } else if (jo.getString("type").equals("1")) {
+                JSONObject jsonObject = jo.getJSONObject("data");
+                if (jsonObject != null) {
+                    if (jsonObject.getString("video").equals("1")) {
+                        if (!globalCanVideo) {
+                            globalCanVideo = true;
+                            //ToastUtils.show("全体成员视频已开启");
+                            if (mDialogFragment != null && mDialogFragment.getShowsDialog()) {
+                                mDialogFragment.dismiss();
+                            }
+                            mDialogFragment = new CircleDialog.Builder()
+                                    .setCanceledOnTouchOutside(false)
+                                    .setCancelable(false)
+
+                                    .setText("主持人请求开启您的视频")
+                                    .setNegative("保持禁用", null)
+                                    .configNegative(new ConfigButton() {
+                                        @Override
+                                        public void onConfig(ButtonParams params) {
+                                            //按钮字体颜色
+                                            params.textColor = Color.parseColor("#cc001426");
+                                        }
+                                    })
+                                    .setPositive("开启视频", new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            if (!mVideoEnabled) {
+                                                if (mEngine != null && mLocalVideoTrack != null) {
+                                                    mVideoEnabled = !mVideoEnabled;
+                                                    mLocalVideoTrack.setMuted(!mVideoEnabled);
+                                                    if (mLocalScreenTrack != null) {
+                                                        mLocalScreenTrack.setMuted(!mVideoEnabled);
+                                                        mEngine.muteTracks(Arrays.asList(mLocalScreenTrack, mLocalVideoTrack));
+                                                    } else {
+                                                        mEngine.muteTracks(Collections.singletonList(mLocalVideoTrack));
+                                                    }
+
+                                                    List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                                                    localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                                                    addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                                                    onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
+                                                }
+                                                //videoStatus.setText(mVideoEnabled ? R.string.menus_video : R.string.menus_cancel_video);
+                                                videoStatus.setImageResource(mVideoEnabled ? R.drawable.ic_open_video : R.drawable.ic_close_video);
+                                                videoStatusText.setText(mVideoEnabled ? "关闭视频" : "开启视频");
+
+                                            }
+
+
+                                        }
+                                    })
+                                    .configPositive(new ConfigButton() {
+                                        @Override
+                                        public void onConfig(ButtonParams params) {
+                                            params.textColor = CommonUtils.getThemeColor(RoomActivity.this);
+                                        }
+                                    })
+                                    .show(getSupportFragmentManager());
+
+
+                        }
+                    } else if (jsonObject.getString("video").equals("2")) {
+                        if (globalCanVideo) {
+                            globalCanVideo = false;
+                            ToastUtils.show("主持人已将全体成员关闭视频");
+                        }
+                        if (mVideoEnabled) {
                             if (mEngine != null && mLocalVideoTrack != null) {
                                 mVideoEnabled = !mVideoEnabled;
                                 mLocalVideoTrack.setMuted(!mVideoEnabled);
@@ -837,20 +1235,75 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                                 List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
                                 localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
                                 addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
-                                onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                                onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
                             }
-                            videoStatus.setText(mVideoEnabled ?  R.string.menus_video:R.string.menus_cancel_video);
+                            //videoStatus.setText(mVideoEnabled ? R.string.menus_video : R.string.menus_cancel_video);
+                            videoStatus.setImageResource(mVideoEnabled ? R.drawable.ic_open_video : R.drawable.ic_close_video);
+                            videoStatusText.setText(mVideoEnabled ? "关闭视频" : "开启视频");
 
                         }
                     }
 
-                    if(jsonObject.getString("audio").equals("1")){
-                        ToastUtils.show("全体成员语音已开启");
-                        canSpeak=true;
-                    }else if(jsonObject.getString("audio").equals("2")){
-                        canSpeak=false;
-                        ToastUtils.show("主持人已将全体成员静音");
-                        if(mMicEnabled){
+                    if (jsonObject.getString("audio").equals("1")) {
+                        if (!globalCanSpeak) {
+                            //ToastUtils.show("全体成员语音已开启");
+                            globalCanSpeak = true;
+                            if (mDialogFragment != null && mDialogFragment.getShowsDialog()) {
+                                mDialogFragment.dismiss();
+                            }
+                            mDialogFragment = new CircleDialog.Builder()
+                                    .setCanceledOnTouchOutside(false)
+                                    .setCancelable(false)
+
+                                    .setText("主持人请求解除您的静音")
+                                    .setNegative("保持静音", null)
+                                    .configNegative(new ConfigButton() {
+                                        @Override
+                                        public void onConfig(ButtonParams params) {
+                                            //按钮字体颜色
+                                            params.textColor = Color.parseColor("#cc001426");
+                                        }
+                                    })
+                                    .setPositive("解除静音", new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            if (!mMicEnabled) {
+                                                if (mEngine != null && mLocalAudioTrack != null) {
+                                                    mMicEnabled = !mMicEnabled;
+                                                    mLocalAudioTrack.setMuted(!mMicEnabled);
+                                                    mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
+                                                    List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                                                    localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                                                    addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                                                    onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
+                                                }
+                                                //muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+                                                muteStatus.setImageResource(mMicEnabled ? R.drawable.ic_open_audio : R.drawable.ic_close_audio);
+                                                muteStatusText.setText(mMicEnabled ? "静音" : "解除静音");
+
+
+                                            }
+
+
+                                        }
+                                    })
+                                    .configPositive(new ConfigButton() {
+                                        @Override
+                                        public void onConfig(ButtonParams params) {
+                                            params.textColor = CommonUtils.getThemeColor(RoomActivity.this);
+                                        }
+                                    })
+                                    .show(getSupportFragmentManager());
+
+                        }
+
+                    } else if (jsonObject.getString("audio").equals("2")) {
+                        if (globalCanSpeak) {
+                            globalCanSpeak = false;
+                            ToastUtils.show("主持人已将全体成员静音");
+                        }
+
+                        if (mMicEnabled) {
                             if (mEngine != null && mLocalAudioTrack != null) {
                                 mMicEnabled = !mMicEnabled;
                                 mLocalAudioTrack.setMuted(!mMicEnabled);
@@ -858,30 +1311,131 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                                 List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
                                 localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
                                 addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
-                                onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                                onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
                             }
-                            muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+                            //muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+                            muteStatus.setImageResource(mMicEnabled ? R.drawable.ic_open_audio : R.drawable.ic_close_audio);
+                            muteStatusText.setText(mMicEnabled ? "静音" : "解除静音");
 
                         }
                     }
 
 
-
                 }
 
 
-            }else if(jo.getString("type").equals("4")){
-                JSONObject jsonObject=jo.getJSONObject("data");
-                if(jsonObject!=null){
+            } else if (jo.getString("type").equals("4")) {
+                JSONObject jsonObject = jo.getJSONObject("data");
+                if (jsonObject != null) {
 
-                    if(jsonObject.getString("id").equals(mUserId)){
-                        if(jsonObject.getString("video").equals("1")){
-                            ToastUtils.show("支持人已允许您的视频请求");
-                            canVideo=true;
-                        }else if(jsonObject.getString("video").equals("2")){
-                            canVideo=false;
-                            ToastUtils.show("支持人已禁止您的视频请求");
-                            if(mVideoEnabled){
+                    if (jsonObject.getString("id").equals("" + User.getInstance().getId())) {
+                        if (jsonObject.getString("video").equals("1")) {
+                            if (!canVideo) {
+                                canVideo = true;
+                                //ToastUtils.show("主持人已允许您的视频请求");
+
+                                if (mDialogFragment != null && mDialogFragment.getShowsDialog()) {
+                                    mDialogFragment.dismiss();
+                                }
+                                mDialogFragment = new CircleDialog.Builder()
+                                        .setCanceledOnTouchOutside(false)
+                                        .setCancelable(false)
+
+                                        .setText("主持人请求开启您的视频")
+                                        .setNegative("保持禁用", null)
+                                        .configNegative(new ConfigButton() {
+                                            @Override
+                                            public void onConfig(ButtonParams params) {
+                                                //按钮字体颜色
+                                                params.textColor = Color.parseColor("#cc001426");
+                                            }
+                                        })
+                                        .setPositive("开启视频", new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                if (!mVideoEnabled) {
+                                                    if (mEngine != null && mLocalVideoTrack != null) {
+                                                        mVideoEnabled = !mVideoEnabled;
+                                                        mLocalVideoTrack.setMuted(!mVideoEnabled);
+                                                        if (mLocalScreenTrack != null) {
+                                                            mLocalScreenTrack.setMuted(!mVideoEnabled);
+                                                            mEngine.muteTracks(Arrays.asList(mLocalScreenTrack, mLocalVideoTrack));
+                                                        } else {
+                                                            mEngine.muteTracks(Collections.singletonList(mLocalVideoTrack));
+                                                        }
+
+                                                        List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                                                        localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                                                        addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                                                        onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
+                                                    }
+                                                    //videoStatus.setText(mVideoEnabled ? R.string.menus_video : R.string.menus_cancel_video);
+                                                    videoStatus.setImageResource(mVideoEnabled ? R.drawable.ic_open_video : R.drawable.ic_close_video);
+                                                    videoStatusText.setText(mVideoEnabled ? "关闭视频" : "开启视频");
+
+                                                }
+
+
+                                            }
+                                        })
+                                        .configPositive(new ConfigButton() {
+                                            @Override
+                                            public void onConfig(ButtonParams params) {
+                                                params.textColor = CommonUtils.getThemeColor(RoomActivity.this);
+                                            }
+                                        })
+                                        .show(getSupportFragmentManager());
+
+
+//                                new CircleDialog.Builder()
+//                                        .setCanceledOnTouchOutside(false)
+//                                        .setCancelable(false)
+//
+//                                        .setText("主持人请求开启您的视频")
+//                                        .setNegative("保持关闭", null)
+//                                        .configNegative(new ConfigButton() {
+//                                            @Override
+//                                            public void onConfig(ButtonParams params) {
+//                                                //按钮字体颜色
+//                                                params.textColor = R.color.themeBlue;
+//                                            }
+//                                        })
+//                                        .setPositive("开启视频", new View.OnClickListener() {
+//                                            @Override
+//                                            public void onClick(View v) {
+//                                                if (!mVideoEnabled) {
+//                                                    if (mEngine != null && mLocalVideoTrack != null) {
+//                                                        mVideoEnabled = !mVideoEnabled;
+//                                                        mLocalVideoTrack.setMuted(!mVideoEnabled);
+//                                                        if (mLocalScreenTrack != null) {
+//                                                            mLocalScreenTrack.setMuted(!mVideoEnabled);
+//                                                            mEngine.muteTracks(Arrays.asList(mLocalScreenTrack, mLocalVideoTrack));
+//                                                        } else {
+//                                                            mEngine.muteTracks(Collections.singletonList(mLocalVideoTrack));
+//                                                        }
+//
+//                                                        List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+//                                                        localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+//                                                        addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+//                                                        onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
+//                                                    }
+//                                                    videoStatus.setText(mVideoEnabled ? R.string.menus_video : R.string.menus_cancel_video);
+//                                                    videoStatusText.setText(mVideoEnabled ? "关闭视频" : "开启视频");
+//
+//                                                }
+//
+//
+//                                            }
+//                                        })
+//                                        .show(getSupportFragmentManager());
+                            }
+
+                        } else if (jsonObject.getString("video").equals("2")) {
+                            if (canVideo) {
+                                canVideo = false;
+                                ToastUtils.show("主持人已关闭您的视频");
+                            }
+                            if (mVideoEnabled) {
                                 if (mEngine != null && mLocalVideoTrack != null) {
                                     mVideoEnabled = !mVideoEnabled;
                                     mLocalVideoTrack.setMuted(!mVideoEnabled);
@@ -895,74 +1449,117 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                                     List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
                                     localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
                                     addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
-                                    onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                                    onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
                                 }
-                                videoStatus.setText(mVideoEnabled ?  R.string.menus_video:R.string.menus_cancel_video);
+                                //videoStatus.setText(mVideoEnabled ? R.string.menus_video : R.string.menus_cancel_video);
+                                videoStatus.setImageResource(mVideoEnabled ? R.drawable.ic_open_video : R.drawable.ic_close_video);
+                                videoStatusText.setText(mVideoEnabled ? "关闭视频" : "开启视频");
 
                             }
                         }
 
-                        if(jsonObject.getString("audio").equals("1")){
-                            ToastUtils.show("支持人已允许您的语音请求");
-                            new CircleDialog.Builder()
-                                    .setCanceledOnTouchOutside(false)
-                                    .setCancelable(false)
+                        if (jsonObject.getString("audio").equals("1")) {
+                            //ToastUtils.show("主持人已允许您的语音请求");
+                            if (!canSpeak) {
+                                canSpeak = true;
 
-                                    .setText("主持人请求解除您的静音")
-                                    .setNegative("保持静音", null)
-                                    .configNegative(new ConfigButton() {
-                                        @Override
-                                        public void onConfig(ButtonParams params) {
-                                            //按钮字体颜色
-                                            params.textColor = CommonUtils.getThemeColor(RoomActivity.this);
-                                        }
-                                    })
-                                    .setPositive("解除静音", new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            if(!mMicEnabled){
-                                                if (mEngine != null && mLocalAudioTrack != null) {
-                                                    mMicEnabled = !mMicEnabled;
-                                                    mLocalAudioTrack.setMuted(!mMicEnabled);
-                                                    mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
-                                                    List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
-                                                    localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
-                                                      addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
-                                                    onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                                if (mDialogFragment != null && mDialogFragment.getShowsDialog()) {
+                                    mDialogFragment.dismiss();
+                                }
+                                mDialogFragment = new CircleDialog.Builder()
+                                        .setCanceledOnTouchOutside(false)
+                                        .setCancelable(false)
+
+                                        .setText("主持人请求解除您的静音")
+                                        .setNegative("保持静音", null)
+                                        .configNegative(new ConfigButton() {
+                                            @Override
+                                            public void onConfig(ButtonParams params) {
+                                                //按钮字体颜色
+                                                params.textColor = Color.parseColor("#cc001426");
+                                            }
+                                        })
+                                        .setPositive("解除静音", new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                if (!mMicEnabled) {
+                                                    if (mEngine != null && mLocalAudioTrack != null) {
+                                                        mMicEnabled = !mMicEnabled;
+                                                        mLocalAudioTrack.setMuted(!mMicEnabled);
+                                                        mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
+                                                        List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                                                        localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                                                        addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                                                        onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
+                                                    }
+                                                    //muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+                                                    muteStatus.setImageResource(mMicEnabled ? R.drawable.ic_open_audio : R.drawable.ic_close_audio);
+                                                    muteStatusText.setText(mMicEnabled ? "静音" : "解除静音");
+
+
                                                 }
-                                                muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
 
 
                                             }
-
-
-                                        }
-                                    })
-                                    .show(getSupportFragmentManager());
-
-
-                            canSpeak=true;
-                        }else if(jsonObject.getString("audio").equals("2")){
-                            canSpeak=false;
-                            ToastUtils.show("支持人已禁止您的语音请求");
-                            if(mMicEnabled){
-                                if (mEngine != null && mLocalAudioTrack != null) {
-                                    mMicEnabled = !mMicEnabled;
-                                    mLocalAudioTrack.setMuted(!mMicEnabled);
-                                    mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
-                                    List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
-                                    localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
-                                    addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
-                                    onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
-                                }
-                                muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+                                        })
+                                        .configPositive(new ConfigButton() {
+                                            @Override
+                                            public void onConfig(ButtonParams params) {
+                                                params.textColor = CommonUtils.getThemeColor(RoomActivity.this);
+                                            }
+                                        })
+                                        .show(getSupportFragmentManager());
 
                             }
+
+
+                        } else if (jsonObject.getString("audio").equals("2")) {
+                            if (canSpeak) {
+                                canSpeak = false;
+                                ToastUtils.show("主持人已将您静音");
+                                if (mMicEnabled) {
+                                    if (mEngine != null && mLocalAudioTrack != null) {
+                                        mMicEnabled = !mMicEnabled;
+                                        mLocalAudioTrack.setMuted(!mMicEnabled);
+                                        mEngine.muteTracks(Collections.singletonList(mLocalAudioTrack));
+                                        List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
+                                        localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
+                                        addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
+                                        onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
+                                    }
+                                    //muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+                                    muteStatus.setImageResource(mMicEnabled ? R.drawable.ic_open_audio : R.drawable.ic_close_audio);
+                                    muteStatusText.setText(mMicEnabled ? "静音" : "解除静音");
+
+                                }
+                            }
+
                         }
                     }
 
 
                 }
+
+
+            } else if (jo.getString("type").equals("5")) {
+
+                new CircleDialog.Builder()
+                        .setText("连麦已结束")
+                        .setPositive("我知道了", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                finish();
+                            }
+                        })
+                        .configPositive(new ConfigButton() {
+                            @Override
+                            public void onConfig(ButtonParams params) {
+                                params.textColor = CommonUtils.getThemeColor(RoomActivity.this);
+                            }
+                        })
+                        .setCancelable(false)
+
+                        .show(getSupportFragmentManager());
 
 
             }
@@ -977,8 +1574,23 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 
 
         }
+//        else if (event.getEventName().equals("primaryScreen")) {
+//
+//            for (int i = 0; i < mUserTrackInfos.size(); i++) {
+//                if (mUserTrackInfos.get(i).getUserId().equals(MoreActionDialog.screenUserId)) {
+//                    if (i != 0) {
+//                        UserTrackInfo userTrackInfo = mUserTrackInfos.remove(i);
+//                        mUserTrackInfos.add(0, userTrackInfo);
+//                        mConferenceMemberAdapter.notifyDataSetChanged();
+//                        break;
+//                    }
+//                }
+//            }
+//
+//
+//            initMergeLayoutConfig();
+//        }
     }
-
 
 
     @Override
@@ -1174,7 +1786,8 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 //                }
                 break;
             case CONNECTING:
-                logAndToast(getString(R.string.connecting_to, mRoomId));
+                //logAndToast(getString(R.string.connecting_to, mRoomId));
+                logAndToast("正在连接");
                 break;
         }
     }
@@ -1203,6 +1816,30 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 //        }
         //logAndToast("onRemoteUserJoined,remoteUserId="+remoteUserId);
         Log.i(TAG, "onRemoteUserJoined,remoteUserId=" + remoteUserId);
+
+//        JSONObject jo = new JSONObject();
+//        jo.put("type", 99);
+//        JSONObject object = new JSONObject();
+//        object.put("audio", JoinApplyListActivity.mAudioMuted ? 2 : 1);
+//        object.put("video", JoinApplyListActivity.mVideoMuted ? 2 : 1);
+//        object.put("screenUserId", MoreActionDialog.screenUserId);
+//        object.put("hostId", User.getInstance().getId());
+//
+//        JSONArray ja = new JSONArray();
+//        for (int i = 0; i < RoomActivity.sCandidateInfos.size(); i++) {
+//            CandidateInfo candidateInfo = RoomActivity.sCandidateInfos.get(i);
+//            JSONObject jsonObject = new JSONObject();
+//            jsonObject.put("id", candidateInfo.getId());
+//            jsonObject.put("userId", "user_"+ candidateInfo.getId());
+//            jsonObject.put("avatar", candidateInfo.getAvatar());
+//            jsonObject.put("nickname", candidateInfo.getNickname());
+//            ja.add(jsonObject);
+//        }
+//        object.put("users", ja);
+//
+//        jo.put("data", object);
+//        sendMessage(jo.toString());
+
     }
 
     /**
@@ -1230,6 +1867,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
         //logAndToast("onLocalPublished");
         Log.i(TAG, "onLocalPublished");
         mEngine.enableStatistics();
+        //initMergeLayoutConfig();
 //        if (mIsAdmin) {
 //            mRoomUserList.onTracksPublished(mUserId, mLocalTrackList);
 //            resetMergeStream();
@@ -1288,8 +1926,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
         Log.i(TAG, "onRemoteUserMuted");
 
 
-
-        onTrackInfoMuted(remoteUserId,trackInfoList);
+        onTrackInfoMuted(remoteUserId, trackInfoList);
     }
 
     /**
@@ -1306,6 +1943,8 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 //        }
         Log.i(TAG, "onSubscribed");
         addTrackInfo(remoteUserId, trackInfoList);
+
+
     }
 
     /**
@@ -1315,8 +1954,32 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
      */
     @Override
     public void onKickedOut(String userId) {
-        ToastUtils.show(getString(R.string.kicked_by_admin));
-        finish();
+
+        new CircleDialog.Builder()
+                .setText("您已经被主持人移除连麦")
+                .setPositive("我知道了", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                    }
+                })
+                .configPositive(new ConfigButton() {
+                    @Override
+                    public void onConfig(ButtonParams params) {
+                        params.textColor = CommonUtils.getThemeColor(RoomActivity.this);
+                    }
+                })
+                 .setCancelable(false)
+                .show(getSupportFragmentManager());
+
+        //ToastUtils.show(getString(R.string.kicked_by_admin));
+
+        //EventBus.getDefault().post(new MessageEvent("kickedOut", null));
+
+        //ToastUtils.show("您已经被主持人移除连麦");
+
+
+        //finish();
     }
 
     /**
@@ -1426,8 +2089,8 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                 break;
             case QNErrorCode.ERROR_TOKEN_EXPIRED:
                 logAndToast("roomToken过期");
-                mRoomToken = QNAppServer.getInstance().requestRoomToken(RoomActivity.this, mUserId, mRoomId);
-                mEngine.joinRoom(mRoomToken);
+//                mRoomToken = QNAppServer.getInstance().requestRoomToken(RoomActivity.this, mUserId, mRoomId);
+//                mEngine.joinRoom(mRoomToken);
                 break;
             case QNErrorCode.ERROR_ROOM_FULL:
                 logAndToast("房间人数已满!");
@@ -1594,7 +2257,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 //        mPopWindow.showAtLocation(getWindow().getDecorView().getRootView(), Gravity.BOTTOM, 0, 0);
 //    }
 
-    @OnClick({R.id.switchCamera, R.id.quit, R.id.openMute, R.id.closeVideo,R.id.interactChat,R.id.panel})
+    @OnClick({R.id.loudspeaker, R.id.switchCamera, R.id.quit, R.id.openMute, R.id.closeVideo, R.id.interactChat, R.id.shareDesktop,R.id.stopShare})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.switchCamera:
@@ -1610,14 +2273,42 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                     });
                 }
                 break;
-            case R.id.quit:
+            case R.id.loudspeaker:
                 if (mEngine != null) {
-                    mEngine.leaveRoom();
+                    mSpeakerEnabled = !mSpeakerEnabled;
+                    mEngine.muteRemoteAudio(!mSpeakerEnabled);
                 }
-                finish();
+                loudspeaker.setText(mSpeakerEnabled ? R.string.loud_speaker : R.string.no_loud_speaker);
+
+                break;
+            case R.id.quit:
+                final String[] items = {"离开连麦"};
+                new CircleDialog.Builder()
+
+                        .setItems(items, new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                if (mEngine != null) {
+                                    mEngine.leaveRoom();
+                                }
+                                finish();
+                            }
+                        })
+                        .configItems(new ConfigItems() {
+                            @Override
+                            public void onConfig(ItemsParams params) {
+                                //params.textColor = Color.parseColor("#f00");
+                                params.textColor = Color.RED;
+
+                            }
+                        })
+                        .setNegative("取消", null)
+                        .show(getSupportFragmentManager());
+
+
                 break;
             case R.id.openMute:
-                if(canSpeak){
+                if (canSpeak && globalCanSpeak) {
                     if (mEngine != null && mLocalAudioTrack != null) {
                         mMicEnabled = !mMicEnabled;
                         mLocalAudioTrack.setMuted(!mMicEnabled);
@@ -1628,19 +2319,24 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                         List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
                         localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
                         addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
-                        onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                        onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
                     }
-                    muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
-                }else{
-                    ToastUtils.show("支持人已经禁言");
+                    //muteStatus.setText(mMicEnabled ? R.string.menus_cancel_mute : R.string.menus_mute);
+                    muteStatus.setImageResource(mMicEnabled ? R.drawable.ic_open_audio : R.drawable.ic_close_audio);
+                    muteStatusText.setText(mMicEnabled ? "静音" : "解除静音");
+                } else {
+                    if (!globalCanSpeak) {
+                        ToastUtils.show("主持人已将全体成员静音");
+                    } else {
+                        ToastUtils.show("主持人已将您静音");
+                    }
+
                 }
-
-
                 //return mMicEnabled;
-
                 break;
+
             case R.id.closeVideo:
-                if(canVideo){
+                if (canVideo && globalCanVideo) {
                     if (mEngine != null && mLocalVideoTrack != null) {
                         mVideoEnabled = !mVideoEnabled;
                         mLocalVideoTrack.setMuted(!mVideoEnabled);
@@ -1657,11 +2353,17 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                         List<QNTrackInfo> localTrackListExcludeScreenTrack = new ArrayList<>(mLocalTrackList);
                         localTrackListExcludeScreenTrack.remove(mLocalScreenTrack);
                         addTrackInfo(mUserId, localTrackListExcludeScreenTrack);
-                        onTrackInfoMuted(mUserId,localTrackListExcludeScreenTrack);
+                        onTrackInfoMuted(mUserId, localTrackListExcludeScreenTrack);
                     }
-                    videoStatus.setText(mVideoEnabled ?  R.string.menus_video:R.string.menus_cancel_video);
-                }else {
-                    ToastUtils.show("支持人已禁止视频");
+                    //videoStatus.setText(mVideoEnabled ? R.string.menus_video : R.string.menus_cancel_video);
+                    videoStatus.setImageResource(mVideoEnabled ? R.drawable.ic_open_video : R.drawable.ic_close_video);
+                    videoStatusText.setText(mVideoEnabled ? "关闭视频" : "开启视频");
+                } else {
+                    if (!globalCanVideo) {
+                        ToastUtils.show("主持人已将全体成员禁止视频");
+                    } else {
+                        ToastUtils.show("主持人已将您禁止视频");
+                    }
                 }
 
                 //return mVideoEnabled;
@@ -1682,45 +2384,45 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                 }
                 //return mBeautyEnabled;
                 break;
-            case R.id.panel:
-                mShowPannel = !mShowPannel;
-                if (!mShowPannel) {
-                    panel.setVisibility(View.GONE);
-                } else {
-                    panel.setVisibility(View.VISIBLE);
-                }
-                break;
+//            case R.id.panel:
+//                mShowPannel = !mShowPannel;
+//                if (!mShowPannel) {
+//                    panel.setVisibility(View.GONE);
+//                } else {
+//                    panel.setVisibility(View.VISIBLE);
+//                }
+//                break;
             case R.id.interactChat:
                 mChatDialog = ChatDialog.getInstance();
                 mChatDialog.setOnChatEventListener(new ChatDialog.OnChatEventListener() {
                     @Override
                     public void sendImage() {
-                        if(User.getInstance()==null){
-                            Intent it=new Intent(RoomActivity.this, NewLoginActivity.class);
-                            it.putExtra("jump_url",ServerInfo.h5IP);
+                        if (User.getInstance() == null) {
+                            Intent it = new Intent(RoomActivity.this, NewLoginActivity.class);
+                            it.putExtra("jump_url", ServerInfo.h5IP);
                             startActivity(it);
-                        }else{
+                        } else {
 
                             RxPermissions rxPermissions = new RxPermissions(RoomActivity.this);
-                            rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            rxPermissions.request(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                                     .subscribe(new Consumer<Boolean>() {
                                         @Override
                                         public void accept(Boolean granted) throws Exception {
-                                            if(granted){
+                                            if (granted) {
                                                 String packageName = getPackageName();
                                                 Matisse.from(RoomActivity.this)
-                                                        .choose(MimeType.of(MimeType.JPEG,MimeType.PNG)) // 选择 mime 的类型
+                                                        .choose(MimeType.of(MimeType.JPEG, MimeType.PNG)) // 选择 mime 的类型
                                                         .countable(false)
                                                         .maxSelectable(1) // 图片选择的最多数量
                                                         .spanCount(4)
                                                         .capture(true)
-                                                        .captureStrategy(new CaptureStrategy(true,packageName+".fileprovider"))
+                                                        .captureStrategy(new CaptureStrategy(true, packageName + ".fileprovider"))
                                                         .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
                                                         .thumbnailScale(1.0f) // 缩略图的比例
                                                         .theme(R.style.Matisse_Zhihu)
                                                         .imageEngine(new MyGlideEngine()) // 使用的图片加载引擎
                                                         .forResult(CHOOSE_PHOTO); // 设置作为标记的请求码
-                                            }else{
+                                            } else {
                                                 ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
                                             }
                                         }
@@ -1736,16 +2438,16 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
 
                         if (TextUtils.isEmpty(str)) return;
                         mMessageMap.clear();
-                        mMessageMap.put("room_id", ""+mRoomId);//直播间ID
-                        mMessageMap.put("parent_id","0");
+                        mMessageMap.put("room_id", "" + mRoomId);//直播间ID
+                        mMessageMap.put("parent_id", "0");
                         mMessageMap.put("user_id", User.getInstance().getId() + "");//用户ID
                         mMessageMap.put("type", "2");//发布端类型：1.主持人   2：用户    3:通知关注  4：通知进入直播间
                         mMessageMap.put("stream_name", mStreamName);//播间推流ID
                         mMessageMap.put("nick_name", User.getInstance().getNickname());//昵称
                         mMessageMap.put("message_type", "1");//消息类型 1.互动消息  2.直播状态更新消息  3.删除消息  4.题目 5.菜单设置 6图文保存  默认1
-                        mMessageMap.put("user_logo",User.getInstance().getAvatar());
+                        mMessageMap.put("user_logo", User.getInstance().getAvatar());
                         mMessageMap.put("message", str);
-                        mMessageMap.put("content_type","1");
+                        mMessageMap.put("content_type", "1");
                         OkHttpUtils.post(postMessageUrl, mMessageMap, new OkHttpCallback(RoomActivity.this) {
                             @Override
                             public void onFailure(Call call, Exception e) {
@@ -1765,6 +2467,100 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                 mChatDialog.show(getSupportFragmentManager(), "ChatDialog");
 
                 break;
+            case R.id.shareDesktop:
+                if (!mShareDesktopEnabled) {
+                    if (mLocalScreenTrack == null) {
+                        QNScreenCaptureUtil.requestScreenCapture(this);
+
+                    } else {
+
+
+                        if(mVideoEnabled){
+                            mNeedResumeVideo=true;
+                        }
+                        //1 先取消发布摄像头流
+                        //mEngine.unPublishTracks(Arrays.asList(mLocalVideoTrack));
+
+                        //todo 要注释掉
+                        mEngine.unPublishTracks(Arrays.asList(mLocalVideoTrack));
+
+
+
+                        //2 发布屏幕流
+                        mEngine.publishTracks(Arrays.asList(mLocalScreenTrack));
+                        //更新UI
+                        addTrackInfo(mUserId, Arrays.asList(mLocalScreenTrack));
+                        //todo 要注释掉
+                        removeTrackInfo(mUserId, Arrays.asList(mLocalVideoTrack));
+                        mPagerAdapter.notifyDataSetChanged();
+                        //显示停止共享UI
+                        stopShareLayout.setVisibility(View.VISIBLE);
+
+                        shareDesktopIcon.setImageResource(R.drawable.ic_stop_share_desktop);
+                        mShareDesktopEnabled=true;
+                        //1 先取消发布摄像头流
+
+//                        mEngine.unPublishTracks(Arrays.asList(mLocalVideoTrack));
+//                        //2 发布屏幕流
+//                        mEngine.publishTracks(Arrays.asList(mLocalScreenTrack));
+//                        //更新UI
+//                        addTrackInfo(mUserId, Arrays.asList(mLocalScreenTrack));
+//                        removeTrackInfo(mUserId, Arrays.asList(mLocalVideoTrack));
+//                        mPagerAdapter.notifyDataSetChanged();
+//                        //显示停止共享UI
+//                        stopShareLayout.setVisibility(View.VISIBLE);
+//                        mShareDesktopEnabled=true;
+                    }
+
+
+                }else{
+                    //1 先取消发布屏幕流
+
+                    mEngine.unPublishTracks(Arrays.asList(mLocalScreenTrack));
+                    removeTrackInfo(mUserId, Arrays.asList(mLocalScreenTrack));
+                    //2 发布视频流
+                    //if(mNeedResumeVideo){
+                        mEngine.publishTracks(Arrays.asList(mLocalVideoTrack));
+                        addTrackInfo(mUserId, Arrays.asList(mLocalVideoTrack));
+                    //}
+
+                    //更新UI
+
+
+                    mPagerAdapter.notifyDataSetChanged();
+                    //显示停止共享UI
+                    stopShareLayout.setVisibility(View.GONE);
+                    shareDesktopIcon.setImageResource(R.drawable.ic_share_desktop);
+                    mShareDesktopEnabled=false;
+                }
+
+                break;
+            case R.id.stopShare:
+                if(mShareDesktopEnabled){
+
+                    //1 先取消发布屏幕流
+                    mEngine.unPublishTracks(Arrays.asList(mLocalScreenTrack));
+                    removeTrackInfo(mUserId, Arrays.asList(mLocalScreenTrack));
+                    //2 发布屏幕流
+                    //if(mNeedResumeVideo){
+                        mEngine.publishTracks(Arrays.asList(mLocalVideoTrack));
+                        addTrackInfo(mUserId, Arrays.asList(mLocalVideoTrack));
+                    //}
+
+                    //更新UI
+
+
+                    mPagerAdapter.notifyDataSetChanged();
+                    //显示停止共享UI
+                    stopShareLayout.setVisibility(View.GONE);
+                    shareDesktopIcon.setImageResource(R.drawable.ic_share_desktop);
+                    mShareDesktopEnabled=false;
+
+                }
+
+
+                break;
+
         }
     }
 
@@ -1909,13 +2705,13 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
     }
 
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CHOOSE_PHOTO && resultCode == Activity.RESULT_OK) {
 
             //List<Uri> selects = Matisse.obtainResult(data);
-            List<String> paths=Matisse.obtainPathResult(data);
+            List<String> paths = Matisse.obtainPathResult(data);
             //List<Uri> selects = Matisse.obtainResult(data);
             //File file = new File(CommonUtils.getRealFilePath(this, selects.get(0)));
 
@@ -1929,24 +2725,57 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                 public void onFailed() {
 
                 }
-            }).uploadFile(this,paths.get(0));
+            }).uploadFile(this, paths.get(0));
 
 
+        } else if (resultCode == Activity.RESULT_OK && requestCode == QNScreenCaptureUtil.SCREEN_CAPTURE_PERMISSION_REQUEST_CODE &&
+                QNScreenCaptureUtil.onActivityResult(requestCode, resultCode, data)) {
+
+            QNVideoFormat screenEncodeFormat = new QNVideoFormat(mScreenWidth / 2, mScreenHeight / 2, 15);
+            mLocalScreenTrack = mEngine.createTrackInfoBuilder()
+                    .setSourceType(QNSourceType.VIDEO_SCREEN)
+                    .setVideoPreviewFormat(screenEncodeFormat)
+                    .setBitrate(BITRATE_FOR_SCREEN_VIDEO)
+                    .setMaster(true)
+                    .setTag(UserTrackView.TAG_SCREEN).create();
+
+            if(mVideoEnabled){
+                mNeedResumeVideo=true;
+            }
+            //todo 要注释掉
+            mEngine.unPublishTracks(Arrays.asList(mLocalVideoTrack));
+
+
+
+            //2 发布屏幕流
+            mEngine.publishTracks(Arrays.asList(mLocalScreenTrack));
+            //更新UI
+            addTrackInfo(mUserId, Arrays.asList(mLocalScreenTrack));
+            //todo 要注释掉
+            removeTrackInfo(mUserId, Arrays.asList(mLocalVideoTrack));
+            mPagerAdapter.notifyDataSetChanged();
+            //显示停止共享UI
+            stopShareLayout.setVisibility(View.VISIBLE);
+
+            shareDesktopIcon.setImageResource(R.drawable.ic_stop_share_desktop);
+            mShareDesktopEnabled=true;
         }
+
+
     }
 
-    private void sendPicture(String pictureUrl){
+    private void sendPicture(String pictureUrl) {
         mMessageMap.clear();
-        mMessageMap.put("room_id", ""+mRoomId);//直播间ID
+        mMessageMap.put("room_id", "" + mRoomId);//直播间ID
         mMessageMap.put("user_id", User.getInstance().getId() + "");//用户ID
-        mMessageMap.put("parent_id","0");
+        mMessageMap.put("parent_id", "0");
         mMessageMap.put("type", "2");//发布端类型：1.主持人   2：用户    3:通知关注  4：通知进入直播间
         mMessageMap.put("stream_name", mStreamName);//播间推流ID
         mMessageMap.put("nick_name", User.getInstance().getNickname());//昵称
         mMessageMap.put("message_type", "1");//消息类型 1.互动消息  2.直播状态更新消息  3.删除消息  4.题目 5.菜单设置 6图文保存  默认1
-        mMessageMap.put("user_logo",User.getInstance().getAvatar());
+        mMessageMap.put("user_logo", User.getInstance().getAvatar());
         mMessageMap.put("message", pictureUrl);
-        mMessageMap.put("content_type","2");
+        mMessageMap.put("content_type", "2");
         OkHttpUtils.post(postMessageUrl, mMessageMap, new OkHttpCallback(this) {
             @Override
             public void onFailure(Call call, Exception e) {
@@ -1958,6 +2787,243 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                 Log.e("test", response);
             }
         });
+    }
+
+
+    private void sendMessage(String message) {
+
+        String postMessageUrl = ServerInfo.live + "/v1/push_message_interact";
+        HashMap<String, String> mMessageMap = new HashMap<>();
+
+
+        mMessageMap.put("room_id", mRoomId);//直播间ID
+        mMessageMap.put("message", message);//用户ID
+
+        OkHttpUtils.post(postMessageUrl, mMessageMap, new OkHttpCallback(this) {
+            @Override
+            public void onFailure(Call call, Exception e) {
+                Log.i("test", e.getCause().getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.e("test", response);
+            }
+        });
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+    }
+
+
+    public void setupPageIndicator(int position, int pageCount) {
+
+//        pageIndicator.removeAllViews();
+//        for (int i = 0; i < pageCount; i++) {
+//            ImageView point = new ImageView(this);
+//            point.setImageResource(R.drawable.shape_vp_dot_unselected);
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-2, -2);
+//            params.rightMargin = CommonUtils.dip2px(10);
+//            if (i == position) {
+//                point.setImageResource(R.drawable.shape_vp_dot_selected);
+//            } else {
+//                point.setImageResource(R.drawable.shape_vp_dot_unselected);
+//            }
+//            pageIndicator.addView(point, params);
+//        }
+
+
+    }
+
+
+    public class ConferenceMemberAdapter extends RecyclerView.Adapter {
+
+
+        public static final int TYPE_PRIMARY_SCREEN = 0;    //主屏
+        public static final int TYPE_OTHER = 1;             //其他
+        private LayoutInflater inflater;
+
+
+        public ConferenceMemberAdapter(Context context) {
+            inflater = LayoutInflater.from(context);
+
+        }
+
+        public void updateView() {
+            notifyDataSetChanged();
+
+        }
+
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+            if (viewType == TYPE_PRIMARY_SCREEN) {
+                return new PrimaryScreenViewHolder(inflater.inflate(R.layout.primary_user_video_item, parent, false));
+            } else {
+                return new OtherViewHolder(inflater.inflate(R.layout.normal_user_video_item, parent, false));
+            }
+
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+
+            int viewType = getItemViewType(position);
+            if (viewType == TYPE_PRIMARY_SCREEN) {
+                PrimaryScreenViewHolder vh = (PrimaryScreenViewHolder) holder;
+                UserTrackInfo userTrackInfo = mUserTrackInfos.get(0);
+                List<QNTrackInfo> trackInfos = new ArrayList<>(userTrackInfo.getQNVideoTrackInfos());
+                if (userTrackInfo.getQNAudioTrackInfo() != null) {
+                    trackInfos.add(userTrackInfo.getQNAudioTrackInfo());
+                }
+
+
+                vh.userTrackView.unSetUserTrackInfo();
+
+
+                vh.userTrackView.setUserTrackInfo(mEngine, userTrackInfo.getUserId(), trackInfos);
+                //userTrackView.changeViewBackgroundByPos(0);
+//                if(mUserTrackInfos.get(0).getUserTrackView()!=null){
+//                    mUserTrackInfos.get(0).getUserTrackView().reset();
+//                    //mUserTrackInfos.get(0).getUserTrackView().setVisibility(View.GONE);
+//                }
+                mUserTrackInfos.get(0).setUserTrackView(vh.userTrackView);
+
+                vh.userTrackView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        mShowPannel = !mShowPannel;
+                        if (!mShowPannel) {
+                            topPanel.setVisibility(View.GONE);
+                            bottomPanel.setVisibility(View.GONE);
+                        } else {
+                            topPanel.setVisibility(View.VISIBLE);
+                            bottomPanel.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+            } else {
+
+                OtherViewHolder vh = (OtherViewHolder) holder;
+                int num = 0;
+                for (int i = (position - 1) * 4 + 1; i < mUserTrackInfos.size() && num < 4; i++, num++) {
+                    UserTrackView userTrackView;
+                    if (num == 0) {
+                        userTrackView = vh.userTrackView1;
+                    } else if (num == 1) {
+                        userTrackView = vh.userTrackView2;
+                    } else if (num == 2) {
+                        userTrackView = vh.userTrackView3;
+                    } else {
+                        userTrackView = vh.userTrackView4;
+                    }
+
+                    UserTrackInfo userTrackInfo = mUserTrackInfos.get(i);
+
+                    List<QNTrackInfo> trackInfos = new ArrayList<>(userTrackInfo.getQNVideoTrackInfos());
+                    if (userTrackInfo.getQNAudioTrackInfo() != null) {
+                        trackInfos.add(userTrackInfo.getQNAudioTrackInfo());
+                    }
+                    userTrackView.unSetUserTrackInfo();
+                    userTrackView.setUserTrackInfo(mEngine, userTrackInfo.getUserId(), trackInfos);
+                    // userTrackView.changeViewBackgroundByPos(i);
+//                    if(mUserTrackInfos.get(i).getUserTrackView()!=null){
+//                        mUserTrackInfos.get(i).getUserTrackView().reset();
+//                        //mUserTrackInfos.get(i).getUserTrackView().setVisibility(View.GONE);
+//                    }
+                    mUserTrackInfos.get(i).setUserTrackView(userTrackView);
+
+                    userTrackView.setOnItemClickListener(new UserTrackView.OnMoreClickListener() {
+                        @Override
+                        public void onMoreClick(UserTrackView user) {
+//                            MoreActionDialog moreActionDialog = MoreActionDialog.getInstance(user, mEngine, mRoomId);
+//                            moreActionDialog.show(getSupportFragmentManager(), "MoreActionDialog");
+
+                        }
+                    });
+                }
+                if (num == 1) {
+                    vh.userTrackView1.setVisibility(View.VISIBLE);
+                    vh.userTrackView2.setVisibility(View.INVISIBLE);
+                    vh.userTrackView3.setVisibility(View.INVISIBLE);
+                    vh.userTrackView4.setVisibility(View.INVISIBLE);
+
+                } else if (num == 2) {
+                    vh.userTrackView1.setVisibility(View.VISIBLE);
+                    vh.userTrackView2.setVisibility(View.VISIBLE);
+                    vh.userTrackView3.setVisibility(View.INVISIBLE);
+                    vh.userTrackView4.setVisibility(View.INVISIBLE);
+                } else if (num == 3) {
+                    vh.userTrackView1.setVisibility(View.VISIBLE);
+                    vh.userTrackView2.setVisibility(View.VISIBLE);
+                    vh.userTrackView3.setVisibility(View.VISIBLE);
+                    vh.userTrackView4.setVisibility(View.INVISIBLE);
+                }
+            }
+
+
+        }
+
+
+        @Override
+        public int getItemCount() {
+
+            if (mUserTrackInfos.size() == 0) {
+                return 0;
+            } else {
+                return (mUserTrackInfos.size() + 2) / 4 + 1;
+            }
+
+        }
+
+
+        @Override
+        public int getItemViewType(int position) {
+
+            if (position == 0) {
+                return TYPE_PRIMARY_SCREEN;
+            } else {
+                return TYPE_OTHER;
+            }
+
+        }
+
+
+        public class PrimaryScreenViewHolder extends RecyclerView.ViewHolder {
+
+            @BindView(R.id.userTrackView)
+            UserTrackView userTrackView;
+
+            public PrimaryScreenViewHolder(View view) {
+                super(view);
+                ButterKnife.bind(this, view);
+            }
+        }
+
+
+        public class OtherViewHolder extends RecyclerView.ViewHolder {
+
+            @BindView(R.id.userTrackView1)
+            UserTrackView userTrackView1;
+            @BindView(R.id.userTrackView2)
+            UserTrackView userTrackView2;
+            @BindView(R.id.userTrackView3)
+            UserTrackView userTrackView3;
+            @BindView(R.id.userTrackView4)
+            UserTrackView userTrackView4;
+
+            public OtherViewHolder(View view) {
+                super(view);
+                ButterKnife.bind(this, view);
+            }
+        }
+
+
     }
 
 

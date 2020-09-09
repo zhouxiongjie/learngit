@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>..</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <style>
+    /**
+ * Eric Meyer's Reset CSS v2.0 (http://meyerweb.com/eric/tools/css/reset/)
+ * http://cssreset.com
+ */
+    html, body, div, span, applet, object, iframe,
+    h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+    a, abbr, acronym, address, big, cite, code,
+    del, dfn, em, img, ins, kbd, q, s, samp,
+    small, strike, strong, sub, sup, tt, var,
+    b, u, i, center,
+    dl, dt, dd, ol, ul, li,
+    fieldset, form, label, legend,
+    table, caption, tbody, tfoot, thead, tr, th, td,
+    article, aside, canvas, details, embed,
+    figure, figcaption, footer, header,
+    menu, nav, output, ruby, section, summary,
+    time, mark, audio, video, input {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "\5FAE\8F6F\96C5\9ED1", Arial, sans-serif;
+      font-size: 100%;
+      font-weight: normal;
+      vertical-align: baseline;
+      box-sizing: border-box;
+    }
+
+    strong {
+      font-weight: bold;
+    }
+
+    /* HTML5 display-role reset for older browsers */
+    article, aside, details, figcaption, figure,
+    footer, header, menu, nav, section {
+      display: block;
+    }
+
+    html, body {
+      height: 100%;
+      background: #fff;
+    }
+
+    body {
+      line-height: 1;
+      box-sizing: border-box;
+    }
+
+    blockquote, q {
+      quotes: none;
+    }
+
+    blockquote:before, blockquote:after,
+    q:before, q:after {
+      content: none;
+    }
+
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+
+    /* custom */
+    a {
+      color: #7e8c8d;
+      -webkit-backface-visibility: hidden;
+      text-decoration: none;
+    }
+
+    li {
+      list-style: none;
+    }
+
+    input, button, textarea {
+      outline: none;
+      border: 0;
+      -webkit-user-select: text !important;
+      -moz-user-select: text !important;
+      user-select: text !important;
+    }
+
+    input:-internal-autofill-selected {
+      background-color: #fff !important;
+    }
+
+    body {
+    //   -webkit-text-size-adjust: none; //   -webkit-tap-highlight-color: rgba(0, 0, 0, 0); -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    #content {
+      padding: 10px 15px 28px 15px;
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    #content img, #content video, #content audio {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+    #content p {
+      margin-bottom: 10px;
+      font-family: PingFang-SC-Medium;
+      color: #333333;
+      line-height: 20px;
+      font-size: 14px;
+      width: 100%;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+<div id="content"></div>
+<script>
+  function _getImgPreviewContent(json) {
+    //try {
+      //json = '[{"type":"text","logo":"","url":"","des":"drtgdrfg"},{"type":"image","logo":"https://sl-cdn.slradio.cn/vms/Image/m4XTSPKWRWyAQEHz.jpg","url":"","des":""}]';
+      var arr = JSON.parse(json)
+      var html = '';
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i].logo) {
+          html += '<p><img src="' + arr[i].logo + '"/>' + '</p>';
+        }
+        if (arr[i].des) {
+          html += '<p>' + arr[i].des + '</p>';
+        }
+      }
+      document.getElementById('content').innerHTML = html;
+    //} catch (e) {
+     // console.log(e);
+    //}
+  }
+    window._getImgPreviewContent = _getImgPreviewContent;
+</script>
+</body>
+</html>

@@ -52,6 +52,10 @@
     <string name="menus_mute">&#xe6f6;</string>
     <string name="menus_cancel_mute">&#xe6f1;</string>
 
+    <!--互动直播图标-->
+    <string name="loud_speaker">&#xe6fc;</string>
+    <string name="no_loud_speaker">&#xe6fb;</string>
+
     <string name="menus_video">&#xe6f2;</string>
     <string name="menus_cancel_video">&#xe6ef;</string>
 

@@ -27,7 +27,7 @@ public class ChatMessageManager {
 
     public static ChatMessageManager getInstance(){
         if(sChatMessageManager==null){
-            synchronized (User.class){
+            synchronized (ChatMessageManager.class){
                 if (sChatMessageManager == null) {
                     sChatMessageManager = new ChatMessageManager();
                 }

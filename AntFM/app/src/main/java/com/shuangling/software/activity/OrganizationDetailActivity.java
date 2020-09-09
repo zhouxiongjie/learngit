@@ -801,6 +801,7 @@ public class OrganizationDetailActivity extends BaseAudioActivity implements Han
                             Glide.with(this).load(R.drawable.wave).into(vh.statusIcon);
 
                             vh.title.setText(liveInfo.getTitle());
+                            vh.popularity.setVisibility(View.GONE);
                             if (liveInfo.getLive() != null) {
                                 vh.popularity.setText(liveInfo.getLive().getPopularity() + "人气");
                                 if (liveInfo.getLive().getType() == 1) {
@@ -813,7 +814,7 @@ public class OrganizationDetailActivity extends BaseAudioActivity implements Han
                                     vh.type.setText("电视");
                                     vh.typeIcon.setText(R.string.live_tv);
                                 } else if (liveInfo.getLive().getType() == 4) {
-                                    vh.type.setText("电商");
+                                    vh.type.setText("教育");
                                     vh.typeIcon.setText(R.string.live_shop);
                                 }
 

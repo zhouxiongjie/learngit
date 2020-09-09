@@ -6,9 +6,9 @@
             <corners android:radius="2dp" />
             <padding android:bottom="2dp" android:left="5dp" android:right="5dp" android:top="2dp" />
             <!-- 填充色 -->
-            <solid android:color="#FF5310" />
+            <solid android:color="?attr/themeColor" />
             <!-- 描边 设置线宽及颜色 -->
-            <stroke android:width="0dp" android:color="#FF5310" />
+            <stroke android:width="0dp" android:color="?attr/themeColor" />
         </shape>
     </item>
 </selector>

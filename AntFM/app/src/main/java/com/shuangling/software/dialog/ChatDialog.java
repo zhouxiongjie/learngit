@@ -132,9 +132,9 @@ public class ChatDialog extends BaseCircleDialog implements ChatAction, View.OnC
         unbinder = ButterKnife.bind(this, rootView);
 
         EventBus.getDefault().register(this);
-
+        inputPanel.setJoinRoomVisible(false);
         inputPanel.setChatAction(this );
-        mChatMessageListAdapter = new ChatMessageListAdapter(getContext(), 1);
+        mChatMessageListAdapter = new ChatMessageListAdapter(getContext());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         //linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);

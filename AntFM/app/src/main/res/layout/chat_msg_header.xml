@@ -13,11 +13,11 @@
         android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/chat_msg_bg"
+
         android:padding="5dp"
         android:text="欢迎来到直播间！菱动直播倡导绿色健康直播。直播内容和评论严禁发布政治、低俗、色情等内容。"
-        android:textColor="#FFBF25"
-        android:textSize="@dimen/font_size_28px" />
+        android:textColor="#FFA425"
+        android:textSize="@dimen/font_size_30px" />
 
 
 </LinearLayout>

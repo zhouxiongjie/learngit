@@ -54,9 +54,13 @@ import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.LiveDetailActivity;
 import com.shuangling.software.activity.ModifyUserInfoActivity;
+import com.shuangling.software.activity.NewLoginActivity;
 import com.shuangling.software.activity.RoomActivity;
 import com.shuangling.software.adapter.ChatMessageListAdapter;
 import com.shuangling.software.customview.ChatInput;
+import com.shuangling.software.dialog.CommentDialog;
+import com.shuangling.software.dialog.ReplyDialog;
+import com.shuangling.software.dialog.ReplyDialog01;
 import com.shuangling.software.entity.ChatMessage;
 import com.shuangling.software.entity.OssInfo;
 import com.shuangling.software.entity.User;
@@ -127,6 +131,8 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
     private OssInfo mOssInfo;
     private OssService mOssService;
 
+    private String mParentId="0";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Bundle args = getArguments();
@@ -150,10 +156,10 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
 //        divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
 //        recyclerView.addItemDecoration(divider);
 
-
-        mChatMessageListAdapter = new ChatMessageListAdapter(getContext(), 1);
+        ChatMessageManager.getInstance().clearMessages();
+        mChatMessageListAdapter = new ChatMessageListAdapter(getContext());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.setStackFromEnd(true);
+        //linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(mChatMessageListAdapter);
         recyclerView.setHasFixedSize(true);
@@ -167,6 +173,56 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
                 if (!recyclerView.canScrollVertically(30)) {
                     //moreMsgBtn.setVisibility(View.GONE);
                 }
+            }
+        });
+
+        mChatMessageListAdapter.setOnItemReply(new ChatMessageListAdapter.OnItemReply() {
+            @Override
+            public void replyItem(ChatMessage message) {
+                ReplyDialog01 replyDialog = ReplyDialog01.getInstance(message,""+mRoomId,mStreamName);
+
+                replyDialog.setOnAction(new ReplyDialog01.OnAction() {
+                    @Override
+                    public void sendImage() {
+                        if(User.getInstance()==null){
+                            Intent it=new Intent(getContext(), NewLoginActivity.class);
+                            startActivity(it);
+                        }else{
+
+                            RxPermissions rxPermissions = new RxPermissions(getActivity());
+                            rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                    .subscribe(new Consumer<Boolean>() {
+                                        @Override
+                                        public void accept(Boolean granted) throws Exception {
+                                            if(granted){
+                                                String packageName = getActivity().getPackageName();
+                                                mParentId=""+message.getChatsId();
+                                                Matisse.from(LiveChatFragment.this)
+                                                        .choose(MimeType.of(MimeType.JPEG,MimeType.PNG)) // 选择 mime 的类型
+                                                        .countable(false)
+                                                        .maxSelectable(1) // 图片选择的最多数量
+                                                        .spanCount(4)
+                                                        .capture(true)
+                                                        .captureStrategy(new CaptureStrategy(true,packageName+".fileprovider"))
+                                                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+                                                        .thumbnailScale(1.0f) // 缩略图的比例
+                                                        .theme(R.style.Matisse_Zhihu)
+                                                        .imageEngine(new MyGlideEngine()) // 使用的图片加载引擎
+                                                        .forResult(CHOOSE_PHOTO); // 设置作为标记的请求码
+                                            }else{
+                                                ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
+                                            }
+                                        }
+                                    });
+
+
+                        }
+                    }
+                });
+                replyDialog.show(getChildFragmentManager(), "replyDialog");
+
+
+
             }
         });
 
@@ -186,6 +242,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
             public void onLoadMore(RefreshLayout refreshLayout) {
             }
         });
+
         getChatHistory();
         joinChannel();
         return view;
@@ -202,10 +259,13 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
         super.onDestroyView();
         EventBus.getDefault().unregister(this);
         if (echo != null) {
+            echo.leave(mStreamName);
             echo.disconnect();
         }
         if(hasApply){
-            cancelInteract(""+mRoomId);
+            ((LiveDetailActivity)getActivity()).cancelInteract(""+mRoomId);
+            hasApply=false;
+            ((LiveDetailActivity)getActivity()).leaveChannel();
         }
 
 
@@ -227,7 +287,8 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
     public void sendImage() {
 
         if(User.getInstance()==null){
-            ToastUtils.show("请先登录");
+            Intent it=new Intent(getContext(), NewLoginActivity.class);
+            startActivity(it);
         }else{
 
             RxPermissions rxPermissions = new RxPermissions(getActivity());
@@ -237,6 +298,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
                         public void accept(Boolean granted) throws Exception {
                             if(granted){
                                 String packageName = getActivity().getPackageName();
+                                mParentId="0";
                                 Matisse.from(LiveChatFragment.this)
                                         .choose(MimeType.of(MimeType.JPEG,MimeType.PNG)) // 选择 mime 的类型
                                         .countable(false)
@@ -262,7 +324,8 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
     @Override
     public void joinRoom() {
         if(User.getInstance()==null){
-            ToastUtils.show("请先登录");
+            Intent it=new Intent(getContext(), NewLoginActivity.class);
+            startActivity(it);
         }else{
             //getRoomToken("359");
             applyInteract(""+mRoomId);
@@ -273,7 +336,8 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
     public void sendText(String str) {
 
         if(User.getInstance()==null){
-            ToastUtils.show("请先登录");
+            Intent it=new Intent(getContext(), NewLoginActivity.class);
+            startActivity(it);
         }else{
             if (TextUtils.isEmpty(str)) return;
             inputPanel.setText("");
@@ -291,7 +355,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
             OkHttpUtils.post(postMessageUrl, mMessageMap, new OkHttpCallback(getContext()) {
                 @Override
                 public void onFailure(Call call, Exception e) {
-                    //Log.e("test",e.getCause().getMessage());
+                    Log.e("test",e.getCause().getMessage());
                 }
 
                 @Override
@@ -352,7 +416,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
         });
     }
 
-    private void getRoomToken(String roomId) {
+    private void getRoomToken(final String roomId) {
         String url = ServerInfo.live + "/v4/get_room_token_c";
         Map<String, String> params = new HashMap<>();
         params.put("userId","user_"+User.getInstance().getId());
@@ -366,7 +430,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
 
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        String roomToken = jsonObject.getString("data");
+                        final String roomToken = jsonObject.getString("data");
 
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -413,13 +477,12 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
             public void onResponse(Call call, String response) throws IOException {
 
                 try{
-                    hasApply=true;
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         hasApply=true;
                         ((LiveDetailActivity)getActivity()).joinChannel();
-
-                        getRoomToken(""+mRoomId);
+                        ToastUtils.show("申请成功,请等待主持人通过");
+                        //getRoomToken(""+mRoomId);
 
 
 //                        String roomToken = jsonObject.getString("data");
@@ -463,71 +526,14 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
 
 
 
-    //申请连麦
-    private void cancelInteract(String roomId) {
-        String url = ServerInfo.live + "/v4/user_cancel_apply_interact";
-        Map<String, String> params = new HashMap<>();
-        params.put("userId",""+User.getInstance().getId());
-        params.put("roomId",roomId);
-        OkHttpUtils.post(url, params, new OkHttpCallback(getContext()) {
-            @Override
-            public void onResponse(Call call, String response) throws IOException {
 
-                try{
-
-                    JSONObject jsonObject = JSONObject.parseObject(response);
-                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        hasApply=false;
-
-
-                        //getRoomToken(""+mRoomId);
-
-
-//                        String roomToken = jsonObject.getString("data");
-//
-//                        getActivity().runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                if (TextUtils.isEmpty(roomToken)) {
-//                                    return;
-//                                }
-//                                Intent intent = new Intent(getContext(), RoomActivity.class);
-//                                intent.putExtra(RoomActivity.EXTRA_ROOM_ID, roomId);
-//                                intent.putExtra(RoomActivity.EXTRA_ROOM_TOKEN, roomToken);
-//                                intent.putExtra(RoomActivity.EXTRA_USER_ID, "user_"+User.getInstance().getId());
-//                                startActivity(intent);
-//                            }
-//                        });
-
-                    }else if(jsonObject != null){
-                        ToastUtils.show(jsonObject.getString("msg"));
-                    }else{
-
-                        ToastUtils.show("取消连麦失败");
-                    }
-
-                }catch (Exception e){
-
-                }
-
-
-            }
-
-            @Override
-            public void onFailure(Call call, Exception exception) {
-
-                Log.e("test",exception.toString());
-
-            }
-        });
-    }
 
 
     private void joinChannel(){
 
 
         EchoOptions options = new EchoOptions();
-        options.host = "http://echo-live.review.slradio.cn";
+        options.host = ServerInfo.echo_server;
         //options.headers.put("Authorization", User.getInstance().getAuthorization());
         echo = new MyEcho(options);
         echo.connect(new EchoCallback() {
@@ -551,7 +557,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
                         Log.i("test", "args");
 
                         try {
-                            ChatMessage msg = JSON.parseObject(args[1].toString(), ChatMessage.class);
+                            final  ChatMessage msg = JSON.parseObject(args[1].toString(), ChatMessage.class);
 
                             if (msg.getMessageType() != 1) return;
                             mHandler.post(new Runnable() {
@@ -718,7 +724,7 @@ public class LiveChatFragment extends Fragment implements ChatAction ,OSSComplet
         mMessageMap.clear();
         mMessageMap.put("room_id", ""+mRoomId);//直播间ID
         mMessageMap.put("user_id", User.getInstance().getId() + "");//用户ID
-        mMessageMap.put("parent_id","0");
+        mMessageMap.put("parent_id",mParentId);
         mMessageMap.put("type", "2");//发布端类型：1.主持人   2：用户    3:通知关注  4：通知进入直播间
         mMessageMap.put("stream_name", mStreamName);//播间推流ID
         mMessageMap.put("nick_name", User.getInstance().getNickname());//昵称

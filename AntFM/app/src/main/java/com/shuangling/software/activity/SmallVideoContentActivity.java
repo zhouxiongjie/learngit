@@ -106,6 +106,16 @@ public class SmallVideoContentActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position, int totalPage) {
+
+            }
+
+            @Override
             public void exitVideo() {
                 new Thread(new Runnable() {
                     @Override

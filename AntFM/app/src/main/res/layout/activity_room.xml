@@ -4,214 +4,580 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black" >
+    android:background="@color/black">
 
+    <View
+        android:id="@+id/statusBar"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="match_parent"
+        android:layout_below="@+id/statusBar" />
 
     <com.viewpagerindicator.CirclePageIndicator
         android:id="@+id/indicator"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="30dp"
-        app:radius="4dp"
-        app:strokeWidth="0dp"
-        app:strokeColor="@color/gray"
-        app:pageColor="@color/gray"
         app:fillColor="@color/white"
-        />
+        app:pageColor="@color/gray"
+        app:radius="4dp"
+        app:strokeColor="@color/gray"
+        app:strokeWidth="0dp" />
+
+    <RelativeLayout
+        android:id="@+id/stopShareLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#030415"
+        android:layout_below="@+id/statusBar"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/a"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/stopShare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/ic_stop_share"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="15dp"
+                android:text="停止共享"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_size_28px"/>
+
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/a"
+            android:layout_marginBottom="30dp"
+            android:layout_centerHorizontal="true"
+            android:text="您正在共享屏幕"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_size_36px"/>
+
+    </RelativeLayout>
+
+
+    <!--<com.viewpagerindicator.CirclePageIndicator-->
+    <!--android:id="@+id/indicator"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_alignParentBottom="true"-->
+    <!--android:layout_centerHorizontal="true"-->
+    <!--android:layout_marginBottom="30dp"-->
+    <!--app:radius="4dp"-->
+    <!--app:strokeWidth="0dp"-->
+    <!--app:strokeColor="@color/gray"-->
+    <!--app:pageColor="@color/gray"-->
+    <!--app:fillColor="@color/white"-->
+
+    <!--<HorizontalScrollView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+    <!--<LinearLayout-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="horizontal">-->
+
 
     <!--<com.shuangling.software.activity.ui.UserTrackView-->
-        <!--android:id="@+id/userTrackView"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent" />-->
+    <!--android:id="@+id/track_window_0"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"/>-->
+    <!--<LinearLayout-->
+    <!--android:id="@+id/linearLayout1"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="vertical">-->
+    <!--<com.shuangling.software.activity.ui.UserTrackView-->
+    <!--android:id="@+id/track_window_1"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
+    <!--<com.shuangling.software.activity.ui.UserTrackView-->
+    <!--android:id="@+id/track_window_3"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
+
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/linearLayout2"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="vertical">-->
+    <!--<com.shuangling.software.activity.ui.UserTrackView-->
+    <!--android:id="@+id/track_window_2"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
+    <!--<com.shuangling.software.activity.ui.UserTrackView-->
+    <!--android:id="@+id/track_window_4"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/linearLayout5"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="vertical">-->
+    <!--<com.shuangling.software.activity.ui.UserTrackView-->
+    <!--android:id="@+id/track_window_5"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
+    <!--<com.shuangling.software.activity.ui.UserTrackView-->
+    <!--android:id="@+id/track_window_7"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
+
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/linearLayout6"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="vertical">-->
+    <!--<com.shuangling.software.activity.ui.UserTrackView-->
+    <!--android:id="@+id/track_window_6"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
+    <!--<com.shuangling.software.activity.ui.UserTrackView-->
+    <!--android:id="@+id/track_window_8"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
+
+    <!--</LinearLayout>-->
+    <!--</LinearLayout>-->
+
+    <!--</HorizontalScrollView>-->
+    <!--/>-->
+
+
+    <!--<android.support.v7.widget.RecyclerView-->
+    <!--android:id="@+id/recyclerView"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
+
+
+
+
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/pageIndicator"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginBottom="30dp"-->
+    <!--android:layout_alignParentBottom="true"-->
+    <!--android:gravity="center"-->
+    <!--android:orientation="horizontal" >-->
+    <!--</LinearLayout>-->
+
+    <!--<com.shuangling.software.activity.ui.UserTrackView-->
+    <!--android:id="@+id/userTrackView"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent" />-->
 
 
     <RelativeLayout
-        android:id="@+id/panel"
+        android:id="@+id/topPanel"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/transparent">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/statusBar"
+        android:background="@color/black">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
+        <com.shuangling.software.customview.FontIconView
+            android:id="@+id/loudspeaker"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:background="@color/black">
+            android:layout_centerVertical="true"
+            android:layout_margin="10dp"
+            android:padding="5dp"
+            android:text="&#xe6fc;"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/font_size_36px" />
 
-            <com.shuangling.software.customview.FontIconView
-                android:id="@+id/switchCamera"
+
+        <com.shuangling.software.customview.FontIconView
+            android:id="@+id/switchCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toEndOf="@+id/loudspeaker"
+            android:padding="5dp"
+            android:text="&#xe6f4;"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/font_size_36px" />
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical">
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:padding="5dp"
-                android:layout_centerVertical="true"
-                android:text="&#xe6f4;"
-                android:textColor="#ffffff"
-                android:textSize="@dimen/font_size_36px" />
-
-
-            <LinearLayout
+                android:layout_gravity="center_horizontal"
+                android:text="多人连麦"
+                android:textColor="#F7F7F7"
+                android:textSize="@dimen/font_size_34px" />
+            <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:textColor="#4CF7F7F7"-->
+            <!--android:text="00:00"/>-->
+            <Chronometer
+                android:id="@+id/timer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_centerInParent="true">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:textColor="#F7F7F7"
-                    android:textSize="@dimen/font_size_34px"
-                    android:text="多人连麦"/>
+                android:layout_gravity="center_horizontal"
+                android:format="%s"
+                android:textColor="#4CF7F7F7" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/quit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="10dp"
+            android:padding="5dp"
+            android:text="离开"
+            android:textColor="#E14C4C"
+            android:textSize="@dimen/font_size_30px" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#222426"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/interactChat"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <!--<com.shuangling.software.customview.FontIconView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:text="&#xe6f7;"-->
+            <!--android:textColor="#ffffff"-->
+            <!--android:textSize="@dimen/font_size_50px" />-->
+
+            <ImageView
+                android:id="@+id/chatStatus"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_horizontal"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_interact_chat" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="聊天互动"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_size_20px" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/openMute"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <!--<com.shuangling.software.customview.FontIconView-->
+            <!--android:id="@+id/muteStatus"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:text="&#xe6f1;"-->
+            <!--android:textColor="#ffffff"-->
+            <!--android:textSize="@dimen/font_size_50px" />-->
+
+            <ImageView
+                android:id="@+id/muteStatus"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:scaleType="centerInside"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_open_audio"/>
+
+
+            <TextView
+                android:id="@+id/muteStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="静音"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_size_20px" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/closeVideo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <!--<com.shuangling.software.customview.FontIconView-->
+            <!--android:id="@+id/videoStatus"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:text="&#xe6f2;"-->
+            <!--android:textColor="#ffffff"-->
+            <!--android:textSize="@dimen/font_size_50px" />-->
+            <ImageView
+                android:id="@+id/videoStatus"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:scaleType="centerInside"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_open_video"/>
+
+            <TextView
+                android:id="@+id/videoStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="关闭视频"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_size_20px" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/shareDesktop"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <ImageView
+                android:id="@+id/shareDesktopIcon"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:scaleType="centerInside"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_share_desktop"/>
+
+            <TextView
+                android:id="@+id/shareDesktopText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="共享屏幕"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_size_20px" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!--<TableLayout-->
+        <!--android:id="@+id/bottomPanel"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:background="#222426"-->
+        <!--android:gravity="bottom"-->
+        <!--android:stretchColumns="0,2,4,6,8">-->
+
+        <!--<TableRow android:layout_marginBottom="0dp">-->
+
+            <!--<ImageView />-->
+
+            <!--<LinearLayout-->
+                <!--android:id="@+id/interactChat"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:orientation="vertical"-->
+                <!--android:padding="5dp">-->
+
+                <!--&lt;!&ndash;<com.shuangling.software.customview.FontIconView&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:layout_gravity="center_horizontal"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:text="&#xe6f7;"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:textColor="#ffffff"&ndash;&gt;-->
+                <!--&lt;!&ndash;android:textSize="@dimen/font_size_50px" />&ndash;&gt;-->
+
+                <!--<ImageView-->
+                    <!--android:id="@+id/chatStatus"-->
+                    <!--android:layout_width="25dp"-->
+                    <!--android:layout_height="25dp"-->
+                    <!--android:layout_gravity="center_horizontal"-->
+                    <!--android:scaleType="centerInside"-->
+                    <!--android:src="@drawable/ic_interact_chat" />-->
+
+
                 <!--<TextView-->
                     <!--android:layout_width="wrap_content"-->
                     <!--android:layout_height="wrap_content"-->
                     <!--android:layout_gravity="center_horizontal"-->
-                    <!--android:textColor="#4CF7F7F7"-->
-                    <!--android:text="00:00"/>-->
-                <Chronometer
-                    android:id="@+id/timer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:format="%s"
-                    android:textColor="#4CF7F7F7"
-                    android:layout_gravity="center_horizontal"
-                    />
+                    <!--android:text="聊天互动"-->
+                    <!--android:textColor="@color/white"-->
+                    <!--android:textSize="@dimen/font_size_20px" />-->
 
-            </LinearLayout>
+            <!--</LinearLayout>-->
 
-            <TextView
-                android:id="@+id/quit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#E14C4C"
-                android:layout_centerVertical="true"
-                android:layout_margin="10dp"
-                android:layout_alignParentEnd="true"
-                android:padding="5dp"
-                android:textSize="@dimen/font_size_30px"
-                android:text="离开"/>
+            <!--<ImageView />-->
 
-        </RelativeLayout>
+            <!--<LinearLayout-->
+                <!--android:id="@+id/openMute"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:orientation="vertical"-->
+                <!--android:padding="5dp">-->
 
+                <!--&lt;!&ndash;<com.shuangling.software.customview.FontIconView&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:id="@+id/muteStatus"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_gravity="center_horizontal"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:text="&#xe6f1;"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:textColor="#ffffff"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:textSize="@dimen/font_size_50px" />&ndash;&gt;-->
 
-
-        <TableLayout
-            android:id="@+id/bottomButtonLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="#222426"
-            android:stretchColumns="0,2,4,6,8"
-            android:gravity="bottom">
-            <TableRow
-                android:layout_marginBottom="0dp">
-                <ImageView />
-                <LinearLayout
-                    android:id="@+id/interactChat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:orientation="vertical">
-                    <com.shuangling.software.customview.FontIconView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:text="&#xe6f7;"
-                        android:textColor="#ffffff"
-                        android:textSize="@dimen/font_size_50px" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="互动聊天"
-                        android:layout_gravity="center_horizontal"
-                        android:textSize="@dimen/font_size_20px"
-                        android:textColor="@color/white"/>
-
-                </LinearLayout>
-                <ImageView />
-                <LinearLayout
-                    android:id="@+id/openMute"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:orientation="vertical">
-                    <com.shuangling.software.customview.FontIconView
-                        android:id="@+id/muteStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:text="&#xe6f1;"
-                        android:textColor="#ffffff"
-                        android:textSize="@dimen/font_size_50px" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="开启禁音"
-                        android:layout_gravity="center_horizontal"
-                        android:textSize="@dimen/font_size_20px"
-                        android:textColor="@color/white"/>
-
-                </LinearLayout>
-                <ImageView />
-                <LinearLayout
-                    android:id="@+id/closeVideo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:orientation="vertical">
-                    <com.shuangling.software.customview.FontIconView
-                        android:id="@+id/videoStatus"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:text="&#xe6f2;"
-                        android:textColor="#ffffff"
-                        android:textSize="@dimen/font_size_50px" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="关闭视频"
-                        android:layout_gravity="center_horizontal"
-                        android:textSize="@dimen/font_size_20px"
-                        android:textColor="@color/white"/>
-
-                </LinearLayout>
-                <ImageView />
-                <LinearLayout
-                    android:id="@+id/barrage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:orientation="vertical">
-                    <com.shuangling.software.customview.FontIconView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:text="&#xe6f9;"
-                        android:textColor="#ffffff"
-                        android:textSize="@dimen/font_size_50px" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="开启弹幕"
-                        android:layout_gravity="center_horizontal"
-                        android:textSize="@dimen/font_size_20px"
-                        android:textColor="@color/white"/>
-
-                </LinearLayout>
-                <ImageView />
-            </TableRow>
-        </TableLayout>
+                <!--<ImageView-->
+                    <!--android:id="@+id/muteStatus"-->
+                    <!--android:layout_width="25dp"-->
+                    <!--android:layout_height="25dp"-->
+                    <!--android:scaleType="centerInside"-->
+                    <!--android:layout_gravity="center_horizontal"-->
+                    <!--android:src="@drawable/ic_open_audio"/>-->
 
 
-    </RelativeLayout>
+                <!--<TextView-->
+                    <!--android:id="@+id/muteStatusText"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="center_horizontal"-->
+                    <!--android:text="静音"-->
+                    <!--android:textColor="@color/white"-->
+                    <!--android:textSize="@dimen/font_size_20px" />-->
+
+            <!--</LinearLayout>-->
+
+            <!--<ImageView />-->
+
+            <!--<LinearLayout-->
+                <!--android:id="@+id/closeVideo"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:orientation="vertical"-->
+                <!--android:padding="5dp">-->
+
+                <!--&lt;!&ndash;<com.shuangling.software.customview.FontIconView&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:id="@+id/videoStatus"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_gravity="center_horizontal"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:text="&#xe6f2;"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:textColor="#ffffff"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:textSize="@dimen/font_size_50px" />&ndash;&gt;-->
+                <!--<ImageView-->
+                    <!--android:id="@+id/videoStatus"-->
+                    <!--android:layout_width="25dp"-->
+                    <!--android:layout_height="25dp"-->
+                    <!--android:scaleType="centerInside"-->
+                    <!--android:layout_gravity="center_horizontal"-->
+                    <!--android:src="@drawable/ic_open_video"/>-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/videoStatusText"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="center_horizontal"-->
+                    <!--android:text="关闭视频"-->
+                    <!--android:textColor="@color/white"-->
+                    <!--android:textSize="@dimen/font_size_20px" />-->
+
+            <!--</LinearLayout>-->
+
+            <!--<ImageView />-->
+
+            <!--<LinearLayout-->
+                <!--android:id="@+id/shareDesktop"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:orientation="vertical"-->
+                <!--android:padding="5dp">-->
+
+                <!--<ImageView-->
+                    <!--android:id="@+id/shareDesktopIcon"-->
+                    <!--android:layout_width="25dp"-->
+                    <!--android:layout_height="25dp"-->
+                    <!--android:scaleType="centerInside"-->
+                    <!--android:layout_gravity="center_horizontal"-->
+                    <!--android:src="@drawable/ic_share_desktop"/>-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/shareDesktopText"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="center_horizontal"-->
+                    <!--android:text="共享屏幕"-->
+                    <!--android:textColor="@color/white"-->
+                    <!--android:textSize="@dimen/font_size_20px" />-->
+
+            <!--</LinearLayout>-->
+
+            <!--<ImageView />-->
+        <!--</TableRow>-->
+    <!--</TableLayout>-->
 
 
 

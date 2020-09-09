@@ -10,8 +10,6 @@ buildscript {
         maven { url 'https://dl.bintray.com/umsdk/release' }
 
 
-
-
         maven {
             url 'http://maven.aliyun.com/nexus/content/repositories/releases/'
         }
@@ -46,6 +44,11 @@ buildscript {
         classpath 'com.aliyun.ams:emas-services:1.0.1'
         classpath 'com.baidu.mobstat:mtj-circle-plugin:latest.integration'
     }
+
+
+//    configurations.all {
+//        resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+//    }
 }
 
 allprojects {

@@ -2,6 +2,7 @@ package com.shuangling.software.activity.ui;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -12,13 +13,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.qiniu.droid.rtc.QNRTCEngine;
 import com.qiniu.droid.rtc.QNSurfaceView;
 import com.qiniu.droid.rtc.QNTrackInfo;
 import com.qiniu.droid.rtc.QNTrackKind;
 import com.shuangling.software.R;
+import com.shuangling.software.activity.RoomActivity;
+import com.shuangling.software.entity.User;
+import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.ImageLoader;
 
 import org.webrtc.RendererCommon;
 import java.util.ArrayList;
@@ -44,10 +52,26 @@ public class UserTrackView extends FrameLayout {
     private QNSurfaceView mSurfaceViewSmall;
 
     private ImageView mMicrophoneStateView;
-    private TextView mAudioView;
+    private RelativeLayout mAudioView;
+    private SimpleDraweeView mHead;
+
+    private ImageView mEmceeView;
+    private TextView mNicknameView;
+
 
     private QNRTCEngine mQNRTCEngine;
     private String mUserId;
+
+    private OnMoreClickListener onMoreClickListener;
+
+    public void setOnItemClickListener(OnMoreClickListener onMoreClickListener) {
+        this.onMoreClickListener = onMoreClickListener;
+    }
+
+    public interface OnMoreClickListener {
+
+        void onMoreClick(UserTrackView user);
+    }
 
     public void setQNAudioTrackInfo(QNTrackInfo mQNAudioTrackInfo) {
         this.mQNAudioTrackInfo = mQNAudioTrackInfo;
@@ -89,7 +113,11 @@ public class UserTrackView extends FrameLayout {
         mSurfaceViewSmall = (QNSurfaceView) findViewById(R.id.qn_surface_view_small);
 
         mMicrophoneStateView = (ImageView) findViewById(R.id.microphone_state_view);
-        mAudioView = (TextView) findViewById(R.id.qn_audio_view);
+        mAudioView = (RelativeLayout) findViewById(R.id.qn_audio_view);
+        mHead= (SimpleDraweeView) findViewById(R.id.head);
+        mEmceeView = (ImageView) findViewById(R.id.emcee);
+        mNicknameView= (TextView) findViewById(R.id.nickname);
+
     }
 
     protected int getLayout() {
@@ -128,9 +156,49 @@ public class UserTrackView extends FrameLayout {
         if (TextUtils.isEmpty(mUserId)) {
             return;
         }
+
+        if(mUserId.substring(5).equals(RoomActivity.mHostId)){
+            mEmceeView.setVisibility(VISIBLE);
+        }else{
+            mEmceeView.setVisibility(GONE);
+        }
+
         setMicrophoneStateVisibility(microphoneViewVisibility);
-        mAudioView.setText(mUserId);
+        //mAudioView.setText(mUserId);
+
+        onUpdateNicknameAndAvatar();
+
         onAddTrackInfo(trackInfos);
+
+    }
+
+
+    public void onUpdateNicknameAndAvatar(){
+        String[] str=getNicknameAndAvatar(mUserId.substring(5));
+        if(str!=null){
+            mNicknameView.setText(str[0]);
+            if (!TextUtils.isEmpty(str[1])) {
+
+                int width = CommonUtils.dip2px(60);
+                int height = width;
+                Uri uri = Uri.parse(str[1]);
+                ImageLoader.showThumb(uri, mHead, width, height);
+            }
+        }
+    }
+
+    private String[] getNicknameAndAvatar(String userId) {
+
+        String[] str=new String[2];
+        for(int i=0;i<RoomActivity.sCandidateInfos.size();i++){
+            if(RoomActivity.sCandidateInfos.get(i).getId().equals(userId)){
+                str[0]=RoomActivity.sCandidateInfos.get(i).getNickname();
+                str[1]=RoomActivity.sCandidateInfos.get(i).getAvatar();
+                return str;
+            }
+        }
+        return null;
+
     }
 
     public void unSetUserTrackInfo() {
@@ -142,7 +210,7 @@ public class UserTrackView extends FrameLayout {
                 mQNRTCEngine.setRenderWindow(mTrackInfoDisplayInSmallView, null);
             }
         }
-        reset();
+        //reset();
     }
 
     public void reset() {
@@ -157,7 +225,8 @@ public class UserTrackView extends FrameLayout {
         mVideoViewLargeParent.setVisibility(View.GONE);
         mSurfaceViewSmall.setVisibility(View.GONE);
         mVideoViewSmallParent.setVisibility(View.GONE);
-        mAudioView.setText("");
+        //mAudioView.setText("");
+        mNicknameView.setText("");
         mAudioView.setVisibility(View.GONE);
         mTrackInfoDisplayInLargeView = null;
         mTrackInfoDisplayInSmallView = null;
@@ -218,6 +287,15 @@ public class UserTrackView extends FrameLayout {
         }
     }
 
+
+    public boolean isAudioMuted(){
+        if(mQNAudioTrackInfo==null||mQNAudioTrackInfo.isMuted()){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
     public void onTracksMuteChanged() {
         LogD(TAG, "onTracksMuteChanged()");
         // audio track
@@ -227,6 +305,7 @@ public class UserTrackView extends FrameLayout {
         } else {
             setMicrophoneStateVisibilityInner(View.INVISIBLE);
         }
+
 
         // video tracks
         boolean hideAudioView = containsUnMutedVideoTracks(2);
@@ -284,29 +363,35 @@ public class UserTrackView extends FrameLayout {
     }
 
     private void updateTrackInfoInLargeView(QNTrackInfo trackInfoDisplayInLargeView) {
-        if (mTrackInfoDisplayInLargeView != null && mTrackInfoDisplayInLargeView == trackInfoDisplayInLargeView) {
-            LogD(TAG, "skip updateTrackInfoInLargeView, same track");
-            return;
-        }
-        mTrackInfoDisplayInLargeView = trackInfoDisplayInLargeView;
-        if (mTrackInfoDisplayInLargeView != null) {
-            if (DISPLAY_LARGE_VIDEO_TRACK) {
-                mSurfaceViewLarge.setVisibility(View.VISIBLE);
-                mQNRTCEngine.setRenderWindow(mTrackInfoDisplayInLargeView, mSurfaceViewLarge);
-                if (TAG_SCREEN.equals(mTrackInfoDisplayInLargeView.getTag())) {
-                    mSurfaceViewLarge.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+        try{
+            if (mTrackInfoDisplayInLargeView != null && mTrackInfoDisplayInLargeView == trackInfoDisplayInLargeView) {
+                LogD(TAG, "skip updateTrackInfoInLargeView, same track");
+                return;
+            }
+            mTrackInfoDisplayInLargeView = trackInfoDisplayInLargeView;
+            if (mTrackInfoDisplayInLargeView != null) {
+                if (DISPLAY_LARGE_VIDEO_TRACK) {
+                    mSurfaceViewLarge.setVisibility(View.VISIBLE);
+                    mQNRTCEngine.setRenderWindow(mTrackInfoDisplayInLargeView, mSurfaceViewLarge);
+                    if (TAG_SCREEN.equals(mTrackInfoDisplayInLargeView.getTag())) {
+                        mSurfaceViewLarge.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+                    } else {
+                        //mSurfaceViewLarge.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
+                        mSurfaceViewLarge.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+                    }
                 } else {
-                    mSurfaceViewLarge.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL);
+                    mSurfaceViewLarge.setVisibility(View.GONE);
+                    mVideoViewLargeParent.setBackgroundColor(getTargetColor(new Random().nextInt(6)));
                 }
+                mVideoViewLargeParent.setVisibility(View.VISIBLE);
             } else {
                 mSurfaceViewLarge.setVisibility(View.GONE);
-                mVideoViewLargeParent.setBackgroundColor(getTargetColor(new Random().nextInt(6)));
+                mVideoViewLargeParent.setVisibility(View.GONE);
             }
-            mVideoViewLargeParent.setVisibility(View.VISIBLE);
-        } else {
-            mSurfaceViewLarge.setVisibility(View.GONE);
-            mVideoViewLargeParent.setVisibility(View.GONE);
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
     }
 
     private void updateTrackInfoInSmallView(QNTrackInfo trackInfoDisplayInSmallView) {
@@ -331,7 +416,7 @@ public class UserTrackView extends FrameLayout {
     }
 
     @SuppressWarnings("all")
-    private boolean containsUnMutedVideoTracks(int count) {
+    public boolean containsUnMutedVideoTracks(int count) {
         boolean unMuted = false;
         for (int i = 0; i < mQNVideoTrackInfos.size() && i < count; i++) {
             QNTrackInfo item = mQNVideoTrackInfos.get(i);
@@ -360,6 +445,7 @@ public class UserTrackView extends FrameLayout {
         mMicrophoneViewVisibility = visibility;
         mMicrophoneStateView.setVisibility(visibility);
     }
+
 
     private void setMicrophoneStateVisibilityInner(int visibility) {
         if (mMicrophoneViewVisibility == -1 || mMicrophoneViewVisibility == View.VISIBLE) {

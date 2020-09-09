@@ -4,39 +4,42 @@ public class ServerInfo {
 
 
 
-//	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
+	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
+
+	public static String h5IP="http://cms.staging.slradio.cn";
+
+	public static String h5HttpsIP="https://cms.staging.slradio.cn";
+
+	public static String activity="https://www-asc-c.staging.slradio.cn/";
+
+	public static String scs="http://www-scs-c.staging.slradio.cn";
+
+    public static String emc="http://api-emc.staging.slradio.cn";
+
+	public static String vms="http://api-vms.staging.slradio.cn";
+
+	public static String live="http://api-live.staging.slradio.cn";
+
+	public static String echo_server="http://echo-live.staging.slradio.cn";
+
+
+//	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
 //
-//	public static String h5IP="http://cms.staging.slradio.cn";
+//	public static String h5IP="http://www-cms-c.review.slradio.cn";
 //
-//	public static String h5HttpsIP="https://cms.staging.slradio.cn";
+//	public static String h5HttpsIP="https://www-cms-c.review.slradio.cn";
 //
-//	public static String activity="https://www-asc-c.staging.slradio.cn/";
+//	public static String activity="https://www-asc-c.review.slradio.cn/";
 //
-//	public static String scs="http://www-scs-c.staging.slradio.cn";
+//	public static String scs="http://www-scs-c.review.slradio.cn";
 //
-//    public static String emc="http://api-emc.staging.slradio.cn";
+//	public static String emc="http://api-emc.review.slradio.cn";
 //
-//	public static String vms="http://api-vms.staging.slradio.cn";
+//	public static String vms="http://api-vms.review.slradio.cn";
 //
-//	public static String live="http://api-live.staging.slradio.cn";
-
-
-
-	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
-
-	public static String h5IP="http://www-cms-c.review.slradio.cn";
-
-	public static String h5HttpsIP="https://www-cms-c.review.slradio.cn";
-
-	public static String activity="https://www-asc-c.review.slradio.cn/";
-
-	public static String scs="http://www-scs-c.review.slradio.cn";
-
-	public static String emc="http://api-emc.review.slradio.cn";
-
-	public static String vms="http://api-vms.review.slradio.cn";
-
-	public static String live="http://api-live.review.slradio.cn";
+//	public static String live="http://api-live.review.slradio.cn";
+//
+//	public static String echo_server="http://echo-live.review.slradio.cn";
 
 
 //	public static String serviceIP="http://api-cms.on-radio.cn";
@@ -248,4 +251,8 @@ public class ServerInfo {
 	public static String commentReplay ="/v2/parent_comments";
 
 	public static String ossSts ="/v1/vod_play_auth";
+
+	public static String getRtsAuthKey ="/v1/get_auth_key";
+
+	public static String getAdvertises ="/v3/get_advertises_c";
 }

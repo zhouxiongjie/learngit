@@ -72,6 +72,24 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
         btnJoinRoom.setOnClickListener(this);
         btnSend.setOnClickListener(this);
         input.addTextChangedListener(this);
+        input.setOnClickListener(this);
+        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    updateView(InputMode.TEXT);
+                }
+            }
+        });
+    }
+
+
+    public void setJoinRoomVisible(boolean isVisible){
+        if(isVisible){
+            btnJoinRoom.setVisibility(VISIBLE);
+        }else{
+            btnJoinRoom.setVisibility(GONE);
+        }
     }
 
 
@@ -93,6 +111,9 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
                 textPanel.setVisibility(GONE);
                 break;
             case EMOTICON:
+                break;
+            case NONE:
+                input.clearFocus();
                 break;
         }
     }
@@ -218,11 +239,17 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
                 //}
                 break;
             case R.id.btn_join_room:
-                if (activity != null && requestVideo(activity)) {
-                    chatAction.joinRoom();
+                if (activity != null){
+                    requestVideo(activity);
                 }
+                chatAction.joinRoom();
+                updateView(InputMode.NONE);
 
                 break;
+//            case R.id.input:{
+//                updateView(InputMode.TEXT);
+//                }
+//                break;
 
         }
 
@@ -235,6 +262,14 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
      */
     public Editable getText(){
         return input.getText();
+    }
+
+
+    /**
+     * 获取输入框文字
+     */
+    public EditText getEditText(){
+        return input;
     }
 
     /**

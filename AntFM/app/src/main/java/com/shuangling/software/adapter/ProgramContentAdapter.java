@@ -602,7 +602,9 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
             }
             liveViewHolder.title.setText(content.getTitle());
             liveViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
+            liveViewHolder.popularity.setVisibility(View.GONE);
             if(content.getLive()!=null){
+
                 liveViewHolder.popularity.setText(content.getLive().getPopularity()+"人气");
                 if(content.getLive().getType()==1){
                     liveViewHolder.type.setText("网络");
@@ -614,7 +616,7 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
                     liveViewHolder.type.setText("电视");
                     liveViewHolder.typeIcon.setText(R.string.live_tv);
                 }else if(content.getLive().getType()==4){
-                    liveViewHolder.type.setText("电商");
+                    liveViewHolder.type.setText("教育");
                     liveViewHolder.typeIcon.setText(R.string.live_shop);
                 }
 

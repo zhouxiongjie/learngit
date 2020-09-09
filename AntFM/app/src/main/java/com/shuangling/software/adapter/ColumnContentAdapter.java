@@ -1030,7 +1030,9 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
             }
             liveViewHolder.title.setText(content.getTitle());
             liveViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
+            liveViewHolder.popularity.setVisibility(View.GONE);
             if (content.getLive() != null) {
+
                 liveViewHolder.popularity.setText(content.getLive().getPopularity() + "人气");
                 if (content.getLive().getType() == 1) {
                     liveViewHolder.type.setText("网络");
@@ -1042,7 +1044,7 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     liveViewHolder.type.setText("电视");
                     liveViewHolder.typeIcon.setText(R.string.live_tv);
                 } else if (content.getLive().getType() == 4) {
-                    liveViewHolder.type.setText("电商");
+                    liveViewHolder.type.setText("教育");
                     liveViewHolder.typeIcon.setText(R.string.live_shop);
                 }
 
@@ -1061,14 +1063,23 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     }
 
                     String url=content.getLive().getUrl();
-                    if(!TextUtils.isEmpty(url)){
-                        String streamName=url.substring(url.lastIndexOf("=")+1);
-                        Intent it = new Intent(mContext,  LiveDetailActivity.class);
-                        it.putExtra("streamName",streamName);
-                        it.putExtra("roomId",content.getLive().getRoom_id());
-                        it.putExtra("url",content.getLive().getRtmp_play_url());
+                    if(content.getLive().getType()==4){
+                        if(!TextUtils.isEmpty(url)){
+                            String streamName=url.substring(url.lastIndexOf("=")+1);
+                            Intent it = new Intent(mContext,  LiveDetailActivity.class);
+                            it.putExtra("streamName",streamName);
+                            it.putExtra("roomId",content.getLive().getRoom_id());
+                            //it.putExtra("url",content.getLive().getHls_play_url());
+                            it.putExtra("url",content.getLive().getRtmp_play_url());
+                            mContext.startActivity(it);
+                        }
+                    }else{
+                        Intent it = new Intent(mContext, WebViewBackActivity.class);
+                        it.putExtra("url", content.getLive().getUrl());
+                        it.putExtra("title",content.getTitle());
                         mContext.startActivity(it);
                     }
+
 
                 }
             });

@@ -1,30 +1,19 @@
 package com.shuangling.software.activity;
 
 
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.os.RemoteException;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -34,63 +23,40 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.player.IPlayer;
 import com.aliyun.player.source.UrlSource;
-import com.aliyun.player.source.VidAuth;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
-import com.ethanhua.skeleton.Skeleton;
-import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
-import com.mylhyl.circledialog.callback.ConfigButton;
-import com.mylhyl.circledialog.callback.ConfigInput;
-import com.mylhyl.circledialog.params.ButtonParams;
-import com.mylhyl.circledialog.params.InputParams;
-import com.mylhyl.circledialog.view.listener.OnInputClickListener;
-import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.scwang.smartrefresh.layout.constant.RefreshState;
-import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
-import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
-import com.shuangling.software.adapter.VideoRecyclerAdapter;
-import com.shuangling.software.dialog.ShareDialog;
-import com.shuangling.software.entity.AnchorOrganizationColumn;
+import com.shuangling.software.customview.BannerView;
+import com.shuangling.software.customview.BannerView1;
+import com.shuangling.software.entity.BannerInfo;
 import com.shuangling.software.entity.Column;
-import com.shuangling.software.entity.ColumnContent;
-import com.shuangling.software.entity.Comment;
 import com.shuangling.software.entity.LiveMenu;
-import com.shuangling.software.entity.ResAuthInfo;
 import com.shuangling.software.entity.User;
-import com.shuangling.software.entity.VideoDetail;
 import com.shuangling.software.event.MessageEvent;
-import com.shuangling.software.event.PlayerEvent;
-import com.shuangling.software.fragment.IndexFragment;
+import com.shuangling.software.fragment.ImgTextFragment;
+import com.shuangling.software.fragment.ImgTextLiveFragment;
 import com.shuangling.software.fragment.LiveChatFragment;
-import com.shuangling.software.fragment.ProgramAnchorFragment;
-import com.shuangling.software.fragment.ProgramContentFragment;
-import com.shuangling.software.fragment.ProgramRadioFragment;
 import com.shuangling.software.network.MyEcho;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
-import com.shuangling.software.service.IAudioPlayer;
 import com.shuangling.software.utils.CommonUtils;
-import com.shuangling.software.utils.Constant;
-import com.shuangling.software.utils.FloatWindowUtil;
-import com.shuangling.software.utils.ImageLoader;
-import com.shuangling.software.utils.QNAppServer;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
-import com.shuangling.software.utils.TimeUtil;
 
 import net.mrbin99.laravelechoandroid.EchoCallback;
 import net.mrbin99.laravelechoandroid.EchoOptions;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -102,16 +68,6 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import cn.sharesdk.framework.Platform;
-import cn.sharesdk.framework.PlatformActionListener;
-import cn.sharesdk.framework.ShareSDK;
-import cn.sharesdk.onekeyshare.OnekeyShare;
-import cn.sharesdk.onekeyshare.ShareContentCustomizeCallback;
-import cn.sharesdk.sina.weibo.SinaWeibo;
-import cn.sharesdk.tencent.qq.QQ;
-import cn.sharesdk.wechat.favorite.WechatFavorite;
-import cn.sharesdk.wechat.friends.Wechat;
-import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 
 
@@ -132,6 +88,8 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     TabLayout tabPageIndicator;
     @BindView(R.id.viewPager)
     ViewPager viewPager;
+    @BindView(R.id.adverts)
+    RelativeLayout adverts;
 
     private MyEcho echo;
 
@@ -141,6 +99,8 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
     private List<LiveMenu> mMenus;
     private FragmentAdapter mFragmentPagerAdapter;
+
+    private boolean mHasInChannel = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +115,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).keyboardEnable(true)  //解决软键盘与底部输入框冲突问题，默认为false，还有一个重载方法，可以指定软键盘mode
                 .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE).init();
         //ImmersionBar.with(this).statusBarDarkFont(true);
+        EventBus.getDefault().register(this);
         ButterKnife.bind(this);
         init();
 
@@ -163,15 +124,14 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
     private void init() {
 
-        mStreamName=getIntent().getStringExtra("streamName");
-        mRoomId=getIntent().getIntExtra("roomId",0);
-        mUrl=getIntent().getStringExtra("url");
+        mStreamName = getIntent().getStringExtra("streamName");
+        mRoomId = getIntent().getIntExtra("roomId", 0);
+        mUrl = getIntent().getStringExtra("url");
         initAliyunPlayerView();
-
-        setPlaySource(mUrl);
+        getAdvertises();
         getMenus();
 
-
+        getAuthKey();
 
         //joinChannel();
     }
@@ -179,13 +139,13 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     private void getMenus() {
         String url = ServerInfo.live + "/v2/get_room_menus_c";
         Map<String, String> params = new HashMap<>();
-        params.put("room_id",""+mRoomId);
+        params.put("room_id", "" + mRoomId);
 
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
-                try{
+                try {
 
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
@@ -194,7 +154,9 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                         Iterator<LiveMenu> iterator = mMenus.iterator();
                         while (iterator.hasNext()) {
                             LiveMenu liveMenu = iterator.next();
-                            if (liveMenu.getShowtype() != 1) {
+                            if (liveMenu.getShowtype() != 1&&
+                                    liveMenu.getShowtype() != 2&&
+                                    liveMenu.getShowtype()!=11) {
                                 iterator.remove();
                             }
                         }
@@ -209,7 +171,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
                     }
 
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -219,7 +181,160 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
             @Override
             public void onFailure(Call call, Exception exception) {
 
-                Log.e("test",exception.toString());
+                Log.e("test", exception.toString());
+
+            }
+        });
+
+    }
+
+
+    private void getAuthKey() {
+        String url = ServerInfo.live + ServerInfo.getRtsAuthKey;
+        Map<String, String> params = new HashMap<>();
+        params.put("room_id", "" + mRoomId);
+        params.put("type", "play");
+        //params.put("suffix",".m3u8");
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                try {
+
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        final String key = jsonObject.getString("data");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    setPlaySource(mUrl + "?" + key);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                Log.e("test", exception.toString());
+
+            }
+        });
+
+    }
+
+
+    private void getAdvertises() {
+        String url = ServerInfo.live + ServerInfo.getAdvertises;
+        Map<String, String> params = new HashMap<>();
+        params.put("room_id", "" + mRoomId);
+
+        //params.put("suffix",".m3u8");
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                try {
+
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        JSONArray ja=jsonObject.getJSONArray("data");
+                        List<BannerView.Banner> banners = new ArrayList<>();
+                        for(int i=0;ja!=null&&i<ja.size();i++){
+
+                            BannerInfo banner = new BannerInfo();
+                            banner.setLogo(ja.getJSONObject(i).getString("pic_url"));
+                            banner.setUrl(ja.getJSONObject(i).getString("url"));
+                            banners.add(banner);
+
+                        }
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                BannerView1 bannerView = new BannerView1(getContext());
+                                int width = CommonUtils.getScreenWidth();
+                                int height = (int)(width / 5.36);
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height);
+//                                params.leftMargin = CommonUtils.dip2px(20);
+//                                params.rightMargin = CommonUtils.dip2px(20);
+//                                params.bottomMargin = CommonUtils.dip2px(10);
+//                                params.topMargin = CommonUtils.dip2px(10);
+                                adverts.addView(bannerView, params);
+
+                                bannerView.setData(banners);
+                                bannerView.setOnItemClickListener(new BannerView1.OnItemClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        BannerInfo banner = (BannerInfo) view.getTag();
+                                        String url = banner.getUrl();
+                                        String title = banner.getTitle();
+                                        jumpTo(url, title);
+
+
+                                    }
+                                });
+                            }
+                        });
+
+//                        BannerView bannerView = new BannerView(getContext());
+//                        int width = CommonUtils.getScreenWidth() - CommonUtils.dip2px(40);
+//                        int height = 10 * width / 23;
+//                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height);
+//                        params.leftMargin = CommonUtils.dip2px(20);
+//                        params.rightMargin = CommonUtils.dip2px(20);
+//                        params.bottomMargin = CommonUtils.dip2px(10);
+//                        params.topMargin = CommonUtils.dip2px(10);
+//                        mDecorateLayout.addView(bannerView, params);
+//                        List<BannerView.Banner> banners = new ArrayList<>();
+//                        for (int j = 0; module.getContents() != null && j < module.getContents().size(); j++) {
+//                            BannerInfo banner = new BannerInfo();
+//                            banner.setLogo(module.getContents().get(j).getCover());
+//                            banner.setUrl(module.getContents().get(j).getSource_url());
+//                            banners.add(banner);
+//
+//                        }
+//                        bannerView.setData(banners);
+//                        bannerView.setOnItemClickListener(new BannerView.OnItemClickListener() {
+//                            @Override
+//                            public void onClick(View view) {
+//                                BannerInfo banner = (BannerInfo) view.getTag();
+//
+//                                String url = banner.getUrl();
+//                                String title = banner.getTitle();
+//                                jumpTo(url, title);
+//
+//
+//                            }
+//                        });
+
+
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                Log.e("test", exception.toString());
 
             }
         });
@@ -228,7 +343,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
     private void initFragment() {
 
-        try{
+        try {
             if (mMenus != null && mMenus.size() > 0) {
 
                 mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager(), mMenus);
@@ -241,14 +356,12 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                     tabPageIndicator.setTabMode(TabLayout.MODE_FIXED);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
 
-
     }
-
 
 
     private void initAliyunPlayerView() {
@@ -259,7 +372,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         aliyunVodPlayerView.setPlayingCache(false, sdDir, 60 * 60 /*时长, s */, 300 /*大小，MB*/);
         aliyunVodPlayerView.setTheme(AliyunVodPlayerView.Theme.Blue);
         //aliyunVodPlayerView.setCirclePlay(true);
-        aliyunVodPlayerView.setAutoPlay(true);
+        //aliyunVodPlayerView.setAutoPlay(true);
 //        aliyunVodPlayerView.setReferer(ServerInfo.h5IP);
         aliyunVodPlayerView.setOnPreparedListener(new IPlayer.OnPreparedListener() {
             @Override
@@ -283,16 +396,21 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
     private void setPlaySource(String url) {
 
-        UrlSource urlSource=new UrlSource();
+        UrlSource urlSource = new UrlSource();
         urlSource.setUri(url);
         aliyunVodPlayerView.setLocalSource(urlSource);
 
     }
 
 
-    public void joinChannel(){
+    public void joinChannel() {
+
+        if (mHasInChannel) {
+            return;
+        }
+        mHasInChannel = true;
         EchoOptions options = new EchoOptions();
-        options.host = "http://echo-live.review.slradio.cn";
+        options.host = ServerInfo.echo_server;
         options.headers.put("Authorization", User.getInstance().getAuthorization());
         echo = new MyEcho(options);
         echo.connect(new EchoCallback() {
@@ -309,38 +427,43 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         });
 
 
-        echo.channel("room.chat.common." +mRoomId)
+        echo.channel("room.chat.common." + mRoomId)
                 .listen("InteractCommonEvent", new EchoCallback() {
                     @Override
                     public void call(Object... args) {
                         // Event thrown.
                         Log.i("test", "args");
 
-                        try{
-                            ToastUtils.show(args[1].toString());
-                            JSONObject jo=JSONObject.parseObject(args[1].toString());
-                            if(jo.getString("type").equals("3")){
-                                //同意或者拒绝连麦申请
-                                if(jo.getJSONObject("data")!=null&&jo.getJSONObject("data").getString("allowed").equals("1")&&jo.getJSONObject("data").getString(" id").equals(""+User.getInstance().getId())){
-                                    //同意连麦
-                                    getRoomToken(""+mRoomId);
+                        try {
+//                            ToastUtils.show(args[1].toString());
+                            Log.i("message", args[1].toString());
+                            JSONObject jo = JSONObject.parseObject(args[1].toString());
+                            if (jo.getInteger("roomID") == mRoomId) {
+                                jo = jo.getJSONObject("msg");
+                                if (jo.getString("type").equals("3")) {
+                                    //同意或者拒绝连麦申请
+                                    if (jo.getJSONObject("data") != null && jo.getJSONObject("data").getString("allowed").equals("1") && jo.getJSONObject("data").getString("id").equals("" + User.getInstance().getId())) {
+                                        //同意连麦
+                                        getRoomToken("" + mRoomId);
 
-                                }else if(jo.getJSONObject("data")!=null&&jo.getJSONObject("data").getString("allowed").equals("0")&&jo.getJSONObject("data").getString(" id").equals(""+User.getInstance().getId())){
-                                    new CircleDialog.Builder()
-                                            .setCanceledOnTouchOutside(false)
-                                            .setCancelable(false)
-                                            .setText("您的连麦请求被拒绝")
-                                            .setPositive("确定", null)
-                                            .show(getSupportFragmentManager());
+                                    } else if (jo.getJSONObject("data") != null && jo.getJSONObject("data").getString("allowed").equals("0") && jo.getJSONObject("data").getString("id").equals("" + User.getInstance().getId())) {
+                                        new CircleDialog.Builder()
+                                                .setCanceledOnTouchOutside(false)
+                                                .setCancelable(false)
+                                                .setText("您的连麦请求被拒绝")
+                                                .setPositive("确定", null)
+                                                .show(getSupportFragmentManager());
 
+                                    }
+                                } else {
+                                    EventBus.getDefault().post(new MessageEvent("message", jo.toString()));
                                 }
-                            }else{
-                                EventBus.getDefault().post(new MessageEvent("message",args[1].toString()));
                             }
-                        }catch (Exception e){
 
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-
 
 
                     }
@@ -348,23 +471,90 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     }
 
 
-
-
-    private void getRoomToken(final String roomId) {
-        String url = "http://api-live.review.slradio.cn" + "/v4/get_room_token_c";
+    //取消连麦
+    public void cancelInteract(String roomId) {
+        String url = ServerInfo.live + "/v4/user_cancel_apply_interact";
         Map<String, String> params = new HashMap<>();
-        params.put("userId","user_"+User.getInstance().getId());
-        params.put("roomId",roomId);
-        params.put("permission","user");
+        params.put("userId", "" + User.getInstance().getId());
+        params.put("roomId", roomId);
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
-                try{
+                try {
 
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                       final String roomToken = jsonObject.getString("data");
+
+
+                        //getRoomToken(""+mRoomId);
+
+
+//                        String roomToken = jsonObject.getString("data");
+//
+//                        getActivity().runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                if (TextUtils.isEmpty(roomToken)) {
+//                                    return;
+//                                }
+//                                Intent intent = new Intent(getContext(), RoomActivity.class);
+//                                intent.putExtra(RoomActivity.EXTRA_ROOM_ID, roomId);
+//                                intent.putExtra(RoomActivity.EXTRA_ROOM_TOKEN, roomToken);
+//                                intent.putExtra(RoomActivity.EXTRA_USER_ID, "user_"+User.getInstance().getId());
+//                                startActivity(intent);
+//                            }
+//                        });
+
+                    } else if (jsonObject != null) {
+                        ToastUtils.show(jsonObject.getString("msg"));
+                    } else {
+
+                        ToastUtils.show("取消连麦失败");
+                    }
+
+                } catch (Exception e) {
+
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                Log.e("test", exception.toString());
+
+            }
+        });
+    }
+
+
+    public void leaveChannel() {
+        if (echo != null && mHasInChannel) {
+            echo.leave("room.chat.common." + mRoomId);
+            mHasInChannel = false;
+        }
+
+
+    }
+
+
+    private void getRoomToken(final String roomId) {
+        String url = ServerInfo.live + "/v4/get_room_token_c";
+        Map<String, String> params = new HashMap<>();
+        params.put("userId", "user_" + User.getInstance().getId());
+        params.put("roomId", roomId);
+        params.put("permission", "user");
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                try {
+
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        final String roomToken = jsonObject.getString("data");
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -375,14 +565,15 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                                 Intent intent = new Intent(LiveDetailActivity.this, RoomActivity.class);
                                 intent.putExtra(RoomActivity.EXTRA_ROOM_ID, roomId);
                                 intent.putExtra(RoomActivity.EXTRA_ROOM_TOKEN, roomToken);
-                                intent.putExtra(RoomActivity.EXTRA_USER_ID, "user_"+User.getInstance().getId());
+                                intent.putExtra(RoomActivity.EXTRA_USER_ID, "user_" + User.getInstance().getId());
+                                intent.putExtra("streamName", mStreamName);
                                 startActivity(intent);
                             }
                         });
 
                     }
 
-                }catch (Exception e){
+                } catch (Exception e) {
 
                 }
 
@@ -392,21 +583,11 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
             @Override
             public void onFailure(Call call, Exception exception) {
 
-                Log.e("test",exception.toString());
+                Log.e("test", exception.toString());
 
             }
         });
     }
-
-
-
-
-
-
-
-
-
-
 
 
     private void updatePlayerViewMode() {
@@ -509,7 +690,25 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
             aliyunVodPlayerView.onDestroy();
             aliyunVodPlayerView = null;
         }
+        EventBus.getDefault().unregister(this);
     }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(MessageEvent event) {
+        if (event.getEventName().equals("kickedOut")) {
+            new CircleDialog.Builder()
+                    .setText("您已经被主持人移除连麦")
+                    .setPositive("我知道了", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                        }
+                    })
+
+                    .show(getSupportFragmentManager());
+        }
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -546,7 +745,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_LOGIN && resultCode == RESULT_OK) {
         }
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
 
 
     }
@@ -557,14 +756,11 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
             case R.id.attention:
 
 
-
-
                 break;
 
 
         }
     }
-
 
 
     public class FragmentAdapter extends FragmentStatePagerAdapter {
@@ -592,7 +788,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         @Override
         public Fragment getItem(int position) {
 
-            if(mMenus.get(position).getShowtype()==1){
+            if (mMenus.get(position).getShowtype() == 1) {
                 //聊天
                 LiveChatFragment liveChatFragment = new LiveChatFragment();
                 Bundle bundle = new Bundle();
@@ -601,13 +797,22 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 liveChatFragment.setArguments(bundle);
                 return liveChatFragment;
 
+            }else if(mMenus.get(position).getShowtype() == 2){
+                //图文
+                ImgTextFragment imgTextFragment = new ImgTextFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("streamName", mStreamName);
+                bundle.putInt("roomId", mRoomId);
+                imgTextFragment.setArguments(bundle);
+                return imgTextFragment;
+            }else{
+                ImgTextLiveFragment imgTextLiveFragment = new ImgTextLiveFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("streamName", mStreamName);
+                bundle.putInt("roomId", mRoomId);
+                imgTextLiveFragment.setArguments(bundle);
+                return imgTextLiveFragment;
             }
-            LiveChatFragment liveChatFragment = new LiveChatFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("streamName", mStreamName);
-            bundle.putInt("roomId", mRoomId);
-            liveChatFragment.setArguments(bundle);
-            return liveChatFragment;
 
 
 
@@ -633,6 +838,160 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
             return fragment;
         }
 
+    }
+
+
+    public void jumpTo(String url,String title){
+        if(url.startsWith(ServerInfo.h5IP+"/tv")||url.startsWith(ServerInfo.h5HttpsIP+"/tv")){
+            Intent it=new Intent(this,RadioListActivity.class);
+            it.putExtra("type","2");
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/lives/")||url.startsWith(ServerInfo.h5HttpsIP+"/lives/")){
+            String radioId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
+            Intent it=new Intent(this,TvDetailActivity.class);
+            it.putExtra("radioId",Integer.parseInt(radioId));
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/radios/")||url.startsWith(ServerInfo.h5HttpsIP+"/radios/")){
+            String radioId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
+            Intent it=new Intent(this,RadioDetailActivity.class);
+            it.putExtra("radioId",Integer.parseInt(radioId));
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/radios")||url.startsWith(ServerInfo.h5HttpsIP+"/radios")){
+            Intent it=new Intent(this,RadioListActivity.class);
+            it.putExtra("type","1");
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/gover")||url.startsWith(ServerInfo.h5HttpsIP+"/gover")){
+            Intent it=new Intent(this,WebViewBackActivity.class);
+            it.putExtra("title",title);
+            it.putExtra("url",url);
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/dj")||url.startsWith(ServerInfo.h5HttpsIP+"/dj")){
+            Intent it=new Intent(this,WebViewBackActivity.class);
+            it.putExtra("title",title);
+            it.putExtra("url",url);
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/interact")||url.startsWith(ServerInfo.h5HttpsIP+"/interact")){
+            Intent it=new Intent(this,WebViewBackActivity.class);
+            it.putExtra("title",title);
+            it.putExtra("url",url);
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/guide")||url.startsWith(ServerInfo.h5HttpsIP+"/guide")){
+            Intent it=new Intent(this,WebViewBackActivity.class);
+            it.putExtra("title",title);
+            it.putExtra("url",url);
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/cates/")||url.startsWith(ServerInfo.h5HttpsIP+"/cates/")){
+            //跳转栏目
+            Intent it=new Intent(this,WebViewBackActivity.class);
+            it.putExtra("url",url);
+            it.putExtra("title",title);
+            startActivity(it);
+
+        }else if(url.startsWith(ServerInfo.h5IP+"/specials")||url.startsWith(ServerInfo.h5HttpsIP+"/specials")){
+            //跳转热门
+            Intent it=new Intent(this,WebViewBackActivity.class);
+            it.putExtra("url",url);
+            it.putExtra("title",title);
+            startActivity(it);
+
+        }else if(url.startsWith(ServerInfo.h5IP+"/orgs/")||url.startsWith(ServerInfo.h5HttpsIP+"/orgs/")){
+            String organizationId=url.substring(url.lastIndexOf("/")+1);
+//            Intent it = new Intent(this, OrganizationDetailActivity.class);
+//            it.putExtra("organizationId", Integer.parseInt(organizationId));
+//            startActivity(it);
+            Intent it = new Intent(this, WebViewBackActivity.class);
+            it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+organizationId);
+            it.putExtra("title",title);
+            startActivity(it);
+
+        }else if(url.startsWith(ServerInfo.h5IP+"/anchors/")||url.startsWith(ServerInfo.h5HttpsIP+"/anchors/")){
+            String anchorId=url.substring(url.lastIndexOf("/")+1);
+//            Intent it = new Intent(this, AnchorDetailActivity.class);
+//            it.putExtra("anchorId", Integer.parseInt(anchorId));
+//            startActivity(it);
+
+            Intent it = new Intent(this, WebViewBackActivity.class);
+            it.putExtra("url", ServerInfo.h5HttpsIP+"/anchors/"+anchorId);
+            it.putExtra("title",title);
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/atlas/")||url.startsWith(ServerInfo.h5HttpsIP+"/atlas/")){
+            String galleriaId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
+            Intent it = new Intent(this, GalleriaActivity.class);
+            it.putExtra("galleriaId", Integer.parseInt(galleriaId));
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/albums/")||url.startsWith(ServerInfo.h5HttpsIP+"/albums/")){
+            String albumId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
+            Intent it = new Intent(this, AlbumDetailActivity.class);
+            it.putExtra("albumId", Integer.parseInt(albumId));
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/audios/")||url.startsWith(ServerInfo.h5HttpsIP+"/audios/")){
+            String audioId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
+            Intent it = new Intent(this, AudioDetailActivity.class);
+            it.putExtra("audioId", Integer.parseInt(audioId));
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/posts/")||url.startsWith(ServerInfo.h5HttpsIP+"/posts/")){
+            String articleId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
+            Intent it = new Intent(this, ArticleDetailActivity.class);
+            it.putExtra("articleId", Integer.parseInt(articleId));
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/specials/")||url.startsWith(ServerInfo.h5HttpsIP+"/specials/")){
+            String specialId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
+            Intent it = new Intent(this, SpecialDetailActivity.class);
+            it.putExtra("specialId", Integer.parseInt(specialId));
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/videos/")||url.startsWith(ServerInfo.h5HttpsIP+"/videos/")){
+            String videoId=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
+            Intent it = new Intent(this, VideoDetailActivity.class);
+            it.putExtra("videoId",Integer.parseInt(videoId));
+            startActivity(it);
+        }else if(url.startsWith(ServerInfo.h5IP+"/subcates/")||url.startsWith(ServerInfo.h5IP+"/subcates/")){
+            String columnid=CommonUtils.getQuantity(url.substring(url.lastIndexOf("/")+1));
+            Column column=new Column();
+            column.setId(Integer.parseInt(columnid));
+            column.setName(url.substring(url.lastIndexOf("=")+1));
+            Intent it = new Intent(this, ContentActivity.class);
+            it.putExtra("column", column);
+            startActivity(it);
+        }else if (url.startsWith(ServerInfo.scs + "/broke-create")) {
+            if (User.getInstance() == null) {
+                Intent it = new Intent(this, NewLoginActivity.class);
+                startActivity(it);
+            }else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+                Intent it = new Intent(this, BindPhoneActivity.class);
+                //it.putExtra("hasLogined",true);
+                startActivity(it);
+            }
+            else {
+                Intent it = new Intent(this, CluesActivity.class);
+                it.putExtra("url", ServerInfo.scs + "/broke-create");
+                startActivity(it);
+            }
+        }else if (url.startsWith(ServerInfo.h5IP + "/invitation-post") || url.startsWith(ServerInfo.h5HttpsIP + "/invitation-post")) {
+            Intent it = new Intent(this, WebViewBackActivity.class);
+            it.putExtra("url", url);
+            it.putExtra("title",title);
+            startActivity(it);
+        }else if (url.startsWith(ServerInfo.h5IP + "/actrank") || url.startsWith(ServerInfo.h5HttpsIP + "/actrank")) {
+            Intent it = new Intent(this, WebViewBackActivity.class);
+            it.putExtra("url", url);
+            it.putExtra("title",title);
+            startActivity(it);
+        }else if (url.startsWith(ServerInfo.h5IP + "/wish") || url.startsWith(ServerInfo.h5HttpsIP + "/wish")) {
+            Intent it = new Intent(this, WebViewBackActivity.class);
+            it.putExtra("url", url);
+            it.putExtra("title",title);
+            startActivity(it);
+        }else if (url.startsWith(ServerInfo.h5IP + "/actlist") || url.startsWith(ServerInfo.h5HttpsIP + "/actlist")) {
+            Intent it = new Intent(this, WebViewBackActivity.class);
+            it.putExtra("url", url);
+            it.putExtra("title",title);
+            startActivity(it);
+        }else {
+            Intent it=new Intent(this,WebViewBackActivity.class);
+            it.putExtra("url",url);
+            it.putExtra("title",title);
+            startActivity(it);
+        }
     }
 
 

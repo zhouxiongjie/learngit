@@ -87,7 +87,6 @@ public class HistoryFragment extends Fragment implements Handler.Callback {
         Normal
     }
 
-    ;
 
 
     private int mCurrentPage = 1;

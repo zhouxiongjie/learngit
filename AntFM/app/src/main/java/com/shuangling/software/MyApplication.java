@@ -236,6 +236,8 @@ public class MyApplication extends MultiDexApplication {
 
         initStation();
 
+        getApiDomain();
+
         getUseProtocol();
 	}
 
@@ -431,6 +433,45 @@ public class MyApplication extends MultiDexApplication {
                         }
 
 
+                    }
+
+
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+
+            }
+        });
+
+
+    }
+
+
+
+    public void getApiDomain() {
+
+        String url = ServerInfo.live + "/v1/api_domain";
+        Map<String, String> params = new HashMap<String, String>();
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+
+                try{
+
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        ServerInfo.echo_server=jsonObject.getJSONObject("data").getString("echo_server");
                     }
 
 

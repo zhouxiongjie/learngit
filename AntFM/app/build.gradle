@@ -24,6 +24,11 @@ android {
 
     }
 
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
     MtjCirclePluginConfig {
 
         appkey = "8bc0e3d645"

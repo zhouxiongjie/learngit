@@ -157,6 +157,8 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
     public static final int MSG_LIKE_CALLBACK = 0xd;
 
+    public static final int REQUEST_REPORT = 0xe;
+
     public static final int REQUEST_PERMISSION_CODE = 0x0110;
 
 
@@ -327,7 +329,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
             public void onClick(View v) {
 
                 if (mArticle != null) {
-                    ShareDialog dialog = ShareDialog.getInstance(mArticle.getIs_collection() == 0 ? false : true);
+                    ShareDialog dialog = ShareDialog.getInstance(mArticle.getIs_collection() == 0 ? false : true,mArticle.getIs_user_report() == 0 ? false : true);
                     dialog.setIsShowPosterButton(true);
                     dialog.setShareHandler(new ShareDialog.ShareHandler() {
                         @Override
@@ -354,6 +356,21 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         @Override
                         public void poster() {
                             showPosterShare();
+                        }
+
+                        @Override
+                        public void report() {
+                            if (User.getInstance() == null) {
+                                Intent it=new Intent(ArticleDetailActivity02.this, NewLoginActivity.class);
+                                it.putExtra("jump_url",ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
+                                startActivityForResult(it, REQUEST_LOGIN);
+                            }else{
+                                Intent it=new Intent(ArticleDetailActivity02.this,ReportActivity.class);
+                                it.putExtra("id",""+mArticle.getId());
+                                startActivityForResult(it,REQUEST_REPORT);
+                            }
+
+
                         }
 
                         @Override
@@ -1475,6 +1492,11 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
 
             }
+        }else if(requestCode==REQUEST_REPORT&& resultCode == Activity.RESULT_OK){
+            if(mArticle!=null){
+                mArticle.setIs_user_report(1);
+            }
+
         }
         super.onActivityResult(requestCode, resultCode, data);
     }

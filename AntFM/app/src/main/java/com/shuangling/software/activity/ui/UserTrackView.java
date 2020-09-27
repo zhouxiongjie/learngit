@@ -364,10 +364,10 @@ public class UserTrackView extends FrameLayout {
 
     private void updateTrackInfoInLargeView(QNTrackInfo trackInfoDisplayInLargeView) {
         try{
-            if (mTrackInfoDisplayInLargeView != null && mTrackInfoDisplayInLargeView == trackInfoDisplayInLargeView) {
-                LogD(TAG, "skip updateTrackInfoInLargeView, same track");
-                return;
-            }
+//            if (mTrackInfoDisplayInLargeView != null && mTrackInfoDisplayInLargeView == trackInfoDisplayInLargeView) {
+//                LogD(TAG, "skip updateTrackInfoInLargeView, same track");
+//                return;
+//            }
             mTrackInfoDisplayInLargeView = trackInfoDisplayInLargeView;
             if (mTrackInfoDisplayInLargeView != null) {
                 if (DISPLAY_LARGE_VIDEO_TRACK) {

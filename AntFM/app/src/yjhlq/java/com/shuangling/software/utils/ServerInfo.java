@@ -35,6 +35,7 @@ public class ServerInfo {
 
 	public static String live="http://api-live.yjhlnews.cn";
 
+	public static String echo_server="http://echo-live.yjhlnews.cn";
 
 //	public static String serviceIP="http://api-cms.on-radio.cn";
 //
@@ -261,4 +262,8 @@ public class ServerInfo {
 	public static String commentReplay ="/v2/parent_comments";
 
 	public static String ossSts ="/v1/vod_play_auth";
+
+	public static String getRtsAuthKey ="/v1/get_auth_key";
+
+	public static String getAdvertises ="/v3/get_advertises_c";
 }

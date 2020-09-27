@@ -421,7 +421,7 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
     private  void showShareDialog(final String title, final String desc, final String logo, final String url) {
 
-        ShareDialog dialog = ShareDialog.getInstance(false);
+        ShareDialog dialog = ShareDialog.getInstance(false,false);
         dialog.setIsShowPosterButton(false);
         dialog.setIsHideSecondGroup(true);
         dialog.setShareHandler(new ShareDialog.ShareHandler() {
@@ -434,6 +434,11 @@ public class DiscoverFragment extends SimpleImmersionFragment implements Handler
 
             @Override
             public void poster() {
+
+            }
+
+            @Override
+            public void report() {
 
             }
 

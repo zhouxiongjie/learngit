@@ -15,7 +15,6 @@ import com.mylhyl.circledialog.BaseCircleDialog;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.FontSizeSettingActivity;
 import com.shuangling.software.customview.SlideSelectView;
-import com.shuangling.software.customview.TextRatingBar;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.SharedPreferencesUtils;
@@ -75,13 +74,29 @@ public class ShareDialog extends BaseCircleDialog {
     HorizontalScrollView otherLayout;
     @BindView(R.id.collectBtn)
     ImageView collectBtn;
+    @BindView(R.id.reportBtn)
+    ImageView reportBtn;
+    @BindView(R.id.reportText)
+    TextView reportText;
+    Unbinder unbinder1;
     private float mAppFontSize;
     Unbinder unbinder;
 
     private boolean mIsCollected;
+    private boolean mIsReported;
 
     private boolean mIsShowPosterButton = false;
+    private boolean mIsShowFontSize=true;
+
+
+
+    private boolean mIsShowRefresh=true;
+    private boolean mIsShowCollect=true;
+    private boolean mIsShowReport=true;
+    private boolean mIsShowCopyLink=true;
+
     private boolean mIsHideSecondGroup = false;
+
 
     public interface ShareHandler {
         void onShare(String platform);
@@ -93,6 +108,8 @@ public class ShareDialog extends BaseCircleDialog {
         void collectContent();
 
         void poster();
+
+        void report();
     }
 
 
@@ -103,6 +120,50 @@ public class ShareDialog extends BaseCircleDialog {
     public void setIsShowPosterButton(boolean mIsShowPosterButton) {
         this.mIsShowPosterButton = mIsShowPosterButton;
     }
+
+
+    public boolean isIsShowFontSize() {
+        return mIsShowFontSize;
+    }
+
+    public void setIsShowFontSize(boolean mIsShowFontSize) {
+        this.mIsShowFontSize = mIsShowFontSize;
+    }
+
+    public boolean isIsShowRefresh() {
+        return mIsShowRefresh;
+    }
+
+    public void setIsShowRefresh(boolean mIsShowRefresh) {
+        this.mIsShowRefresh = mIsShowRefresh;
+    }
+
+    public boolean isIsShowCollect() {
+        return mIsShowCollect;
+    }
+
+    public void setIsShowCollect(boolean mIsShowCollect) {
+        this.mIsShowCollect = mIsShowCollect;
+    }
+
+    public boolean isIsShowReport() {
+        return mIsShowReport;
+    }
+
+    public void setIsShowReport(boolean mIsShowReport) {
+        this.mIsShowReport = mIsShowReport;
+    }
+
+    public boolean isIsShowCopyLink() {
+        return mIsShowCopyLink;
+    }
+
+    public void setIsShowCopyLink(boolean mIsShowCopyLink) {
+        this.mIsShowCopyLink = mIsShowCopyLink;
+    }
+
+
+
 
     public boolean isIsHideSecondGroup() {
         return mIsHideSecondGroup;
@@ -119,13 +180,14 @@ public class ShareDialog extends BaseCircleDialog {
     private ShareHandler mShareHandler;
 
 
-    public static ShareDialog getInstance(boolean isCollected) {
+    public static ShareDialog getInstance(boolean isCollected, boolean isReported) {
         ShareDialog dialogFragment = new ShareDialog();
         dialogFragment.setCanceledBack(true);
         dialogFragment.setCanceledOnTouchOutside(true);
         dialogFragment.setGravity(Gravity.BOTTOM);
         dialogFragment.setWidth(1f);
         dialogFragment.mIsCollected = isCollected;
+        dialogFragment.mIsReported = isReported;
         dialogFragment.mIsShowPosterButton = false;
         dialogFragment.mIsHideSecondGroup = false;
         return dialogFragment;
@@ -193,20 +255,28 @@ public class ShareDialog extends BaseCircleDialog {
 
         if (mIsCollected) {
             collectBtn.setSelected(true);
-        }else{
+        } else {
             collectBtn.setSelected(false);
         }
 
-        if(mIsShowPosterButton){
+        if (mIsReported) {
+            reportBtn.setSelected(true);
+            reportText.setText("已举报");
+        } else {
+            reportBtn.setSelected(false);
+            reportText.setText("举报");
+        }
+
+        if (mIsShowPosterButton) {
             poster.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             poster.setVisibility(View.GONE);
         }
 
 
-        if(mIsHideSecondGroup) {
+        if (mIsHideSecondGroup) {
             secondGroupLayout.setVisibility(View.GONE);
-        }else{
+        } else {
             secondGroupLayout.setVisibility(View.VISIBLE);
         }
 
@@ -241,7 +311,7 @@ public class ShareDialog extends BaseCircleDialog {
     }
 
 
-    @OnClick({R.id.post,R.id.weiXin, R.id.weiXinCollect, R.id.weiXinFriends, R.id.weibo, R.id.qq, R.id.qqZone, R.id.fontSize, R.id.fontSizeBar, R.id.cancel, R.id.copyLink, R.id.collect, R.id.refresh})
+    @OnClick({R.id.post, R.id.weiXin, R.id.weiXinCollect, R.id.weiXinFriends, R.id.weibo, R.id.qq, R.id.qqZone, R.id.fontSize, R.id.fontSizeBar, R.id.cancel, R.id.copyLink, R.id.collect, R.id.report, R.id.refresh})
     public void onViewClicked(View view) {
         switch (view.getId()) {
 
@@ -314,6 +384,16 @@ public class ShareDialog extends BaseCircleDialog {
 
                 break;
 
+            case R.id.report:
+                if (!mIsReported) {
+                    if (mShareHandler != null) {
+                        mShareHandler.report();
+                    }
+                }
+                dismiss();
+
+                break;
+
             case R.id.refresh:
                 if (mShareHandler != null) {
                     mShareHandler.refresh();
@@ -339,6 +419,7 @@ public class ShareDialog extends BaseCircleDialog {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO: inflate a fragment view
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
+        unbinder1 = ButterKnife.bind(this, rootView);
         return rootView;
     }
 }

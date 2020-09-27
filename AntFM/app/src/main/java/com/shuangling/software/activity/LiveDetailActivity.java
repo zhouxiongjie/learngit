@@ -38,7 +38,9 @@ import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.BannerView1;
 import com.shuangling.software.entity.BannerInfo;
 import com.shuangling.software.entity.Column;
+import com.shuangling.software.entity.LiveInfo;
 import com.shuangling.software.entity.LiveMenu;
+import com.shuangling.software.entity.LiveRoomInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.MessageEvent;
 import com.shuangling.software.fragment.ImgTextFragment;
@@ -99,8 +101,10 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
     private List<LiveMenu> mMenus;
     private FragmentAdapter mFragmentPagerAdapter;
-
+    private LiveRoomInfo mLiveRoomInfo;
     private boolean mHasInChannel = false;
+
+    public boolean canGrabRedPacket=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +135,9 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         getAdvertises();
         getMenus();
 
-        getAuthKey();
+        getDetail();
+
+
 
         //joinChannel();
     }
@@ -154,9 +160,14 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                         Iterator<LiveMenu> iterator = mMenus.iterator();
                         while (iterator.hasNext()) {
                             LiveMenu liveMenu = iterator.next();
-                            if (liveMenu.getShowtype() != 1&&
+
+                            if ((liveMenu.getUsing()!=1)||(liveMenu.getShowtype() != 1&&
                                     liveMenu.getShowtype() != 2&&
-                                    liveMenu.getShowtype()!=11) {
+                                    liveMenu.getShowtype()!=11)) {
+                                if(liveMenu.getShowtype()==6&&liveMenu.getUsing()==1){
+                                    canGrabRedPacket=true;
+                                }
+
                                 iterator.remove();
                             }
                         }
@@ -167,6 +178,50 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                                 initFragment();
                             }
                         });
+
+
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                Log.e("test", exception.toString());
+
+            }
+        });
+
+    }
+
+
+
+    private void getDetail() {
+        String url = ServerInfo.live + "/v3/get_room_details_c";
+        Map<String, String> params = new HashMap<>();
+        params.put("stream_name", "" + mStreamName);
+
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                try {
+
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        JSONArray ja=jsonObject.getJSONArray("data");
+                        if(ja!=null&&ja.size()>0){
+                            mLiveRoomInfo = JSONObject.parseObject(ja.getJSONObject(0).toJSONString(), LiveRoomInfo.class);
+                            getAuthKey();
+                        }
+
+
 
 
                     }
@@ -208,7 +263,8 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                             @Override
                             public void run() {
                                 try {
-                                    setPlaySource(mUrl + "?" + key);
+                                    //setPlaySource(mUrl + "?" + key);
+                                    setPlaySource(mLiveRoomInfo.getRts_pull_url() + "?" + key);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }

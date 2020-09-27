@@ -1079,7 +1079,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             it.putExtra("url", url);
             it.putExtra("title", title);
             startActivity(it);
-        } else if (url.startsWith(ServerInfo.h5IP + "/actlist") || url.startsWith(ServerInfo.h5HttpsIP + "/actlist")) {
+        }  else if (url.startsWith(ServerInfo.h5IP + "/actlist") || url.startsWith(ServerInfo.h5HttpsIP + "/actlist")) {
             Intent it = new Intent(getContext(), WebViewBackActivity.class);
             it.putExtra("url", url);
             it.putExtra("title", title);

@@ -45,6 +45,9 @@ public class Article implements Serializable {
     private AuthorInfoBean author_info;
     private List<CategoriesBean> categories;
 
+    private int is_user_report;
+
+
     public int getId() {
         return id;
     }
@@ -179,6 +182,14 @@ public class Article implements Serializable {
 
     public void setCategories(List<CategoriesBean> categories) {
         this.categories = categories;
+    }
+
+    public int getIs_user_report() {
+        return is_user_report;
+    }
+
+    public void setIs_user_report(int is_user_report) {
+        this.is_user_report = is_user_report;
     }
 
     public static class ArticleBean {

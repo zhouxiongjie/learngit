@@ -196,7 +196,7 @@ public class AlivcVideoListView extends FrameLayout {
         PlayerConfig config = mListPlayer.getConfig();
         config.mClearFrameWhenStop = true;
         mListPlayer.setConfig(config);
-        mListPlayer.enableLog(true);
+        //mListPlayer.enableLog(true);
         mListPlayer.setLoop(true);
         mListPlayer.setAutoPlay(false);
         //mListPlayer.set

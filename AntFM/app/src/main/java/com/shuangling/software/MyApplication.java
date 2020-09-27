@@ -148,7 +148,7 @@ public class MyApplication extends MultiDexApplication {
 //        Fresco.initialize(this, config);
 //        Fresco.initialize(this);
         Sentry.init("http://a31a66f6b5ee4bd4ad7ef75899bfd28f@47.94.104.239:9000/7", new AndroidSentryClientFactory(this));
-      //  Thread.setDefaultUncaughtExceptionHandler(new CrashHandler());
+        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler());
 
 
 

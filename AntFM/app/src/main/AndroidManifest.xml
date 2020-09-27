@@ -113,9 +113,15 @@
             android:screenOrientation="portrait" >
         </activity>
 
+        <activity
+            android:name=".activity.RedPacketDetailActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
 
         <activity
             android:name=".activity.LiveDetailActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" >
         </activity>
         <activity
@@ -159,6 +165,12 @@
             android:name=".activity.ModifyUserInfoActivity"
             android:screenOrientation="portrait" >
         </activity>
+
+        <activity
+            android:name=".activity.ReportActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
 
         <activity
             android:name=".activity.RoomActivity"

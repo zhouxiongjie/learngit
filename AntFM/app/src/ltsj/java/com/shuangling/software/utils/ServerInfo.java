@@ -4,19 +4,35 @@ public class ServerInfo {
 
 
 //
-	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
 
-	public static String h5IP="http://cms.staging.slradio.cn";
 
-	public static String h5HttpsIP="https://cms.staging.slradio.cn";
+	public static String serviceIP="http://api-cms.lsxrmtzx.com";  		//测试环境
 
-	public static String activity="https://asc.staging.slradio.cn/";
+	public static String h5IP="http://cms.lsxrmtzx.com";
 
-	public static String scs="http://scs.staging.slradio.cn";
+	public static String h5HttpsIP="https://cms.lsxrmtzx.com";
 
-    public static String emc="http://api-emc.staging.slradio.cn";
+	public static String activity="https://asc.lsxrmtzx.com/";
 
-	public static String vms="http://api-vms.staging.slradio.cn";
+	public static String scs="http://scs.lsxrmtzx.com";
+
+	public static String emc="http://api-emc.lsxrmtzx.com";
+
+	public static String vms="http://api-vms.lsxrmtzx.com";
+
+//	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
+//
+//	public static String h5IP="http://cms.staging.slradio.cn";
+//
+//	public static String h5HttpsIP="https://cms.staging.slradio.cn";
+//
+//	public static String activity="https://asc.staging.slradio.cn/";
+//
+//	public static String scs="http://scs.staging.slradio.cn";
+//
+//    public static String emc="http://api-emc.staging.slradio.cn";
+//
+//	public static String vms="http://api-vms.staging.slradio.cn";
 
 
 

@@ -86,7 +86,6 @@ public class ServerInfo {
 	public static String getRelatedRecommend="/v1/relatedPosts";				//相关推荐
 
 	public static String getAlbumAudios="/v1/c_audios/";						//专辑下所有音频
-
 	//登录模块
 	public static String login="/v1/consumer/app_login";						//账号密码登陆
 
@@ -208,11 +207,15 @@ public class ServerInfo {
 
 	public static String takeCashDetail="/v1/consumer/transfers";
 
+
+
 	public static String takeCashAccount="/v1/consumer/transfer_alipay";
 
 	public static String bindZhifubao="/v1/consumer/transfer_alipay";			//绑定支付宝
 
 	public static String requestCash="/v1/consumer/transfers";					//发起提现请求
+
+	public static String requestWeixinCash="/v1/consumer/wechat_transfers";		//发起微信提现请求
 
 	public static String getCashDetail="/v1/consumer/transfers/";				//获取提现详情
 

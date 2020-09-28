@@ -69,13 +69,13 @@ public class ServerInfo {
 
 	public static String getGalleriaPage="/atlas/";					    		//图集h5页面
 
-    public static String getGalleriaDetail="/v1/c_galleries/";					//图集详情
+	public static String getGalleriaDetail="/v1/c_galleries/";					//图集详情
 
 	public static String getSpecialPage="/specials/";							//专题h5页面
 
-    public static String getSpecialDetail="/v1/c_special/";						//专题详情
+	public static String getSpecialDetail="/v1/c_special/";						//专题详情
 
-    public static String getAlbumDetail="/v1/c_album/";							//专辑详情
+	public static String getAlbumDetail="/v1/c_album/";							//专辑详情
 
 	public static String getArticleDetail="/v1/c_article/";						//文章详情
 
@@ -103,11 +103,11 @@ public class ServerInfo {
 
 	public static String indexDecorate="/v1/consumer/layouts";					//首页装修
 
-    public static String topPost="/v1/top_posts";			            		//热门置顶
+	public static String topPost="/v1/top_posts";			            		//热门置顶
 
-    public static String marvellousPosts="/v1/marvellousPosts";         		//热门精彩推荐
+	public static String marvellousPosts="/v1/marvellousPosts";         		//热门精彩推荐
 
-    public static String getRadioList="/v1/mobile/channel";    					//电台列表
+	public static String getRadioList="/v1/mobile/channel";    					//电台列表
 
 	public static String getRadioDetail="/v1/mobile/channel/play";    			//电台详情
 
@@ -181,7 +181,7 @@ public class ServerInfo {
 
 	public static String shareStatistics="/v2/share";							//分享添加来记录
 
-    public static String bottomMenus="/v2/consumer/menus";					    //C端获取底部菜单
+	public static String bottomMenus="/v2/consumer/menus";					    //C端获取底部菜单
 
 	public static String indexDecorateContent="/v2/cassify_posts";			    //首页装修内容（c端）
 
@@ -205,11 +205,15 @@ public class ServerInfo {
 
 	public static String takeCashDetail="/v1/consumer/transfers";
 
+
+
 	public static String takeCashAccount="/v1/consumer/transfer_alipay";
 
 	public static String bindZhifubao="/v1/consumer/transfer_alipay";			//绑定支付宝
 
 	public static String requestCash="/v1/consumer/transfers";					//发起提现请求
+
+	public static String requestWeixinCash="/v1/consumer/wechat_transfers";		//发起微信提现请求
 
 	public static String getCashDetail="/v1/consumer/transfers/";				//获取提现详情
 
@@ -225,7 +229,7 @@ public class ServerInfo {
 
 	public static String bindPhone="/v2/consumer/bind_phone";					//绑定手机号码
 
-    public static String weixinBindPhone="/v2/consumer/wechat_bind_phone";		//微信绑定手机号码
+	public static String weixinBindPhone="/v2/consumer/wechat_bind_phone";		//微信绑定手机号码
 
 	public static String getThirdPlatformInfo="/v2/consumer/proxies";			//微信绑定手机号码
 

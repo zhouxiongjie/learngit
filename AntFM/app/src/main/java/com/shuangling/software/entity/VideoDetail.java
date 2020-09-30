@@ -45,6 +45,10 @@ public class VideoDetail implements Serializable {
     private VideoBean video;
     private AuthorInfoBean author_info;
 
+
+
+    private int is_user_report;
+
     public int getId() {
         return id;
     }
@@ -187,6 +191,14 @@ public class VideoDetail implements Serializable {
 
     public void setAuthor_info(AuthorInfoBean author_info) {
         this.author_info = author_info;
+    }
+
+    public int getIs_user_report() {
+        return is_user_report;
+    }
+
+    public void setIs_user_report(int is_user_report) {
+        this.is_user_report = is_user_report;
     }
 
     public static class VideoBean {

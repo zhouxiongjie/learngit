@@ -1,6 +1,7 @@
 package com.shuangling.software.activity;
 
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -126,6 +127,8 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
     private static final int MSG_DELETE_COMMENT = 0xc;
 
     private static final int MSG_GET_VIDEO_AUTH = 0xd;
+
+    public static final int REQUEST_REPORT = 0xe;
 
     @BindView(R.id.aliyunVodPlayerView)
     AliyunVodPlayerView aliyunVodPlayerView;
@@ -1389,6 +1392,11 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
         if (requestCode == REQUEST_LOGIN && resultCode == RESULT_OK) {
             updateStatus();
             getComments(0);
+        }else if(requestCode==REQUEST_REPORT&& resultCode == Activity.RESULT_OK){
+            if(mVideoDetail!=null){
+                mVideoDetail.setIs_user_report(1);
+            }
+
         }
 
     }
@@ -1525,9 +1533,15 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
 
     private  void showShareDialog(final String title, final String desc, final String logo, final String url) {
 
-        ShareDialog dialog = ShareDialog.getInstance(false,false);
+        ShareDialog dialog = ShareDialog.getInstance(false,mVideoDetail.getIs_user_report() == 0 ? false : true);
+        dialog.setIsHideSecondGroup(false);
         dialog.setIsShowPosterButton(false);
-        dialog.setIsHideSecondGroup(true);
+        dialog.setIsShowReport(true);
+        dialog.setIsShowCollect(false);
+        dialog.setIsShowCopyLink(false);
+        dialog.setIsShowFontSize(false);
+        dialog.setIsShowRefresh(false);
+
         dialog.setShareHandler(new ShareDialog.ShareHandler() {
             @Override
             public void onShare(String platform) {
@@ -1543,7 +1557,14 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
 
             @Override
             public void report() {
-
+                if (User.getInstance() == null) {
+                    Intent it=new Intent(VideoDetailActivity.this, NewLoginActivity.class);
+                    startActivityForResult(it, REQUEST_LOGIN);
+                }else{
+                    Intent it=new Intent(VideoDetailActivity.this,ReportActivity.class);
+                    it.putExtra("id",""+mVideoDetail.getId());
+                    startActivityForResult(it,REQUEST_REPORT);
+                }
             }
 
             @Override

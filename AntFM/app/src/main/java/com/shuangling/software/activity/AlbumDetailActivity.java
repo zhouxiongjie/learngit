@@ -120,7 +120,7 @@ public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Ca
             public void onClick(View v) {
 
                 if (mAlbum != null) {
-                    ShareDialog dialog = ShareDialog.getInstance( false,false);
+                    ShareDialog dialog = ShareDialog.getInstance( false,mAlbum.getIs_user_report() == 0 ? false : true);
                     dialog.setIsHideSecondGroup(false);
                     dialog.setIsShowPosterButton(false);
                     dialog.setIsShowReport(true);

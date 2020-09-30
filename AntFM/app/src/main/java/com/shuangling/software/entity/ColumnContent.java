@@ -45,6 +45,15 @@ public class ColumnContent  implements Serializable {
     private List<CategoriesBean> categories;
     private TopBean top;
     private int is_like;
+    private int is_user_report;
+
+    public int getIs_user_report() {
+        return is_user_report;
+    }
+
+    public void setIs_user_report(int is_user_report) {
+        this.is_user_report = is_user_report;
+    }
 
     public int getIs_like() {
         return is_like;

@@ -9,7 +9,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -105,6 +107,22 @@ public class ReportActivity extends AppCompatActivity {
         mId=getIntent().getStringExtra("id");
 
         getReason();
+        desc.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                descLength.setText("" + s.toString().length() + "/" + 200);
+            }
+        });
 
         mMaterialGridAdapter = new MaterialGridAdapter(this);
         material.setAdapter(mMaterialGridAdapter);

@@ -56,7 +56,6 @@ public class ShareDialog extends BaseCircleDialog {
     LinearLayout weibo;
     @BindView(R.id.fontSize)
     LinearLayout fontSize;
-
     @BindView(R.id.layout_second_group)
     LinearLayout secondGroupLayout;
 
@@ -79,6 +78,10 @@ public class ShareDialog extends BaseCircleDialog {
     @BindView(R.id.reportText)
     TextView reportText;
     Unbinder unbinder1;
+    @BindView(R.id.refresh)
+    LinearLayout refresh;
+    @BindView(R.id.report)
+    LinearLayout report;
     private float mAppFontSize;
     Unbinder unbinder;
 
@@ -86,14 +89,13 @@ public class ShareDialog extends BaseCircleDialog {
     private boolean mIsReported;
 
     private boolean mIsShowPosterButton = false;
-    private boolean mIsShowFontSize=true;
+    private boolean mIsShowFontSize = true;
 
 
-
-    private boolean mIsShowRefresh=true;
-    private boolean mIsShowCollect=true;
-    private boolean mIsShowReport=true;
-    private boolean mIsShowCopyLink=true;
+    private boolean mIsShowRefresh = true;
+    private boolean mIsShowCollect = true;
+    private boolean mIsShowReport = true;
+    private boolean mIsShowCopyLink = true;
 
     private boolean mIsHideSecondGroup = false;
 
@@ -161,8 +163,6 @@ public class ShareDialog extends BaseCircleDialog {
     public void setIsShowCopyLink(boolean mIsShowCopyLink) {
         this.mIsShowCopyLink = mIsShowCopyLink;
     }
-
-
 
 
     public boolean isIsHideSecondGroup() {
@@ -267,11 +267,43 @@ public class ShareDialog extends BaseCircleDialog {
             reportText.setText("举报");
         }
 
+        if(mIsShowFontSize){
+            fontSize.setVisibility(View.VISIBLE);
+        } else {
+            fontSize.setVisibility(View.GONE);
+        }
+
+
         if (mIsShowPosterButton) {
             poster.setVisibility(View.VISIBLE);
         } else {
             poster.setVisibility(View.GONE);
         }
+
+        if (mIsShowRefresh) {
+            refresh.setVisibility(View.VISIBLE);
+        } else {
+            refresh.setVisibility(View.GONE);
+        }
+
+        if (mIsShowCollect) {
+            collect.setVisibility(View.VISIBLE);
+        } else {
+            collect.setVisibility(View.GONE);
+        }
+
+        if (mIsShowReport) {
+            report.setVisibility(View.VISIBLE);
+        } else {
+            report.setVisibility(View.GONE);
+        }
+
+        if (mIsShowCopyLink) {
+            copyLink.setVisibility(View.VISIBLE);
+        } else {
+            copyLink.setVisibility(View.GONE);
+        }
+
 
 
         if (mIsHideSecondGroup) {

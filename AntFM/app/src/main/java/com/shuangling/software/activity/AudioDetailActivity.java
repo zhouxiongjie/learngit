@@ -2,6 +2,8 @@ package com.shuangling.software.activity;
 
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -58,6 +60,7 @@ import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.dialog.AudioListDialog;
 import com.shuangling.software.dialog.AudioSpeedDialog;
 import com.shuangling.software.dialog.AudioTimerDialog;
+import com.shuangling.software.dialog.ShareDialog;
 import com.shuangling.software.entity.Audio;
 import com.shuangling.software.entity.AudioDetail;
 import com.shuangling.software.entity.AudioInfo;
@@ -134,6 +137,8 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     public static final int MSG_DELETE_COMMENT = 0xb;
 
     public static final int REQUEST_BIND_PHONE = 0xc;
+
+    public static final int REQUEST_REPORT = 0xd;
 
 
     public static final int REQUEST_PERMISSION_CODE = 0x0110;
@@ -304,15 +309,89 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
             public void onClick(View v) {
                 if (mAudioDetail != null) {
 
-                    String url;
-                    if(User.getInstance()!=null){
-                        url=ServerInfo.h5IP + "/audios/" + mAudioId+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP + "/audios/" + mAudioId;
-                    }else{
-                        url=ServerInfo.h5IP + "/audios/" + mAudioId+"?from_url="+ServerInfo.h5IP + "/audios/" + mAudioId;
-                    }
 
-                    showShare(mAudioDetail.getAlbum().get(0).getTitle(), mAudioDetail.getTitle(), mAudioDetail.getAlbum().get(0).getCover(), url);
-                    //shareTest();
+                    ShareDialog dialog = ShareDialog.getInstance(false,mAudioDetail.getIs_user_report() == 0 ? false : true);
+                    dialog.setIsHideSecondGroup(false);
+                    dialog.setIsShowPosterButton(false);
+                    dialog.setIsShowReport(true);
+                    dialog.setIsShowCollect(false);
+                    dialog.setIsShowCopyLink(false);
+                    dialog.setIsShowFontSize(false);
+                    dialog.setIsShowRefresh(false);
+                    dialog.setShareHandler(new ShareDialog.ShareHandler() {
+                        @Override
+                        public void onShare(String platform) {
+
+                            if (mAudioDetail != null) {
+                                String url;
+                                if(User.getInstance()!=null){
+                                    url=ServerInfo.h5IP + "/audios/" + mAudioId+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP + "/audios/" + mAudioId;
+                                }else{
+                                    url=ServerInfo.h5IP + "/audios/" + mAudioId+"?from_url="+ServerInfo.h5IP + "/audios/" + mAudioId;
+                                }
+
+                                showShare(platform,mAudioDetail.getAlbum().get(0).getTitle(), mAudioDetail.getTitle(), mAudioDetail.getAlbum().get(0).getCover(), url);
+
+                            }
+
+                        }
+
+                        @Override
+                        public void poster() {
+
+                        }
+
+                        @Override
+                        public void report() {
+                            if (User.getInstance() == null) {
+                                Intent it=new Intent(AudioDetailActivity.this, NewLoginActivity.class);
+                                it.putExtra("jump_url",ServerInfo.h5IP + "/audios/" + mAudioId);
+                                startActivityForResult(it, REQUEST_LOGIN);
+                            }else{
+                                Intent it=new Intent(AudioDetailActivity.this,ReportActivity.class);
+                                it.putExtra("id",""+mAudioDetail.getId());
+                                startActivityForResult(it,REQUEST_REPORT);
+                            }
+
+
+                        }
+
+                        @Override
+                        public void copyLink() {
+
+                            //获取剪贴板管理器：
+
+
+                        }
+
+                        @Override
+                        public void refresh() {
+
+                            init();
+
+                        }
+
+                        @Override
+                        public void collectContent() {
+
+
+
+                        }
+                    });
+                    dialog.show(getSupportFragmentManager(), "ShareDialog");
+
+
+
+
+//                    String url;
+//                    if(User.getInstance()!=null){
+//                        url=ServerInfo.h5IP + "/audios/" + mAudioId+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP + "/audios/" + mAudioId;
+//                    }else{
+//                        url=ServerInfo.h5IP + "/audios/" + mAudioId+"?from_url="+ServerInfo.h5IP + "/audios/" + mAudioId;
+//                    }
+//
+//                    showShare(mAudioDetail.getAlbum().get(0).getTitle(), mAudioDetail.getTitle(), mAudioDetail.getAlbum().get(0).getCover(), url);
+
                 }
             }
         });
@@ -1388,12 +1467,16 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
 
 
             }
+        }else if(requestCode==REQUEST_REPORT&& resultCode == Activity.RESULT_OK){
+            if(mAudioDetail!=null){
+                mAudioDetail.setIs_user_report(1);
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
 
-    private void showShare(final String title, final String desc, final String logo, final String url) {
+    private void showShare(String platform,final String title, final String desc, final String logo, final String url) {
         final String cover;
         if (logo.startsWith("http://")) {
             cover = logo.replace("http://", "https://");
@@ -1403,6 +1486,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
         oks.disableSSOWhenAuthorize();
+        oks.setPlatform(platform);
         final Platform qq = ShareSDK.getPlatform(QQ.NAME);
         if (!qq.isClientValid()) {
             oks.addHiddenPlatform(QQ.NAME);

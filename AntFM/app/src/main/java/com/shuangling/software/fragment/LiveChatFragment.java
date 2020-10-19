@@ -160,6 +160,17 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
         unbinder = ButterKnife.bind(this, view);
         EventBus.getDefault().register(this);
         inputPanel.setChatAction(this);
+        if(((LiveDetailActivity)getActivity()).mType!=4){
+            inputPanel.setJoinRoomVisible(false);
+        }
+
+        if(((LiveDetailActivity)getActivity()).getLiveRoomInfo()!=null){
+            if(((LiveDetailActivity)getActivity()).getLiveRoomInfo().getChat()==0){
+                inputPanel.setMuted(true);
+            }
+        }
+
+
         likeView.addLikeImage(R.drawable.ic_heart);
         //recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
@@ -280,7 +291,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
 //                    @Override
 //                    public void onFinish() {
 //
-//                        redPacketComingDialog.dismiss();
+//                            redPacketComingDialog.dismiss();
 //                        RedPacketDialog.getInstance().setOnOkClickListener(new RedPacketDialog.OnOkClickListener() {
 //                            @Override
 //                            public void openNoticafition() {
@@ -332,6 +343,14 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                 mChatMessageListAdapter.notifyDataSetChanged();
 
                 recyclerView.scrollToPosition(mChatMessageListAdapter.getItemCount() - 1);
+            }
+        }else if(event.getEventName().equals("liveRoomInfo")){
+            if(((LiveDetailActivity)getActivity()).getLiveRoomInfo()!=null){
+                if(((LiveDetailActivity)getActivity()).getLiveRoomInfo().getChat()==0){
+                    inputPanel.setMuted(true);
+                }else {
+                    inputPanel.setMuted(false);
+                }
             }
         }
     }
@@ -771,20 +790,11 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                 });
                             }else if(msg.getMessageType() == 16){
 
+                                long id=Thread.currentThread().getId();
 
-                                mRedPacketComingDialog = RedPacketComingDialog.getInstance();
-                                mRedPacketComingDialog.setOnCloseListener(new RedPacketComingDialog.OnCloseListener() {
+                                mHandler.post(new Runnable() {
                                     @Override
-                                    public void onClose() {
-                                        mRedPacketComingDialog=null;
-                                    }
-                                }).show(getChildFragmentManager(), "RedPacketComingDialog");
-
-                                redPacket.setVisibility(View.VISIBLE);
-
-                                redPacket.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
+                                    public void run() {
                                         mRedPacketComingDialog = RedPacketComingDialog.getInstance();
                                         mRedPacketComingDialog.setOnCloseListener(new RedPacketComingDialog.OnCloseListener() {
                                             @Override
@@ -792,41 +802,59 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                                 mRedPacketComingDialog=null;
                                             }
                                         }).show(getChildFragmentManager(), "RedPacketComingDialog");
+
+                                        redPacket.setVisibility(View.VISIBLE);
+
+                                        redPacket.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                mRedPacketComingDialog = RedPacketComingDialog.getInstance();
+                                                mRedPacketComingDialog.setOnCloseListener(new RedPacketComingDialog.OnCloseListener() {
+                                                    @Override
+                                                    public void onClose() {
+                                                        mRedPacketComingDialog=null;
+                                                    }
+                                                }).show(getChildFragmentManager(), "RedPacketComingDialog");
+                                            }
+                                        });
+
+                                        //红包活动开始倒计时
+                                        mCountDownTimer = new CountDownTimer(10 * 1000, 500) {
+                                            @Override
+                                            public void onTick(long millisUntilFinished) {
+                                                if(millisUntilFinished / 1000==0){
+                                                    if(mRedPacketComingDialog!=null){
+                                                        mRedPacketComingDialog.setRemainTime("1");
+                                                    }
+                                                    redPacketStatus.setText("1s");
+                                                }else{
+                                                    if(mRedPacketComingDialog!=null){
+                                                        mRedPacketComingDialog.setRemainTime("" + millisUntilFinished / 1000);
+                                                    }
+                                                    redPacketStatus.setText(millisUntilFinished / 1000+"s");
+
+
+                                                }
+
+
+                                            }
+
+                                            @Override
+                                            public void onFinish() {
+
+                                                if(mRedPacketComingDialog!=null){
+                                                    mRedPacketComingDialog.dismiss();
+                                                }
+                                                getRedPacketRecord();
+
+                                            }
+                                        };
+                                        mCountDownTimer.start();
                                     }
                                 });
 
-                                //红包活动开始倒计时
-                                mCountDownTimer = new CountDownTimer(10 * 1000, 500) {
-                                    @Override
-                                    public void onTick(long millisUntilFinished) {
-                                        if(millisUntilFinished / 1000==0){
-                                            if(mRedPacketComingDialog!=null){
-                                                mRedPacketComingDialog.setRemainTime("1");
-                                            }
-                                            redPacketStatus.setText("1s");
-                                        }else{
-                                            if(mRedPacketComingDialog!=null){
-                                                mRedPacketComingDialog.setRemainTime("" + millisUntilFinished / 1000);
-                                            }
-                                            redPacketStatus.setText(millisUntilFinished / 1000+"s");
 
 
-                                        }
-
-
-                                    }
-
-                                    @Override
-                                    public void onFinish() {
-
-                                        if(mRedPacketComingDialog!=null){
-                                            mRedPacketComingDialog.dismiss();
-                                        }
-                                        getRedPacketRecord();
-
-                                    }
-                                };
-                                mCountDownTimer.start();
 
 
                             }else if(msg.getMessageType() == 17){

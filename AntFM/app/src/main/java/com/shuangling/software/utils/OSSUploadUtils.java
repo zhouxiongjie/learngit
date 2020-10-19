@@ -151,6 +151,9 @@ public class OSSUploadUtils implements OSSCompletedCallback<PutObjectRequest, Pu
 
                     }else{
                         ToastUtils.show("OSS初始化失败,请稍后再试");
+                        if(mOnCallbackListener!=null){
+                            mOnCallbackListener.onFailed();
+                        }
                     }
                 }
 
@@ -161,6 +164,9 @@ public class OSSUploadUtils implements OSSCompletedCallback<PutObjectRequest, Pu
             public void onFailure(Call call, Exception exception) {
 
                 Log.e("test",exception.toString());
+                if(mOnCallbackListener!=null){
+                    mOnCallbackListener.onFailed();
+                }
             }
         });
 

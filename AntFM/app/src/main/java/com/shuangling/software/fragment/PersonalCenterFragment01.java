@@ -28,21 +28,19 @@ import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloadQueueSet;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.mylhyl.circledialog.CircleDialog;
+import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AccountAndSecurityActivity;
 import com.shuangling.software.activity.AttentionActivity;
 import com.shuangling.software.activity.BindPhoneActivity;
 import com.shuangling.software.activity.CluesActivity;
 import com.shuangling.software.activity.CollectActivity;
-import com.shuangling.software.activity.CommentDetailActivity;
 import com.shuangling.software.activity.FeedbackActivity;
 import com.shuangling.software.activity.HistoryActivity;
-import com.shuangling.software.activity.MainActivity;
 import com.shuangling.software.activity.MessageListActivity;
 import com.shuangling.software.activity.ModifyUserInfoActivity;
 import com.shuangling.software.activity.MyWalletsActivity;
 import com.shuangling.software.activity.NewLoginActivity;
-import com.shuangling.software.activity.RoomActivity;
 import com.shuangling.software.activity.SettingActivity;
 import com.shuangling.software.activity.SubscribeActivity;
 import com.shuangling.software.activity.WebViewActivity;
@@ -54,7 +52,6 @@ import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
-import com.shuangling.software.utils.QNAppServer;
 import com.shuangling.software.utils.ServerInfo;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -119,6 +116,8 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
     Unbinder unbinder;
     @BindView(R.id.statusBar)
     View statusBar;
+    @BindView(R.id.aboutUs)
+    LinearLayout aboutUs;
 
     private Handler mHandler;
     private DialogFragment mDialogFragment;
@@ -142,6 +141,10 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
 //            Drawable drawableRight = getResources().getDrawable(R.drawable.update_red_circle);
 //            update.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableRight, null);
 //        }
+        if(MyApplication.aboutUsInfo!=null&&MyApplication.aboutUsInfo.getAbout_us_status()==1){
+            aboutUs.setVisibility(View.VISIBLE);
+        }
+
         return view;
 
     }
@@ -153,7 +156,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.history, R.id.collect, R.id.subscribeNumber, R.id.userLayout, R.id.login, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet,R.id.award})
+    @OnClick({R.id.history, R.id.collect, R.id.subscribeNumber, R.id.userLayout, R.id.login, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet, R.id.award,R.id.aboutUs})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.history:
@@ -219,10 +222,10 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                     Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
 
-                } else if (User.getInstance() !=null&&TextUtils.isEmpty(User.getInstance().getPhone())) {
+                } else if (User.getInstance() != null && TextUtils.isEmpty(User.getInstance().getPhone())) {
                     Intent it = new Intent(getContext(), BindPhoneActivity.class);
                     startActivity(it);
-                }else {
+                } else {
                     Intent it = new Intent(getContext(), CluesActivity.class);
                     it.putExtra("url", ServerInfo.scs + "/broke-create");
                     startActivity(it);
@@ -248,10 +251,6 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 }
                 break;
             case R.id.setting:
-
-
-
-
 
 
                 startActivity(new Intent(getContext(), SettingActivity.class));
@@ -282,6 +281,12 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                     Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
+                break;
+            case R.id.aboutUs:
+                Intent it = new Intent(getContext(), WebViewBackActivity.class);
+                it.putExtra("url", ServerInfo.h5IP+ "/about");
+                it.putExtra("title", "关于我们");
+                startActivity(it);
                 break;
         }
     }
@@ -344,10 +349,10 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                try{
+                try {
                     mDialogFragment.dismiss();
                     ToastUtils.show("请求失败，请稍后再试");
-                }catch (Exception e){
+                } catch (Exception e) {
 
                 }
 
@@ -436,10 +441,10 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            try{
+                            try {
                                 attentionNumber.setText("关注 " + jsonObject.getJSONObject("data").getInteger("follows_count"));
                                 subscribeNumber.setText("订阅 " + jsonObject.getJSONObject("data").getInteger("subscribe_count"));
-                            }catch (Exception e){
+                            } catch (Exception e) {
 
                             }
 

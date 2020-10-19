@@ -535,7 +535,26 @@ public class TvDetailActivity extends BaseAudioActivity implements Handler.Callb
 //            }
 
         }
+        if (aliyunVodPlayerView != null) {
+            aliyunVodPlayerView.onDestroy();
+            aliyunVodPlayerView = null;
+        }
         super.onDestroy();
+
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (mNeedResumeAudioPlay) {
+            FloatWindowUtil.getInstance().visibleWindow();
+        }
+        if (aliyunVodPlayerView != null) {
+            aliyunVodPlayerView.onStop();
+            aliyunVodPlayerView.onDestroy();
+            aliyunVodPlayerView = null;
+        }
+        super.onBackPressed();
     }
 
 

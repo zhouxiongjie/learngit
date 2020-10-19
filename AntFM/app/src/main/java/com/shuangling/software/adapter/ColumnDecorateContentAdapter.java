@@ -994,6 +994,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                             it.putExtra("roomId",content.getLive().getRoom_id());
                             //it.putExtra("url",content.getLive().getHls_play_url());
                             it.putExtra("url",content.getLive().getRtmp_play_url());
+                            it.putExtra("type",content.getLive().getType());
                             mContext.startActivity(it);
                         }
                     }else{

@@ -26,6 +26,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hjq.toast.ToastUtils;
 import com.previewlibrary.GPreviewBuilder;
+import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.customview.MyGridView;
@@ -94,6 +95,7 @@ public class ReportActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
         ButterKnife.bind(this);
@@ -250,23 +252,36 @@ public class ReportActivity extends AppCompatActivity {
         mDialogFragment=CommonUtils.showLoadingDialog(getSupportFragmentManager());
         mUrls.clear();
 
-        OSSUploadUtils.getInstance().setOnCallbackListener(new OSSUploadUtils.OnCallbackListener() {
-            @Override
-            public void onSuccess(String url) {
-                mUrls.add(url);
-            }
+        if(mImgs.size()==0){
+            submit();
+        }else{
+            OSSUploadUtils.getInstance().setOnCallbackListener(new OSSUploadUtils.OnCallbackListener() {
+                @Override
+                public void onSuccess(String url) {
+                    mUrls.add(url);
+                }
 
-            @Override
-            public void onSuccessAll() {
-                submit();
-            }
+                @Override
+                public void onSuccessAll() {
+                    submit();
+                }
 
-            @Override
-            public void onFailed() {
-                mDialogFragment.dismiss();
-                ToastUtils.show("上传图片失败");
-            }
-        }).uploadFile(this, mImgs);
+                @Override
+                public void onFailed() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDialogFragment.dismiss();
+                            ToastUtils.show("上传图片失败");
+                        }
+                    });
+
+                }
+            }).uploadFile(this, mImgs);
+        }
+
+
+
 
 
 

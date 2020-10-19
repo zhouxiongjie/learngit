@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -31,6 +32,7 @@
             android:textSize="@dimen/font_size_30px"
             android:padding="10dp"
             android:layout_alignParentRight="true"
+            android:visibility="gone"
             />
 
         <android.support.design.widget.TabLayout
@@ -38,15 +40,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_toLeftOf="@+id/attention"
+            android:textSize="@dimen/font_size_32px"
+
+            android:textStyle="normal"
             app:tabIndicatorColor="?attr/themeColor"
             app:tabIndicatorFullWidth="false"
             app:tabIndicatorHeight="2dp"
             app:tabMode="scrollable"
             app:tabSelectedTextColor="?attr/themeColor"
-            app:tabTextAppearance="@style/TabTextStyle"
+
+             app:tabPaddingStart="0dp"
+            app:tabPaddingEnd="0dp"
             app:tabTextColor="@color/black" />
 
-
+        <!--app:tabTextAppearance="@style/TabTextStyle"-->
     </RelativeLayout>
 
     <android.support.v4.view.ViewPager

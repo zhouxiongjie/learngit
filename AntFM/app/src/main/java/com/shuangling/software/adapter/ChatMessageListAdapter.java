@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -148,12 +149,15 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
             vh.content.setText(msg.getMsg());
 
             if (msg.getParentMsgInfo() != null) {
+
+                ViewGroup.MarginLayoutParams lp=(ViewGroup.MarginLayoutParams)vh.content.getLayoutParams();
+                lp.leftMargin=CommonUtils.dip2px(13);
+                vh.content.setLayoutParams(lp);
                 if (msg.getParentMsgInfo().getContentType() == 1) {
                     vh.parentLayout.setVisibility(View.GONE);
                     vh.parentContent.setVisibility(View.VISIBLE);
                     vh.divider.setVisibility(View.VISIBLE);
                     vh.parentContent.setText("「"+msg.getNickName()+":" + msg.getParentMsgInfo().getMsg().trim() + "」");
-
                 } else {
                     vh.parentLayout.setVisibility(View.VISIBLE);
                     vh.parentName.setText("「"+msg.getNickName());
@@ -209,6 +213,9 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
                     }
                 }
             } else {
+                ViewGroup.MarginLayoutParams lp=(ViewGroup.MarginLayoutParams)vh.content.getLayoutParams();
+                lp.leftMargin=CommonUtils.dip2px(0);
+                vh.content.setLayoutParams(lp);
                 vh.parentContent.setVisibility(View.GONE);
                 vh.parentLayout.setVisibility(View.GONE);
                 vh.divider.setVisibility(View.GONE);

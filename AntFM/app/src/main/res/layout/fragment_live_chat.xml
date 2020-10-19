@@ -60,27 +60,15 @@
         <!--android:layout_marginRight="20dp"-->
         <!--android:layout_marginBottom="120dp">-->
     <!--</com.example.floating.FloatingIv>-->
-
-
-    <com.kaisengao.likeview.like.KsgLikeView
-        android:id="@+id/likeView"
-        android:layout_width="80dp"
-        android:layout_height="250dp"
-        android:layout_above="@+id/heartBtn"
-        ptr:ksg_default_image="@drawable/ic_heart"
-        ptr:ksg_enter_duration="1500"
-        ptr:ksg_curve_duration="4500"
-        android:layout_alignParentRight="true"
-        />
-
     <FrameLayout
         android:id="@+id/redPacket"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/heartBtn"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="120dp"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="20dp">
+        android:layout_marginRight="20dp"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/shakeRedPacket"
@@ -101,6 +89,19 @@
             android:layout_gravity="center_horizontal|bottom"
             android:background="@drawable/red_packet_status_bg"/>
     </FrameLayout>
+
+    <com.kaisengao.likeview.like.KsgLikeView
+        android:id="@+id/likeView"
+        android:layout_width="80dp"
+        android:layout_height="250dp"
+        android:layout_above="@+id/heartBtn"
+        ptr:ksg_default_image="@drawable/ic_heart"
+        ptr:ksg_enter_duration="1500"
+        ptr:ksg_curve_duration="4500"
+        android:layout_alignParentRight="true"
+        />
+
+
 
 
     <ImageView

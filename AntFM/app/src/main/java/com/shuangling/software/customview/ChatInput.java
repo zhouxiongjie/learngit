@@ -18,6 +18,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.aliyun.svideo.common.utils.ToastUtils;
 import com.shuangling.software.R;
 import com.shuangling.software.interf.ChatAction;
 import java.util.ArrayList;
@@ -33,17 +35,19 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
 
 
     EditText input;
-    LinearLayout textPanel;
+    RelativeLayout textPanel;
     ImageButton btnAdd;
     LinearLayout btnImage;
     LinearLayout btnJoinRoom;
     LinearLayout morePanel;
     TextView btnSend;
+    TextView mute;
 
 
     private InputMode inputMode = InputMode.NONE;
     private ChatAction chatAction;
     private boolean isSendVisible;
+    private boolean isMuted=false;
 
     private final int REQUEST_CODE_ASK_PERMISSIONS = 100;
     private Context context;
@@ -66,7 +70,7 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
         btnJoinRoom=findViewById(R.id.btn_join_room);
         morePanel=findViewById(R.id.morePanel);
         btnSend=findViewById(R.id.btn_send);
-
+        mute=findViewById(R.id.mute);
         btnAdd.setOnClickListener(this);
         btnImage.setOnClickListener(this);
         btnJoinRoom.setOnClickListener(this);
@@ -90,6 +94,21 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
         }else{
             btnJoinRoom.setVisibility(GONE);
         }
+    }
+
+
+    public void setMuted(boolean muted){
+        isMuted=muted;
+        if(isMuted){
+            mute.setVisibility(VISIBLE);
+            input.setVisibility(INVISIBLE);
+        }else {
+            input.setVisibility(VISIBLE);
+            mute.setVisibility(GONE);
+        }
+
+
+
     }
 
 
@@ -228,14 +247,24 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
         int id = v.getId();
         switch (id) {
             case R.id.btn_send:
-                chatAction.sendText(input.getText().toString());
+                if(isMuted){
+                    com.hjq.toast.ToastUtils.show("禁言中");
+                }else{
+                    chatAction.sendText(input.getText().toString());
+                }
+
                 break;
             case R.id.btn_add:
                 updateView(inputMode == InputMode.MORE ? InputMode.TEXT : InputMode.MORE);
                 break;
             case R.id.btn_image:
                 //if (activity != null && requestStorage(activity)) {
+                if(isMuted){
+                    com.hjq.toast.ToastUtils.show("禁言中");
+                }else{
                     chatAction.sendImage();
+                }
+
                 //}
                 break;
             case R.id.btn_join_room:

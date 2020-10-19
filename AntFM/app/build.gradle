@@ -71,6 +71,13 @@ android {
             keyPassword "123456"
         }
 
+        zsls {
+            storeFile file("../keystore/zsls.jks")
+            storePassword "123456"
+            keyAlias "zsls"
+            keyPassword "123456"
+        }
+
 
 
     }
@@ -134,6 +141,18 @@ android {
             manifestPlaceholders = [
                     GD_KEY: "8fec8bb792b0f96fae170fb46ec91778",
                     APP_SCHEME:"mgfbapp"
+            ]
+
+
+        }
+
+        zsls {
+            applicationId "com.shuangling.software.zsls"
+            signingConfig signingConfigs.zsls         //配置签名
+            String bdtjAppkey = "d11e565d03"
+            manifestPlaceholders = [
+                    GD_KEY: "841b1d5da96a41ca1c8f5900eefa8f38",
+                    APP_SCHEME:"zslsapp"
             ]
 
 

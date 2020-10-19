@@ -281,6 +281,7 @@ public class RecommendFragment extends SimpleImmersionFragment implements Handle
             }
             pagerIndicator.updateIndicator(true);
             //viewPager.setCurrentItem(mColumnSelectIndex);
+            viewPager.setOffscreenPageLimit(20);
 
         }
 

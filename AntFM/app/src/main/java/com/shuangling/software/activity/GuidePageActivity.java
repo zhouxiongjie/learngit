@@ -14,6 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -65,7 +67,11 @@ public class GuidePageActivity extends AppCompatActivity implements Handler.Call
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-        CommonUtils.transparentStatusBar(this);
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //隐藏顶部状态栏
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //ImmersionBar.with(this).transparentStatusBar().init();
+        //CommonUtils.transparentStatusBar(this);
         boolean firstRun = SharedPreferencesUtils.getBooleanValue(FIRST_RUN, true);
         //测试
 

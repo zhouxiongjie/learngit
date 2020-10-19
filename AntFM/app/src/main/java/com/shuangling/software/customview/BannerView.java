@@ -43,6 +43,18 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
 	private int mWidth;
 	private int mHeight;
 
+
+
+	private int mMode=2;		//1大图，2卡片
+
+	public int getmMode() {
+		return mMode;
+	}
+
+	public void setmMode(int mMode) {
+		this.mMode = mMode;
+	}
+
 	public abstract static class Banner
 	{
 		public abstract String getLogo();
@@ -116,20 +128,40 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
 		for(int i=0;i<mData.size();i++){
 			final T data=mData.get(i);
 			SimpleDraweeView view=new SimpleDraweeView(mContext);
-			GenericDraweeHierarchy hierarchy = view.getHierarchy();
-			hierarchy.setActualImageScaleType(ScalingUtils.ScaleType.FIT_XY);
-			RoundingParams rp = new RoundingParams();
-			rp.setRoundAsCircle(false);
-			rp.setCornersRadius(10);
-			hierarchy.setRoundingParams(rp);
-			view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-			view.setTag(data);
-			int width=CommonUtils.getScreenWidth()-CommonUtils.dip2px(40);
-			int height=10*width/23;
-			if(!TextUtils.isEmpty(data.getLogo())){
-				Uri uri = Uri.parse(data.getLogo()+CommonUtils.getOssResize(width,height));
-				ImageLoader.showThumb(uri, view, width, height);
+
+			if(mMode==1){
+				//大图模式
+				GenericDraweeHierarchy hierarchy = view.getHierarchy();
+				hierarchy.setActualImageScaleType(ScalingUtils.ScaleType.FIT_XY);
+
+				view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+				view.setTag(data);
+				int width=CommonUtils.getScreenWidth();
+				int height=14*width/25;
+				if(!TextUtils.isEmpty(data.getLogo())){
+					Uri uri = Uri.parse(data.getLogo()+CommonUtils.getOssResize(width,height));
+					ImageLoader.showThumb(uri, view, width, height);
+				}
+			}else{
+				//卡片模式
+
+				GenericDraweeHierarchy hierarchy = view.getHierarchy();
+				hierarchy.setActualImageScaleType(ScalingUtils.ScaleType.FIT_XY);
+				RoundingParams rp = new RoundingParams();
+				rp.setRoundAsCircle(false);
+				rp.setCornersRadius(10);
+				hierarchy.setRoundingParams(rp);
+				view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+				view.setTag(data);
+				int width=CommonUtils.getScreenWidth()-CommonUtils.dip2px(40);
+				int height=10*width/23;
+				if(!TextUtils.isEmpty(data.getLogo())){
+					Uri uri = Uri.parse(data.getLogo()+CommonUtils.getOssResize(width,height));
+					ImageLoader.showThumb(uri, view, width, height);
+				}
 			}
+
+
 			mAutoViews.add(view);
 			view.setOnClickListener(new OnClickListener() {
 

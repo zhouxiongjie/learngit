@@ -1,6 +1,8 @@
 package com.shuangling.software.entity;
 
-public class LiveRoomInfo {
+import java.io.Serializable;
+
+public class LiveRoomInfo implements Serializable {
 
 
     /**
@@ -80,7 +82,7 @@ public class LiveRoomInfo {
     private int show_cover;
     private int entry_mode;
     private int sms_subscribe;
-    private Object entry_password;
+    private String entry_password;
     private String logo;
     private String h5_index;
     private String pc_index;
@@ -359,11 +361,11 @@ public class LiveRoomInfo {
         this.sms_subscribe = sms_subscribe;
     }
 
-    public Object getEntry_password() {
+    public String getEntry_password() {
         return entry_password;
     }
 
-    public void setEntry_password(Object entry_password) {
+    public void setEntry_password(String entry_password) {
         this.entry_password = entry_password;
     }
 

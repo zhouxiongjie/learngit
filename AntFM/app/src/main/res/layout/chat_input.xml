@@ -22,15 +22,14 @@
         android:orientation="horizontal">
 
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/text_panel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/bg_inputbox"
             android:layout_marginLeft="10dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:gravity="center">
 
             <!--<TextView-->
                 <!--android:id="@+id/reply"-->
@@ -44,7 +43,7 @@
 
             <EditText
                 android:id="@+id/input"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minLines="1"
                 android:layout_weight="1"
@@ -52,12 +51,26 @@
                 android:layout_gravity="center_vertical"
                 android:padding="8dp"
                 android:textSize="@dimen/font_size_28px"
-                tools:text="全员禁言中"
+                android:hint="跟大家聊聊"
                 android:textColor="#BCBCBC"
                 android:textCursorDrawable="@null" />
 
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/mute"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:padding="8dp"
+                android:textSize="@dimen/font_size_28px"
+                android:text="全员禁言中"
+                android:textColor="#BCBCBC"
+                android:textCursorDrawable="@null"
+                android:visibility="gone"/>
+
+
+
+        </RelativeLayout>
 
         <ImageButton
             android:id="@+id/btn_add"

@@ -162,7 +162,7 @@ public class ColumnAlbumContentAdapter extends RecyclerView.Adapter implements V
             albumViewHolder.title.setTag(listener);
             albumViewHolder.title.getViewTreeObserver().addOnPreDrawListener(listener);
             albumViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            if (content.getAlbums().getStatus() == 1) {
+            if (content.getAlbums()!=null&&content.getAlbums().getStatus() == 1) {
                 //已完结
                 albumViewHolder.title.setText(CommonUtils.tagKeyword("完~" + content.getTitle(), "完~", CommonUtils.getThemeColor(mContext)));
             } else {

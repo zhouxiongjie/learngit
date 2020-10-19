@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/passphrase_bg">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="150dp"
+        android:layout_centerHorizontal="true">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:text="2020湖南双菱直播峰会灵动直播间灵动直播间"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="@dimen/font_size_50px" />
+
+        <ImageView
+            android:id="@+id/indicator"
+            android:layout_width="30dp"
+            android:layout_height="3dp"
+            android:background="@drawable/indicator_line_bg01"
+            android:layout_marginTop="2dp"
+
+            android:layout_gravity="center_horizontal"
+            />
+
+
+
+        <EditText
+            android:id="@+id/verifyCode"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/bg_inputbox01"
+            android:layout_marginTop="50dp"
+            android:padding="15dp"
+            android:enabled="true"
+            android:gravity="center"
+            android:hint="输入口令"
+            android:textColorHint="#4c001426"
+            android:textColor="@color/black"
+            android:textSize="@dimen/font_size_36px"
+            android:layout_marginBottom="30dp"/>
+
+
+        <TextView
+            android:id="@+id/verify"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/verify_button_bg"
+            android:enabled="true"
+            android:gravity="center"
+            android:text="验证观看"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_size_36px" />
+
+
+
+
+    </LinearLayout>
+
+
+
+
+
+</RelativeLayout>

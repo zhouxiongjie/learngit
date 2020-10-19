@@ -29,6 +29,8 @@ import com.aliyun.player.IPlayer;
 import com.aliyun.player.source.UrlSource;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
+import com.ethanhua.skeleton.Skeleton;
+import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
@@ -42,9 +44,11 @@ import com.shuangling.software.entity.LiveInfo;
 import com.shuangling.software.entity.LiveMenu;
 import com.shuangling.software.entity.LiveRoomInfo;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.event.MessageEvent;
 import com.shuangling.software.fragment.ImgTextFragment;
 import com.shuangling.software.fragment.ImgTextLiveFragment;
+import com.shuangling.software.fragment.InviteRankFragment;
 import com.shuangling.software.fragment.LiveChatFragment;
 import com.shuangling.software.network.MyEcho;
 import com.shuangling.software.network.OkHttpCallback;
@@ -92,19 +96,29 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     ViewPager viewPager;
     @BindView(R.id.adverts)
     RelativeLayout adverts;
+    @BindView(R.id.root)
+    LinearLayout root;
 
     private MyEcho echo;
 
     private int mRoomId;
     private String mStreamName;
     private String mUrl;
+    private boolean mVerify;
 
     private List<LiveMenu> mMenus;
     private FragmentAdapter mFragmentPagerAdapter;
+
+    public LiveRoomInfo getLiveRoomInfo() {
+        return mLiveRoomInfo;
+    }
+
     private LiveRoomInfo mLiveRoomInfo;
     private boolean mHasInChannel = false;
+    public int mType;
 
     public boolean canGrabRedPacket=false;
+    private ViewSkeletonScreen mViewSkeletonScreen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,9 +142,18 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
     private void init() {
 
+        mViewSkeletonScreen = Skeleton.bind(root)
+                .load(R.layout.skeleton_video_detail)
+                .shimmer(false)
+                .angle(20)
+                .duration(1000)
+                .color(R.color.shimmer_color)
+                .show();
+        mVerify = getIntent().getBooleanExtra("verify",true);
         mStreamName = getIntent().getStringExtra("streamName");
         mRoomId = getIntent().getIntExtra("roomId", 0);
         mUrl = getIntent().getStringExtra("url");
+        mType = getIntent().getIntExtra("type",4);
         initAliyunPlayerView();
         getAdvertises();
         getMenus();
@@ -161,9 +184,11 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                         while (iterator.hasNext()) {
                             LiveMenu liveMenu = iterator.next();
 
-                            if ((liveMenu.getUsing()!=1)||(liveMenu.getShowtype() != 1&&
+                            if ((liveMenu.getUsing()!=1)||
+                                    (liveMenu.getShowtype() != 1&&
                                     liveMenu.getShowtype() != 2&&
-                                    liveMenu.getShowtype()!=11)) {
+                                    liveMenu.getShowtype()!=11&&
+                                    liveMenu.getShowtype()!=14)) {
                                 if(liveMenu.getShowtype()==6&&liveMenu.getUsing()==1){
                                     canGrabRedPacket=true;
                                 }
@@ -212,19 +237,40 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
                 try {
 
+
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
                         JSONArray ja=jsonObject.getJSONArray("data");
                         if(ja!=null&&ja.size()>0){
                             mLiveRoomInfo = JSONObject.parseObject(ja.getJSONObject(0).toJSONString(), LiveRoomInfo.class);
-                            getAuthKey();
+                            EventBus.getDefault().post(new CommonEvent("liveRoomInfo"));
+                            if(mLiveRoomInfo!=null&&mLiveRoomInfo.getEntry_mode()==2&&mVerify){
+                                //口令观看
+                                Intent it=new Intent(LiveDetailActivity.this,PassPhraseActivity.class);
+                                it.putExtra("LiveRoomInfo",mLiveRoomInfo);
+                                startActivity(it);
+                                finish();
+                            }else{
+                                getAuthKey();
+                            }
+
+
                         }
 
-
-
-
                     }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try{
+                                mViewSkeletonScreen.hide();
+                            }catch (Exception e){
+
+                            }
+
+
+                        }
+                    });
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -235,6 +281,19 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
             @Override
             public void onFailure(Call call, Exception exception) {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            mViewSkeletonScreen.hide();
+                        }catch (Exception e){
+
+                        }
+
+
+                    }
+                });
 
                 Log.e("test", exception.toString());
 
@@ -405,6 +464,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager(), mMenus);
                 viewPager.setAdapter(mFragmentPagerAdapter);
                 tabPageIndicator.setupWithViewPager(viewPager);
+                viewPager.setOffscreenPageLimit(20);
 
                 if (mMenus.size() > 5) {
                     tabPageIndicator.setTabMode(TabLayout.MODE_SCROLLABLE);
@@ -861,6 +921,13 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 bundle.putInt("roomId", mRoomId);
                 imgTextFragment.setArguments(bundle);
                 return imgTextFragment;
+            }else if(mMenus.get(position).getShowtype() == 14){
+                //邀请榜
+                InviteRankFragment inviteRankFragment = new InviteRankFragment();
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("LiveRoomInfo",mLiveRoomInfo);
+                inviteRankFragment.setArguments(bundle);
+                return inviteRankFragment;
             }else{
                 ImgTextLiveFragment imgTextLiveFragment = new ImgTextLiveFragment();
                 Bundle bundle = new Bundle();

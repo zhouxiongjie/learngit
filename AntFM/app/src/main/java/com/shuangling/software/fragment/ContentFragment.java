@@ -695,16 +695,29 @@ public class ContentFragment extends Fragment implements Handler.Callback {
                                     //模块类型1轮播图，2金刚区，3主播，4生活服务，5机构，6资讯
                                     if (module.getType() == 1) {
                                         //轮播图
-
                                         BannerView bannerView = new BannerView(getContext());
-                                        int width = CommonUtils.getScreenWidth() - CommonUtils.dip2px(40);
-                                        int height = 10 * width / 23;
-                                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height);
-                                        params.leftMargin = CommonUtils.dip2px(20);
-                                        params.rightMargin = CommonUtils.dip2px(20);
-                                        params.bottomMargin = CommonUtils.dip2px(10);
-                                        params.topMargin = CommonUtils.dip2px(10);
-                                        mDecorateLayout.addView(bannerView, params);
+                                        bannerView.setmMode(module.getAnimated());
+                                        if(module.getAnimated()==1){
+                                            //大图
+
+                                            int width = CommonUtils.getScreenWidth();
+                                            int height = 14 * width / 25;
+                                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height);
+                                            mDecorateLayout.addView(bannerView, params);
+
+                                        }else{
+                                            //卡片
+                                            int width = CommonUtils.getScreenWidth() - CommonUtils.dip2px(40);
+                                            int height = 10 * width / 23;
+                                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, height);
+                                            params.leftMargin = CommonUtils.dip2px(20);
+                                            params.rightMargin = CommonUtils.dip2px(20);
+                                            params.bottomMargin = CommonUtils.dip2px(10);
+                                            params.topMargin = CommonUtils.dip2px(10);
+                                            mDecorateLayout.addView(bannerView, params);
+                                        }
+
+
                                         List<BannerView.Banner> banners = new ArrayList<>();
                                         for (int j = 0; module.getContents() != null && j < module.getContents().size(); j++) {
                                             BannerInfo banner = new BannerInfo();

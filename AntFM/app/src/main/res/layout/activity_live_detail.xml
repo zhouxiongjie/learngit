@@ -1,23 +1,95 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
-    <com.aliyun.vodplayerview.widget.AliyunVodPlayerView
-        android:id="@+id/aliyunVodPlayerView"
-        android:layout_width="match_parent"
+    <LinearLayout android:id="@+id/player_container"
         android:layout_height="200dp"
-        />
+        android:layout_width="match_parent"
+        android:orientation="horizontal">
+        <com.aliyun.vodplayerview.widget.AliyunVodPlayerView
+            android:id="@+id/aliyunVodPlayerView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            >
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_alignParentRight="true"
+                    android:orientation="horizontal">
+                    <LinearLayout android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/live_type_bg">
+
+                        <TextView
+                            android:text="直播"
+                            android:layout_gravity="center_vertical"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/font_size_22px"/>
+
+                    </LinearLayout>
+
+
+                    <LinearLayout
+                        android:layout_marginLeft="6dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/live_type_bg">
+
+                        <com.aliyun.apsara.alivclittlevideo.view.video.FontIconView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:id="@+id/fiv_close"
+                            android:text="&#xe61e;"
+                            android:textColor="#ffffff"
+                            android:gravity="center"
+                            layout_gravity="left|top"
+                            android:textSize="11sp"/>
+                        <TextView
+
+                            android:id="@+id/audit"
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:maxLines="1"
+                            android:text="37.3万人"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/font_size_22px"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </RelativeLayout>
+
+        </com.aliyun.vodplayerview.widget.AliyunVodPlayerView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+    </LinearLayout>
+    </LinearLayout>
+
+
 
     <RelativeLayout
+        android:layout_below="@+id/player_container"
         android:id="@+id/adverts"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
     <RelativeLayout
+        android:id="@+id/tab_container"
+        android:layout_below="@+id/player_container"
         android:layout_width="match_parent"
         android:layout_height="40dp">
 
@@ -50,6 +122,8 @@
     </RelativeLayout>
 
     <android.support.v4.view.ViewPager
+
+        android:layout_below="@+id/tab_container"
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -58,6 +132,6 @@
 
 
 
-</LinearLayout>
+</RelativeLayout>
 
 

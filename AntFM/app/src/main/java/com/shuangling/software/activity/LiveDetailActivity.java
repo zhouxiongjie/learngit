@@ -34,11 +34,14 @@ import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.api.APICallBack;
+import com.shuangling.software.api.APILiving;
 import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.BannerView1;
 import com.shuangling.software.entity.BannerInfo;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.LiveMenu;
+import com.shuangling.software.entity.LiveRoomDetail;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.MessageEvent;
 import com.shuangling.software.fragment.ImgTextFragment;
@@ -91,8 +94,11 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     @BindView(R.id.adverts)
     RelativeLayout adverts;
 
-    private MyEcho echo;
+    @BindView(R.id.audit)
+    TextView audit;
 
+
+    private MyEcho echo;
     private int mRoomId;
     private String mStreamName;
     private String mUrl;
@@ -128,6 +134,9 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         mRoomId = getIntent().getIntExtra("roomId", 0);
         mUrl = getIntent().getStringExtra("url");
         initAliyunPlayerView();
+
+        getLiveDetail();
+
         getAdvertises();
         getMenus();
 
@@ -187,6 +196,24 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         });
 
     }
+
+
+
+
+    private void getLiveDetail(){
+        audit.setText("");
+        APILiving.getRoomDetail(this, mStreamName, new APICallBack<LiveRoomDetail>() {
+            @Override
+            public void onSuccess(LiveRoomDetail liveRoomDetail) {
+                audit.setText(liveRoomDetail.getAudit() + "人");
+            }
+            @Override
+            public void onFail(String error) {
+            }
+        });
+    }
+
+
 
 
     private void getAuthKey() {
@@ -610,8 +637,6 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
                 ViewGroup.LayoutParams lp = aliyunVodPlayerView.getLayoutParams();
                 aliyunVodPlayerView.setLayoutParams(lp);
-
-
                 aliyunVodPlayerView.setBackBtnVisiable(View.INVISIBLE);
                 ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).init();
             } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {

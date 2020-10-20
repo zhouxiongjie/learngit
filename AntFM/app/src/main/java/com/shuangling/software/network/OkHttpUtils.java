@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.activity.LoginActivity;
 import com.shuangling.software.activity.NewLoginActivity;
+import com.shuangling.software.api.APICallBack;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
@@ -288,43 +289,7 @@ public class OkHttpUtils {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
-//				try{
-//					int code=response.code();
-//					String resp=response.body().string();
-//					JSONObject jsonObject = JSONObject.parseObject(resp);
-//					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
-//						//授权失败，token过期
-//						mHandler.post(new Runnable() {
-//							@Override
-//							public void run() {
-//								ToastUtils.show("您的登录信息已失效，请重新登录");
-//								Intent it=new Intent(callback.getContext(),LoginActivity.class);
-//								callback.getContext().startActivity(it);
-//							}
-//						});
-//
-//					}else{
-//						callback.onResponse(call,resp);
-//					}
-//				}catch (Exception e){
-//
-//				}
-
-				try{
-					int code=response.code();
-					String resp=response.body().string();
-					JSONObject jsonObject = JSONObject.parseObject(resp);
-					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
-
-						postRefreshTokenLogin(url,params,callback);
-
-					}else{
-						callback.onResponse(call,resp);
-					}
-				}catch (Exception e){
-					callback.onFailure(call,e);
-				}
-
+				handleResponse(url,params,call,response,callback);
 			}
 		});
 	}
@@ -355,44 +320,7 @@ public class OkHttpUtils {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
-//				try{
-//					int code=response.code();
-//					String resp=response.body().string();
-//					JSONObject jsonObject = JSONObject.parseObject(resp);
-//					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
-//						//授权失败，token过期
-//						mHandler.post(new Runnable() {
-//							@Override
-//							public void run() {
-//								ToastUtils.show("您的登录信息已失效，请重新登录");
-//								Intent it=new Intent(callback.getContext(),LoginActivity.class);
-//								callback.getContext().startActivity(it);
-//							}
-//						});
-//
-//					}else{
-//						callback.onResponse(call,resp);
-//					}
-//				}catch (Exception e){
-//
-//				}
-
-
-				try{
-					int code=response.code();
-					String resp=response.body().string();
-					JSONObject jsonObject = JSONObject.parseObject(resp);
-					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
-
-						putRefreshTokenLogin(url,params,callback);
-
-					}else{
-						callback.onResponse(call,resp);
-					}
-				}catch (Exception e){
-					callback.onFailure(call,e);
-				}
-
+				handleResponse(url,params,call,response,callback);
 			}
 		});
 	}
@@ -498,42 +426,7 @@ public class OkHttpUtils {
 
 			@Override
 			public void onResponse(Call call, Response response) throws IOException {
-//				try{
-//					int code=response.code();
-//					String resp=response.body().string();
-//					JSONObject jsonObject = JSONObject.parseObject(resp);
-//					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
-//						//授权失败，token过期
-//						mHandler.post(new Runnable() {
-//							@Override
-//							public void run() {
-//								ToastUtils.show("您的登录信息已失效，请重新登录");
-//								Intent it=new Intent(callback.getContext(),LoginActivity.class);
-//								callback.getContext().startActivity(it);
-//							}
-//						});
-//
-//					}else{
-//						callback.onResponse(call,resp);
-//					}
-//				}catch (Exception e){
-//
-//				}
-
-				try{
-					int code=response.code();
-					String resp=response.body().string();
-					JSONObject jsonObject = JSONObject.parseObject(resp);
-					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
-						getRefreshTokenLogin(url,params,callback);
-					}else{
-						callback.onResponse(call,resp);
-					}
-				}catch (Exception e){
-					callback.onFailure(call,e);
-				}
-
-
+				handleResponse(url,params,call,response,callback);
 			}
 		});
 
@@ -576,8 +469,6 @@ public class OkHttpUtils {
 				}catch (Exception e){
 					callback.onFailure(call,e);
 				}
-
-
 
 			}
 		});
@@ -644,8 +535,6 @@ public class OkHttpUtils {
 
 			}
 		});
-
-
 	}
 
 
@@ -766,8 +655,6 @@ public class OkHttpUtils {
 
 			}
 		});
-
-
 	}
 
 	public static void putRefreshTokenLogin(final String url, final Map<String,String> params, final OkHttpCallback callback){
@@ -826,8 +713,6 @@ public class OkHttpUtils {
 
 			}
 		});
-
-
 	}
 
 
@@ -888,8 +773,6 @@ public class OkHttpUtils {
 
 			}
 		});
-
-
 	}
 
 
@@ -951,8 +834,49 @@ public class OkHttpUtils {
 			}
 		});
 
+	}
+
+
+	public  static  void handleResponse(final String url,final Map<String,String> params,Call call ,Response response, OkHttpCallback callback ) {
+
+		try{
+			int code=response.code();
+			switch ( code) {
+				case 200://请求成功
+				{
+					String resp=response.body().string();
+					JSONObject jsonObject = JSONObject.parseObject(resp);
+					if (jsonObject != null && jsonObject.getIntValue("code") == 303001) {
+						getRefreshTokenLogin(url,params,callback);
+					}else{
+						callback.onResponse(call,resp);
+					}
+				}
+				break;
+				case 404:
+				{
+					Exception e = new Exception("404，请求接口不存在");
+					callback.onFailure(call,e);
+				}
+				break;
+				case 500:
+				{
+					Exception e = new Exception("500，服务器内部错误");
+					callback.onFailure(call,e);
+				}
+				default:
+				{
+					Exception e = new Exception(code + "，服务器错误");
+					callback.onFailure(call,e);
+				}
+				break;
+			}
+
+		}catch (Exception e){
+			callback.onFailure(call,e);
+		}
 
 	}
-	
-	
+
+
 }

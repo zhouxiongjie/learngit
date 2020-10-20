@@ -259,7 +259,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
 
     private  void showShareDialog(final String title, final String desc, final String logo, final String url) {
 
-        ShareDialog dialog = ShareDialog.getInstance(false);
+        ShareDialog dialog = ShareDialog.getInstance(false,false);
         dialog.setIsShowPosterButton(false);
         dialog.setIsHideSecondGroup(true);
         dialog.setShareHandler(new ShareDialog.ShareHandler() {
@@ -272,6 +272,11 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
 
             @Override
             public void poster() {
+
+            }
+
+            @Override
+            public void report() {
 
             }
 

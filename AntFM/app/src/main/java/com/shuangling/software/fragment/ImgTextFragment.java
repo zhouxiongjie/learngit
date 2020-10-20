@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.RelativeLayout;
 
 import com.alibaba.fastjson.JSONObject;
 import com.shuangling.software.R;
@@ -39,9 +41,11 @@ public class ImgTextFragment extends Fragment implements Handler.Callback {
 
     @BindView(R.id.webView)
     WebView webView;
-
+    @BindView(R.id.noData)
+    RelativeLayout noData;
 
     Unbinder unbinder;
+
     private Handler mHandler;
     private String mStreamName;
     private int mRoomId;
@@ -53,8 +57,8 @@ public class ImgTextFragment extends Fragment implements Handler.Callback {
         super.onCreate(savedInstanceState);
         mHandler = new Handler(this);
         Bundle args = getArguments();
-        mStreamName=args.getString("streamName");
-        mRoomId=args.getInt("roomId");
+        mStreamName = args.getString("streamName");
+        mRoomId = args.getInt("roomId");
     }
 
 
@@ -66,7 +70,6 @@ public class ImgTextFragment extends Fragment implements Handler.Callback {
         return view;
 
     }
-
 
 
     private void init() {
@@ -187,23 +190,25 @@ public class ImgTextFragment extends Fragment implements Handler.Callback {
 
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        JSONObject jo=jsonObject.getJSONObject("data");
-                        if(jo!=null){
-                            String text =jo.getString("text");
+                        JSONObject jo = jsonObject.getJSONObject("data");
+                        if (jo != null) {
+                            String text = jo.getString("text");
 
-                            String js="javascript:_getImgPreviewContent('"+text+"')";
+                            String js = "javascript:_getImgPreviewContent('" + text + "')";
                             //String js="javascript:getPreviewContent("+test+")";
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    webView.loadUrl(js);
+                                    if(TextUtils.isEmpty(text)){
+                                        noData.setVisibility(View.VISIBLE);
+                                    }else{
+                                        webView.loadUrl(js);
+                                    }
+
                                 }
                             });
 
                         }
-
-
-
 
 
                     }
@@ -241,8 +246,6 @@ public class ImgTextFragment extends Fragment implements Handler.Callback {
         unbinder.unbind();
         super.onDestroyView();
     }
-
-
 
 
     @Override

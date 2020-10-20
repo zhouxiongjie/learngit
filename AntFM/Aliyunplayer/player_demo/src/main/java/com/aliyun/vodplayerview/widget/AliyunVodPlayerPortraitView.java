@@ -1195,7 +1195,7 @@ public class AliyunVodPlayerPortraitView extends RelativeLayout  {
      */
     private void initAliVcPlayer() {
         mAliyunVodPlayer = AliPlayerFactory.createAliPlayer(getContext().getApplicationContext());
-        mAliyunVodPlayer.enableLog(true);
+        //mAliyunVodPlayer.enableLog(true);
         //设置准备回调
         mAliyunVodPlayer.setOnPreparedListener(new VideoPlayerPreparedListener(this));
         //播放器出错监听
@@ -1612,11 +1612,11 @@ public class AliyunVodPlayerPortraitView extends RelativeLayout  {
         }
     }
 
-    /**
-     * 设置循环播放开始监听
-     *
-     * @param onCircleStartListener 循环播放开始监听
-     */
+//    /**
+//     * 设置循环播放开始监听
+//     *
+//     * @param onCircleStartListener 循环播放开始监听
+//     */
 //    public void setOnCircleStartListener(IPlayer.OnCircleStartListener onCircleStartListener) {
 //        if (mAliyunVodPlayer != null) {
 //            mAliyunVodPlayer.setOnCircleStartListener(onCircleStartListener);
@@ -2138,7 +2138,7 @@ public class AliyunVodPlayerPortraitView extends RelativeLayout  {
      */
     public void enableNativeLog() {
         if (mAliyunVodPlayer != null) {
-            mAliyunVodPlayer.enableLog(true);
+           // mAliyunVodPlayer.enableLog(true);
         }
     }
 
@@ -2147,7 +2147,7 @@ public class AliyunVodPlayerPortraitView extends RelativeLayout  {
      */
     public void disableNativeLog() {
         if (mAliyunVodPlayer != null) {
-            mAliyunVodPlayer.enableLog(false);
+            //mAliyunVodPlayer.enableLog(false);
         }
     }
 

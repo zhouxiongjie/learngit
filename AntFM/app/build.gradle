@@ -71,6 +71,13 @@ android {
             keyPassword "123456"
         }
 
+        zsls {
+            storeFile file("../keystore/zsls.jks")
+            storePassword "123456"
+            keyAlias "zsls"
+            keyPassword "123456"
+        }
+
 
 
     }
@@ -134,6 +141,18 @@ android {
             manifestPlaceholders = [
                     GD_KEY: "8fec8bb792b0f96fae170fb46ec91778",
                     APP_SCHEME:"mgfbapp"
+            ]
+
+
+        }
+
+        zsls {
+            applicationId "com.shuangling.software.zsls"
+            signingConfig signingConfigs.zsls         //配置签名
+            String bdtjAppkey = "d11e565d03"
+            manifestPlaceholders = [
+                    GD_KEY: "841b1d5da96a41ca1c8f5900eefa8f38",
+                    APP_SCHEME:"zslsapp"
             ]
 
 
@@ -237,7 +256,8 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.2.46'
     implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0'
     implementation 'org.greenrobot:eventbus:3.1.1'
-    implementation 'com.mylhyl:circleDialog:2.6.7'
+    //implementation 'com.mylhyl:circleDialog:2.6.7'
+    implementation 'com.mylhyl:circleDialog:2.6.18'
     implementation 'com.jack.frdialog:FRDialog:1.0.3'
     implementation 'com.hjq:toast:8.0'
     implementation 'com.amap.api:3dmap:6.4.0'
@@ -268,6 +288,8 @@ dependencies {
     implementation project(path: ':AlivcLittleVideo')
     implementation project(path: ':AliyunVideoCommon')
     implementation 'com.github.MrBin99:LaravelEchoAndroid:1.0'
+    implementation 'com.github.kaisengao:KsgLikeView:1.0.1'
+    implementation 'com.aliyun.sdk.android:AlivcArtc:5.1.5'
 
     implementation externalGSON
 }

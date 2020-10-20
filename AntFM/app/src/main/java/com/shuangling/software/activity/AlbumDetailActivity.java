@@ -1,6 +1,9 @@
 package com.shuangling.software.activity;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +27,7 @@ import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.TopTitleBar;
+import com.shuangling.software.dialog.ShareDialog;
 import com.shuangling.software.entity.Album;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.fragment.AlbumAudiosFragment;
@@ -69,6 +73,8 @@ public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Ca
 
     private static final int SHARE_FAILED = 0x5;
 
+    public static final int REQUEST_REPORT = 0x6;
+
     @BindView(R.id.activity_title)
     TopTitleBar activityTitle;
     @BindView(R.id.logo)
@@ -112,17 +118,79 @@ public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Ca
         activityTitle.setMoreAction(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mAlbum!=null){
-                    String url;
-                    if(User.getInstance()!=null){
-                        url=ServerInfo.h5IP+"/albums/"+mAlbumId+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP+"/albums/"+mAlbumId;
-                    }else{
-                        url=ServerInfo.h5IP+"/albums/"+mAlbumId+"?from_url="+ServerInfo.h5IP+"/albums/"+mAlbumId;
-                    }
 
-                    showShare(mAlbum.getTitle(),mAlbum.getDes(),mAlbum.getCover(),url);
-                    //shareTest();
+                if (mAlbum != null) {
+                    ShareDialog dialog = ShareDialog.getInstance( false,mAlbum.getIs_user_report() == 0 ? false : true);
+                    dialog.setIsHideSecondGroup(false);
+                    dialog.setIsShowPosterButton(false);
+                    dialog.setIsShowReport(true);
+                    dialog.setIsShowCollect(false);
+                    dialog.setIsShowCopyLink(false);
+                    dialog.setIsShowFontSize(false);
+                    dialog.setIsShowRefresh(false);
+                    dialog.setShareHandler(new ShareDialog.ShareHandler() {
+                        @Override
+                        public void onShare(String platform) {
+
+                            if (mAlbum != null) {
+
+                                String url;
+                                if(User.getInstance()!=null){
+                                    url=ServerInfo.h5IP+"/albums/"+mAlbumId+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP+"/albums/"+mAlbumId;
+                                }else{
+                                    url=ServerInfo.h5IP+"/albums/"+mAlbumId+"?from_url="+ServerInfo.h5IP+"/albums/"+mAlbumId;
+                                }
+
+                                showShare(platform,mAlbum.getTitle(),mAlbum.getDes(),mAlbum.getCover(),url);
+
+                            }
+
+                        }
+
+                        @Override
+                        public void poster() {
+
+                        }
+
+                        @Override
+                        public void report() {
+                            if (User.getInstance() == null) {
+                                Intent it=new Intent(AlbumDetailActivity.this, NewLoginActivity.class);
+                                startActivityForResult(it, REQUEST_LOGIN);
+                            }else{
+                                Intent it=new Intent(AlbumDetailActivity.this,ReportActivity.class);
+                                it.putExtra("id",""+mAlbum.getId());
+                                startActivityForResult(it,REQUEST_REPORT);
+                            }
+
+
+                        }
+
+                        @Override
+                        public void copyLink() {
+
+
+                        }
+
+                        @Override
+                        public void refresh() {
+
+
+                        }
+
+                        @Override
+                        public void collectContent() {
+
+                        }
+                    });
+                    dialog.show(getSupportFragmentManager(), "ShareDialog");
                 }
+
+
+//                if(mAlbum!=null){
+//
+//                    //shareTest();
+//                }
 
             }
         });
@@ -378,12 +446,17 @@ public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Ca
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_LOGIN && resultCode == Activity.RESULT_OK) {
             getAlbumDetail();
+        }else if(requestCode==REQUEST_REPORT&& resultCode == Activity.RESULT_OK){
+            if(mAlbum!=null){
+                mAlbum.setIs_user_report(1);
+            }
+
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
 
-    private void showShare(final String title, final String desc, final String logo, final String url) {
+    private void showShare(String platform,final String title, final String desc, final String logo, final String url) {
         final String cover;
         if(logo.startsWith("http://")){
             cover=logo.replace("http://","https://");
@@ -393,6 +466,7 @@ public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Ca
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
         oks.disableSSOWhenAuthorize();
+        oks.setPlatform(platform);
         final Platform qq = ShareSDK.getPlatform(QQ.NAME);
         if (!qq.isClientValid()) {
             oks.addHiddenPlatform(QQ.NAME);

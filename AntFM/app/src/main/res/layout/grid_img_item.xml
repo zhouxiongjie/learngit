@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F5F6">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        fresco:actualImageScaleType="centerCrop"
+        fresco:placeholderImage="@drawable/special_placeholder"
+        fresco:placeholderImageScaleType="centerCrop"
+        fresco:failureImage="@drawable/special_placeholder"
+        fresco:failureImageScaleType="centerCrop" />
+
+
+
+    <com.shuangling.software.customview.FontIconView
+        android:id="@+id/add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="&#xe6ac;"
+        android:textColor="#D8D8DD"
+        android:textSize="@dimen/font_size_100px"
+        android:visibility="visible"/>
+
+    <com.shuangling.software.customview.FontIconView
+        android:id="@+id/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="&#xe62a;"
+        android:textColor="#ffffff"
+        android:textSize="@dimen/font_size_40px"
+        android:visibility="gone"/>
+
+
+</RelativeLayout>

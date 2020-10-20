@@ -118,7 +118,7 @@ public class SpecialDetailActivity extends AppCompatActivity implements Handler.
         } else {
             url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&multiple="+CommonUtils.getFontSize();
         }
-        WebSettings s = webView.getSettings();
+           WebSettings s = webView.getSettings();
         CommonUtils.setWebviewUserAgent(s);
         s.setTextZoom(100);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {

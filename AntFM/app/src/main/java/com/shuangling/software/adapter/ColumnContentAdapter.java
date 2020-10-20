@@ -1063,14 +1063,16 @@ public class ColumnContentAdapter extends RecyclerView.Adapter implements View.O
                     }
 
                     String url=content.getLive().getUrl();
-                    if(content.getLive().getType()==4){
+                    if(content.getLive().getType()==4||content.getLive().getType()==1){
                         if(!TextUtils.isEmpty(url)){
                             String streamName=url.substring(url.lastIndexOf("=")+1);
                             Intent it = new Intent(mContext,  LiveDetailActivity.class);
                             it.putExtra("streamName",streamName);
                             it.putExtra("roomId",content.getLive().getRoom_id());
                             //it.putExtra("url",content.getLive().getHls_play_url());
+                            //it.putExtra("url",content.getLive().getRtmp_play_url());
                             it.putExtra("url",content.getLive().getRtmp_play_url());
+                            it.putExtra("type",content.getLive().getType());
                             mContext.startActivity(it);
                         }
                     }else{

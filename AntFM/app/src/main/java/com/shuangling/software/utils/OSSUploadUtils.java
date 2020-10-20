@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -56,6 +57,8 @@ public class OSSUploadUtils implements OSSCompletedCallback<PutObjectRequest, Pu
 
         void onSuccess(String url);
 
+        void onSuccessAll();
+
         void onFailed();
     }
 
@@ -63,7 +66,9 @@ public class OSSUploadUtils implements OSSCompletedCallback<PutObjectRequest, Pu
 
     private OssInfo mOssInfo;
     private OssService mOssService;
-    private String mUploadFilePath;
+    //private String mUploadFilePath;
+    //待上传成功数量
+    private int mFileNumber;
 
     public static OSSUploadUtils getInstance(){
         if(sOSSUploadUtils==null){
@@ -78,7 +83,8 @@ public class OSSUploadUtils implements OSSCompletedCallback<PutObjectRequest, Pu
 
 
     public void uploadFile(Context context,String filePath) {
-        mUploadFilePath=filePath;
+        mFileNumber=1;
+        //mUploadFilePath=filePath;
         String url = ServerInfo.serviceIP + ServerInfo.appOss;
 
         OkHttpUtils.get(url, null, new OkHttpCallback(context) {
@@ -96,7 +102,7 @@ public class OSSUploadUtils implements OSSCompletedCallback<PutObjectRequest, Pu
 
                     // 2.把图片文件file上传到服务器
                     if(mOssInfo != null&&mOssService!=null){
-                        mOssService.asyncUploadFile(mOssInfo.getDir()+mUploadFilePath.substring(mUploadFilePath.lastIndexOf(File.separator)+1),mUploadFilePath,null,OSSUploadUtils.this);
+                        mOssService.asyncUploadFile(mOssInfo.getDir()+filePath.substring(filePath.lastIndexOf(File.separator)+1),filePath,null,OSSUploadUtils.this);
                     }else{
                         ToastUtils.show("OSS初始化失败,请稍后再试");
                     }
@@ -113,6 +119,60 @@ public class OSSUploadUtils implements OSSCompletedCallback<PutObjectRequest, Pu
         });
 
     }
+
+
+
+    public void uploadFile(Context context,List<String> filePaths) {
+
+        mFileNumber=filePaths.size();
+
+        String url = ServerInfo.serviceIP + ServerInfo.appOss;
+
+        OkHttpUtils.get(url, null, new OkHttpCallback(context) {
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+
+                String result = response;
+                final JSONObject jsonObject = JSONObject.parseObject(result);
+                if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                    mOssInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), OssInfo.class);
+                    mOssService=initOSS(mOssInfo.getHost(),mOssInfo.getBucket(),mOssInfo.getAccess_key_id(),mOssInfo.getAccess_key_secret(),mOssInfo.getExpiration(),mOssInfo.getSecurity_token());
+                    //mOssService.setCallbackAddress(Config.callbackAddress);
+
+                    // 2.把图片文件file上传到服务器
+                    if(mOssInfo != null&&mOssService!=null){
+
+                        for(int i=0;i<filePaths.size();i++){
+                            String filepath=filePaths.get(i);
+                            mOssService.asyncUploadFile(mOssInfo.getDir()+filepath.substring(filepath.lastIndexOf(File.separator)+1),filepath,null,OSSUploadUtils.this);
+                        }
+
+                    }else{
+                        ToastUtils.show("OSS初始化失败,请稍后再试");
+                        if(mOnCallbackListener!=null){
+                            mOnCallbackListener.onFailed();
+                        }
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                Log.e("test",exception.toString());
+                if(mOnCallbackListener!=null){
+                    mOnCallbackListener.onFailed();
+                }
+            }
+        });
+
+    }
+
+
 
 
     public OssService initOSS(String endpoint, String bucket, String accessKey, String accessKeySecret, String expiration,
@@ -151,9 +211,22 @@ public class OSSUploadUtils implements OSSCompletedCallback<PutObjectRequest, Pu
     @Override
     public void onSuccess(PutObjectRequest request, PutObjectResult result) {
 
-        if(mOnCallbackListener!=null){
-            mOnCallbackListener.onSuccess(mOssInfo.getHost()+"/"+mOssInfo.getDir()+mUploadFilePath.substring(mUploadFilePath.lastIndexOf(File.separator)+1));
+        synchronized (this){
+            long id=Thread.currentThread().getId();
+            mFileNumber--;
+            if(mOnCallbackListener!=null){
+                String filepath=request.getUploadFilePath();
+                //mOnCallbackListener.onSuccess(mOssInfo.getHost()+"/"+mOssInfo.getDir()+mUploadFilePath.substring(mUploadFilePath.lastIndexOf(File.separator)+1));
+                mOnCallbackListener.onSuccess(mOssInfo.getHost()+"/"+mOssInfo.getDir()+filepath.substring(filepath.lastIndexOf(File.separator)+1));
+
+                if(mFileNumber==0){
+                    //全部上传成功
+                    mOnCallbackListener.onSuccessAll();
+                }
+            }
         }
+
+
     }
 
     @Override

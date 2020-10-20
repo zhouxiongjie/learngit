@@ -307,5 +307,44 @@ public class TimeUtil {
     }
 
 
+
+    public static String getTimeSpan(String starTime, String endTime) {
+        int timeString = 0;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        try {
+            Date start = dateFormat.parse(starTime);
+            Date end = dateFormat.parse(endTime);
+            long milliseconds = end.getTime() - start.getTime();
+            long seconds = milliseconds / 1000;
+
+            String timecodeSeconds = "" + (seconds % 60);
+            String timecodeMinutes = "" + (seconds / 60) % 60;
+            String timecodeHours = "" + (seconds / 3600);
+            if ((seconds % 60) < 10) {
+                timecodeSeconds = "0" + timecodeSeconds;
+            }
+            if ((seconds / 60) % 60 < 10) {
+                timecodeMinutes = "0" + timecodeMinutes;
+            }
+            if (seconds / 3600 < 10) {
+                timecodeHours = "0" + timecodeHours;
+            }
+            if (seconds / 60 < 1) {
+                return timecodeSeconds+"秒";
+            }else if (seconds / 3600 < 1) {
+                return timecodeMinutes + "分" + timecodeSeconds+"秒";
+            } else {
+                return timecodeHours + "时" + timecodeMinutes + "分" + timecodeSeconds+"秒";
+            }
+
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return "";
+
+    }
+
 }
 

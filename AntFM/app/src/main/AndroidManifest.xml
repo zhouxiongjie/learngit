@@ -89,6 +89,7 @@
         <activity
             android:name=".activity.GuidePageActivity"
             android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -108,14 +109,28 @@
             android:name=".activity.AlbumDetailActivity"
             android:screenOrientation="portrait" >
         </activity>
+
+        <activity
+            android:name=".activity.PassPhraseActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+
+
         <activity
             android:name=".activity.CityListActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <activity
+            android:name=".activity.RedPacketDetailActivity"
             android:screenOrientation="portrait" >
         </activity>
 
 
         <activity
             android:name=".activity.LiveDetailActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" >
         </activity>
         <activity
@@ -159,6 +174,12 @@
             android:name=".activity.ModifyUserInfoActivity"
             android:screenOrientation="portrait" >
         </activity>
+
+        <activity
+            android:name=".activity.ReportActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+
 
         <activity
             android:name=".activity.RoomActivity"

@@ -49,7 +49,12 @@ public class MyColumnGridViewAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mColumns.size();
+        if(mColumns==null){
+            return 0;
+        }else{
+            return mColumns.size();
+        }
+
     }
 
 

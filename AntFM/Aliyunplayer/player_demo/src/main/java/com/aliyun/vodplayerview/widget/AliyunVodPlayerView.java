@@ -1244,7 +1244,7 @@ public class AliyunVodPlayerView extends RelativeLayout implements ITheme {
      */
     private void initAliVcPlayer() {
         mAliyunVodPlayer = AliPlayerFactory.createAliPlayer(getContext().getApplicationContext());
-        mAliyunVodPlayer.enableLog(true);
+        //mAliyunVodPlayer.enableLog(true);
         //设置准备回调
         mAliyunVodPlayer.setOnPreparedListener(new VideoPlayerPreparedListener(this));
         //播放器出错监听
@@ -2181,7 +2181,7 @@ public class AliyunVodPlayerView extends RelativeLayout implements ITheme {
      */
     public void enableNativeLog() {
         if (mAliyunVodPlayer != null) {
-            mAliyunVodPlayer.enableLog(true);
+            //mAliyunVodPlayer.enableLog(true);
         }
     }
 
@@ -2190,7 +2190,7 @@ public class AliyunVodPlayerView extends RelativeLayout implements ITheme {
      */
     public void disableNativeLog() {
         if (mAliyunVodPlayer != null) {
-            mAliyunVodPlayer.enableLog(false);
+            //mAliyunVodPlayer.enableLog(false);
         }
     }
 

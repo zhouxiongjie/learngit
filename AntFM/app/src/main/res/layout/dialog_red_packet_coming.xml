@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schem as.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/transparent">
+
+
+        <com.shuangling.software.customview.FontIconView
+            android:id="@+id/close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="&#xe728;"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/font_size_60px" />
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:gravity="bottom"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="倒计时"
+                android:textSize="@dimen/font_size_32px"
+
+                android:textColor="#FFE14D"/>
+
+            <TextView
+                android:id="@+id/remainTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="10"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:textSize="@dimen/font_size_46px"
+                android:textColor="#FFE14D"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="s"
+                android:textSize="@dimen/font_size_32px"
+                android:textColor="#FFE14D"/>
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/red_packet_img"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <!--<com.facebook.drawee.view.SimpleDraweeView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--app:actualImageScaleType="fitCenter"-->
+            <!--app:failureImage="@drawable/notification_bg"-->
+            <!--app:failureImageScaleType="fitCenter"-->
+            <!--app:placeholderImage="@drawable/notification_bg"-->
+            <!--app:placeholderImageScaleType="fitCenter"-->
+            <!--app:roundingBorderColor="@color/white"-->
+            <!--app:roundingBorderWidth="0dp"-->
+            <!--app:viewAspectRatio="1.09" />-->
+
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -2475,9 +2475,9 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                     } else {
 
 
-                        if(mVideoEnabled){
-                            mNeedResumeVideo=true;
-                        }
+//                        if(mVideoEnabled){
+//                            mNeedResumeVideo=true;
+//                        }
                         //1 先取消发布摄像头流
                         //mEngine.unPublishTracks(Arrays.asList(mLocalVideoTrack));
 
@@ -2676,6 +2676,13 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
             if (QNTrackKind.AUDIO.equals(trackInfo.getTrackKind())) {
                 mQNAudioTrackInfo = trackInfo;
             } else {
+                for(int i=0;i<mQNVideoTrackInfos.size();i++){
+                    QNTrackInfo qnTrackInfo=mQNVideoTrackInfos.get(i);
+                    if(qnTrackInfo.getTrackId().equals(trackInfo.getTrackId())){
+                        mQNVideoTrackInfos.remove(qnTrackInfo);
+                        break;
+                    }
+                }
                 mQNVideoTrackInfos.add(trackInfo);
             }
 
@@ -2698,7 +2705,14 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
             if (QNTrackKind.AUDIO.equals(trackInfo.getTrackKind())) {
                 mQNAudioTrackInfo = null;
             } else {
-                mQNVideoTrackInfos.remove(trackInfo);
+                for(int i=0;i<mQNVideoTrackInfos.size();i++){
+                    QNTrackInfo qnTrackInfo=mQNVideoTrackInfos.get(i);
+                    if(qnTrackInfo.getTrackId().equals(trackInfo.getTrackId())){
+                        mQNVideoTrackInfos.remove(qnTrackInfo);
+                        break;
+                    }
+                }
+
             }
 
         }
@@ -2719,6 +2733,11 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEngineEventL
                 @Override
                 public void onSuccess(String url) {
                     sendPicture(url);
+                }
+
+                @Override
+                public void onSuccessAll() {
+
                 }
 
                 @Override

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.gson.internal.$Gson$Preconditions;
 import com.shuangling.software.entity.LiveRoomDetail;
+import com.shuangling.software.entity.LiveRoomInfo;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.GsonUtils;
@@ -21,7 +22,7 @@ public class APILiving extends  API {
     /**
      * http://yapi.slradio.cn:3000/project/220/interface/api/13881
      */
-    public static void getRoomDetail(Context context, String streamName, APICallBack<LiveRoomDetail> callBack) {
+    public static void getRoomDetail(Context context, String streamName, APICallBack<LiveRoomInfo> callBack) {
         String url = ServerInfo.live + "/v3/get_room_details_c" + "?stream_name=" + streamName;
         OkHttpUtils.get(url, null, new OkHttpCallback(context) {
             @Override
@@ -31,7 +32,7 @@ public class APILiving extends  API {
                handleResult(response, new APICallBack<String>() {
                    @Override
                    public void onSuccess(String data) {
-                       List<LiveRoomDetail> roomDetails =  GsonUtils.gsonToList(data,LiveRoomDetail.class);
+                       List<LiveRoomInfo> roomDetails =  GsonUtils.gsonToList(data,LiveRoomInfo.class);
                        if(roomDetails.size()>0){
                            callBack.onSuccess(roomDetails.get(0));
                        }else{

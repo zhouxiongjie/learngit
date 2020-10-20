@@ -27,6 +27,10 @@ public class Album {
     private int is_sub;
     private AuthorInfo author_info;
 
+
+
+    private int is_user_report;
+
     public int getId() {
         return id;
     }
@@ -105,6 +109,14 @@ public class Album {
 
     public void setAuthor_info(AuthorInfo author_info) {
         this.author_info = author_info;
+    }
+
+    public int getIs_user_report() {
+        return is_user_report;
+    }
+
+    public void setIs_user_report(int is_user_report) {
+        this.is_user_report = is_user_report;
     }
 
     public static class AuthorInfo {

@@ -1,53 +1,128 @@
 package com.shuangling.software.dialog;
 
-import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.NestedScrollView;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.view.ViewGroup;
 
+import com.mylhyl.circledialog.BaseCircleDialog;
 import com.shuangling.software.R;
+import com.shuangling.software.activity.NewLoginActivity;
 import com.shuangling.software.customview.ChatReplyInput;
-import com.shuangling.software.customview.CircleIndicator;
+import com.shuangling.software.entity.ChatMessage;
+import com.shuangling.software.entity.User;
 import com.shuangling.software.interf.ChatAction;
-import com.shuangling.software.utils.EmotionInputDetector;
-import com.shuangling.software.utils.KeyBordUtil;
+import com.shuangling.software.network.OkHttpCallback;
+import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.ServerInfo;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+import okhttp3.Call;
+
 
 /**
- * 评论详情
+ * 注销框
+ * Created by hupei on 2017/4/5.
  */
-public class ReplyDialog extends DialogFragment implements ChatAction {
-    //点击发表，内容不为空时的回调
-    public SendListener sendListener;
+public class ReplyDialog extends BaseCircleDialog  implements ChatAction{
 
-    private Dialog dialog;
-    private ChatReplyInput chatReplyInput;
+    private String postMessageUrl = ServerInfo.live + "/v3/push_message";
 
-    private View contentView;
+    Unbinder unbinder;
+    @BindView(R.id.chatReplyInput)
+    ChatReplyInput chatReplyInput;
 
-    private String toWho;
+    private String mRoomId;
+    private String mStreamName;
+
+    private ChatMessage chatMessage;
+    private HashMap<String, String> mMessageMap = new HashMap<>();
 
 
-    private DismissListener mListener;
+    private OnAction mOnAction;
 
-    public void setDismissListener(DismissListener listener) {
-        this.mListener = listener;
+
+    public interface OnAction {
+        void sendImage();
+    }
+
+    public void setOnAction(OnAction onAction) {
+        this.mOnAction = onAction;
+    }
+
+
+    public static ReplyDialog getInstance(ChatMessage msg, String roomId, String streamName) {
+        ReplyDialog dialogFragment = new ReplyDialog();
+        dialogFragment.setCanceledBack(true);
+        dialogFragment.setCanceledOnTouchOutside(true);
+        dialogFragment.setGravity(Gravity.BOTTOM);
+        dialogFragment.setWidth(1f);
+
+        dialogFragment.chatMessage=msg;
+        dialogFragment.mRoomId=roomId;
+        dialogFragment.mStreamName=streamName;
+        return dialogFragment;
     }
 
     @Override
-    public void sendImage() {
+    public View createView(Context context, LayoutInflater inflater, ViewGroup container) {
+        return inflater.inflate(R.layout.chat_reply_dialog, container, false);
+    }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+//    public void addChatMsg(ChatMessage msg) {
+//        mChatMessageListAdapter.addChatMsg(msg);
+//    }
+//
+//
+//    public void addChatMsgs(List<ChatMessage> msgs) {
+//
+//        mChatMessageListAdapter.addChatMsgs(msgs);
+//
+//    }
+
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = super.onCreateView(inflater, container, savedInstanceState);
+        unbinder = ButterKnife.bind(this, rootView);
+        chatReplyInput.setChatAction(this);
+        chatReplyInput.getEditText().setHint(chatMessage.getNickName());
+        chatReplyInput.getEditText().setFocusable(true);
+        chatReplyInput.getEditText().setFocusableInTouchMode(true);
+        chatReplyInput.getEditText().requestFocus();
+        showSoftInputView();
+        return rootView;
+    }
+
+
+    @Override
+    public void sendImage() {
+        if(mOnAction!=null){
+            mOnAction.sendImage();
+            dismiss();
+        }
     }
 
     @Override
@@ -58,102 +133,36 @@ public class ReplyDialog extends DialogFragment implements ChatAction {
     @Override
     public void sendText(String str) {
 
-    }
+        if(User.getInstance()==null){
+            Intent it=new Intent(getContext(), NewLoginActivity.class);
+            startActivity(it);
+        }else{
+            if (TextUtils.isEmpty(str)) return;
+            chatReplyInput.setText("");
+            mMessageMap.clear();
+            mMessageMap.put("room_id", ""+mRoomId);//直播间ID
+            mMessageMap.put("parent_id",""+chatMessage.getChatsId());
+            mMessageMap.put("user_id", User.getInstance().getId() + "");//用户ID
+            mMessageMap.put("type", "2");//发布端类型：1.主持人   2：用户    3:通知关注  4：通知进入直播间
+            mMessageMap.put("stream_name", mStreamName);//播间推流ID
+            mMessageMap.put("nick_name", User.getInstance().getNickname());//昵称
+            mMessageMap.put("message_type", "1");//消息类型 1.互动消息  2.直播状态更新消息  3.删除消息  4.题目 5.菜单设置 6图文保存  默认1
+            mMessageMap.put("user_logo",User.getInstance().getAvatar());
+            mMessageMap.put("message", str);
+            mMessageMap.put("content_type","1");
+            OkHttpUtils.post(postMessageUrl, mMessageMap, new OkHttpCallback(getContext()) {
+                @Override
+                public void onFailure(Call call, Exception e) {
+                    //Log.e("test",e.getCause().getMessage());
+                }
 
-    public interface DismissListener {
-        void onDismiss();
-    }
+                @Override
+                public void onResponse(Call call, String response) throws IOException {
+                    Log.e("test", response);
+                }
+            });
 
-    public void setToWho(String toWho) {
-        this.toWho = toWho;
-        chatReplyInput.getEditText().setHint(toWho);
-
-    }
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        // 使用不带Theme的构造器, 获得的dialog边框距离屏幕仍有几毫米的缝隙。
-        dialog = new Dialog(getActivity(), R.style.Comment_Dialog);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);// 设置Content前设定
-        contentView = View.inflate(getActivity(), R.layout.chat_reply_dialog, null);
-        dialog.setContentView(contentView);
-        dialog.setCanceledOnTouchOutside(true);// 外部点击取消
-
-        String dialogType = this.getTag();
-
-        // 设置宽度为屏宽，靠近屏幕底部
-        Window window = dialog.getWindow();
-        WindowManager.LayoutParams layoutParams = window.getAttributes();
-        layoutParams.gravity = Gravity.BOTTOM;// 紧贴底部
-        layoutParams.alpha = 1;
-        layoutParams.dimAmount = 0.0f;
-        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;// 宽度持平
-        window.setAttributes(layoutParams);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-
-        chatReplyInput = contentView.findViewById(R.id.chatReplyInput);
-        assert dialogType != null;
-
-
-        chatReplyInput.getEditText().setFocusable(true);
-        chatReplyInput.getEditText().setFocusableInTouchMode(true);
-        chatReplyInput.getEditText().requestFocus();
-
-        return dialog;
-    }
-
-
-
-
-
-    public interface SendListener {
-        void sendComment(String inputText);
-    }
-
-    public void setSendListener(SendListener sendListener) {
-        this.sendListener = sendListener;
-    }
-
-
-    // 监听软件盘是否关闭的接口 ： 没有用到
-    private void setSoftKeyBordListener(){
-        KeyBordUtil.SoftKeyBoardListener softKeyBoardListener = new KeyBordUtil.SoftKeyBoardListener(getActivity());
-        softKeyBoardListener.setListener(new KeyBordUtil.SoftKeyBoardListener.OnSoftKeyBoardChangeListener() {
-            @Override
-            public void keyBoardShow(int height) {
-
-            }
-
-            @Override
-            public void keyBoardHide(int height) {
-                dismiss();
-            }
-        });
-    }
-
-    // 重写 dismiss 设置延迟，否则会又残留dialog不能及时关闭
-    @Override
-    public void dismiss() {
-
-        if (mListener != null){
-            mListener.onDismiss();
+            dismiss();
         }
-        chatReplyInput.getEditText().setText("");
-        super.dismiss();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
-    public void onDestroy() {
-        if (mListener != null){
-            mListener.onDismiss();
-        }
-
-        super.onDestroy();
     }
 }

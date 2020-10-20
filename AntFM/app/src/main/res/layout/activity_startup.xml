@@ -25,7 +25,7 @@
             android:id="@+id/logo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:actualImageScaleType="centerCrop"/>
+            app:actualImageScaleType="fitXY"/>
         <SurfaceView
             android:id="@+id/surface"
             android:layout_width="match_parent"

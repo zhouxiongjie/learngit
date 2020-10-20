@@ -1,5 +1,6 @@
 package com.shuangling.software.activity;
 
+import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -72,6 +73,7 @@ import okhttp3.Call;
 public class AlivcLittleVideoActivity extends AppCompatActivity {
 
     public static final int REQUEST_LOGIN = 0x1;
+    public static final int REQUEST_REPORT = 0xe;
 
 
     public static final int PAN_DOWN = 1;
@@ -240,7 +242,7 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                         url=ServerInfo.h5IP + "/share/" + columnContent.getVideo().getPost_id() +"?from_url=" + ServerInfo.h5IP + "/share/" + columnContent.getVideo().getPost_id() ;
                     }
                     Log.d("Share",url);
-                    showShareDialog(columnContent.getTitle(),columnContent.getDes(),columnContent.getCover(),url);
+                    showShareDialog(columnContent.getTitle(),columnContent.getDes(),columnContent.getCover(),url,columnContent.getIs_user_report());
 
                 }
             }
@@ -340,8 +342,14 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_LOGIN && resultCode == RESULT_OK) {
             getVideoDetail(mVideoPosition);
-        }
+        }else if(requestCode==REQUEST_REPORT&& resultCode == Activity.RESULT_OK){
 
+
+            ColumnContent columnContent = mColumnContents.get(mVideoPosition);
+            columnContent.setIs_user_report(1);
+
+
+        }
     }
 
 
@@ -737,6 +745,7 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
 
 
                                     ColumnContent columnContent = mColumnContents.get(mVideoPosition);
+
                                     if(videoDetail.getComment()>columnContent.getComment()){
                                         columnContent.setComment(videoDetail.getComment());
                                     }else{
@@ -754,6 +763,8 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                                     }else{
                                         holder.getmTvLikes().setText("点赞");
                                     }
+
+                                    columnContent.setIs_user_report(videoDetail.getIs_user_report());
                                 }
                             }
                         });
@@ -995,11 +1006,17 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
 
 
 
-    private  void showShareDialog(final String title, final String desc, final String logo, final String url) {
+    private  void showShareDialog(final String title, final String desc, final String logo, final String url ,int is_user_report) {
 
-        ShareDialog dialog = ShareDialog.getInstance(false);
+        ShareDialog dialog = ShareDialog.getInstance(false,is_user_report==1);
         dialog.setIsShowPosterButton(false);
-        dialog.setIsHideSecondGroup(true);
+        dialog.setIsHideSecondGroup(false);
+        dialog.setIsShowPosterButton(false);
+        dialog.setIsShowReport(true);
+        dialog.setIsShowCollect(false);
+        dialog.setIsShowCopyLink(false);
+        dialog.setIsShowFontSize(false);
+        dialog.setIsShowRefresh(false);
         dialog.setShareHandler(new ShareDialog.ShareHandler() {
             @Override
             public void onShare(String platform) {
@@ -1010,6 +1027,22 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
 
             @Override
             public void poster() {
+
+            }
+
+            @Override
+            public void report() {
+                //举报
+                ColumnContent columnContent = mColumnContents.get(mVideoPosition);
+                if (User.getInstance() == null) {
+                    Intent it=new Intent(AlivcLittleVideoActivity.this, NewLoginActivity.class);
+                    startActivityForResult(it, REQUEST_LOGIN);
+                }else{
+                    Intent it=new Intent(AlivcLittleVideoActivity.this,ReportActivity.class);
+                    it.putExtra("id",""+columnContent.getId());
+                    startActivityForResult(it,REQUEST_REPORT);
+                }
+
 
             }
 

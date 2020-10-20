@@ -476,6 +476,7 @@ public class StartupActivity extends Activity implements Handler.Callback {
 
             }
         });
+        mAliyunVodPlayer.setScaleMode(IPlayer.ScaleMode.SCALE_ASPECT_FILL);
         //播放器出错监听
         mAliyunVodPlayer.setOnErrorListener(new IPlayer.OnErrorListener() {
             @Override

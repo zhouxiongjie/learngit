@@ -409,7 +409,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                 }
             } else {
                 articleViewHolder.top.setVisibility(View.GONE);
-                if (content.getArticle().getCovers().size() > 0 && !TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
+                if (content.getArticle()!=null&&content.getArticle().getCovers().size() > 0 && !TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
                     articleViewHolder.logo.setVisibility(View.VISIBLE);
 
                     int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
@@ -986,7 +986,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                     }
 
                     String url=content.getLive().getUrl();
-                    if(content.getLive().getType()==4){
+                    if(content.getLive().getType()==4||content.getLive().getType()==1){
                         if(!TextUtils.isEmpty(url)){
                             String streamName=url.substring(url.lastIndexOf("=")+1);
                             Intent it = new Intent(mContext,  LiveDetailActivity.class);
@@ -994,6 +994,7 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                             it.putExtra("roomId",content.getLive().getRoom_id());
                             //it.putExtra("url",content.getLive().getHls_play_url());
                             it.putExtra("url",content.getLive().getRtmp_play_url());
+                            it.putExtra("type",content.getLive().getType());
                             mContext.startActivity(it);
                         }
                     }else{
@@ -1403,7 +1404,9 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                     } else if (mColumnContent.get(position - 2).getType() == 2) {
                         return TYPE_ALBUM;
                     } else if (mColumnContent.get(position - 2).getType() == 3) {
-                        if (mColumnContent.get(position - 2).getArticle().getType() == 1) {
+                        if (mColumnContent.get(position - 2).getArticle()==null){
+                            return TYPE_ARTICLE;
+                        }else if (mColumnContent.get(position - 2).getArticle().getType() == 1) {
                             return TYPE_ARTICLE;
                         } else if (mColumnContent.get(position - 2).getArticle().getType() == 2) {
                             return TYPE_ARTICLE_THREE;
@@ -1443,7 +1446,9 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                 } else if (mColumnContent.get(position - 1).getType() == 2) {
                     return TYPE_ALBUM;
                 } else if (mColumnContent.get(position - 1).getType() == 3) {
-                    if (mColumnContent.get(position - 1).getArticle().getType() == 1) {
+                    if (mColumnContent.get(position - 1).getArticle()==null){
+                        return TYPE_ARTICLE;
+                    }else if (mColumnContent.get(position - 1).getArticle().getType() == 1) {
                         return TYPE_ARTICLE;
                     } else if (mColumnContent.get(position - 1).getArticle().getType() == 2) {
                         return TYPE_ARTICLE_THREE;
@@ -1490,7 +1495,9 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                         if (mColumnContent.get(position - 1).getTop() != null) {
                             return TYPE_ARTICLE;
                         } else {
-                            if (mColumnContent.get(position - 1).getArticle().getType() == 1) {
+                            if(mColumnContent.get(position-1).getArticle()==null){
+                                return TYPE_ARTICLE;
+                            }else if (mColumnContent.get(position - 1).getArticle().getType() == 1) {
                                 return TYPE_ARTICLE;
                             } else if (mColumnContent.get(position - 1).getArticle().getType() == 2) {
                                 return TYPE_ARTICLE_THREE;
@@ -1536,7 +1543,9 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                     if (mColumnContent.get(position).getTop() != null) {
                         return TYPE_ARTICLE;
                     } else {
-                        if (mColumnContent.get(position).getArticle().getType() == 1) {
+                        if(mColumnContent.get(position).getArticle()==null){
+                            return TYPE_ARTICLE;
+                        }else if (mColumnContent.get(position).getArticle().getType() == 1) {
                             return TYPE_ARTICLE;
                         } else if (mColumnContent.get(position).getArticle().getType() == 2) {
                             return TYPE_ARTICLE_THREE;

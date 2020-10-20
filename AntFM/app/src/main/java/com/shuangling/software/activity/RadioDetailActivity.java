@@ -39,6 +39,7 @@ import com.shuangling.software.customview.MyListView;
 import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.dialog.AudioTimerDialog;
 import com.shuangling.software.dialog.RadioListDialog;
+import com.shuangling.software.dialog.ShareDialog;
 import com.shuangling.software.entity.AudioInfo;
 import com.shuangling.software.entity.RadioDetail;
 import com.shuangling.software.entity.RadioRecommend;
@@ -198,15 +199,61 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
             @Override
             public void onClick(View v) {
                 if (mRadioDetail != null) {
-                    String shareUrl=ServerInfo.h5IP + "/radios/" + mRadioDetail.getChannel().getId();
-                    String url;
-                    if(User.getInstance()!=null){
-                        url=shareUrl+"?from_user_id="+User.getInstance().getId()+"&from_url="+shareUrl;
-                    }else{
-                        url=shareUrl+"?from_url="+shareUrl;
-                    }
 
-                    showShare(mRadioDetail.getChannel().getName(), mRadioDetail.getChannel().getDes(), mRadioDetail.getChannel().getLogo(), url);
+
+                    ShareDialog dialog = ShareDialog.getInstance(false,false);
+                    dialog.setIsHideSecondGroup(true);
+//                    dialog.setIsShowPosterButton(false);
+//                    dialog.setIsShowReport(true);
+//                    dialog.setIsShowCollect(false);
+//                    dialog.setIsShowCopyLink(false);
+//                    dialog.setIsShowFontSize(false);
+//                    dialog.setIsShowRefresh(false);
+
+                    dialog.setShareHandler(new ShareDialog.ShareHandler() {
+                        @Override
+                        public void onShare(String platform) {
+
+
+                            String shareUrl=ServerInfo.h5IP + "/radios/" + mRadioDetail.getChannel().getId();
+                            String url;
+                            if(User.getInstance()!=null){
+                                url=shareUrl+"?from_user_id="+User.getInstance().getId()+"&from_url="+shareUrl;
+                            }else{
+                                url=shareUrl+"?from_url="+shareUrl;
+                            }
+
+                            showShare(platform,mRadioDetail.getChannel().getName(), mRadioDetail.getChannel().getDes(), mRadioDetail.getChannel().getLogo(), url);
+                        }
+
+                        @Override
+                        public void poster() {
+
+                        }
+
+                        @Override
+                        public void report() {
+
+                        }
+
+                        @Override
+                        public void copyLink() {
+
+
+                        }
+
+                        @Override
+                        public void refresh() {
+                        }
+
+                        @Override
+                        public void collectContent() {
+
+                        }
+                    });
+                    dialog.show(getSupportFragmentManager(), "ShareDialog");
+
+
                     //shareTest();
                 }
 
@@ -460,7 +507,7 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
-                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         mRadioDetail = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), RadioDetail.class);
 
 
@@ -779,7 +826,7 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
         }
     }
 
-    private void showShare(final String title, final String desc, final String logo, final String url) {
+    private void showShare(String platform,final String title, final String desc, final String logo, final String url) {
         final String cover;
         if(logo.startsWith("http://")){
             cover=logo.replace("http://","https://");
@@ -789,6 +836,7 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
         oks.disableSSOWhenAuthorize();
+        oks.setPlatform(platform);
         final Platform qq = ShareSDK.getPlatform(QQ.NAME);
         if (!qq.isClientValid()) {
             oks.addHiddenPlatform(QQ.NAME);

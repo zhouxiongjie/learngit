@@ -33,7 +33,7 @@ public class AudioDetail implements Parcelable {
     private AudioBean audio;
     private AuthorInfoBean author_info;
     private List<AlbumBean> album;
-
+    private int is_user_report;
 
     public AudioDetail(){
 
@@ -117,6 +117,14 @@ public class AudioDetail implements Parcelable {
 
     public void setAlbum(List<AlbumBean> album) {
         this.album = album;
+    }
+
+    public int getIs_user_report() {
+        return is_user_report;
+    }
+
+    public void setIs_user_report(int is_user_report) {
+        this.is_user_report = is_user_report;
     }
 
     @Override

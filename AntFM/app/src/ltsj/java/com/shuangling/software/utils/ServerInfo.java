@@ -55,6 +55,10 @@ public class ServerInfo {
 //	public static String emc="http://api-emc.on-radio.cn";
 //
 //	public static String vms="http://api-vms.on-radio.cn";
+//
+//	public static String live="http://api-live.on-radio.cn";
+//
+//	public static String echo_server="http://echo-live.on-radio.cn";
 
 
 
@@ -255,4 +259,6 @@ public class ServerInfo {
 	public static String getRtsAuthKey ="/v1/get_auth_key";
 
 	public static String getAdvertises ="/v3/get_advertises_c";
+
+	public static String heart ="/v3/heart";
 }

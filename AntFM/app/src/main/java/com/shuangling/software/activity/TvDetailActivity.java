@@ -1,6 +1,9 @@
 package com.shuangling.software.activity;
 
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -41,6 +44,7 @@ import com.shuangling.software.adapter.RadioListAdapter;
 import com.shuangling.software.adapter.RadioProgramListAdapter;
 import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.customview.TopTitleBar;
+import com.shuangling.software.dialog.ShareDialog;
 import com.shuangling.software.entity.RadioDetail;
 import com.shuangling.software.entity.RadioSet;
 import com.shuangling.software.entity.User;
@@ -182,13 +186,60 @@ public class TvDetailActivity extends BaseAudioActivity implements Handler.Callb
             public void onClick(View v) {
                 if (mRadioDetail != null) {
 
-                    String url;
-                    if(User.getInstance()!=null){
-                        url=ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId()+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId();
-                    }else{
-                        url=ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId()+"?from_url="+ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId();
-                    }
-                    showShare(mRadioDetail.getChannel().getName(), mRadioDetail.getChannel().getDes(), mRadioDetail.getChannel().getLogo(), url);
+
+                    ShareDialog dialog = ShareDialog.getInstance(false,false);
+                    dialog.setIsHideSecondGroup(true);
+//                    dialog.setIsShowPosterButton(false);
+//                    dialog.setIsShowReport(true);
+//                    dialog.setIsShowCollect(false);
+//                    dialog.setIsShowCopyLink(false);
+//                    dialog.setIsShowFontSize(false);
+//                    dialog.setIsShowRefresh(false);
+
+                    dialog.setShareHandler(new ShareDialog.ShareHandler() {
+                        @Override
+                        public void onShare(String platform) {
+
+
+                            String url;
+                            if(User.getInstance()!=null){
+                                url=ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId()+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId();
+                            }else{
+                                url=ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId()+"?from_url="+ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId();
+                            }
+                            showShare(platform,mRadioDetail.getChannel().getName(), mRadioDetail.getChannel().getDes(), mRadioDetail.getChannel().getLogo(), url);
+
+                        }
+
+                        @Override
+                        public void poster() {
+
+                        }
+
+                        @Override
+                        public void report() {
+
+                        }
+
+                        @Override
+                        public void copyLink() {
+
+
+                        }
+
+                        @Override
+                        public void refresh() {
+                        }
+
+                        @Override
+                        public void collectContent() {
+
+                        }
+                    });
+                    dialog.show(getSupportFragmentManager(), "ShareDialog");
+
+
+
                     //shareTest();
                 }
 
@@ -484,7 +535,26 @@ public class TvDetailActivity extends BaseAudioActivity implements Handler.Callb
 //            }
 
         }
+        if (aliyunVodPlayerView != null) {
+            aliyunVodPlayerView.onDestroy();
+            aliyunVodPlayerView = null;
+        }
         super.onDestroy();
+
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (mNeedResumeAudioPlay) {
+            FloatWindowUtil.getInstance().visibleWindow();
+        }
+        if (aliyunVodPlayerView != null) {
+            aliyunVodPlayerView.onStop();
+            aliyunVodPlayerView.onDestroy();
+            aliyunVodPlayerView = null;
+        }
+        super.onBackPressed();
     }
 
 
@@ -823,7 +893,7 @@ public class TvDetailActivity extends BaseAudioActivity implements Handler.Callb
     }
 
 
-    private void showShare(final String title, final String desc, final String logo, final String url) {
+    private void showShare(String platform,final String title, final String desc, final String logo, final String url) {
         final String cover;
         if(logo.startsWith("http://")){
             cover=logo.replace("http://","https://");
@@ -833,6 +903,7 @@ public class TvDetailActivity extends BaseAudioActivity implements Handler.Callb
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
         oks.disableSSOWhenAuthorize();
+        oks.setPlatform(platform);
         final Platform qq = ShareSDK.getPlatform(QQ.NAME);
         if (!qq.isClientValid()) {
             oks.addHiddenPlatform(QQ.NAME);

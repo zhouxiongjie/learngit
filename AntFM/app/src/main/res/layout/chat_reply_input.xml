@@ -62,7 +62,8 @@
                 android:background="@null"
                 android:minLines="1"
                 android:padding="8dp"
-                android:textColor="#BCBCBC"
+                android:textColorHint="#BCBCBC"
+                android:textColor="#000000"
                 android:textCursorDrawable="@null"
                 android:textSize="@dimen/font_size_28px"
                 tools:text="全员禁言中" />

@@ -25,6 +25,10 @@ public class ChatMessageManager {
 
     private static ChatMessageManager sChatMessageManager;
 
+
+
+    private int addSize;
+
     public static ChatMessageManager getInstance(){
         if(sChatMessageManager==null){
             synchronized (ChatMessageManager.class){
@@ -43,11 +47,13 @@ public class ChatMessageManager {
 
     public void addMessage(ChatMessage message) {
         this.messageList.add(message);
+        setAddSize(1);
         EventBus.getDefault().post(new CommonEvent("refreshMessageList"));
     }
 
     public void addMessages(List<ChatMessage> messages) {
         this.messageList.addAll(messages);
+        setAddSize(messages.size());
         EventBus.getDefault().post(new CommonEvent("refreshMessageList"));
     }
 
@@ -56,6 +62,14 @@ public class ChatMessageManager {
     }
 
     private ArrayList<ChatMessage> messageList = new ArrayList<>();
+
+    public int getAddSize() {
+        return addSize;
+    }
+
+    public void setAddSize(int addSize) {
+        this.addSize = addSize;
+    }
 
 
 

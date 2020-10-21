@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -128,7 +129,16 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
         if (viewType == TYPE_HEADER) {
 
         } else if (viewType == TYPE_TEXT) {
+
+
             TextViewHolder vh = (TextViewHolder) viewHolder;
+            vh.root.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    CommonUtils.hideInput(mContext);
+                    return false;
+                }
+            });
             ChatMessage msg = ChatMessageManager.getInstance().getMessageList().get(position - 1);
 
             if (!TextUtils.isEmpty(msg.getUserLog())) {
@@ -259,6 +269,13 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
             });
         } else if (getItemViewType(position) == TYPE_PICTURE) {
             final PictureViewHolder vh = (PictureViewHolder) viewHolder;
+            vh.root.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    CommonUtils.hideInput(mContext);
+                    return false;
+                }
+            });
             ChatMessage msg = ChatMessageManager.getInstance().getMessageList().get(position - 1);
 
             if (!TextUtils.isEmpty(msg.getUserLog())) {

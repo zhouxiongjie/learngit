@@ -52,7 +52,8 @@
                 android:padding="8dp"
                 android:textSize="@dimen/font_size_28px"
                 android:hint="跟大家聊聊"
-                android:textColor="#BCBCBC"
+                android:textColorHint="#BCBCBC"
+                android:textColor="#000000"
                 android:textCursorDrawable="@null" />
 
 

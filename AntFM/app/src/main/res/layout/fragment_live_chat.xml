@@ -125,12 +125,32 @@
         android:textColor="#3396FA"
         android:textSize="@dimen/font_size_26px"
         android:gravity="center"
+        android:padding="5dp"
         android:layout_above="@+id/input_panel"
         android:layout_centerHorizontal="true"
         android:background="@drawable/refer_me_button_bg"
         android:visibility="gone"
-
         />
+
+    <TextView
+        android:id="@+id/moreMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="2dp"
+        android:drawableStart="@drawable/ic_down"
+        android:text="更多消息"
+        android:textColor="#3396FA"
+        android:padding="5dp"
+        android:textSize="@dimen/font_size_26px"
+        android:gravity="center"
+        android:layout_above="@+id/input_panel"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="20dp"
+        android:background="@drawable/refer_me_button_bg"
+        android:visibility="gone"
+        />
+
+
     <com.shuangling.software.customview.ChatInput
         android:id="@+id/input_panel"
         android:layout_width="match_parent"

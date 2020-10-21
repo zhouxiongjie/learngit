@@ -18,15 +18,12 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
-import android.view.animation.CycleInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
-import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -124,6 +121,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
 
     public static final int SHARE_SUCCESS = 0x2;
 
+
     private String postMessageUrl = ServerInfo.live + "/v3/push_message";
 
     @BindView(R.id.recyclerView)
@@ -144,6 +142,8 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
     TextView redPacketStatus;
     @BindView(R.id.referMe)
     TextView referMe;
+    @BindView(R.id.moreMessage)
+    TextView moreMessage;
     Unbinder unbinder;
 
     String mStreamName;
@@ -172,7 +172,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
         hasApply = false;
         mStreamName = args.getString("streamName");
         mRoomId = args.getInt("roomId");
-        mLiveRoomInfo=(LiveRoomInfo)args.getSerializable("LiveRoomInfo");
+        mLiveRoomInfo = (LiveRoomInfo) args.getSerializable("LiveRoomInfo");
     }
 
 
@@ -182,17 +182,17 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
         unbinder = ButterKnife.bind(this, view);
         EventBus.getDefault().register(this);
         inputPanel.setChatAction(this);
-        if(((LiveDetailActivity)getActivity()).mType!=4){
+        if (((LiveDetailActivity) getActivity()).mType != 4) {
             inputPanel.setJoinRoomVisible(false);
         }
         if (((LiveDetailActivity) getActivity()).hasInvite) {
             inputPanel.setInviteVisible(true);
-        }else{
+        } else {
             inputPanel.setInviteVisible(false);
         }
 
-        if(((LiveDetailActivity)getActivity()).getLiveRoomInfo()!=null){
-            if(((LiveDetailActivity)getActivity()).getLiveRoomInfo().getChat()==0){
+        if (((LiveDetailActivity) getActivity()).getLiveRoomInfo() != null) {
+            if (((LiveDetailActivity) getActivity()).getLiveRoomInfo().getChat() == 0) {
                 inputPanel.setMuted(true);
             }
         }
@@ -220,8 +220,26 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
 
 
                 if (!recyclerView.canScrollVertically(30)) {
-                    //moreMsgBtn.setVisibility(View.GONE);
+                    moreMessage.setVisibility(View.GONE);
                 }
+            }
+        });
+
+        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener(){
+
+            @Override
+            public boolean onInterceptTouchEvent(@NonNull RecyclerView recyclerView, @NonNull MotionEvent motionEvent) {
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(@NonNull RecyclerView recyclerView, @NonNull MotionEvent motionEvent) {
+                //CommonUtils.hideInput(getActivity());
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean b) {
+                Log.i("test",""+b);
             }
         });
 
@@ -312,6 +330,17 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
             }
         });
 
+        moreMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                moreMessage.setVisibility(View.GONE);
+                if(mChatMessageListAdapter!=null){
+                    recyclerView.scrollToPosition(mChatMessageListAdapter.getItemCount() - 1);
+                }
+
+            }
+        });
+
 //        redPacket.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -344,7 +373,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if(mCountDownTimer!=null){
+        if (mCountDownTimer != null) {
             mCountDownTimer.cancel();
         }
 
@@ -369,15 +398,31 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
     public void getEventBus(CommonEvent event) {
         if (event.getEventName().equals("refreshMessageList")) {
             if (mChatMessageListAdapter != null) {
-                mChatMessageListAdapter.notifyDataSetChanged();
 
-                recyclerView.scrollToPosition(mChatMessageListAdapter.getItemCount() - 1);
+                if(ChatMessageManager.getInstance().getAddSize()==1){
+                    mChatMessageListAdapter.notifyItemInserted(mChatMessageListAdapter.getItemCount());
+                }else{
+                    mChatMessageListAdapter.notifyDataSetChanged();
+                }
+
+
+                //mChatMessageListAdapter.notifyDataSetChanged();
+
+                if (recyclerView.canScrollVertically(1)) {//还可以向下滑动（还没到底部）
+                    moreMessage.setVisibility(View.VISIBLE);
+
+                } else {//滑动到底部了
+                    recyclerView.scrollToPosition(mChatMessageListAdapter.getItemCount() - 1);
+                    moreMessage.setVisibility(View.GONE);
+                }
+
+                //recyclerView.scrollToPosition(mChatMessageListAdapter.getItemCount() - 1);
             }
-        }else if(event.getEventName().equals("liveRoomInfo")){
-            if(((LiveDetailActivity)getActivity()).getLiveRoomInfo()!=null){
-                if(((LiveDetailActivity)getActivity()).getLiveRoomInfo().getChat()==0){
+        } else if (event.getEventName().equals("liveRoomInfo")) {
+            if (((LiveDetailActivity) getActivity()).getLiveRoomInfo() != null) {
+                if (((LiveDetailActivity) getActivity()).getLiveRoomInfo().getChat() == 0) {
                     inputPanel.setMuted(true);
-                }else {
+                } else {
                     inputPanel.setMuted(false);
                 }
             }
@@ -472,36 +517,36 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
 
     @Override
     public void invite() {
-        showPosterShare(ServerInfo.mlive+"/index?stream_name="+mLiveRoomInfo.getStream_name()+"&from_url="+
-                ServerInfo.mlive+"/index?stream_name="+mLiveRoomInfo.getStream_name()+"&from_id="+User.getInstance()!=null?""+User.getInstance().getId():"");
+        showPosterShare(ServerInfo.mlive + "/index?stream_name=" + mLiveRoomInfo.getStream_name() + "&from_url=" +
+                ServerInfo.mlive + "/index?stream_name=" + mLiveRoomInfo.getStream_name() + "&from_id=" + User.getInstance() != null ? "" + User.getInstance().getId() : "");
     }
 
 
-    private void showPosterShare(String shareUrl){
+    private void showPosterShare(String shareUrl) {
 
-        ShareLivePosterDialog dialog =  ShareLivePosterDialog.getInstance(mLiveRoomInfo,shareUrl);
+        ShareLivePosterDialog dialog = ShareLivePosterDialog.getInstance(mLiveRoomInfo, shareUrl);
         dialog.setShareHandler(new ShareLivePosterDialog.ShareHandler() {
             @Override
-            public void onShare(String platform,Bitmap bitmap) {
-                showShareImage(platform,bitmap);
+            public void onShare(String platform, Bitmap bitmap) {
+                showShareImage(platform, bitmap);
 
             }
 
             @Override
             public void download(Bitmap bitmap) {
 
-                final Bitmap saveBitmap =bitmap;
+                final Bitmap saveBitmap = bitmap;
 
                 //获取写文件权限
                 RxPermissions rxPermissions = new RxPermissions(getActivity());
-                rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                rxPermissions.request(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .subscribe(new Consumer<Boolean>() {
                             @Override
                             public void accept(Boolean granted) throws Exception {
-                                if(granted){
+                                if (granted) {
                                     Random rand = new Random();
                                     int randNum = rand.nextInt(1000);
-                                    File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), CommonUtils.getCurrentTimeString()+randNum+".png");
+                                    File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), CommonUtils.getCurrentTimeString() + randNum + ".png");
                                     CommonUtils.saveBitmapToPNG(tempFile.getAbsolutePath(), saveBitmap);
                                     ToastUtils.show("图片保存成功");
 
@@ -511,7 +556,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                     intent.setData(uri);
                                     getActivity().sendBroadcast(intent);
 
-                                }else{
+                                } else {
                                     ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
                                 }
                             }
@@ -529,7 +574,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
     private void showShareImage(String platform, final Bitmap bitmap) {
 
 
-        final Bitmap saveBitmap =bitmap;
+        final Bitmap saveBitmap = bitmap;
 
 
         final OnekeyShare oks = new OnekeyShare();
@@ -548,22 +593,20 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
 
         Random rand = new Random();
         int randNum = rand.nextInt(1000);
-        final String childPath =  CommonUtils.getCurrentTimeString()+randNum+".png";
+        final String childPath = CommonUtils.getCurrentTimeString() + randNum + ".png";
 
 
-
-
-        if(QQ.NAME.equals(platform)){
+        if (QQ.NAME.equals(platform)) {
 
             //获取写文件权限
             RxPermissions rxPermissions = new RxPermissions(getActivity());
-            rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            rxPermissions.request(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     .subscribe(new Consumer<Boolean>() {
                         @Override
                         public void accept(Boolean granted) throws Exception {
-                            if(granted){
+                            if (granted) {
 
-                                final  File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), childPath);
+                                final File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), childPath);
                                 CommonUtils.saveBitmapToPNG(tempFile.getAbsolutePath(), saveBitmap);
                                 //ToastUtils.show("图片保存成功");
 
@@ -578,7 +621,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                 oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
                                     //自定义分享的回调想要函数
                                     @Override
-                                    public void onShare(Platform platform, final  Platform.ShareParams paramsToShare) {
+                                    public void onShare(Platform platform, final Platform.ShareParams paramsToShare) {
 
                                         paramsToShare.setShareType(Platform.SHARE_IMAGE);
                                         // paramsToShare.setImageData(bitmap);
@@ -588,27 +631,24 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                 });
 
 
-                            }else{
+                            } else {
                                 ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
                             }
                         }
                     });
 
 
-
-
-        }else{
+        } else {
             oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
                 //自定义分享的回调想要函数
                 @Override
-                public void onShare(Platform platform, final  Platform.ShareParams paramsToShare) {
+                public void onShare(Platform platform, final Platform.ShareParams paramsToShare) {
                     paramsToShare.setShareType(Platform.SHARE_IMAGE);
                     paramsToShare.setImageData(bitmap);
                 }
             });
 
         }
-
 
 
         oks.setCallback(new PlatformActionListener() {
@@ -739,16 +779,16 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if(redPacketInfos==null||redPacketInfos.size()==0){
+                                if (redPacketInfos == null || redPacketInfos.size() == 0) {
                                     redPacket.setVisibility(View.GONE);
-                                }else{
+                                } else {
                                     redPacket.setVisibility(View.VISIBLE);
-                                    RedPacketInfo redPacketInfo=redPacketInfos.get(redPacketInfos.size()-1);
-                                    if(redPacketInfo.getState()==0){
+                                    RedPacketInfo redPacketInfo = redPacketInfos.get(redPacketInfos.size() - 1);
+                                    if (redPacketInfo.getState() == 0) {
                                         //定时红包，即将开始
                                         redPacketStatus.setText("即将开始");
-                                    }else{
-                                        if(redPacketInfo.getState()==1&&redPacketInfo.getState_end()==0){
+                                    } else {
+                                        if (redPacketInfo.getState() == 1 && redPacketInfo.getState_end() == 0) {
                                             //正在进行
                                             redPacketStatus.setText("进行中");
 //                                            TranslateAnimation animation = new TranslateAnimation(0, -5, 0, 0);
@@ -758,7 +798,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
 //                                            animation.setRepeatMode(Animation.REVERSE);
 //                                            shakeRedPacket.startAnimation(animation);
 
-                                            Animation anim =new RotateAnimation(-15f, 15f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                                            Animation anim = new RotateAnimation(-15f, 15f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
                                             anim.setDuration(600); // 设置动画时间
                                             anim.setRepeatCount(INFINITE);
                                             anim.setRepeatMode(Animation.REVERSE);
@@ -772,18 +812,18 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                                     if (User.getInstance() == null) {
                                                         Intent it = new Intent(getContext(), NewLoginActivity.class);
                                                         startActivity(it);
-                                                    }else{
+                                                    } else {
                                                         //抢红包操作
-                                                        RedPacketDialog.getInstance(redPacketInfo,mStreamName).setOnOkClickListener(new RedPacketDialog.OnGrabClickListener() {
+                                                        RedPacketDialog.getInstance(redPacketInfo, mStreamName).setOnOkClickListener(new RedPacketDialog.OnGrabClickListener() {
                                                             @Override
                                                             public void onGrab() {
 
                                                                 if (User.getInstance() == null) {
                                                                     Intent it = new Intent(getContext(), NewLoginActivity.class);
                                                                     startActivity(it);
-                                                                }else{
-                                                                    Intent it=new Intent(getContext(),RedPacketDetailActivity.class);
-                                                                    it.putExtra("id",""+redPacketInfo.getId());
+                                                                } else {
+                                                                    Intent it = new Intent(getContext(), RedPacketDetailActivity.class);
+                                                                    it.putExtra("id", "" + redPacketInfo.getId());
                                                                     startActivity(it);
                                                                 }
 
@@ -796,7 +836,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                             });
 
 
-                                        }else if(redPacketInfo.getState()==1&&redPacketInfo.getState_end()==1){
+                                        } else if (redPacketInfo.getState() == 1 && redPacketInfo.getState_end() == 1) {
                                             //已结束
                                             redPacketStatus.setText("已结束");
                                             shakeRedPacket.clearAnimation();
@@ -808,9 +848,9 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                                     if (User.getInstance() == null) {
                                                         Intent it = new Intent(getContext(), NewLoginActivity.class);
                                                         startActivity(it);
-                                                    }else{
-                                                        Intent it=new Intent(getContext(),RedPacketDetailActivity.class);
-                                                        it.putExtra("id",""+redPacketInfo.getId());
+                                                    } else {
+                                                        Intent it = new Intent(getContext(), RedPacketDetailActivity.class);
+                                                        it.putExtra("id", "" + redPacketInfo.getId());
                                                         startActivity(it);
                                                     }
 
@@ -822,7 +862,6 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                 }
                             }
                         });
-
 
 
                     }
@@ -842,9 +881,6 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
             }
         });
     }
-
-
-
 
 
     private void getRoomToken(final String roomId) {
@@ -986,16 +1022,16 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                         try {
                             final ChatMessage msg = JSON.parseObject(args[1].toString(), ChatMessage.class);
 
-                            if (msg.getMessageType() == 1){
+                            if (msg.getMessageType() == 1) {
                                 mHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
                                         showMsg(msg);
                                     }
                                 });
-                            }else if(msg.getMessageType() == 16){
+                            } else if (msg.getMessageType() == 16) {
 
-                                long id=Thread.currentThread().getId();
+                                long id = Thread.currentThread().getId();
 
                                 mHandler.post(new Runnable() {
                                     @Override
@@ -1004,7 +1040,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                         mRedPacketComingDialog.setOnCloseListener(new RedPacketComingDialog.OnCloseListener() {
                                             @Override
                                             public void onClose() {
-                                                mRedPacketComingDialog=null;
+                                                mRedPacketComingDialog = null;
                                             }
                                         }).show(getChildFragmentManager(), "RedPacketComingDialog");
 
@@ -1017,7 +1053,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                                 mRedPacketComingDialog.setOnCloseListener(new RedPacketComingDialog.OnCloseListener() {
                                                     @Override
                                                     public void onClose() {
-                                                        mRedPacketComingDialog=null;
+                                                        mRedPacketComingDialog = null;
                                                     }
                                                 }).show(getChildFragmentManager(), "RedPacketComingDialog");
                                             }
@@ -1027,16 +1063,16 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                         mCountDownTimer = new CountDownTimer(10 * 1000, 500) {
                                             @Override
                                             public void onTick(long millisUntilFinished) {
-                                                if(millisUntilFinished / 1000==0){
-                                                    if(mRedPacketComingDialog!=null){
+                                                if (millisUntilFinished / 1000 == 0) {
+                                                    if (mRedPacketComingDialog != null) {
                                                         mRedPacketComingDialog.setRemainTime("1");
                                                     }
                                                     redPacketStatus.setText("1s");
-                                                }else{
-                                                    if(mRedPacketComingDialog!=null){
+                                                } else {
+                                                    if (mRedPacketComingDialog != null) {
                                                         mRedPacketComingDialog.setRemainTime("" + millisUntilFinished / 1000);
                                                     }
-                                                    redPacketStatus.setText(millisUntilFinished / 1000+"s");
+                                                    redPacketStatus.setText(millisUntilFinished / 1000 + "s");
 
 
                                                 }
@@ -1047,7 +1083,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                             @Override
                                             public void onFinish() {
 
-                                                if(mRedPacketComingDialog!=null){
+                                                if (mRedPacketComingDialog != null) {
                                                     mRedPacketComingDialog.dismiss();
                                                 }
                                                 getRedPacketRecord();
@@ -1059,38 +1095,35 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                 });
 
 
-
-
-
-                            }else if(msg.getMessageType() == 17){
+                            } else if (msg.getMessageType() == 17) {
                                 //红包活动结束
                                 getRedPacketRecord();
-                            }else if(msg.getMessageType()==13){
+                            } else if (msg.getMessageType() == 13) {
                                 //点心
                                 mHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
-                                        try{
+                                        try {
                                             likeView.addFavor();
-                                        }catch (Exception e){
+                                        } catch (Exception e) {
 
                                         }
 
                                     }
                                 });
-                            }else if(msg.getMessageType() == 15){
+                            } else if (msg.getMessageType() == 15) {
                                 //图文直播更新
                                 EventBus.getDefault().post(new CommonEvent("ImgTextLiveUpdate"));
-                            }else if(msg.getMessageType() == 5){
+                            } else if (msg.getMessageType() == 5) {
                                 //菜单设置
                                 EventBus.getDefault().post(new CommonEvent("modifyMenu"));
-                            }else if(msg.getMessageType() == 2){
+                            } else if (msg.getMessageType() == 2) {
                                 //直播状态更新
-                                if(msg.getMsg().equals("关闭直播间")){
+                                if (msg.getMsg().equals("关闭直播间")) {
                                     mHandler.post(new Runnable() {
                                         @Override
                                         public void run() {
-                                            try{
+                                            try {
                                                 new CircleDialog.Builder()
                                                         .setText("直播已结束")
                                                         .setPositive("知道了", new View.OnClickListener() {
@@ -1109,7 +1142,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                                         .show(getChildFragmentManager());
 
 
-                                            }catch (Exception e){
+                                            } catch (Exception e) {
 
                                             }
 
@@ -1147,9 +1180,9 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
 
 
         ChatMessageManager.getInstance().addMessage(chatMessage);
-        if (chatMessage.getParentMsgInfo()!=null&&User.getInstance()!=null&&chatMessage.getParentMsgInfo().getUserId().equals(""+User.getInstance().getId())) {
+        if (chatMessage.getParentMsgInfo() != null && User.getInstance() != null && chatMessage.getParentMsgInfo().getUserId().equals("" + User.getInstance().getId())) {
             referMe.setVisibility(View.VISIBLE);
-            final int pos=ChatMessageManager.getInstance().getMessageList().size();
+            final int pos = ChatMessageManager.getInstance().getMessageList().size();
             referMe.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -1299,8 +1332,6 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
             }
         });
     }
-
-
 
 
 }

@@ -134,7 +134,7 @@ public class ChatDialog extends BaseCircleDialog implements ChatAction, View.OnC
         EventBus.getDefault().register(this);
         inputPanel.setJoinRoomVisible(false);
         inputPanel.setChatAction(this );
-        mChatMessageListAdapter = new ChatMessageListAdapter(getContext());
+        mChatMessageListAdapter = new ChatMessageListAdapter(getActivity());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         //linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -192,6 +192,11 @@ public class ChatDialog extends BaseCircleDialog implements ChatAction, View.OnC
                 mOnChatEventListener.sendText(str);
             }
         }
+
+    }
+
+    @Override
+    public void invite() {
 
     }
 

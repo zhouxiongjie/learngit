@@ -1,16 +1,20 @@
 package com.shuangling.software.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.facebook.common.logging.FLog;
@@ -21,6 +25,7 @@ import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.image.QualityInfo;
+import com.previewlibrary.GPreviewBuilder;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
@@ -35,6 +40,7 @@ import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.TimeUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -54,7 +60,7 @@ public class ImgTextAdapter extends RecyclerView.Adapter implements View.OnClick
     public static final int TYPE_OTHER = 3;             //三图
 
 
-    private Context mContext;
+    private Activity mContext;
     private List<ImgTextInfo> mImgTextInfos;
     private LayoutInflater inflater;
 
@@ -72,13 +78,13 @@ public class ImgTextAdapter extends RecyclerView.Adapter implements View.OnClick
     }
 
 
-    public ImgTextAdapter(Context context) {
+    public ImgTextAdapter(Activity context) {
         this.mContext = context;
         inflater = LayoutInflater.from(mContext);
 
     }
 
-    public ImgTextAdapter(Context context, List<ImgTextInfo> imgTextInfos) {
+    public ImgTextAdapter(Activity context, List<ImgTextInfo> imgTextInfos) {
         this.mContext = context;
         this.mImgTextInfos = imgTextInfos;
         inflater = LayoutInflater.from(mContext);
@@ -153,6 +159,23 @@ public class ImgTextAdapter extends RecyclerView.Adapter implements View.OnClick
                                     qualityInfo.isOfGoodEnoughQuality(),
                                     qualityInfo.isOfFullQuality());
                             float ratio = (float) imageInfo.getWidth() / (float) imageInfo.getHeight();
+                            if(ratio<0.6f){
+                                ViewGroup.LayoutParams lp=oneViewHolder.image.getLayoutParams();
+                                int width=CommonUtils.getScreenWidth()-CommonUtils.dip2px(60);
+                                lp.width=(int)(width*0.5);
+                                oneViewHolder.image.setLayoutParams(lp);
+
+                            }else if(ratio<1f){
+                                ViewGroup.LayoutParams lp=oneViewHolder.image.getLayoutParams();
+                                int width=CommonUtils.getScreenWidth()-CommonUtils.dip2px(60);
+                                lp.width=(int)(width*0.6);
+                                oneViewHolder.image.setLayoutParams(lp);
+                            }else{
+                                ViewGroup.LayoutParams lp=oneViewHolder.image.getLayoutParams();
+                                int width=CommonUtils.getScreenWidth()-CommonUtils.dip2px(60);
+                                lp.width=(int)(width*0.6);
+                                oneViewHolder.image.setLayoutParams(lp);
+                            }
                             oneViewHolder.image.setAspectRatio(ratio);
 
 
@@ -176,6 +199,27 @@ public class ImgTextAdapter extends RecyclerView.Adapter implements View.OnClick
                             // other setters
                             .build();
                     oneViewHolder.image.setController(controller);
+
+                    oneViewHolder.image.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
+
+                            com.shuangling.software.entity.ImageInfo image = new com.shuangling.software.entity.ImageInfo(content.getImgArray().get(0));
+                            images.add(image);
+                            Rect bounds = new Rect();
+                            oneViewHolder.image.getGlobalVisibleRect(bounds);
+                            image.setBounds(bounds);
+
+                            GPreviewBuilder.from(mContext)
+                                    .setData(images)
+                                    .setCurrentIndex(0)
+                                    .setDrag(true, 0.6f)
+                                    .setSingleFling(true)
+                                    .setType(GPreviewBuilder.IndicatorType.Number)
+                                    .start();
+                        }
+                    });
 
                 }
 
@@ -204,12 +248,66 @@ public class ImgTextAdapter extends RecyclerView.Adapter implements View.OnClick
                 int width = (CommonUtils.getScreenWidth()-CommonUtils.dip2px(90))/2;
                 int height = (int)(width/1.5);
                 ImageLoader.showThumb(uri, twoViewHolder.image01, width, height);
+
+                twoViewHolder.image01.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
+
+                        com.shuangling.software.entity.ImageInfo image = new com.shuangling.software.entity.ImageInfo(content.getImgArray().get(0));
+                        images.add(image);
+                        Rect bounds = new Rect();
+                        twoViewHolder.image01.getGlobalVisibleRect(bounds);
+                        image.setBounds(bounds);
+
+                        com.shuangling.software.entity.ImageInfo image1 = new com.shuangling.software.entity.ImageInfo(content.getImgArray().get(1));
+                        images.add(image1);
+                        Rect bounds1 = new Rect();
+                        twoViewHolder.image01.getGlobalVisibleRect(bounds1);
+                        image1.setBounds(bounds1);
+
+                        GPreviewBuilder.from(mContext)
+                                .setData(images)
+                                .setCurrentIndex(0)
+                                .setDrag(true, 0.6f)
+                                .setSingleFling(true)
+                                .setType(GPreviewBuilder.IndicatorType.Number)
+                                .start();
+                    }
+                });
             }
             if (!TextUtils.isEmpty(content.getImgArray().get(1))) {
                 Uri uri = Uri.parse(content.getImgArray().get(1));
                 int width = (CommonUtils.getScreenWidth()-CommonUtils.dip2px(90))/2;
                 int height = (int)(width/1.5);
                 ImageLoader.showThumb(uri, twoViewHolder.image02, width, height);
+
+                twoViewHolder.image02.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
+
+                        com.shuangling.software.entity.ImageInfo image = new com.shuangling.software.entity.ImageInfo(content.getImgArray().get(0));
+                        images.add(image);
+                        Rect bounds = new Rect();
+                        twoViewHolder.image01.getGlobalVisibleRect(bounds);
+                        image.setBounds(bounds);
+
+                        com.shuangling.software.entity.ImageInfo image1 = new com.shuangling.software.entity.ImageInfo(content.getImgArray().get(1));
+                        images.add(image1);
+                        Rect bounds1 = new Rect();
+                        twoViewHolder.image01.getGlobalVisibleRect(bounds1);
+                        image1.setBounds(bounds1);
+
+                        GPreviewBuilder.from(mContext)
+                                .setData(images)
+                                .setCurrentIndex(1)
+                                .setDrag(true, 0.6f)
+                                .setSingleFling(true)
+                                .setType(GPreviewBuilder.IndicatorType.Number)
+                                .start();
+                    }
+                });
             }
 
 
@@ -239,6 +337,27 @@ public class ImgTextAdapter extends RecyclerView.Adapter implements View.OnClick
             otherViewHolder.gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                    ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
+                    for(int i=0;i<content.getImgArray().size();i++){
+                        com.shuangling.software.entity.ImageInfo image = new com.shuangling.software.entity.ImageInfo(content.getImgArray().get(i));
+                        images.add(image);
+                        Rect bounds = new Rect();
+                        view.getGlobalVisibleRect(bounds);
+                        image.setBounds(bounds);
+                    }
+
+
+
+                    GPreviewBuilder.from(mContext)
+                            .setData(images)
+                            .setCurrentIndex(position)
+                            .setDrag(true, 0.6f)
+                            .setSingleFling(true)
+                            .setType(GPreviewBuilder.IndicatorType.Number)
+                            .start();
+
 
                 }
             });

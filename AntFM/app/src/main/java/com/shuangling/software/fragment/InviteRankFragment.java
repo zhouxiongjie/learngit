@@ -49,6 +49,13 @@ import java.util.Random;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.PlatformActionListener;
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.onekeyshare.OnekeyShare;
+import cn.sharesdk.onekeyshare.ShareContentCustomizeCallback;
+import cn.sharesdk.sina.weibo.SinaWeibo;
+import cn.sharesdk.tencent.qq.QQ;
 import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
@@ -58,6 +65,10 @@ import static android.os.Environment.DIRECTORY_PICTURES;
 public class InviteRankFragment extends Fragment implements Handler.Callback {
 
     private static final int LOGIN_RESULT = 0x1;
+
+    public static final int SHARE_FAILED = 0x2;
+
+    public static final int SHARE_SUCCESS = 0x3;
 
     @BindView(R.id.webView)
     WebView webView;
@@ -301,7 +312,7 @@ public class InviteRankFragment extends Fragment implements Handler.Callback {
         dialog.setShareHandler(new ShareLivePosterDialog.ShareHandler() {
             @Override
             public void onShare(String platform,Bitmap bitmap) {
-                //showShareImage(platform,bitmap);
+                showShareImage(platform,bitmap);
 
             }
 
@@ -312,7 +323,7 @@ public class InviteRankFragment extends Fragment implements Handler.Callback {
 
                 //获取写文件权限
                 RxPermissions rxPermissions = new RxPermissions(getActivity());
-                rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .subscribe(new Consumer<Boolean>() {
                             @Override
                             public void accept(Boolean granted) throws Exception {
@@ -341,6 +352,118 @@ public class InviteRankFragment extends Fragment implements Handler.Callback {
         });
         dialog.show(getChildFragmentManager(), "ShareDialog");
 
+    }
+
+
+
+    private void showShareImage(String platform, final Bitmap bitmap) {
+
+
+        final Bitmap saveBitmap =bitmap;
+
+
+        final OnekeyShare oks = new OnekeyShare();
+        //关闭sso授权
+        oks.disableSSOWhenAuthorize();
+        oks.setPlatform(platform);
+        final Platform qq = ShareSDK.getPlatform(QQ.NAME);
+        if (!qq.isClientValid()) {
+            oks.addHiddenPlatform(QQ.NAME);
+        }
+        final Platform sina = ShareSDK.getPlatform(SinaWeibo.NAME);
+        if (!sina.isClientValid()) {
+            oks.addHiddenPlatform(SinaWeibo.NAME);
+        }
+
+
+        Random rand = new Random();
+        int randNum = rand.nextInt(1000);
+        final String childPath =  CommonUtils.getCurrentTimeString()+randNum+".png";
+
+
+
+
+        if(QQ.NAME.equals(platform)){
+
+            //获取写文件权限
+            RxPermissions rxPermissions = new RxPermissions(getActivity());
+            rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    .subscribe(new Consumer<Boolean>() {
+                        @Override
+                        public void accept(Boolean granted) throws Exception {
+                            if(granted){
+
+                                final  File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), childPath);
+                                CommonUtils.saveBitmapToPNG(tempFile.getAbsolutePath(), saveBitmap);
+                                //ToastUtils.show("图片保存成功");
+
+                                //发送广播更新相册
+                                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                                Uri uri = Uri.fromFile(tempFile);
+                                intent.setData(uri);
+                                getActivity().sendBroadcast(intent);
+
+                                // oks.setImagePath(filePath);
+
+                                oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+                                    //自定义分享的回调想要函数
+                                    @Override
+                                    public void onShare(Platform platform, final  Platform.ShareParams paramsToShare) {
+
+                                        paramsToShare.setShareType(Platform.SHARE_IMAGE);
+                                        // paramsToShare.setImageData(bitmap);
+                                        paramsToShare.setImagePath(tempFile.getAbsolutePath());
+
+                                    }
+                                });
+
+
+                            }else{
+                                ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
+                            }
+                        }
+                    });
+
+
+
+
+        }else{
+            oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+                //自定义分享的回调想要函数
+                @Override
+                public void onShare(Platform platform, final  Platform.ShareParams paramsToShare) {
+                    paramsToShare.setShareType(Platform.SHARE_IMAGE);
+                    paramsToShare.setImageData(bitmap);
+                }
+            });
+
+        }
+
+
+
+        oks.setCallback(new PlatformActionListener() {
+            @Override
+            public void onError(Platform arg0, int arg1, Throwable arg2) {
+                Message msg = Message.obtain();
+                msg.what = SHARE_FAILED;
+                msg.obj = arg2.getMessage();
+                mHandler.sendMessage(msg);
+            }
+
+            @Override
+            public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
+                Message msg = Message.obtain();
+                msg.what = SHARE_SUCCESS;
+                mHandler.sendMessage(msg);
+            }
+
+            @Override
+            public void onCancel(Platform arg0, int arg1) {
+
+            }
+        });
+        // 启动分享GUI
+        oks.show(getContext());
     }
 
 

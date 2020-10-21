@@ -4,10 +4,13 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -42,6 +45,9 @@ import com.alibaba.sdk.android.oss.model.PutObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectResult;
 import com.hjq.toast.ToastUtils;
 import com.kaisengao.likeview.like.KsgLikeView;
+import com.mylhyl.circledialog.CircleDialog;
+import com.mylhyl.circledialog.callback.ConfigButton;
+import com.mylhyl.circledialog.params.ButtonParams;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
@@ -56,7 +62,9 @@ import com.shuangling.software.customview.ChatInput;
 import com.shuangling.software.dialog.RedPacketComingDialog;
 import com.shuangling.software.dialog.RedPacketDialog;
 import com.shuangling.software.dialog.ReplyDialog;
+import com.shuangling.software.dialog.ShareLivePosterDialog;
 import com.shuangling.software.entity.ChatMessage;
+import com.shuangling.software.entity.LiveRoomInfo;
 import com.shuangling.software.entity.OssInfo;
 import com.shuangling.software.entity.RedPacketInfo;
 import com.shuangling.software.entity.User;
@@ -89,13 +97,22 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.PlatformActionListener;
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.onekeyshare.OnekeyShare;
+import cn.sharesdk.onekeyshare.ShareContentCustomizeCallback;
+import cn.sharesdk.sina.weibo.SinaWeibo;
+import cn.sharesdk.tencent.qq.QQ;
 import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
+import static android.os.Environment.DIRECTORY_PICTURES;
 import static android.view.animation.Animation.INFINITE;
 
 
@@ -103,7 +120,9 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
 
     private static final int CHOOSE_PHOTO = 0x0;
 
+    public static final int SHARE_FAILED = 0x1;
 
+    public static final int SHARE_SUCCESS = 0x2;
 
     private String postMessageUrl = ServerInfo.live + "/v3/push_message";
 
@@ -123,13 +142,15 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
     ImageView shakeRedPacket;
     @BindView(R.id.redPacketStatus)
     TextView redPacketStatus;
-
+    @BindView(R.id.referMe)
+    TextView referMe;
     Unbinder unbinder;
 
     String mStreamName;
     private MyEcho echo;
     private Handler mHandler;
     private int mRoomId;
+    private LiveRoomInfo mLiveRoomInfo;
     private boolean hasApply;
 
     private ChatMessageListAdapter mChatMessageListAdapter;
@@ -151,6 +172,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
         hasApply = false;
         mStreamName = args.getString("streamName");
         mRoomId = args.getInt("roomId");
+        mLiveRoomInfo=(LiveRoomInfo)args.getSerializable("LiveRoomInfo");
     }
 
 
@@ -162,6 +184,11 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
         inputPanel.setChatAction(this);
         if(((LiveDetailActivity)getActivity()).mType!=4){
             inputPanel.setJoinRoomVisible(false);
+        }
+        if (((LiveDetailActivity) getActivity()).hasInvite) {
+            inputPanel.setInviteVisible(true);
+        }else{
+            inputPanel.setInviteVisible(false);
         }
 
         if(((LiveDetailActivity)getActivity()).getLiveRoomInfo()!=null){
@@ -179,7 +206,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
 //        recyclerView.addItemDecoration(divider);
 
         ChatMessageManager.getInstance().clearMessages();
-        mChatMessageListAdapter = new ChatMessageListAdapter(getContext());
+        mChatMessageListAdapter = new ChatMessageListAdapter(getActivity());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         //linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -197,6 +224,8 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                 }
             }
         });
+
+
 
         mChatMessageListAdapter.setOnItemReply(new ChatMessageListAdapter.OnItemReply() {
             @Override
@@ -441,6 +470,172 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
 
     }
 
+    @Override
+    public void invite() {
+        showPosterShare(ServerInfo.mlive+"/index?stream_name="+mLiveRoomInfo.getStream_name()+"&from_url="+
+                ServerInfo.mlive+"/index?stream_name="+mLiveRoomInfo.getStream_name()+"&from_id="+User.getInstance()!=null?""+User.getInstance().getId():"");
+    }
+
+
+    private void showPosterShare(String shareUrl){
+
+        ShareLivePosterDialog dialog =  ShareLivePosterDialog.getInstance(mLiveRoomInfo,shareUrl);
+        dialog.setShareHandler(new ShareLivePosterDialog.ShareHandler() {
+            @Override
+            public void onShare(String platform,Bitmap bitmap) {
+                showShareImage(platform,bitmap);
+
+            }
+
+            @Override
+            public void download(Bitmap bitmap) {
+
+                final Bitmap saveBitmap =bitmap;
+
+                //获取写文件权限
+                RxPermissions rxPermissions = new RxPermissions(getActivity());
+                rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .subscribe(new Consumer<Boolean>() {
+                            @Override
+                            public void accept(Boolean granted) throws Exception {
+                                if(granted){
+                                    Random rand = new Random();
+                                    int randNum = rand.nextInt(1000);
+                                    File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), CommonUtils.getCurrentTimeString()+randNum+".png");
+                                    CommonUtils.saveBitmapToPNG(tempFile.getAbsolutePath(), saveBitmap);
+                                    ToastUtils.show("图片保存成功");
+
+                                    //发送广播更新相册
+                                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                                    Uri uri = Uri.fromFile(tempFile);
+                                    intent.setData(uri);
+                                    getActivity().sendBroadcast(intent);
+
+                                }else{
+                                    ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
+                                }
+                            }
+                        });
+
+            }
+
+
+        });
+        dialog.show(getChildFragmentManager(), "ShareDialog");
+
+    }
+
+
+    private void showShareImage(String platform, final Bitmap bitmap) {
+
+
+        final Bitmap saveBitmap =bitmap;
+
+
+        final OnekeyShare oks = new OnekeyShare();
+        //关闭sso授权
+        oks.disableSSOWhenAuthorize();
+        oks.setPlatform(platform);
+        final Platform qq = ShareSDK.getPlatform(QQ.NAME);
+        if (!qq.isClientValid()) {
+            oks.addHiddenPlatform(QQ.NAME);
+        }
+        final Platform sina = ShareSDK.getPlatform(SinaWeibo.NAME);
+        if (!sina.isClientValid()) {
+            oks.addHiddenPlatform(SinaWeibo.NAME);
+        }
+
+
+        Random rand = new Random();
+        int randNum = rand.nextInt(1000);
+        final String childPath =  CommonUtils.getCurrentTimeString()+randNum+".png";
+
+
+
+
+        if(QQ.NAME.equals(platform)){
+
+            //获取写文件权限
+            RxPermissions rxPermissions = new RxPermissions(getActivity());
+            rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    .subscribe(new Consumer<Boolean>() {
+                        @Override
+                        public void accept(Boolean granted) throws Exception {
+                            if(granted){
+
+                                final  File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), childPath);
+                                CommonUtils.saveBitmapToPNG(tempFile.getAbsolutePath(), saveBitmap);
+                                //ToastUtils.show("图片保存成功");
+
+                                //发送广播更新相册
+                                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                                Uri uri = Uri.fromFile(tempFile);
+                                intent.setData(uri);
+                                getActivity().sendBroadcast(intent);
+
+                                // oks.setImagePath(filePath);
+
+                                oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+                                    //自定义分享的回调想要函数
+                                    @Override
+                                    public void onShare(Platform platform, final  Platform.ShareParams paramsToShare) {
+
+                                        paramsToShare.setShareType(Platform.SHARE_IMAGE);
+                                        // paramsToShare.setImageData(bitmap);
+                                        paramsToShare.setImagePath(tempFile.getAbsolutePath());
+
+                                    }
+                                });
+
+
+                            }else{
+                                ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
+                            }
+                        }
+                    });
+
+
+
+
+        }else{
+            oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+                //自定义分享的回调想要函数
+                @Override
+                public void onShare(Platform platform, final  Platform.ShareParams paramsToShare) {
+                    paramsToShare.setShareType(Platform.SHARE_IMAGE);
+                    paramsToShare.setImageData(bitmap);
+                }
+            });
+
+        }
+
+
+
+        oks.setCallback(new PlatformActionListener() {
+            @Override
+            public void onError(Platform arg0, int arg1, Throwable arg2) {
+                Message msg = Message.obtain();
+                msg.what = SHARE_FAILED;
+                msg.obj = arg2.getMessage();
+                mHandler.sendMessage(msg);
+            }
+
+            @Override
+            public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
+                Message msg = Message.obtain();
+                msg.what = SHARE_SUCCESS;
+                mHandler.sendMessage(msg);
+            }
+
+            @Override
+            public void onCancel(Platform arg0, int arg1) {
+
+            }
+        });
+        // 启动分享GUI
+        oks.show(getContext());
+    }
+
 
     private void heart() {
         String url = ServerInfo.live + ServerInfo.heart;
@@ -449,7 +644,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
         params.put("room_id", "" + mRoomId);
         params.put("user_id", "" + User.getInstance().getId());
         params.put("amount", "1");
-        params.put("stream_na me", mStreamName);
+        params.put("stream_name", mStreamName);
         params.put("nick_name", User.getInstance().getNickname());
         params.put("user_logo", User.getInstance().getAvatar());
         OkHttpUtils.post(url, params, new OkHttpCallback(getContext()) {
@@ -583,6 +778,15 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                                             @Override
                                                             public void onGrab() {
 
+                                                                if (User.getInstance() == null) {
+                                                                    Intent it = new Intent(getContext(), NewLoginActivity.class);
+                                                                    startActivity(it);
+                                                                }else{
+                                                                    Intent it=new Intent(getContext(),RedPacketDetailActivity.class);
+                                                                    it.putExtra("id",""+redPacketInfo.getId());
+                                                                    startActivity(it);
+                                                                }
+
 
                                                             }
                                                         }).show(getChildFragmentManager(), "RedPacketDialog");
@@ -595,6 +799,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                         }else if(redPacketInfo.getState()==1&&redPacketInfo.getState_end()==1){
                                             //已结束
                                             redPacketStatus.setText("已结束");
+                                            shakeRedPacket.clearAnimation();
 
                                             redPacket.setOnClickListener(new View.OnClickListener() {
                                                 @Override
@@ -860,6 +1065,58 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                             }else if(msg.getMessageType() == 17){
                                 //红包活动结束
                                 getRedPacketRecord();
+                            }else if(msg.getMessageType()==13){
+                                //点心
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try{
+                                            likeView.addFavor();
+                                        }catch (Exception e){
+
+                                        }
+
+                                    }
+                                });
+                            }else if(msg.getMessageType() == 15){
+                                //图文直播更新
+                                EventBus.getDefault().post(new CommonEvent("ImgTextLiveUpdate"));
+                            }else if(msg.getMessageType() == 5){
+                                //菜单设置
+                                EventBus.getDefault().post(new CommonEvent("modifyMenu"));
+                            }else if(msg.getMessageType() == 2){
+                                //直播状态更新
+                                if(msg.getMsg().equals("关闭直播间")){
+                                    mHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try{
+                                                new CircleDialog.Builder()
+                                                        .setText("直播已结束")
+                                                        .setPositive("知道了", new View.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(View v) {
+
+                                                            }
+                                                        })
+                                                        .configPositive(new ConfigButton() {
+                                                            @Override
+                                                            public void onConfig(ButtonParams params) {
+                                                                params.textColor = CommonUtils.getThemeColor(getContext());
+                                                            }
+                                                        })
+                                                        .setCancelable(false)
+                                                        .show(getChildFragmentManager());
+
+
+                                            }catch (Exception e){
+
+                                            }
+
+                                        }
+                                    });
+                                }
+
                             }
 
 
@@ -890,9 +1147,19 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
 
 
         ChatMessageManager.getInstance().addMessage(chatMessage);
-        if (recyclerView == null) {
-            return;
+        if (chatMessage.getParentMsgInfo()!=null&&User.getInstance()!=null&&chatMessage.getParentMsgInfo().getUserId().equals(""+User.getInstance().getId())) {
+            referMe.setVisibility(View.VISIBLE);
+            final int pos=ChatMessageManager.getInstance().getMessageList().size();
+            referMe.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    referMe.setVisibility(View.GONE);
+                    recyclerView.scrollToPosition(pos);
+                }
+            });
         }
+
+
 //        if (recyclerView.canScrollVertically(1)) {//还可以向下滑动（还没到底部）
 //            //moreMsgBtn.setVisibility(View.VISIBLE);
 //

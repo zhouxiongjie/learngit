@@ -118,6 +118,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     public int mType;
 
     public boolean canGrabRedPacket=false;
+    public boolean hasInvite=false;
     private ViewSkeletonScreen mViewSkeletonScreen;
 
     @Override
@@ -156,7 +157,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         mType = getIntent().getIntExtra("type",4);
         initAliyunPlayerView();
         getAdvertises();
-        getMenus();
+
 
         getDetail();
 
@@ -183,7 +184,9 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                         Iterator<LiveMenu> iterator = mMenus.iterator();
                         while (iterator.hasNext()) {
                             LiveMenu liveMenu = iterator.next();
-
+                            if(liveMenu.getShowtype()==14&&liveMenu.getUsing()==1){
+                                hasInvite=true;
+                            }
                             if ((liveMenu.getUsing()!=1)||
                                     (liveMenu.getShowtype() != 1&&
                                     liveMenu.getShowtype() != 2&&
@@ -245,6 +248,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                         if(ja!=null&&ja.size()>0){
                             mLiveRoomInfo = JSONObject.parseObject(ja.getJSONObject(0).toJSONString(), LiveRoomInfo.class);
                             EventBus.getDefault().post(new CommonEvent("liveRoomInfo"));
+                            getMenus();
                             if(mLiveRoomInfo!=null&&mLiveRoomInfo.getEntry_mode()==2&&mVerify){
                                 //口令观看
                                 Intent it=new Intent(LiveDetailActivity.this,PassPhraseActivity.class);
@@ -826,6 +830,14 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     }
 
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if (event.getEventName().equals("modifyMenu")) {
+            getMenus();
+        }
+    }
+
+
     @Override
     public void onBackPressed() {
 
@@ -910,6 +922,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 Bundle bundle = new Bundle();
                 bundle.putString("streamName", mStreamName);
                 bundle.putInt("roomId", mRoomId);
+                bundle.putSerializable("LiveRoomInfo",mLiveRoomInfo);
                 liveChatFragment.setArguments(bundle);
                 return liveChatFragment;
 

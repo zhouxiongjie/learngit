@@ -1519,7 +1519,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
                 //获取写文件权限
                 RxPermissions rxPermissions = new RxPermissions(ArticleDetailActivity02.this);
-                rxPermissions.request(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .subscribe(new Consumer<Boolean>() {
                             @Override
                             public void accept(Boolean granted) throws Exception {

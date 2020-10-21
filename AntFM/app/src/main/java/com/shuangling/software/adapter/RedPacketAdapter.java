@@ -2,6 +2,7 @@ package com.shuangling.software.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -16,6 +17,8 @@ import com.aliyun.apsara.alivclittlevideo.utils.Common;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.shuangling.software.R;
+import com.shuangling.software.activity.MyWalletsActivity;
+import com.shuangling.software.activity.NewLoginActivity;
 import com.shuangling.software.entity.RedPacketDetailInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.utils.CommonUtils;
@@ -95,11 +98,28 @@ public class RedPacketAdapter extends RecyclerView.Adapter {
                 Uri uri = Uri.parse(mRedPacketDetailInfo.getBusiness_logo());
                 ImageLoader.showThumb(uri, vh.head, width, height);
             }
+            if(!TextUtils.isEmpty(mRedPacketDetailInfo.getBusiness())){
+                vh.name.setVisibility(View.VISIBLE);
+                vh.name.setText(mRedPacketDetailInfo.getBusiness()+"的红包");
+            }else{
+                vh.name.setVisibility(View.INVISIBLE);
+            }
 
-            vh.name.setText(mRedPacketDetailInfo.getBusiness()+"的红包");
+
             vh.desc.setText(mRedPacketDetailInfo.getWish());
             vh.moneyLayout.setVisibility(View.GONE);
             vh.tip.setVisibility(View.GONE);
+            vh.tip.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (User.getInstance() != null) {
+                        mContext.startActivity(new Intent(mContext, MyWalletsActivity.class));
+                    } else {
+                        Intent it = new Intent(mContext, NewLoginActivity.class);
+                        mContext.startActivity(it);
+                    }
+                }
+            });
             for(int i=0;mRedPacketDetailInfo.getHistory()!=null&&i<mRedPacketDetailInfo.getHistory().size();i++){
                 if(User.getInstance().getId()==mRedPacketDetailInfo.getHistory().get(i).getUser_id()){
                     vh.moneyLayout.setVisibility(View.VISIBLE);
@@ -109,7 +129,7 @@ public class RedPacketAdapter extends RecyclerView.Adapter {
                 }
             }
             if(mRedPacketDetailInfo.getSend_num()==mRedPacketDetailInfo.getTotal_num()){
-                vh.summary.setText(mRedPacketDetailInfo.getTotal_num()+"个红包,"+TimeUtil.getTimeSpan(mRedPacketDetailInfo.getSend_time(),mRedPacketDetailInfo.getSend_end_time())+"被抢光");
+                vh.summary.setText(mRedPacketDetailInfo.getTotal_num()+"个红包，"+TimeUtil.getTimeSpan(mRedPacketDetailInfo.getSend_time(),mRedPacketDetailInfo.getSend_end_time())+"被抢光");
             }else{
                 vh.summary.setText("已领取"+mRedPacketDetailInfo.getSend_num()+"/"+mRedPacketDetailInfo.getTotal_num()+"个");
             }

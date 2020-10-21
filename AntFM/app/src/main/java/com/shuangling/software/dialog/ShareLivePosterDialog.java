@@ -146,7 +146,7 @@ public class ShareLivePosterDialog extends BaseCircleDialog {
         if(User.getInstance()!=null){
             userName.setText(User.getInstance().getNickname());
         }
-        startTime.setText(mLiveRoomInfo.getOpen_at());
+        startTime.setText(mLiveRoomInfo.getEstimate_play_time());
 
         if(mLiveRoomInfo != null && mLiveRoomInfo.getCover_url()!=null){
            String cover = mLiveRoomInfo.getCover_url();

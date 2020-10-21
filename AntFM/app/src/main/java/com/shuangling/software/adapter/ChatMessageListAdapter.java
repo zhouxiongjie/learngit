@@ -1,7 +1,9 @@
 package com.shuangling.software.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -24,11 +26,14 @@ import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.image.QualityInfo;
+import com.previewlibrary.GPreviewBuilder;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.ChatMessage;
 import com.shuangling.software.utils.ChatMessageManager;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,7 +45,7 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
     public static final int TYPE_PICTURE = 2;
 
     private LayoutInflater inflater;
-    private Context mContext;
+    private Activity mContext;
     private OnItemReply mOnItemReply;
 
 
@@ -82,7 +87,7 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
 //    }
 
 
-    public ChatMessageListAdapter(Context context) {
+    public ChatMessageListAdapter(Activity context) {
         //this.directionType = directionType;
         mContext = context;
         inflater = LayoutInflater.from(context);
@@ -157,10 +162,10 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
                     vh.parentLayout.setVisibility(View.GONE);
                     vh.parentContent.setVisibility(View.VISIBLE);
                     vh.divider.setVisibility(View.VISIBLE);
-                    vh.parentContent.setText("「"+msg.getNickName()+":" + msg.getParentMsgInfo().getMsg().trim() + "」");
+                    vh.parentContent.setText("「"+msg.getParentMsgInfo().getNickName()+":" + msg.getParentMsgInfo().getMsg().trim() + "」");
                 } else {
                     vh.parentLayout.setVisibility(View.VISIBLE);
-                    vh.parentName.setText("「"+msg.getNickName());
+                    vh.parentName.setText("「"+msg.getParentMsgInfo().getNickName());
                     vh.parentContent.setVisibility(View.GONE);
                     vh.divider.setVisibility(View.VISIBLE);
                     if (!TextUtils.isEmpty(msg.getParentMsgInfo().getMsg())) {
@@ -188,6 +193,7 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
                                 vh.parentPicture.setAspectRatio(ratio);
 
 
+
                             }
 
                             @Override
@@ -208,6 +214,29 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
                                 // other setters
                                 .build();
                         vh.parentPicture.setController(controller);
+
+
+                        vh.parentPicture.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
+
+                                com.shuangling.software.entity.ImageInfo image = new com.shuangling.software.entity.ImageInfo(msg.getParentMsgInfo().getMsg());
+                                images.add(image);
+                                Rect bounds = new Rect();
+                                vh.parentPicture.getGlobalVisibleRect(bounds);
+                                image.setBounds(bounds);
+
+                                GPreviewBuilder.from(mContext)
+                                        .setData(images)
+                                        .setCurrentIndex(0)
+                                        .setDrag(true, 0.6f)
+                                        .setSingleFling(true)
+                                        .setType(GPreviewBuilder.IndicatorType.Number)
+                                        .start();
+                            }
+                        });
 
 
                     }
@@ -319,6 +348,29 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
                         vh.parentPicture.setController(controller);
 
 
+                        vh.parentPicture.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
+
+                                com.shuangling.software.entity.ImageInfo image = new com.shuangling.software.entity.ImageInfo(msg.getParentMsgInfo().getMsg());
+                                images.add(image);
+                                Rect bounds = new Rect();
+                                vh.parentPicture.getGlobalVisibleRect(bounds);
+                                image.setBounds(bounds);
+
+                                GPreviewBuilder.from(mContext)
+                                        .setData(images)
+                                        .setCurrentIndex(0)
+                                        .setDrag(true, 0.6f)
+                                        .setSingleFling(true)
+                                        .setType(GPreviewBuilder.IndicatorType.Number)
+                                        .start();
+                            }
+                        });
+
+
                     }
                 }
             } else {
@@ -372,10 +424,27 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
                         .build();
                 vh.picture.setController(controller);
 
+                vh.picture.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
 
+                        ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
+                        com.shuangling.software.entity.ImageInfo image = new com.shuangling.software.entity.ImageInfo(msg.getMsg());
+                        images.add(image);
+                        Rect bounds = new Rect();
+                        vh.picture.getGlobalVisibleRect(bounds);
+                        image.setBounds(bounds);
+
+                        GPreviewBuilder.from(mContext)
+                                .setData(images)
+                                .setCurrentIndex(0)
+                                .setDrag(true, 0.6f)
+                                .setSingleFling(true)
+                                .setType(GPreviewBuilder.IndicatorType.Number)
+                                .start();
+                    }
+                });
             }
-
-
         }
 
     }
@@ -415,6 +484,8 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
     }
 
     static class TextViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.root)
+        LinearLayout root;
         @BindView(R.id.head)
         SimpleDraweeView head;
         @BindView(R.id.emcee)
@@ -436,6 +507,7 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
         @BindView(R.id.content)
         TextView content;
 
+
         TextViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
@@ -444,6 +516,8 @@ public class ChatMessageListAdapter extends RecyclerView.Adapter {
 
 
     static class PictureViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.root)
+        LinearLayout root;
         @BindView(R.id.head)
         SimpleDraweeView head;
         @BindView(R.id.emcee)

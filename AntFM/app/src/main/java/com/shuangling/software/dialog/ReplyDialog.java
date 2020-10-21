@@ -165,4 +165,9 @@ public class ReplyDialog extends BaseCircleDialog  implements ChatAction{
             dismiss();
         }
     }
+
+    @Override
+    public void invite() {
+
+    }
 }

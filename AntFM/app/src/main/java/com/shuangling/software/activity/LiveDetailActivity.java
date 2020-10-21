@@ -78,6 +78,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -155,6 +157,8 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     public boolean canGrabRedPacket=false;
     public boolean hasInvite=false;
     private ViewSkeletonScreen mViewSkeletonScreen;
+    private Handler mHandler = new Handler();
+    private Timer mTimer = new Timer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -267,60 +271,6 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     }
 
 
-//
-//    private void getDetail() {
-//        String url = ServerInfo.live + "/v3/get_room_details_c";
-//        Map<String, String> params = new HashMap<>();
-//        params.put("stream_name", "" + mStreamName);
-//
-//        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-//            @Override
-//            public void onResponse(Call call, String response) throws IOException {
-//
-//                try {
-//
-//
-//                    JSONObject jsonObject = JSONObject.parseObject(response);
-//                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-//
-//                        JSONArray ja=jsonObject.getJSONArray("data");
-//                        if(ja!=null&&ja.size()>0){
-//                            mLiveRoomInfo = JSONObject.parseObject(ja.getJSONObject(0).toJSONString(), LiveRoomInfo.class);
-//                            EventBus.getDefault().post(new CommonEvent("liveRoomInfo"));
-//                            getMenus();
-//                            if(mLiveRoomInfo!=null&&mLiveRoomInfo.getEntry_mode()==2&&mVerify){
-//                                //口令观看
-//                                Intent it=new Intent(LiveDetailActivity.this,PassPhraseActivity.class);
-//                                it.putExtra("LiveRoomInfo",mLiveRoomInfo);
-//                                startActivity(it);
-//                                finish();
-//                            }else{
-//                                getAuthKey();
-//                            }
-//
-//
-//                        }
-//
-//                    }
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            try{
-//                                mViewSkeletonScreen.hide();
-//                            }catch (Exception e){
-//
-//                            }
-//
-//
-//                        }
-//                    });
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//
-
-
     private void getLiveDetail(){
         auditTextView.setText("");
         APILiving.getRoomDetail(this, mStreamName, new APICallBack<LiveRoomInfo>() {
@@ -342,6 +292,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 ImageLoader.showThumb(uri, hostHeader, width, height);
                 EventBus.getDefault().post(new CommonEvent("liveRoomInfo"));
                 getMenus();
+
                 if(mLiveRoomInfo!=null&&mLiveRoomInfo.getEntry_mode()==2&&mVerify){
                     //口令观看
                     Intent it=new Intent(LiveDetailActivity.this,PassPhraseActivity.class);
@@ -356,6 +307,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                     @Override
                     public void run() {
                         try{
+                            getUsersCount(liveRoomInfo.getId() + "");
                             mViewSkeletonScreen.hide();
                         }catch (Exception e) { }
                     }
@@ -368,6 +320,37 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 mViewSkeletonScreen.hide();
             }
         });
+    }
+
+    
+    private void getUsersCount(String roomId){
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    APILiving.getLiveUsers(LiveDetailActivity.this, roomId, new APICallBack<String>() {
+                        @Override
+                        public void onSuccess(String count) {
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try{
+                                        auditTextView.setText(count + "人");
+                                    }catch (Exception e) { }
+                                }
+                            });
+                        }
+                        @Override
+                        public void onFail(String error) {
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        mTimer.schedule(task,0,5000);
     }
 
 
@@ -792,8 +775,6 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 } catch (Exception e) {
 
                 }
-
-
             }
 
             @Override
@@ -897,6 +878,10 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     protected void onDestroy() {
 
         super.onDestroy();
+
+        mTimer.cancel();
+        mHandler = null;
+
         if (echo != null) {
             echo.disconnect();
         }

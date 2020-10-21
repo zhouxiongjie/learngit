@@ -16,7 +16,7 @@ import okhttp3.Call;
 
 
 /**
- * 直播相关的接口
+ * 获取直播间详情
  */
 public class APILiving extends  API {
     /**
@@ -50,5 +50,38 @@ public class APILiving extends  API {
                 callBack.onFail(callError(call, exception));
             }
         });
+
     }
+
+    /**
+     * 获取直播间人数
+     */
+    public static void getLiveUsers(Context context, String roomId, APICallBack<String> callBack) {
+        String url = ServerInfo.live + "/v3/live_users" + "?room_id=" + roomId;
+        OkHttpUtils.get(url, null, new OkHttpCallback(context) {
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Log.d("live_users",response);
+
+                handleResult(response, new APICallBack<String>() {
+                    @Override
+                    public void onSuccess(String data) {
+                        callBack.onSuccess(data);
+                    }
+                    @Override
+                    public void onFail(String error) {
+                        callBack.onFail(error);
+                    }
+                });
+            }
+            @Override
+            public void onFailure(Call call, Exception exception) {
+                callBack.onFail(callError(call, exception));
+            }
+        });
+
+    }
+
+
+
 }

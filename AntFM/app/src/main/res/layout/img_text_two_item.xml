@@ -56,7 +56,7 @@
             android:layout_marginLeft="10dp"
             android:layout_gravity="center_vertical"
             tools:text="李晓峰"
-            android:textColor="#ADADAD"
+            android:textColor="?attr/themeColor"
             android:textSize="@dimen/font_size_26px"
             />
 

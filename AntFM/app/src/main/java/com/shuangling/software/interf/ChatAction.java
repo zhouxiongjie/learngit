@@ -27,4 +27,7 @@ public interface ChatAction {
      */
     void sendText(String str);
 
+
+    void invite();
+
 }

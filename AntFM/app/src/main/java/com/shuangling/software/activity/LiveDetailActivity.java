@@ -153,6 +153,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     public int mType;
 
     public boolean canGrabRedPacket=false;
+    public boolean hasInvite=false;
     private ViewSkeletonScreen mViewSkeletonScreen;
 
     @Override
@@ -195,7 +196,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         initAliyunPlayerView();
         getLiveDetail();
         getAdvertises();
-        getMenus();
+
 
         //getDetail();
 
@@ -222,7 +223,9 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                         Iterator<LiveMenu> iterator = mMenus.iterator();
                         while (iterator.hasNext()) {
                             LiveMenu liveMenu = iterator.next();
-
+                            if(liveMenu.getShowtype()==14&&liveMenu.getUsing()==1){
+                                hasInvite=true;
+                            }
                             if ((liveMenu.getUsing()!=1)||
                                     (liveMenu.getShowtype() != 1&&
                                     liveMenu.getShowtype() != 2&&
@@ -264,76 +267,6 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     }
 
 
-
-
-
-    private void getLiveDetail(){
-        auditTextView.setText("");
-        APILiving.getRoomDetail(this, mStreamName, new APICallBack<LiveRoomInfo>() {
-            @Override
-            public void onSuccess(LiveRoomInfo liveRoomInfo) {
-                auditTextView.setText(liveRoomInfo.getAudit() + "人");
-                mLiveRoomInfo = liveRoomInfo;
-
-                setLiveStatus(liveRoomInfo.getState());
-
-                Uri uri = Uri.parse(liveRoomInfo.getCover_url());
-                int width = CommonUtils.dip2px(375);
-                int height = CommonUtils.dip2px(200);
-                ImageLoader.showThumb(uri, liveCover, width, height);
-
-                uri = Uri.parse(liveRoomInfo.getLogo());
-                width = CommonUtils.dip2px(65);
-                height = CommonUtils.dip2px(65);
-                ImageLoader.showThumb(uri, hostHeader, width, height);
-                EventBus.getDefault().post(new CommonEvent("liveRoomInfo"));
-                if(mLiveRoomInfo!=null&&mLiveRoomInfo.getEntry_mode()==2&&mVerify){
-                    //口令观看
-                    Intent it=new Intent(LiveDetailActivity.this,PassPhraseActivity.class);
-                    it.putExtra("LiveRoomInfo",mLiveRoomInfo);
-                    startActivity(it);
-                    finish();
-                }else{
-                    getAuthKey();
-                }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try{
-                            mViewSkeletonScreen.hide();
-                        }catch (Exception e) {
-
-                        }
-                    }
-                });
-
-            }
-            @Override
-            public void onFail(String error) {
-
-                mViewSkeletonScreen.hide();
-            }
-        });
-    }
-
-    private void setLiveStatus(int status){
-        switch (status) {
-            case 1:
-                statusTextView.setText("未开始");
-                liveCover.setVisibility(View.VISIBLE);
-                break;
-            case 2:
-                statusTextView.setText("直播");
-                liveCover.setVisibility(View.GONE);
-                break;
-            case 3:
-                statusTextView.setText("已结束");
-                liveCover.setVisibility(View.VISIBLE);
-                break;
-        }
-    }
-
 //
 //    private void getDetail() {
 //        String url = ServerInfo.live + "/v3/get_room_details_c";
@@ -354,6 +287,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 //                        if(ja!=null&&ja.size()>0){
 //                            mLiveRoomInfo = JSONObject.parseObject(ja.getJSONObject(0).toJSONString(), LiveRoomInfo.class);
 //                            EventBus.getDefault().post(new CommonEvent("liveRoomInfo"));
+//                            getMenus();
 //                            if(mLiveRoomInfo!=null&&mLiveRoomInfo.getEntry_mode()==2&&mVerify){
 //                                //口令观看
 //                                Intent it=new Intent(LiveDetailActivity.this,PassPhraseActivity.class);
@@ -385,33 +319,79 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 //                    e.printStackTrace();
 //                }
 //
-//
-//            }
-//
-//            @Override
-//            public void onFailure(Call call, Exception exception) {
-//
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        try{
-//                            mViewSkeletonScreen.hide();
-//                        }catch (Exception e){
-//
-//                        }
-//
-//
-//                    }
-//                });
-//
-//                Log.e("test", exception.toString());
-//
-//            }
-//        });
-//
-//    }
-//
 
+
+    private void getLiveDetail(){
+        auditTextView.setText("");
+        APILiving.getRoomDetail(this, mStreamName, new APICallBack<LiveRoomInfo>() {
+            @Override
+            public void onSuccess(LiveRoomInfo liveRoomInfo) {
+                auditTextView.setText(liveRoomInfo.getAudit() + "人");
+                mLiveRoomInfo = liveRoomInfo;
+
+                setLiveStatus(liveRoomInfo.getState());
+
+                Uri uri = Uri.parse(liveRoomInfo.getCover_url());
+                int width = CommonUtils.dip2px(375);
+                int height = CommonUtils.dip2px(200);
+                ImageLoader.showThumb(uri, liveCover, width, height);
+
+                uri = Uri.parse(liveRoomInfo.getLogo());
+                width = CommonUtils.dip2px(65);
+                height = CommonUtils.dip2px(65);
+                ImageLoader.showThumb(uri, hostHeader, width, height);
+                EventBus.getDefault().post(new CommonEvent("liveRoomInfo"));
+                getMenus();
+                if(mLiveRoomInfo!=null&&mLiveRoomInfo.getEntry_mode()==2&&mVerify){
+                    //口令观看
+                    Intent it=new Intent(LiveDetailActivity.this,PassPhraseActivity.class);
+                    it.putExtra("LiveRoomInfo",mLiveRoomInfo);
+                    startActivity(it);
+                    finish();
+                }else{
+                    getAuthKey();
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            mViewSkeletonScreen.hide();
+                        }catch (Exception e) { }
+                    }
+                });
+
+            }
+            @Override
+            public void onFail(String error) {
+
+                mViewSkeletonScreen.hide();
+            }
+        });
+    }
+
+
+
+    private void setLiveStatus(int status){
+        switch (status) {
+            case 1:
+                statusTextView.setText("未开始");
+                liveCover.setVisibility(View.VISIBLE);
+                aliyunVodPlayerView.pause();
+                aliyunVodPlayerView.setVisibility(View.GONE);
+                break;
+            case 2:
+                statusTextView.setText("直播");
+                liveCover.setVisibility(View.GONE);
+                break;
+            case 3:
+                statusTextView.setText("已结束");
+                liveCover.setVisibility(View.VISIBLE);
+                aliyunVodPlayerView.pause();
+                aliyunVodPlayerView.setVisibility(View.GONE);
+                break;
+        }
+    }
 
     private void getAuthKey() {
         String url = ServerInfo.live + ServerInfo.getRtsAuthKey;
@@ -864,11 +844,11 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 }
 
                 //设置view的布局，宽高
-                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) aliyunVodPlayerView
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) playerContainer
                         .getLayoutParams();
                 layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
                 layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                aliyunVodPlayerView.setLayoutParams(layoutParams);
+                playerContainer.setLayoutParams(layoutParams);
 
                 aliyunVodPlayerView.setBackBtnVisiable(View.VISIBLE);
                 ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(false).init();
@@ -941,6 +921,14 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                     })
 
                     .show(getSupportFragmentManager());
+        }
+    }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if (event.getEventName().equals("modifyMenu")) {
+            getMenus();
         }
     }
 
@@ -1029,6 +1017,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 Bundle bundle = new Bundle();
                 bundle.putString("streamName", mStreamName);
                 bundle.putInt("roomId", mRoomId);
+                bundle.putSerializable("LiveRoomInfo",mLiveRoomInfo);
                 liveChatFragment.setArguments(bundle);
                 return liveChatFragment;
 

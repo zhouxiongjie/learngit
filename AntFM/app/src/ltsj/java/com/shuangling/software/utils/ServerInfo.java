@@ -22,6 +22,8 @@ public class ServerInfo {
 
 	public static String echo_server="http://echo-live.staging.slradio.cn";
 
+	public static String mlive="http://live-m.staging.slradio.cn";
+
 
 //	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
 //

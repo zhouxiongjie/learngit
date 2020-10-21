@@ -204,20 +204,30 @@ public class RedPacketDialog extends BaseCircleDialog {
                                 JSONObject jsonObject = JSONObject.parseObject(response);
                                 if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                                     //100000 领取成功
-                                    note.setVisibility(View.GONE);
-                                    name.setText(mRedPacketInfo.getSponsor_nm() + "的红包");
-                                    desc.setVisibility(View.GONE);
-                                    grab.setVisibility(View.INVISIBLE);
-                                    detail.setVisibility(View.VISIBLE);
-                                    moneyLayout.setVisibility(View.VISIBLE);
-                                    int amount=jsonObject.getJSONObject("data").getInteger("money");
-                                    money.setText(String.format("%.2f",(float)amount/100));
+//                                    note.setVisibility(View.GONE);
+//                                    name.setText(mRedPacketInfo.getSponsor_nm() + "的红包");
+//                                    desc.setVisibility(View.GONE);
+//                                    grab.setVisibility(View.INVISIBLE);
+//                                    detail.setVisibility(View.VISIBLE);
+//                                    moneyLayout.setVisibility(View.VISIBLE);
+//                                    int amount=jsonObject.getJSONObject("data").getInteger("money");
+//                                    money.setText(String.format("%.2f",(float)amount/100));
+
+                                    if(mOnGrabClickListener!=null){
+                                        mOnGrabClickListener.onGrab();
+                                    }
+                                    dismiss();
 
 
                                 } else if (jsonObject != null && jsonObject.getIntValue("code") == 407002) {
                                     //407002 手慢了，红包派完了
                                     note.setVisibility(View.GONE);
-                                    name.setText(mRedPacketInfo.getSponsor_nm() + "的红包");
+                                    if(!TextUtils.isEmpty(mRedPacketInfo.getSponsor_nm())){
+                                        name.setText(mRedPacketInfo.getSponsor_nm() + "的红包");
+                                    }else{
+                                        name.setText("");
+                                    }
+
                                     desc.setText("手慢了，红包派完了");
                                     grab.setVisibility(View.INVISIBLE);
                                     detail.setVisibility(View.VISIBLE);
@@ -228,7 +238,12 @@ public class RedPacketDialog extends BaseCircleDialog {
                                     //407003 红包活动已结束
 
                                     note.setVisibility(View.GONE);
-                                    name.setText(mRedPacketInfo.getSponsor_nm() + "的红包");
+                                    if(!TextUtils.isEmpty(mRedPacketInfo.getSponsor_nm())){
+                                        name.setText(mRedPacketInfo.getSponsor_nm() + "的红包");
+                                    }else{
+                                        name.setText("");
+                                    }
+
                                     desc.setText("红包活动已结束");
                                     grab.setVisibility(View.INVISIBLE);
                                     detail.setVisibility(View.VISIBLE);
@@ -237,7 +252,11 @@ public class RedPacketDialog extends BaseCircleDialog {
                                 } else if (jsonObject != null && jsonObject.getIntValue("code") == 407004) {
                                     //407004 这个红包已经领过了哦
                                     note.setVisibility(View.GONE);
-                                    name.setText(mRedPacketInfo.getSponsor_nm() + "的红包");
+                                    if(!TextUtils.isEmpty(mRedPacketInfo.getSponsor_nm())){
+                                        name.setText(mRedPacketInfo.getSponsor_nm() + "的红包");
+                                    }else{
+                                        name.setText("");
+                                    }
                                     desc.setText("这个红包已经领过了哦");
                                     grab.setVisibility(View.INVISIBLE);
                                     detail.setVisibility(View.VISIBLE);

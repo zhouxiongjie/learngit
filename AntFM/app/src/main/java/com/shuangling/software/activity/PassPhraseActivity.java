@@ -89,7 +89,7 @@ public class PassPhraseActivity extends AppCompatActivity {
 
     private void init() {
         mLiveRoomInfo=(LiveRoomInfo)getIntent().getSerializableExtra("LiveRoomInfo");
-
+        title.setText(mLiveRoomInfo.getName());
         verifyCode.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

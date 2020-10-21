@@ -39,6 +39,7 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
     ImageButton btnAdd;
     LinearLayout btnImage;
     LinearLayout btnJoinRoom;
+    LinearLayout btnInvite;
     LinearLayout morePanel;
     TextView btnSend;
     TextView mute;
@@ -68,12 +69,14 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
         btnAdd=findViewById(R.id.btn_add);
         btnImage=findViewById(R.id.btn_image);
         btnJoinRoom=findViewById(R.id.btn_join_room);
+        btnInvite=findViewById(R.id.invite);
         morePanel=findViewById(R.id.morePanel);
         btnSend=findViewById(R.id.btn_send);
         mute=findViewById(R.id.mute);
         btnAdd.setOnClickListener(this);
         btnImage.setOnClickListener(this);
         btnJoinRoom.setOnClickListener(this);
+        btnInvite.setOnClickListener(this);
         btnSend.setOnClickListener(this);
         input.addTextChangedListener(this);
         input.setOnClickListener(this);
@@ -93,6 +96,14 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
             btnJoinRoom.setVisibility(VISIBLE);
         }else{
             btnJoinRoom.setVisibility(GONE);
+        }
+    }
+
+    public void setInviteVisible(boolean isVisible){
+        if(isVisible){
+            btnInvite.setVisibility(VISIBLE);
+        }else{
+            btnInvite.setVisibility(GONE);
         }
     }
 
@@ -275,6 +286,10 @@ public class ChatInput extends RelativeLayout implements TextWatcher, View.OnCli
                 updateView(InputMode.NONE);
 
                 break;
+            case R.id.invite:
+
+                chatAction.invite();
+
 //            case R.id.input:{
 //                updateView(InputMode.TEXT);
 //                }

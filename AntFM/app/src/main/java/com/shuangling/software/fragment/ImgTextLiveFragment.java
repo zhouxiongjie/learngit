@@ -26,11 +26,16 @@ import com.shuangling.software.R;
 import com.shuangling.software.adapter.ColumnDecorateContentAdapter;
 import com.shuangling.software.adapter.ImgTextAdapter;
 import com.shuangling.software.entity.ImgTextInfo;
+import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.GetContentMode;
 import com.shuangling.software.utils.ServerInfo;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -94,6 +99,7 @@ public class ImgTextLiveFragment extends Fragment implements Handler.Callback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_img_text_live, container, false);
         unbinder = ButterKnife.bind(this, view);
+        EventBus.getDefault().register(this);
         init();
         return view;
 
@@ -114,7 +120,7 @@ public class ImgTextLiveFragment extends Fragment implements Handler.Callback {
                 getImgText(GetContentMode.LoadMore);
             }
         });
-        mAdapter = new ImgTextAdapter(getContext());
+        mAdapter = new ImgTextAdapter(getActivity());
         DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
         recyclerView.addItemDecoration(divider);
@@ -242,7 +248,7 @@ public class ImgTextLiveFragment extends Fragment implements Handler.Callback {
 
 
                         if (mAdapter == null) {
-                            mAdapter = new ImgTextAdapter(getContext(), mImgTextInfos);
+                            mAdapter = new ImgTextAdapter(getActivity(), mImgTextInfos);
                             mAdapter.setOnItemClickListener(new ImgTextAdapter.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(int pos) {
@@ -279,10 +285,19 @@ public class ImgTextLiveFragment extends Fragment implements Handler.Callback {
     }
 
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void getEventBus(CommonEvent event) {
+        if (event.getEventName().equals("ImgTextLiveUpdate")) {
+            mCurrentPage = 1;
+            getImgText(GetContentMode.Normal);
+        }
+    }
+
     @Override
     public void onDestroyView() {
 
         unbinder.unbind();
+        EventBus.getDefault().unregister(this);
         super.onDestroyView();
     }
 

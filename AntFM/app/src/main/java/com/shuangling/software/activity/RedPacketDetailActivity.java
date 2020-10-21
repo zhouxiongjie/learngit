@@ -69,7 +69,7 @@ public class RedPacketDetailActivity extends AppCompatActivity {
         mId = getIntent().getStringExtra("id");
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
-        divider.setDrawable(ContextCompat.getDrawable(this, R.drawable.recycleview_divider_drawable));
+        divider.setDrawable(ContextCompat.getDrawable(this, R.drawable.recycleview_divider_drawable01));
         recyclerView.addItemDecoration(divider);
 
         refreshLayout.setEnableAutoLoadMore(false);

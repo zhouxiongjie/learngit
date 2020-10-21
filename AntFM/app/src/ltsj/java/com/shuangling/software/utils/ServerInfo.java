@@ -61,6 +61,8 @@ public class ServerInfo {
 //	public static String live="http://api-live.on-radio.cn";
 //
 //	public static String echo_server="http://echo-live.on-radio.cn";
+//
+//	public static String mlive="http://live-m.on-radio.cn";
 
 
 

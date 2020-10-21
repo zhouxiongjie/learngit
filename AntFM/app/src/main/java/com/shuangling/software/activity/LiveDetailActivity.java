@@ -3,6 +3,7 @@ package com.shuangling.software.activity;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -26,22 +28,27 @@ import android.widget.TextView;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.player.IPlayer;
+import com.aliyun.player.bean.ErrorInfo;
 import com.aliyun.player.source.UrlSource;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.api.APICallBack;
+import com.shuangling.software.api.APILiving;
 import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.BannerView1;
 import com.shuangling.software.entity.BannerInfo;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.LiveInfo;
 import com.shuangling.software.entity.LiveMenu;
+
 import com.shuangling.software.entity.LiveRoomInfo;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
@@ -54,6 +61,7 @@ import com.shuangling.software.network.MyEcho;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 
@@ -86,6 +94,11 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
 
     private static final int MSG_GET_VIDEO_AUTH = 0xd;
 
+
+    @BindView(R.id.player_container)
+    FrameLayout playerContainer;
+
+
     @BindView(R.id.aliyunVodPlayerView)
     AliyunVodPlayerView aliyunVodPlayerView;
     @BindView(R.id.attention)
@@ -99,8 +112,30 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     @BindView(R.id.root)
     LinearLayout root;
 
-    private MyEcho echo;
+    @BindView(R.id.audit)
+    TextView auditTextView;
 
+
+    @BindView(R.id.status)
+    TextView statusTextView;
+
+    @BindView(R.id.cover)
+    SimpleDraweeView liveCover;
+
+
+    @BindView(R.id.host_header)
+    SimpleDraweeView hostHeader;
+
+
+    @BindView(R.id.host_leave)
+    FrameLayout hostLeaveLayout;
+
+
+
+
+
+
+    private MyEcho echo;
     private int mRoomId;
     private String mStreamName;
     private String mUrl;
@@ -155,16 +190,20 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         mRoomId = getIntent().getIntExtra("roomId", 0);
         mUrl = getIntent().getStringExtra("url");
         mType = getIntent().getIntExtra("type",4);
+
+        hostLeaveLayout.setVisibility(View.GONE);
+
         initAliyunPlayerView();
+        getLiveDetail();
         getAdvertises();
 
 
-        getDetail();
-
-
+        //getDetail();
 
         //joinChannel();
     }
+
+
 
     private void getMenus() {
         String url = ServerInfo.live + "/v2/get_room_menus_c";
@@ -228,84 +267,131 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
     }
 
 
+//
+//    private void getDetail() {
+//        String url = ServerInfo.live + "/v3/get_room_details_c";
+//        Map<String, String> params = new HashMap<>();
+//        params.put("stream_name", "" + mStreamName);
+//
+//        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+//            @Override
+//            public void onResponse(Call call, String response) throws IOException {
+//
+//                try {
+//
+//
+//                    JSONObject jsonObject = JSONObject.parseObject(response);
+//                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+//
+//                        JSONArray ja=jsonObject.getJSONArray("data");
+//                        if(ja!=null&&ja.size()>0){
+//                            mLiveRoomInfo = JSONObject.parseObject(ja.getJSONObject(0).toJSONString(), LiveRoomInfo.class);
+//                            EventBus.getDefault().post(new CommonEvent("liveRoomInfo"));
+//                            getMenus();
+//                            if(mLiveRoomInfo!=null&&mLiveRoomInfo.getEntry_mode()==2&&mVerify){
+//                                //口令观看
+//                                Intent it=new Intent(LiveDetailActivity.this,PassPhraseActivity.class);
+//                                it.putExtra("LiveRoomInfo",mLiveRoomInfo);
+//                                startActivity(it);
+//                                finish();
+//                            }else{
+//                                getAuthKey();
+//                            }
+//
+//
+//                        }
+//
+//                    }
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            try{
+//                                mViewSkeletonScreen.hide();
+//                            }catch (Exception e){
+//
+//                            }
+//
+//
+//                        }
+//                    });
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//
 
-    private void getDetail() {
-        String url = ServerInfo.live + "/v3/get_room_details_c";
-        Map<String, String> params = new HashMap<>();
-        params.put("stream_name", "" + mStreamName);
 
-        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+    private void getLiveDetail(){
+        auditTextView.setText("");
+        APILiving.getRoomDetail(this, mStreamName, new APICallBack<LiveRoomInfo>() {
             @Override
-            public void onResponse(Call call, String response) throws IOException {
+            public void onSuccess(LiveRoomInfo liveRoomInfo) {
+                auditTextView.setText(liveRoomInfo.getAudit() + "人");
+                mLiveRoomInfo = liveRoomInfo;
 
-                try {
+                setLiveStatus(liveRoomInfo.getState());
 
+                Uri uri = Uri.parse(liveRoomInfo.getCover_url());
+                int width = CommonUtils.dip2px(375);
+                int height = CommonUtils.dip2px(200);
+                ImageLoader.showThumb(uri, liveCover, width, height);
 
-                    JSONObject jsonObject = JSONObject.parseObject(response);
-                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-
-                        JSONArray ja=jsonObject.getJSONArray("data");
-                        if(ja!=null&&ja.size()>0){
-                            mLiveRoomInfo = JSONObject.parseObject(ja.getJSONObject(0).toJSONString(), LiveRoomInfo.class);
-                            EventBus.getDefault().post(new CommonEvent("liveRoomInfo"));
-                            getMenus();
-                            if(mLiveRoomInfo!=null&&mLiveRoomInfo.getEntry_mode()==2&&mVerify){
-                                //口令观看
-                                Intent it=new Intent(LiveDetailActivity.this,PassPhraseActivity.class);
-                                it.putExtra("LiveRoomInfo",mLiveRoomInfo);
-                                startActivity(it);
-                                finish();
-                            }else{
-                                getAuthKey();
-                            }
-
-
-                        }
-
-                    }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try{
-                                mViewSkeletonScreen.hide();
-                            }catch (Exception e){
-
-                            }
-
-
-                        }
-                    });
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                uri = Uri.parse(liveRoomInfo.getLogo());
+                width = CommonUtils.dip2px(65);
+                height = CommonUtils.dip2px(65);
+                ImageLoader.showThumb(uri, hostHeader, width, height);
+                EventBus.getDefault().post(new CommonEvent("liveRoomInfo"));
+                getMenus();
+                if(mLiveRoomInfo!=null&&mLiveRoomInfo.getEntry_mode()==2&&mVerify){
+                    //口令观看
+                    Intent it=new Intent(LiveDetailActivity.this,PassPhraseActivity.class);
+                    it.putExtra("LiveRoomInfo",mLiveRoomInfo);
+                    startActivity(it);
+                    finish();
+                }else{
+                    getAuthKey();
                 }
-
-
-            }
-
-            @Override
-            public void onFailure(Call call, Exception exception) {
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         try{
                             mViewSkeletonScreen.hide();
-                        }catch (Exception e){
-
-                        }
-
-
+                        }catch (Exception e) { }
                     }
                 });
 
-                Log.e("test", exception.toString());
+            }
+            @Override
+            public void onFail(String error) {
 
+                mViewSkeletonScreen.hide();
             }
         });
-
     }
 
+
+
+    private void setLiveStatus(int status){
+        switch (status) {
+            case 1:
+                statusTextView.setText("未开始");
+                liveCover.setVisibility(View.VISIBLE);
+                aliyunVodPlayerView.pause();
+                aliyunVodPlayerView.setVisibility(View.GONE);
+                break;
+            case 2:
+                statusTextView.setText("直播");
+                liveCover.setVisibility(View.GONE);
+                break;
+            case 3:
+                statusTextView.setText("已结束");
+                liveCover.setVisibility(View.VISIBLE);
+                aliyunVodPlayerView.pause();
+                aliyunVodPlayerView.setVisibility(View.GONE);
+                break;
+        }
+    }
 
     private void getAuthKey() {
         String url = ServerInfo.live + ServerInfo.getRtsAuthKey;
@@ -500,6 +586,16 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 //准备完成触发
 
 
+            }
+        });
+
+        aliyunVodPlayerView.setOnErrorListener(new IPlayer.OnErrorListener() {
+            @Override
+            public void onError(ErrorInfo errorInfo) {
+                aliyunVodPlayerView.pause();
+                aliyunVodPlayerView.setVisibility(View.GONE);
+                liveCover.setVisibility(View.VISIBLE);
+                hostLeaveLayout.setVisibility(View.VISIBLE);
             }
         });
 
@@ -724,14 +820,13 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 aliyunVodPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 
                 //设置view的布局，宽高之类
-                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) aliyunVodPlayerView
+                LinearLayout.LayoutParams layoutParams = (
+                        LinearLayout.LayoutParams) playerContainer
                         .getLayoutParams();
                 layoutParams.height = (int) (ScreenUtils.getWidth(this) * 9.0f / 16);
                 layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                ViewGroup.LayoutParams lp = aliyunVodPlayerView.getLayoutParams();
-                aliyunVodPlayerView.setLayoutParams(lp);
-
-
+                //ViewGroup.LayoutParams lp = playerContainer.getLayoutParams();
+                playerContainer.setLayoutParams(layoutParams);
                 aliyunVodPlayerView.setBackBtnVisiable(View.INVISIBLE);
                 ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).init();
             } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -749,11 +844,11 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                 }
 
                 //设置view的布局，宽高
-                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) aliyunVodPlayerView
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) playerContainer
                         .getLayoutParams();
                 layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
                 layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                aliyunVodPlayerView.setLayoutParams(layoutParams);
+                playerContainer.setLayoutParams(layoutParams);
 
                 aliyunVodPlayerView.setBackBtnVisiable(View.VISIBLE);
                 ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(false).init();

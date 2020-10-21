@@ -1,76 +1,137 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout android:id="@+id/player_container"
+    <FrameLayout android:id="@+id/player_container"
         android:layout_height="200dp"
         android:layout_width="match_parent"
         android:orientation="horizontal">
+
+
         <com.aliyun.vodplayerview.widget.AliyunVodPlayerView
             android:id="@+id/aliyunVodPlayerView"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="match_parent"
+            android:visibility="visible"
             >
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <LinearLayout
+        </com.aliyun.vodplayerview.widget.AliyunVodPlayerView>
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/cover"
+            android:layout_width="match_parent"
+            fresco:viewAspectRatio="1"
+            android:layout_height="match_parent"
+            fresco:placeholderImage="@drawable/article_placeholder"
+            fresco:placeholderImageScaleType="centerCrop"
+            fresco:actualImageScaleType="centerCrop" />
+
+        <FrameLayout
+            android:id="@+id/host_leave"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#cc000000">
+
+
+            <FrameLayout
+
+                android:layout_width="190dp"
+                android:layout_height="92dp"
+
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:background="#5D6069"
+
+                >
+
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="主播暂不在播哦~"
+                    android:textColor="#ffffff"
+                    android:textSize="15sp"
+                    android:layout_gravity="center_horizontal|center_vertical"
                     android:layout_marginTop="15dp"
-                    android:layout_marginRight="15dp"
-                    android:layout_alignParentRight="true"
-                    android:orientation="horizontal">
-                    <LinearLayout android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/live_type_bg">
+                   />
 
-                        <TextView
-                            android:text="直播"
-                            android:layout_gravity="center_vertical"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:textSize="@dimen/font_size_22px"/>
+            </FrameLayout>
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/host_header"
+                android:layout_width="63dp"
+                android:layout_height="63dp"
+                fresco:viewAspectRatio="1"
+                app:roundAsCircle="true"
+                app:roundingBorderWidth="1dp"
+                app:roundingBorderColor="#ffffff"
+                fresco:placeholderImage="@drawable/article_placeholder"
+                fresco:placeholderImageScaleType="centerCrop"
+                fresco:actualImageScaleType="centerCrop"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:layout_marginBottom="45.5dp" />
 
-                    </LinearLayout>
 
+        </FrameLayout>
 
-                    <LinearLayout
-                        android:layout_marginLeft="6dp"
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_alignParentRight="true"
+                android:orientation="horizontal">
+                <LinearLayout android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/live_type_bg">
+
+                    <TextView
+                        android:id="@+id/status"
+                        android:text="直播"
+                        android:layout_gravity="center_vertical"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/live_type_bg">
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/font_size_22px"/>
 
-                        <com.aliyun.apsara.alivclittlevideo.view.video.FontIconView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:id="@+id/fiv_close"
-                            android:text="&#xe61e;"
-                            android:textColor="#ffffff"
-                            android:gravity="center"
-                            layout_gravity="left|top"
-                            android:textSize="11sp"/>
-                        <TextView
-
-                            android:id="@+id/audit"
-                            android:layout_height="wrap_content"
-                            android:layout_width="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:maxLines="1"
-                            android:text="37.3万人"
-                            android:textColor="@color/white"
-                            android:textSize="@dimen/font_size_22px"/>
-                    </LinearLayout>
                 </LinearLayout>
-            </RelativeLayout>
 
-        </com.aliyun.vodplayerview.widget.AliyunVodPlayerView>
+
+                <LinearLayout
+                    android:layout_marginLeft="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/live_type_bg">
+
+                    <com.aliyun.apsara.alivclittlevideo.view.video.FontIconView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:id="@+id/fiv_close"
+                        android:text="&#xe61e;"
+                        android:textColor="#ffffff"
+                        android:gravity="center"
+                        layout_gravity="left|top"
+                        android:textSize="11sp"/>
+                    <TextView
+
+                        android:id="@+id/audit"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:maxLines="1"
+                        android:text="37.3万人"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/font_size_22px"/>
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -78,7 +139,7 @@
             android:orientation="horizontal" >
 
     </LinearLayout>
-    </LinearLayout>
+    </FrameLayout>
 
 
 
@@ -139,6 +200,6 @@
 
 
 
-</RelativeLayout>
+</LinearLayout>
 
 

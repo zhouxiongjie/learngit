@@ -13,6 +13,8 @@ static def releaseTime() {
 
 android {
     compileSdkVersion externalCompileSdkVersion
+
+
     defaultConfig {
         applicationId "com.shuangling.software"
         minSdkVersion externalMinSdkVersion

@@ -150,8 +150,8 @@ public class MyApplication extends MultiDexApplication {
 //
 //        Fresco.initialize(this, config);
 //        Fresco.initialize(this);
-        Sentry.init("http://a31a66f6b5ee4bd4ad7ef75899bfd28f@47.94.104.239:9000/7", new AndroidSentryClientFactory(this));
-        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler());
+//        Sentry.init("http://a31a66f6b5ee4bd4ad7ef75899bfd28f@47.94.104.239:9000/7", new AndroidSentryClientFactory(this));
+//        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler());
 
 
 
@@ -468,13 +468,11 @@ public class MyApplication extends MultiDexApplication {
             @Override
             public void onResponse(Call call, String response) throws IOException {
 
-
                 try{
 
                     JSONObject jsonObject = JSONObject.parseObject(response);
 
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-
                         ServerInfo.echo_server=jsonObject.getJSONObject("data").getString("echo_server");
                     }
 

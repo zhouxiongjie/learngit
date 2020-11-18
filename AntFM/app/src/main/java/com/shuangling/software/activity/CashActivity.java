@@ -130,8 +130,8 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback 
 //            }
 //        });
         //默认两位小数
-        customAmount.addTextChangedListener(new MoneyTextWatcher(customAmount));
-//手动设置其他位数，例如3
+        //customAmount.addTextChangedListener(new MoneyTextWatcher(customAmount));
+        //手动设置其他位数，例如3
         customAmount.addTextChangedListener(new MoneyTextWatcher(customAmount).setDigits(2));
 
         getAccountDetail();

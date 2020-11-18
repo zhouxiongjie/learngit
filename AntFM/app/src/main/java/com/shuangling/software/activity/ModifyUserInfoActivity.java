@@ -213,8 +213,8 @@ public class ModifyUserInfoActivity extends AppCompatActivity implements Handler
 
     private void init() {
         EventBus.getDefault().register(this);
-        nickName.setText("" + User.getInstance().getNickname());
-        if (!TextUtils.isEmpty(User.getInstance().getAvatar())) {
+        nickName.setText(User.getInstance()!=null?User.getInstance().getNickname():"");
+        if (User.getInstance()!=null&&!TextUtils.isEmpty(User.getInstance().getAvatar())) {
             Uri uri = Uri.parse(User.getInstance().getAvatar());
             ImageLoader.showThumb(uri, head, CommonUtils.dip2px(40), CommonUtils.dip2px(40));
         }

@@ -508,6 +508,16 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                 @Override
                 public void onResponse(Call call, String response) throws IOException {
                     Log.e("test", response);
+
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                        ToastUtils.show("消息发送成功!");
+                    }else if(jsonObject != null && jsonObject.getIntValue("code") == 102001){
+                        ToastUtils.show("您已经被主播禁言!");
+                    }else{
+                        ToastUtils.show("消息发送失败!");
+                    }
                 }
             });
         }
@@ -1178,19 +1188,24 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
 //        msgList.add(msgModel);
 //        msgLandscapeList.add(msgModel);
 
-
-        ChatMessageManager.getInstance().addMessage(chatMessage);
-        if (chatMessage.getParentMsgInfo() != null && User.getInstance() != null && chatMessage.getParentMsgInfo().getUserId().equals("" + User.getInstance().getId())) {
-            referMe.setVisibility(View.VISIBLE);
-            final int pos = ChatMessageManager.getInstance().getMessageList().size();
-            referMe.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    referMe.setVisibility(View.GONE);
-                    recyclerView.scrollToPosition(pos);
-                }
-            });
+        if(chatMessage.getAiAudit()==1){
+            ToastUtils.show("消息审核中...");
+        }else{
+            ChatMessageManager.getInstance().addMessage(chatMessage);
+            if (chatMessage.getParentMsgInfo() != null && User.getInstance() != null && chatMessage.getParentMsgInfo().getUserId().equals("" + User.getInstance().getId())) {
+                referMe.setVisibility(View.VISIBLE);
+                final int pos = ChatMessageManager.getInstance().getMessageList().size();
+                referMe.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        referMe.setVisibility(View.GONE);
+                        recyclerView.scrollToPosition(pos);
+                    }
+                });
+            }
         }
+
+
 
 
 //        if (recyclerView.canScrollVertically(1)) {//还可以向下滑动（还没到底部）
@@ -1329,6 +1344,15 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
             @Override
             public void onResponse(Call call, String response) throws IOException {
                 Log.e("test", response);
+                JSONObject jsonObject = JSONObject.parseObject(response);
+                if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+
+                    ToastUtils.show("消息发送成功!");
+                }else if(jsonObject != null && jsonObject.getIntValue("code") == 102001){
+                    ToastUtils.show("您已经被主播禁言!");
+                }else{
+                    ToastUtils.show("消息发送失败!");
+                }
             }
         });
     }

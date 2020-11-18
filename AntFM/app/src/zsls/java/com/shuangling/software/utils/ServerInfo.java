@@ -43,7 +43,7 @@ public class ServerInfo {
 
 	public static String activity="http://asc.lsxrmtzx.com/";
 
-	public static String scs="http://scs.lsxrmtzx.com";
+	public static String scs="https://scs.lsxrmtzx.com";
 
 	public static String emc="http://api-emc.lsxrmtzx.com";
 
@@ -52,6 +52,8 @@ public class ServerInfo {
 	public static String live="http://api-live.lsxrmtzx.com";
 
 	public static String echo_server="http://echo-live.lsxrmtzx.com";
+
+	public static String mlive="http://live-m.lsxrmtzx.com";
 
 
 

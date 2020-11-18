@@ -132,7 +132,7 @@
             android:name=".activity.LiveDetailActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustNothing">
         </activity>
         <activity
             android:name=".activity.ArticleDetailActivity"
@@ -143,7 +143,8 @@
         <activity
             android:name=".activity.ArticleDetailActivity02"
             android:screenOrientation="portrait"
-
+            android:hardwareAccelerated="true"
+            android:configChanges="orientation|screenSize|keyboardHidden"
             android:windowSoftInputMode="adjustResize|stateHidden">
         </activity>
 

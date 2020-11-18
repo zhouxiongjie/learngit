@@ -10,9 +10,9 @@ public class ServerInfo {
 
 	public static String h5HttpsIP="https://cms.staging.slradio.cn";
 
-	public static String activity="https://www-asc-c.staging.slradio.cn/";
+	public static String activity="https://asc.staging.slradio.cn/";
 
-	public static String scs="http://www-scs-c.staging.slradio.cn";
+	public static String scs="https://scs.staging.slradio.cn";
 
     public static String emc="http://api-emc.staging.slradio.cn";
 
@@ -27,13 +27,13 @@ public class ServerInfo {
 
 //	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
 //
-//	public static String h5IP="http://www-cms-c.review.slradio.cn";
+//	public static String h5IP="http://cms.review.slradio.cn";
 //
-//	public static String h5HttpsIP="https://www-cms-c.review.slradio.cn";
+//	public static String h5HttpsIP="https://cms.review.slradio.cn";
 //
-//	public static String activity="https://www-asc-c.review.slradio.cn/";
+//	public static String activity="https://asc.review.slradio.cn/";
 //
-//	public static String scs="http://www-scs-c.review.slradio.cn";
+//	public static String scs="http://scs.review.slradio.cn";
 //
 //	public static String emc="http://api-emc.review.slradio.cn";
 //

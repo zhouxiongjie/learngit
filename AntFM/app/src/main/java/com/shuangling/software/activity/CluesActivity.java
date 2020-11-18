@@ -5,9 +5,11 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
@@ -28,6 +31,11 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
+import com.amap.api.maps.model.LatLng;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.MyApplication;
@@ -71,7 +79,7 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 @EnableDragToClose()
-public class CluesActivity extends AppCompatActivity implements Handler.Callback {
+public class CluesActivity extends AppCompatActivity implements Handler.Callback,AMapLocationListener {
 
     private static final int LOGIN_RESULT = 0x1;
     public static final int MSG_GET_DETAIL = 0x2;
@@ -91,6 +99,17 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
     private Handler mHandler;
     private String mUrl;
 
+
+    private AMapLocationClient mlocationClient;
+    private LatLng mlocation;
+
+    protected String[] needPermissions = {
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.READ_PHONE_STATE
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +139,22 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
         }
         webView.getSettings().setBlockNetworkImage(false);
         s.setJavaScriptEnabled(true);       //js
-        s.setDomStorageEnabled(true);       //localStorage
+
+
+        //启用数据库
+        s.setDatabaseEnabled(true);
+        //启用地理定位，默认为true
+        s.setGeolocationEnabled(true);
+        //设置定位的数据库路径
+        String dir = this.getApplicationContext().getDir("database", Context.MODE_PRIVATE).getPath();
+        s.setGeolocationDatabasePath(dir);
+        //开启DomStorage缓存
+        s.setDomStorageEnabled(true);
+
+
+
+
+        s.setGeolocationEnabled(true);
 
 //        s.setBuiltInZoomControls(true);
 //        s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
@@ -220,6 +254,14 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
             }
 
 
+            @Override
+            public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+                callback.invoke(origin, true, false);
+                super.onGeolocationPermissionsShowPrompt(origin, callback);
+            }
+
+
+
             // For 3.0+ Devices (Start)
             // onActivityResult attached before constructor
 
@@ -304,10 +346,120 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
             }
         });
         webView.addJavascriptInterface(new JsToAndroid(), "clientJS");
-        webView.loadUrl(mUrl);
+
+        //initLocation();
+
+
+        requestpermissions();
+
+        //webView.loadUrl(mUrl);
 
 
     }
+
+    private void requestpermissions() {
+        RxPermissions rxPermissions = new RxPermissions(this);
+        rxPermissions.request(needPermissions)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean granted) throws Exception {
+                        if(granted){
+                            //获得定位权限 开始定位
+                            //startLocation();
+                        }else{
+                            //未获得定位权限 直接加载
+                            //webView.loadUrl(mUrl);
+                        }
+
+                        webView.loadUrl(mUrl);
+                    }
+                });
+    }
+
+
+    /**
+     * 初始化定位，设置回调监听
+     */
+    private void initLocation(){
+
+        //初始化client
+        mlocationClient = new AMapLocationClient(this.getApplicationContext());
+        // 设置定位监听
+        mlocationClient.setLocationListener(this);
+
+        RxPermissions rxPermissions = new RxPermissions(this);
+        rxPermissions.request(needPermissions)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean granted) throws Exception {
+                        if(granted){
+                            //获得定位权限 开始定位
+                            startLocation();
+                        }else{
+                            //未获得定位权限 直接加载
+                            webView.loadUrl(mUrl);
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void onLocationChanged(AMapLocation aMapLocation) {
+        if (aMapLocation != null&& aMapLocation.getErrorCode() == 0) {
+            mlocation = new LatLng(aMapLocation.getLatitude(), aMapLocation.getLongitude());
+            String mAddress=aMapLocation.getAddress();
+
+            String url = String.format("%s&lat=%f&lon=%f&addr=%s",mUrl,mlocation.latitude,mlocation.longitude,mAddress);
+            webView.loadUrl(url);
+
+        } else {
+            ToastUtils.show("获取定位失败,请确认是否开启GPS定位!");
+            webView.loadUrl(mUrl);
+        }
+    }
+
+    /**
+     * 开始定位
+     */
+
+    /**
+     * 手机是否开启位置服务，如果没有开启那么所有app将不能使用定位功能
+     */
+    public static boolean isLocServiceEnable(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        //boolean network = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        //if (gps || network) {
+        if (gps) {
+            return true;
+        }
+        return false;
+    }
+
+    private void startLocation(){
+
+        mlocationClient.setLocationOption(getOption());
+        // 启动定位
+        mlocationClient.startLocation();
+    }
+
+    /**
+     * 设置定位参数
+     * @return 定位参数类
+     */
+    private AMapLocationClientOption getOption() {
+        AMapLocationClientOption mOption = new AMapLocationClientOption();
+        mOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);//可选，设置定位模式，可选的模式有高精度、仅设备、仅网络。默认为高精度模式
+        mOption.setHttpTimeOut(30000);//可选，设置网络请求超时时间。默认为30秒。在仅设备模式下无效
+        mOption.setNeedAddress(true);//可选，设置是否返回逆地理地址信息。默认是true
+        mOption.setLocationCacheEnable(false);//设置是否返回缓存中位置，默认是true
+        mOption.setOnceLocation(true);//可选，设置是否单次定位。默认是false
+        //设置定位间隔,单位毫秒,默认为2000ms
+        //mOption.setInterval(4000);
+        return mOption;
+    }
+
+
 
     @Override
     public boolean handleMessage(Message msg) {
@@ -670,5 +822,15 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
             }
         });
 
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+            //在activity执行onDestroy时执行mMapView.onDestroy()，实现地图生命周期管理
+
+        //mlocationClient.stopLocation();
     }
 }

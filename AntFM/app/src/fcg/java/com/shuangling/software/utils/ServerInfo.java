@@ -13,7 +13,7 @@ public class ServerInfo {
 
 	public static String activity="https://asc.fcgtvb.com/";
 
-	public static String scs="http://scs.fcgtvb.com";
+	public static String scs="https://scs.fcgtvb.com";
 
 	public static String emc="http://api-emc.fcgtvb.com";
 

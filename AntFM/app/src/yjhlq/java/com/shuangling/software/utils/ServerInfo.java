@@ -27,7 +27,7 @@ public class ServerInfo {
 
 	public static String activity="https://asc.yjhlnews.cn/";
 
-	public static String scs="http://scs.yjhlnews.cn";
+	public static String scs="https://scs.yjhlnews.cn";
 
 	public static String emc="http://api-emc.yjhlnews.cn";
 

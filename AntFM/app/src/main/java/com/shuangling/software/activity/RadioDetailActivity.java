@@ -195,6 +195,12 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
         EventBus.getDefault().register(this);
         //mRadio = getIntent().getParcelableExtra("Radio");
         mRadioId= getIntent().getIntExtra("radioId",0);
+        activityTitle.setBackListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         activityTitle.setMoreAction(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -446,6 +452,9 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
         super.onPause();
     }
 
+
+
+
     private void showFloatWindowPermission() {
         FloatWindowUtil.getInstance().addOnPermissionListener(new FloatWindowUtil.OnPermissionListener() {
             @Override
@@ -492,9 +501,28 @@ public class RadioDetailActivity extends AppCompatActivity implements Handler.Ca
 
     @Override
     protected void onDestroy() {
+
+
         EventBus.getDefault().unregister(this);
         unbindService(mConnection);
         super.onDestroy();
+    }
+
+
+
+    @Override
+    public void onBackPressed() {
+        try{
+            if(mAudioPlayer!=null){
+                if(mAudioPlayer.getPlayerState()==IPlayer.started){
+                    mAudioPlayer.stop();
+                }
+            }
+        }catch (Exception e){
+
+        }
+
+        super.onBackPressed();
     }
 
 

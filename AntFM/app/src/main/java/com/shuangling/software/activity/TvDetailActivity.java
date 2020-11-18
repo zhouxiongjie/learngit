@@ -181,6 +181,12 @@ public class TvDetailActivity extends BaseAudioActivity implements Handler.Callb
         mHandler = new Handler(this);
         //mRadio = getIntent().getParcelableExtra("Radio");
         mRadioId = getIntent().getIntExtra("radioId", 0);
+        activityTitle.setBackListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         activityTitle.setMoreAction(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

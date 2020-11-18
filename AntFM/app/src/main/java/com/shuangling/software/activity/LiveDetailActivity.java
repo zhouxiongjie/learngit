@@ -171,7 +171,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         //ImmersionBar.with(this).transparentBar().titleBar(activityTitle).init();
         //ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).init();
         ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).keyboardEnable(true)  //解决软键盘与底部输入框冲突问题，默认为false，还有一个重载方法，可以指定软键盘mode
-                .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE).init();
+                .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING).init();
         //ImmersionBar.with(this).statusBarDarkFont(true);
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);

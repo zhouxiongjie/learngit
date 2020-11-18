@@ -85,6 +85,15 @@
                         android:layout_gravity="center_horizontal"
                         android:background="@drawable/share_wx_collect" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="微信收藏"
+                        android:textColor="#222222"
+                        android:textSize="@dimen/font_size_24px" />
+
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -140,7 +149,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="15dp"
-                    android:visibility="visible">
+                    android:visibility="gone">
 
                     <ImageView
                         android:layout_width="50dp"

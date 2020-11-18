@@ -16,7 +16,7 @@ public class ServerInfo {
 
 	public static String activity="https://asc.jxtvs.com/";
 
-	public static String scs="http://scs.jxtvs.com";
+	public static String scs="https://scs.jxtvs.com";
 
 	public static String vms="http://api-vms.jxtvs.com";
 

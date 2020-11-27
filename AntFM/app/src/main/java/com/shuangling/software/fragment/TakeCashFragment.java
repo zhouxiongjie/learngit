@@ -222,7 +222,7 @@ public class TakeCashFragment extends Fragment implements Handler.Callback {
                                 refreshLayout.setEnableLoadMore(false);
                                 //refreshLayout.finishLoadMoreWithNoMoreData();
                             }
-                            mTakeCashInfos.addAll(takeCashInfos);
+                            mTakeCashInfos.addAll(takeCashInfos);  
                         } else {
                             mTakeCashInfos = takeCashInfos;
                         }

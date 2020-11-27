@@ -187,18 +187,28 @@ public class AccountSettingDialog extends BaseCircleDialog {
 
                 }
 
-
             }
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        dismiss();
-                        ToastUtils.show("绑定账号失败");
-                    }
-                });
+                try{
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try{
+                                dismiss();
+                                ToastUtils.show("绑定账号失败");
+                            }catch (Exception e){
+
+                            }
+
+                        }
+                    });
+                }catch (Exception e){
+
+                }
+
+
 
             }
         });

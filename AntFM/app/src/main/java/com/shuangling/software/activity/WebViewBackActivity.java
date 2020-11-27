@@ -110,8 +110,6 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
         mActivityId= getIntent().getIntExtra("activityId",-1);
         activtyTitle.setTitleText(mTitle);
         String url=initUrl(mUrl);
-
-
         if(url.startsWith(ServerInfo.activity)){
             activtyTitle.setMoreVisibility(true);
         }else {
@@ -336,6 +334,7 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
                     url = url + "&Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
                 }else{
                     url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android"+"&multiple="+CommonUtils.getFontSize();
+
                 }
             }
         }

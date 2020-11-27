@@ -296,7 +296,7 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
                                     Matisse.from(CluesActivity.this)
                                             .choose(MimeType.of(MimeType.JPEG,MimeType.PNG,MimeType.MP4)) // 选择 mime 的类型
                                             .countable(false)
-                                            .maxSelectable(9) // 图片选择的最多数量
+                                            .maxSelectable(1) // 图片选择的最多数量
                                             .spanCount(4)
                                             .capture(true)
                                             .captureStrategy(new CaptureStrategy(true,packageName+".fileprovider"))
@@ -667,11 +667,14 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
                 if (uploadMessage == null)
                     return;
 
-                //List<String> paths=Matisse.obtainPathResult(data);
-                List<Uri> selects = Matisse.obtainResult(data);
+                List<String> paths=Matisse.obtainPathResult(data);
+                //List<Uri> selects = Matisse.obtainResult(data);
                 //File file = new File(CommonUtils.getRealFilePath(this, selects.get(0)));
-                Uri[] urls = selects.toArray(new Uri[selects.size()]);
-                uploadMessage.onReceiveValue(urls);
+                //Uri[] urls = selects.toArray(new Uri[selects.size()]);
+                Uri uri=Uri.fromFile(new File(paths.get(0)));
+                uploadMessage.onReceiveValue(new Uri[]{uri});
+
+                //uploadMessage.onReceiveValue(urls);
                 //uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
                 uploadMessage = null;
             }else if (requestCode == REQUEST_SELECT_FILE &&resultCode==RESULT_CANCELED) {

@@ -228,6 +228,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
                 startActivity(it);
             }
             break;
+            
         }
     }
 
@@ -566,6 +567,7 @@ public class NewLoginActivity extends AppCompatActivity implements Handler.Callb
 
             @Override
             public void onFailure(Call call, Exception exception) {
+
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {

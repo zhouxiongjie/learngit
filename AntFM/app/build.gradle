@@ -36,14 +36,25 @@ android {
 
     MtjCirclePluginConfig {
 
-        appkey = "d11e565d03"
+        appkey = "8a3086f16e"
         // 设置debug 开关，如果需要查看日志则打开开关，为避免影响性能建议上线前关闭（设置为false）
         debug = false
         // 默认启动此插件，如果开发者不需要可以禁用（设置为false）
         enabled = true
 
-
     }
+
+//    MtjCirclePluginConfig {
+//
+//        appkey = "8bc0e3d645"
+//
+//        // 设置debug 开关，如果需要查看日志则打开开关，为避免影响性能建议上线前关闭（设置为false）
+//        debug = false
+//        // 默认启动此插件，如果开发者不需要可以禁用（设置为false）
+//        enabled = true
+//
+//
+//    }
 
     signingConfigs {
 
@@ -174,6 +185,8 @@ android {
 
 
     applicationVariants.all {
+
+
         variant ->
             variant.outputs.all {
                 outputFileName = "${variant.productFlavors[0].name}-v${variant.productFlavors[0].versionName}-${releaseTime()}.apk"
@@ -228,6 +241,7 @@ configurations.all {
 //        force 'com.android.support:recyclerview-v7:26.0.0-alpha1'
 //    }
 
+
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         def requested = details.requested
         if (requested.group == 'com.android.support') {
@@ -255,6 +269,8 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+//    implementation 'com.jakewharton:butterknife:10.2.1'
+//    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
     implementation 'com.jaeger.statusbarutil:library:1.4.0'
     //implementation externalOKHTTP
     //implementation 'com.mcxiaoke.viewpagerindicator:library:2.4.1'

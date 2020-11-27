@@ -152,7 +152,6 @@ public class ServiceFragment extends SimpleImmersionFragment implements Handler.
         if(MainActivity.sCurrentCity!=null){
             params.put("city_code", "" + MainActivity.sCurrentCity.getCode());
         }
-
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
 
             @Override

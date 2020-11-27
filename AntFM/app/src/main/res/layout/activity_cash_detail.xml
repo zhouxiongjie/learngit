@@ -24,15 +24,40 @@
         android:orientation="vertical"
         android:padding="30dp">
 
-        <TextView
+        <!--<TextView-->
+            <!--android:id="@+id/type"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:drawableLeft="@drawable/ic_zhifubao_circle"-->
+            <!--android:drawablePadding="5dp"-->
+            <!--android:text="支付宝"-->
+            <!--android:textColor="#333333"-->
+            <!--android:textSize="@dimen/font_size_28px" />-->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:drawableLeft="@drawable/ic_zhifubao_circle"
-            android:drawablePadding="5dp"
-            android:text="支付宝"
-            android:textColor="#333333"
-            android:textSize="@dimen/font_size_28px" />
+            android:orientation="horizontal">
+
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/typeIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="&#xe67e;"
+                android:textColor="#1BA4E5"
+                android:textSize="@dimen/font_size_36px" />
+
+            <TextView
+                android:id="@+id/typeName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="支付宝"
+                android:textColor="#464746"
+                android:textSize="@dimen/font_size_28px" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/money"

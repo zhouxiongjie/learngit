@@ -12,8 +12,8 @@ MobSDK {
             SinaWeibo {
                 id 1
                 sortId 1
-                appKey "863300925"
-                appSecret "122edf316a6104cf7c710369f3719b9a"
+                appKey "2592649986"
+                appSecret "d8ccf12af21221d1dedc07e08bd23e78"
                 callbackUri "http://www.sharesdk.cn"
                 shareByAppClient true
                 enable true
@@ -35,8 +35,8 @@ MobSDK {
             Wechat {
                 id 2
                 sortId 2
-                appId "wxa798f0f7057253a3"
-                appSecret "4fbe20f1135e82c8852e251985b9cac4"
+                appId "wxc38f1e1d443dadd7"
+                appSecret "f3bcef3199cb9fe0e415b5ecbd2d367d"
                 userName "gh_afb25ac019c9"
                 path "pages/index/index.html?id=1"
                 bypassApproval false
@@ -51,8 +51,8 @@ MobSDK {
             WechatMoments {
                 id 3
                 sortId 3
-                appId "wxa798f0f7057253a3"
-                appSecret "4fbe20f1135e82c8852e251985b9cac4"
+                appId "wxc38f1e1d443dadd7"
+                appSecret "f3bcef3199cb9fe0e415b5ecbd2d367d"
                 bypassApproval false
                 enable true
             }
@@ -62,8 +62,8 @@ MobSDK {
             WechatFavorite {
                 id 4
                 sortId 4
-                appId "wxa798f0f7057253a3"
-                appSecret "4fbe20f1135e82c8852e251985b9cac4"
+                appId "wxc38f1e1d443dadd7"
+                appSecret "f3bcef3199cb9fe0e415b5ecbd2d367d"
                 bypassApproval false
                 enable true
             }
@@ -73,8 +73,8 @@ MobSDK {
             QQ {
                 id 5
                 sortId 5
-                appId "1105753219"
-                appKey "pUcWuvEHmg1FilIx"
+                appId "101910024"
+                appKey "f11d19b29f48d6a5c63977f1985085d9"
                 shareByAppClient true
                 bypassApproval false
                 enable true

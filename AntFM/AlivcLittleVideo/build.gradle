@@ -27,19 +27,19 @@ dependencies {
     // 播放器
 //    api externalPlayerPart
 
-    compile project(':Aliyunplayer:AlivcPlayer')
+    implementation project(':Aliyunplayer:AlivcPlayer')
 
     implementation 'com.facebook.fresco:fresco:0.12.0'
     // 短视频
     implementation project(':AliyunVideoCommon')
-    implementation externalAndroidSupportV4
-    implementation externalAndroidAppCompatV7
+//    implementation externalAndroidSupportV4
+    api externalAndroidAppCompatV7
     implementation externalOKHTTP
-    implementation externalAndroidRecyclerView
+    api externalAndroidRecyclerView
     implementation externalGSON
     implementation externalAliyunOSS
-    implementation externalAndroidCardView
-    implementation externalAndroidDesign
+    api 'androidx.cardview:cardview:1.0.0'/*externalAndroidCardView*/
+    api 'com.google.android.material:material:1.2.1'//externalAndroidDesign
     implementation externalAliyunVodUpload
 
 }

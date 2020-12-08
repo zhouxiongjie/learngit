@@ -1,35 +1,25 @@
 apply plugin: 'com.android.library'
-
 android {
     compileSdkVersion externalCompileSdkVersion
-
     defaultConfig {
         minSdkVersion externalMinSdkVersion
         targetSdkVersion externalTargetSdkVersion
         versionCode 1
         versionName "1.0"
-
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-
 }
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    // 播放器
+// 播放器
 //    api externalPlayerPart
-
     implementation project(':Aliyunplayer:AlivcPlayer')
-
-    implementation 'com.facebook.fresco:fresco:0.12.0'
+    implementation 'com.facebook.fresco:fresco:2.3.0'//0.12.0'
     // 短视频
     implementation project(':AliyunVideoCommon')
 //    implementation externalAndroidSupportV4
@@ -41,5 +31,5 @@ dependencies {
     api 'androidx.cardview:cardview:1.0.0'/*externalAndroidCardView*/
     api 'com.google.android.material:material:1.2.1'//externalAndroidDesign
     implementation externalAliyunVodUpload
-
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 }

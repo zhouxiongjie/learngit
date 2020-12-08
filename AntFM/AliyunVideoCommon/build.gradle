@@ -1,18 +1,14 @@
 apply plugin: 'com.android.library'
-
 android {
     compileSdkVersion externalCompileSdkVersion
 //    buildToolsVersion externalBuildToolsVersion
-
     defaultConfig {
         minSdkVersion externalMinSdkVersion
         targetSdkVersion externalTargetSdkVersion
     }
-
 }
-
 dependencies {
-    implementation (externalGlide){
+    implementation(externalGlide) {
         exclude group: "com.android.support"
     }
 //    implementation externalAndroidSupportV4 

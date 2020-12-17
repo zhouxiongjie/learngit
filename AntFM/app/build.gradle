@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 apply from: '../MobSDK.gradle'
 apply plugin: 'com.aliyun.ams.emas-services'
-apply plugin: 'mtj-circle-plugin'
+//apply plugin: 'mtj-circle-plugin'
 
 static def releaseTime() {
     return new Date().format("yyyy-MM-dd-HH.mm", TimeZone.getTimeZone("GMT+8"))
@@ -25,13 +25,13 @@ android {
 //    lintOptions{
 //        disable "ResourceType"
 //    }
-    MtjCirclePluginConfig {
-        appkey = "d11e565d03"
-        // 设置debug 开关，如果需要查看日志则打开开关，为避免影响性能建议上线前关闭（设置为false）
-        debug = false
-        // 默认启动此插件，如果开发者不需要可以禁用（设置为false）
-        enabled = true
-    }
+//    MtjCirclePluginConfig {
+//        appkey = "d11e565d03"
+//        // 设置debug 开关，如果需要查看日志则打开开关，为避免影响性能建议上线前关闭（设置为false）
+//        debug = false
+//        // 默认启动此插件，如果开发者不需要可以禁用（设置为false）
+//        enabled = true
+//    }
 //    MtjCirclePluginConfig {
 //
 //        appkey = "8bc0e3d645"

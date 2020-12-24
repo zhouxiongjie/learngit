@@ -261,5 +261,5 @@ dependencies {
     implementation "com.qmuiteam:qmui:$version"
     implementation "com.qmuiteam:arch:$version"
     annotationProcessor "com.qmuiteam:arch-compiler:$version"
-    implementation 'com.tencent.tbs.tbssdk:sdk:43939' //https://x5.tencent.com/docs/access.html
+//    implementation 'com.tencent.tbs.tbssdk:sdk:43939' //https://x5.tencent.com/docs/access.html
 }

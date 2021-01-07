@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/logo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        app:actualImageScaleType="fitXY"
+         />
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        app:actualImageScaleType="centerCrop"
+        app:placeholderImage="@drawable/banner_mask"
+        app:placeholderImageScaleType="centerCrop"
+        app:failureImage="@drawable/banner_mask"
+        app:failureImageScaleType="centerCrop"
+        app:roundAsCircle="false"
+        app:roundingBorderWidth="0dp"/>
+
+<!--    <TextView-->
+<!--        android:id="@+id/title"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_marginBottom="25dp"-->
+<!--        android:textColor="#FFFFFF"-->
+<!--        android:textSize="@dimen/font_size_17sp"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:maxLines="2"-->
+<!--        android:textStyle="bold"-->
+<!--        android:ellipsize="end"-->
+<!--        tools:text="音悦台"/>-->
+
+
+
+
+</RelativeLayout>
+
+
+
+
+

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/keyword"
+        android:layout_width="wrap_content"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:ellipsize="end"
+        android:textColor="#242424"
+        android:textSize="@dimen/font_size_34px"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="10dp"
+        tools:text="全国新增确认15例全国新增确认15例全国新增确认15例全国新增确认15例全国新增确认15例"
+        />
+
+    <com.shuangling.software.customview.FontIconView
+        android:id="@+id/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:text="&#xe62a;"
+        android:textColor="#999999"
+        android:textSize="@dimen/font_size_28px"
+
+        android:layout_marginRight="10dp"
+        android:layout_gravity="center_vertical"/>
+    
+    <ImageView
+        android:id="@+id/divide"
+        android:layout_width="1dp"
+        android:layout_height="12dp"
+        android:background="#D8D8D8"
+        android:layout_gravity="center_vertical"/>
+
+</LinearLayout>
+
+
+

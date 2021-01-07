@@ -2,11 +2,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--动态承载WebView的容器-->
     <FrameLayout
         android:id="@+id/fl_web_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!--progressBar 需要时再inflate-->
     <ViewStub
         android:id="@+id/viewStub"
         android:layout_width="match_parent"

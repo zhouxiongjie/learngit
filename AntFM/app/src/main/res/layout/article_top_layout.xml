@@ -100,13 +100,7 @@
             android:textSize="@dimen/font_size_12sp" />
     </RelativeLayout>
 
-    <!--<android.webkit.WebView
-        android:id="@+id/webView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="400dp"
-        android:scrollbars="none"
-        android:visibility="visible" />-->
+
     <FrameLayout
         android:id="@+id/fl_web_container"
         android:layout_width="match_parent"

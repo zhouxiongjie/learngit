@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@android:color/white"
     android:descendantFocusability="blocksDescendants"
     android:orientation="vertical">
 
@@ -36,6 +37,7 @@
         android:id="@+id/organizationLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:padding="10dp">
 
         <com.facebook.drawee.view.SimpleDraweeView
@@ -66,8 +68,8 @@
             android:textColor="#282828"
             android:textSize="@dimen/font_size_14sp"
             android:textStyle="bold"
-            tools:text="浏阳电台"
-            tools:ignore="RelativeOverlap" />
+            tools:ignore="RelativeOverlap"
+            tools:text="浏阳电台" />
 
         <TextView
             android:id="@+id/time"
@@ -100,12 +102,17 @@
             android:textSize="@dimen/font_size_12sp" />
     </RelativeLayout>
 
-
+    <!--代碼中加载WebView-->
     <FrameLayout
         android:id="@+id/fl_web_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="500dp" /><!--代碼中加载WebView-->
+        android:minHeight="500dp" />
+    <!--<android.webkit.WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="500dp"/>-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -147,8 +154,8 @@
                     android:padding="3dp"
                     android:textColor="@color/praise_color_selector"
                     android:textSize="@dimen/font_size_12sp"
-                    tools:text="25"
-                    app:drawableStartCompat="@drawable/praise_selector" />
+                    app:drawableStartCompat="@drawable/praise_selector"
+                    tools:text="25" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -177,7 +184,7 @@
         android:id="@+id/divide_line"
         android:layout_width="match_parent"
         android:layout_height="6dp"
-        android:visibility="invisible"
         android:alpha="0.3"
-        android:background="@color/divideColorTwo" />
+        android:background="@color/divideColorTwo"
+        android:visibility="invisible" />
 </LinearLayout>

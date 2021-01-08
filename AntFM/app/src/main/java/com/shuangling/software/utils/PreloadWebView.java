@@ -67,6 +67,7 @@ public class PreloadWebView {
 
     private WebView createWebView() {
         WebView webview = new WebView(new MutableContextWrapper(MyApplication.getInstance()));
+//        webview.loadUrl("file:///android_asset/app_article_static.html");//
         WebSettings s = webview.getSettings();
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
             s.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);

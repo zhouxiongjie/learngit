@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <style>
+    #content {
+      padding: 0 20px;
+      line-height: 30px;
+    }
+
+    #content img, #content video {
+      max-width: 100% !important;
+    }
+
+    #content audio {
+      width: 100%;
+    }
+  </style>
+  <!--NODE_ENV_API_OUT-->
+  <script>
+    window.serveUrl = 'http://api-cms.review.slradio.cn';
+  </script>
+</head>
+<body>
+<div id="content">
+
+</div>
+<script>
+  var MINI_PIC_SIZE = 250;
+  var BIG_PIC_SIZE = 600;
+  var imgSrcArr = [];
+  // var articleId = getId();
+  // var initIsBigPic = getQuerys('size') == 2;
+  // var multiple = getQuerys('multiple') || 1;
+  // var app = getQuerys('app');
+  var initIsBigPic = false;
+  var multiple = 1;
+  var app = 'android';
+
+  // 处理字体大小缩放
+  function handleMuti(multiple) {
+    if (multiple && multiple != 1) {
+      var el = document.getElementById('content');
+      console.log('styles');
+      console.log('fontSize', window.getComputedStyle(el).fontSize);
+      var fontSize = parseFloat(window.getComputedStyle(el).fontSize.replace('px'));
+      var muti = multiple;
+      console.log('multiple', muti);
+      el.style.fontSize = (fontSize * muti) + 'px';
+      var lineHeight = parseFloat(window.getComputedStyle(el).lineHeight.replace('px'));
+      el.style.lineHeight = (lineHeight * muti) + 'px';
+    }
+  }
+
+  // 播放视频时，停止其他正在播放的视频
+  function stopAllVideo(contentVideo) {
+    var videos = contentVideo.getElementsByTagName("video");
+    for (var i = videos.length - 1; i >= 0; i--) {
+      videos[i].setAttribute('data-index', i);
+      videos[i].addEventListener('play', function (e) {
+        var targetIndex = e.target.getAttribute('data-index');
+        for (var j = videos.length - 1; j >= 0; j--) {
+          if (videos[j].getAttribute('data-index') !== targetIndex) {
+            videos[j].pause();
+          }
+        }
+      })
+    }
+  }
+
+  // 初始化-数据请求、节点渲染、业务处理
+  function _renderRich(txt, multiple2, isBigPic) {
+    initIsBigPic = isBigPic == 2;
+    if (multiple2 == '0'){
+        multiple = 1;
+    } else {
+         multiple = multiple2
+         
+    }
+    handleMuti(multiple || 1);
+    var size = MINI_PIC_SIZE;
+    if (initIsBigPic) {
+      size = BIG_PIC_SIZE;
+    }
+    var renderDom = document.createElement('div');
+    renderDom.innerHTML = txt;
+    stopAllVideo(renderDom);
+    var renderDomImg = renderDom.querySelectorAll('img');
+    if (renderDomImg.length) {
+      for (var i = 0; i < renderDomImg.length; i++) {
+        var item = renderDomImg[i];
+        var parIndent = item.parentElement.style.textIndent;
+        var textAlign = item.parentElement.style.textAlign;
+        console.log('99999999', item.parentElement.style);
+        if (parIndent == '2em') {
+          item.style.marginLeft = '-' + (parIndent);
+        }
+        if (textAlign != 'center') {
+          item.parentElement.style.textAlign = 'center';
+        }
+        imgSrcArr.push(item.src);
+        if (item.src.indexOf('.jpg') > -1 || item.src.indexOf('.jpeg') > -1 || item.src.indexOf('.png') > -1 || item.src.indexOf('.gif') > -1) {
+          item.src = item.src.replace(/\.jpeg/g, `.jpeg?x-oss-process=image/resize,m_lfit,w_${size}`)
+          item.src = item.src.replace(/\.jpg/g, `.jpg?x-oss-process=image/resize,m_lfit,w_${size}`)
+          item.src = item.src.replace(/\.png/g, `.png?x-oss-process=image/resize,m_lfit,w_${size}`)
+          item.src = item.src.replace(/\.gif/g, `.gif?x-oss-process=image/resize,m_lfit,w_${size}`)
+        } else {
+          item.src += `?x-oss-process=image/resize,m_lfit,w_${size}/format,jpg`;
+        }
+        item.setAttribute('data-src-id', Math.random());
+        item.setAttribute('data-src-size', size);
+        item.setAttribute('data-img-num', i);
+        item.onclick = handleImgClick;
+      }
+    }
+    document.getElementById('content').appendChild(renderDom);
+  }
+
+
+  function handleImgClick($event) {
+    var size = $event.target.getAttribute('data-src-size');
+    var viewIndex = $event.target.getAttribute('data-img-num');
+    if (size == MINI_PIC_SIZE) {
+      // 变大图
+      handleImgToBig($event.target.getAttribute('data-src-id'));
+    } else {
+      if (app === 'ios') {
+        window.webkit.messageHandlers.viewImgEvent.postMessage({
+          imgs: imgSrcArr,
+          index: viewIndex
+        });
+      } else {//android
+        window.clientJS.viewImgEvent(JSON.stringify({
+          imgs: imgSrcArr,
+          index: viewIndex
+        }));
+      }
+    }
+
+    function handleImgToBig(id) {
+      var content = document.getElementById('content');
+      var img = content.getElementsByTagName("img");
+      if (id) {
+        // 单个替换
+        for (var i = 0; i < img.length; i++) {
+          var item = img[i];
+          var imgId = item.getAttribute('data-src-id');
+          var src = item.src.split('?')[0];
+          if (id == imgId) {
+            if (item.src.indexOf('.jpg') > -1 || item.src.indexOf('.jpeg') > -1 || item.src.indexOf('.png') > -1 || item.src.indexOf('.gif') > -1) {
+              src = src.replace(/\.jpeg/g, `.jpeg?x-oss-process=image/resize,m_lfit,w_${BIG_PIC_SIZE}`)
+              src = src.replace(/\.jpg/g, `.jpg?x-oss-process=image/resize,m_lfit,w_${BIG_PIC_SIZE}`)
+              src = src.replace(/\.png/g, `.png?x-oss-process=image/resize,m_lfit,w_${BIG_PIC_SIZE}`)
+              src = src.replace(/\.gif/g, `.gif?x-oss-process=image/resize,m_lfit,w_${BIG_PIC_SIZE}`)
+            } else {
+              src += `?x-oss-process=image/resize,m_lfit,w_${BIG_PIC_SIZE}/format,jpg`;
+            }
+            item.src = src;
+            item.setAttribute('data-src-size', BIG_PIC_SIZE);
+          }
+        }
+      }
+    }
+  }
+
+    window._renderRich = _renderRich;
+
+</script>
+</body>
+</html>

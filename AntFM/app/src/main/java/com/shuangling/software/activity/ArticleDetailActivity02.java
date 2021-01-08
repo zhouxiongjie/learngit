@@ -44,8 +44,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ethanhua.skeleton.Skeleton;
-import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
@@ -60,10 +58,8 @@ import com.qmuiteam.qmui.skin.QMUISkinManager;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
-import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
-import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.ArticleRecyclerAdapter;
@@ -132,20 +128,20 @@ import static com.shuangling.software.utils.CommonUtils.NETWORKTYPE_WIFI;
 
 @EnableDragToClose()
 public class ArticleDetailActivity02 extends BaseAudioActivity implements Handler.Callback {
-    public static final String TAG = "AlbumDetailActivity";
-    public static final int MSG_GET_RELATED_POST = 0x1;
-    public static final int MSG_GET_COMMENTS = 0x2;
-    public static final int MSG_WRITE_COMMENTS = 0x3;
-    public static final int MSG_PRAISE = 0x4;
+    public static final String TAG = "ArticleDetailActivity02";
+    public static final int MSG_GET_RELATED_POST = 0x1;//相关文章
+    public static final int MSG_GET_COMMENTS = 0x2;//评论列表
+    public static final int MSG_WRITE_COMMENTS = 0x3;//写评论
+    public static final int MSG_PRAISE = 0x4;//点赞
     public static final int REQUEST_LOGIN = 0x5;
-    public static final int MSG_DELETE_COMMENT = 0x6;
+    public static final int MSG_DELETE_COMMENT = 0x6;//删除评论
     public static final int SHARE_FAILED = 0x7;
     public static final int SHARE_SUCCESS = 0x8;
-    public static final int MSG_GET_DETAIL = 0x9;
-    public static final int MSG_GET_VOICES = 0xa;
-    public static final int MSG_ATTENTION_CALLBACK = 0xb;
-    public static final int MSG_COLLECT_CALLBACK = 0xc;
-    public static final int MSG_LIKE_CALLBACK = 0xd;
+    public static final int MSG_GET_DETAIL = 0x9;//文章详情
+    public static final int MSG_GET_VOICES = 0xa;//朗读文章
+    public static final int MSG_ATTENTION_CALLBACK = 0xb;//关注
+    public static final int MSG_COLLECT_CALLBACK = 0xc;//收藏
+    public static final int MSG_LIKE_CALLBACK = 0xd;//点赞
     public static final int REQUEST_REPORT = 0xe;
     public static final int REQUEST_PERMISSION_CODE = 0x0110;
     @BindView(R.id.recyclerView)
@@ -159,11 +155,11 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     @BindView(R.id.commentNumLayout)
     FrameLayout commentNumLayout;
     @BindView(R.id.refreshLayout)
-    SmartRefreshLayout refreshLayout;
+    SmartRefreshLayout refreshLayout;//评论列表
     @BindView(R.id.img_back)
     ImageView imgBack;
     @BindView(R.id.logo)
-    SimpleDraweeView logo;
+    SimpleDraweeView logo;//Toolbar中间的图片
     @BindView(R.id.organizationLogo)
     SimpleDraweeView organizationLogo;
     @BindView(R.id.organization)
@@ -196,7 +192,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     private int currentPage = 1;
     private Article mArticle;
     private ArticleVoicesInfo mArticleVoicesInfo;
-    private ViewSkeletonScreen mViewSkeletonScreen;
+    //    private ViewSkeletonScreen mViewSkeletonScreen;
     private boolean firstTime = true;
     private boolean isPlaying = false;
     private int mScrollY;
@@ -216,7 +212,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
+    protected void onNewIntent(Intent intent) {//当Activity被设以singleTop模式启动，当需要再次响应此Activity启动需求时，会复用栈顶的已有Activity，还会调用onNewIntent方法
         mArticleId = intent.getIntExtra("articleId", 0);
         init();
         super.onNewIntent(intent);
@@ -265,100 +261,94 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     }
 
     private void init() {
-        mViewSkeletonScreen = Skeleton.bind(root)//骨骼图
-                .load(R.layout.skeleton_article_detail)
-                .shimmer(false)
-                .angle(20)
-                .duration(1000)
-                .color(R.color.shimmer_color)
-                .show();
+//        if (mViewSkeletonScreen == null) {
+//            mViewSkeletonScreen = Skeleton.bind(root)//骨骼图
+//                    .load(R.layout.skeleton_article_detail)
+//                    .shimmer(false)
+//                    .angle(20)
+//                    .duration(1000)
+//                    .color(R.color.shimmer_color)
+//                    .show();
+//        }
         if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getLogo2())) {
             Uri uri = Uri.parse(MyApplication.getInstance().getStation().getLogo2());
-            ImageLoader.showThumb(uri, logo, CommonUtils.dip2px(161), CommonUtils.dip2px(28));
+            ImageLoader.showThumb(uri, logo, CommonUtils.dip2px(161), CommonUtils.dip2px(28));//Toolbar中间的图片
         }
-        refreshLayout.setRefreshFooter(new ClassicsFooter(this));//设置
-        mHandler = new Handler(this);
-        getArticleDetail();
-        imgBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-        imgMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mArticle != null) {
-                    ShareDialog dialog = ShareDialog.getInstance(mArticle.getIs_collection() != 0, mArticle.getIs_user_report() != 0);
-                    dialog.setIsShowPosterButton(true);
-                    dialog.setShareHandler(new ShareDialog.ShareHandler() {
-                        @Override
-                        public void onShare(String platform) {//分享至微信/QQ等
-                            if (mArticle != null) {
-                                String logo = "";
-                                if (mArticle.getArticle().getCovers().size() > 0) {
-                                    logo = mArticle.getArticle().getCovers().get(0);
-                                }
-                                String url;
-                                if (User.getInstance() != null) {
-                                    url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?from_user_id=" + User.getInstance().getId() + "&from_url=" + ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
-                                } else {
-                                    url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?from_url=" + ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
-                                }
-                                showShare(platform, mArticle.getTitle(), mArticle.getDes(), logo, url);
+        refreshLayout.setRefreshFooter(new ClassicsFooter(this));// 评论
+        if (mHandler == null) mHandler = new Handler(this);
+        getArticleDetail();//文章详情
+        imgBack.setOnClickListener(v -> finish());
+        imgMore.setOnClickListener(v -> {
+            if (mArticle != null) {
+                ShareDialog dialog = ShareDialog.getInstance(mArticle.getIs_collection() != 0, mArticle.getIs_user_report() != 0);
+                dialog.setIsShowPosterButton(true);
+                dialog.setShareHandler(new ShareDialog.ShareHandler() {
+                    @Override
+                    public void onShare(String platform) {//分享至微信/QQ等
+                        if (mArticle != null) {
+                            String logo = "";
+                            if (mArticle.getArticle().getCovers().size() > 0) {
+                                logo = mArticle.getArticle().getCovers().get(0);
                             }
-                        }
-
-                        @Override
-                        public void poster() {//点击分享海报
-                            showPosterShare();
-                        }
-
-                        @Override
-                        public void report() {//举报按钮
-                            if (User.getInstance() == null) {
-                                Intent it = new Intent(ArticleDetailActivity02.this, NewLoginActivity.class);
-                                it.putExtra("jump_url", ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
-                                startActivityForResult(it, REQUEST_LOGIN);
+                            String url;
+                            if (User.getInstance() != null) {
+                                url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?from_user_id=" + User.getInstance().getId() + "&from_url=" + ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
                             } else {
-                                Intent it = new Intent(ArticleDetailActivity02.this, ReportActivity.class);
-                                it.putExtra("id", "" + mArticle.getId());
-                                startActivityForResult(it, REQUEST_REPORT);
+                                url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId + "?from_url=" + ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
                             }
+                            showShare(platform, mArticle.getTitle(), mArticle.getDes(), logo, url);
                         }
+                    }
 
-                        @Override
-                        public void copyLink() {//获取剪贴板管理器：
-                            ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                            // 创建普通字符型ClipData
-                            ClipData clipData = ClipData.newPlainText("Label", ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
-                            // 将ClipData内容放到系统剪贴板里。
-                            cm.setPrimaryClip(clipData);
-                            ToastUtils.show("复制成功，可以发给朋友们了。");
+                    @Override
+                    public void poster() {//点击分享海报
+                        showPosterShare();
+                    }
+
+                    @Override
+                    public void report() {//举报按钮
+                        if (User.getInstance() == null) {
+                            Intent it = new Intent(ArticleDetailActivity02.this, NewLoginActivity.class);
+                            it.putExtra("jump_url", ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
+                            startActivityForResult(it, REQUEST_LOGIN);
+                        } else {
+                            Intent it = new Intent(ArticleDetailActivity02.this, ReportActivity.class);
+                            it.putExtra("id", String.valueOf(mArticle.getId()));
+                            startActivityForResult(it, REQUEST_REPORT);
                         }
+                    }
 
-                        @Override
-                        public void refresh() {//刷新
-                            init();
-                        }
+                    @Override
+                    public void copyLink() {//获取剪贴板管理器：
+                        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        // 创建普通字符型ClipData
+                        ClipData clipData = ClipData.newPlainText("Label", ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
+                        // 将ClipData内容放到系统剪贴板里。
+                        cm.setPrimaryClip(clipData);
+                        ToastUtils.show("复制成功，可以发给朋友们了。");
+                    }
 
-                        @Override
-                        public void collectContent() {//收藏
-                            if (User.getInstance() == null) {
-                                Intent it = new Intent(ArticleDetailActivity02.this, NewLoginActivity.class);
-                                it.putExtra("jump_url", ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
-                                startActivityForResult(it, REQUEST_LOGIN);
+                    @Override
+                    public void refresh() {//刷新
+                        init();
+                    }
+
+                    @Override
+                    public void collectContent() {//收藏
+                        if (User.getInstance() == null) {
+                            Intent it = new Intent(ArticleDetailActivity02.this, NewLoginActivity.class);
+                            it.putExtra("jump_url", ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
+                            startActivityForResult(it, REQUEST_LOGIN);
+                        } else {
+                            if (mArticle.getIs_collection() == 0) {
+                                collect(true);
                             } else {
-                                if (mArticle.getIs_collection() == 0) {
-                                    collect(true);
-                                } else {
-                                    collect(false);
-                                }
+                                collect(false);
                             }
                         }
-                    });
-                    dialog.show(getSupportFragmentManager(), "ShareDialog");
-                }
+                    }
+                });
+                dialog.show(getSupportFragmentManager(), "ShareDialog");
             }
         });
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -368,7 +358,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                int srcollY = recyclerView.getScrollY();
+//                int srcollY = recyclerView.getScrollY();
                 int verticalOffset = recyclerView.computeVerticalScrollOffset();
                 int height1 = mHeadViewHolder.articleTitle.getHeight();
                 int height2 = mHeadViewHolder.organizationLayout.getHeight();
@@ -388,19 +378,19 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         ViewGroup headView = (ViewGroup) getLayoutInflater().inflate(R.layout.article_top_layout, recyclerView, false);
         mHeadViewHolder = new HeadViewHolder(headView);// 文章详情页面原生头部、webview、原生阅读次数、点赞、收藏
         mAdapter.addHeaderView(headView);
-        String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;
-        int size = 1;
+        String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;//
+        int size = 1;//小图
         int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 0);
         if (netLoad == 0 || CommonUtils.getNetWorkType(this) == NETWORKTYPE_WIFI) {
-            size = 2;
+            size = 2;//大图
         }
         if (User.getInstance() == null) {
             url = url + "?app=android&size=" + size + "&multiple=" + CommonUtils.getFontSize();
         } else {
             url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size + "&multiple=" + CommonUtils.getFontSize();
         }
-        WebView webView = mHeadViewHolder.webView;
-//        WebSettings s = webView.getSettings();//todo 临时删除
+//        WebView webView = mHeadViewHolder.webView;
+//        WebSettings s = webView.getSettings();//to do 临时删除
 //        CommonUtils.setWebviewUserAgent(s);
 //        s.setTextZoom(100);
 //        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
@@ -409,26 +399,15 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 //        webView.getSettings().setBlockNetworkImage(false);
 //        s.setJavaScriptEnabled(true);       //js
 //        s.setDomStorageEnabled(true);       //localStorage
-//        s.setJavaScriptCanOpenWindowsAutomatically(true);
-//        s.setPluginState(WebSettings.PluginState.ON);
-//        s.setAllowFileAccess(true);
-//        s.setLoadWithOverviewMode(true);
-//        s.setUseWideViewPort(true);
-//        s.setCacheMode(WebSettings.LOAD_NO_CACHE);
-//        s.setCacheMode(WebSettings.LOAD_DEFAULT);
 
-        InsideWebChromeClient mInsideWebChromeClient = new InsideWebChromeClient();//视频全屏
-        InsideWebViewClient mInsideWebViewClient = new InsideWebViewClient();
-        webView.setWebChromeClient(mInsideWebChromeClient);
-        webView.setWebViewClient(mInsideWebViewClient);
-        webView.addJavascriptInterface(new JsToAndroid(), "clientJS");
-        webView.loadUrl(url);
-        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
-            @Override
-            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
-                currentPage++;
-                getComments(1);
-            }
+        mHeadViewHolder.webView.setWebChromeClient(new InsideWebChromeClient());//Web浏览器Client
+        mHeadViewHolder.webView.setWebViewClient(new InsideWebViewClient());//Web视图Client
+        mHeadViewHolder.webView.addJavascriptInterface(new JsToAndroid(), "clientJS");
+        mHeadViewHolder.webView.loadUrl(url);
+//        mHeadViewHolder.webView.loadUrl("file:///android_asset/app_article_static.html");//
+        refreshLayout.setOnLoadMoreListener(refreshLayout -> {//评论
+            currentPage++;
+            getComments(1);
         });
     }
 
@@ -437,21 +416,18 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
      */
     private final class JsToAndroid {
         @JavascriptInterface
-        public void viewImgEvent(final String imgs) {
-//            {"imgs":["https://sl-cdn.slradio.cn/vms/merchants/2019/20191223/1577078953/e252c3bea3040ac6eb2cc985d5f298de"],"index":"0"}
+        public void viewImgEvent(final String imgs) {//            {"imgs":["https://sl-cdn.slradio.cn/vms/merchants/2019/20191223/1577078953/e252c3bea3040ac6eb2cc985d5f298de"],"index":"0"}
             JSONObject jo = JSON.parseObject(imgs);
             final JSONArray ja = jo.getJSONArray("imgs");
             final int index = jo.getInteger("index");
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    ArrayList<ImageInfo> images = new ArrayList<>();
-                    for (int i = 0; i < ja.size(); i++) {
-                        ImageInfo image = new ImageInfo((String) ja.get(i));
-                        images.add(image);
-                        Rect bounds = new Rect(CommonUtils.getScreenWidth() / 2, CommonUtils.getScreenHeight() / 2, CommonUtils.getScreenWidth() / 2, CommonUtils.getScreenHeight() / 2);
-                        image.setBounds(bounds);
-                    }
+            mHandler.post(() -> {
+                ArrayList<ImageInfo> images = new ArrayList<>();
+                for (int i = 0; i < ja.size(); i++) {
+                    ImageInfo image = new ImageInfo((String) ja.get(i));
+                    images.add(image);
+                    Rect bounds = new Rect(CommonUtils.getScreenWidth() / 2, CommonUtils.getScreenHeight() / 2, CommonUtils.getScreenWidth() / 2, CommonUtils.getScreenHeight() / 2);
+                    image.setBounds(bounds);
+                }
 //                    GPreviewBuilder.from(ArticleDetailActivity02.this)
 //                            .setData(images)
 //                            .setCurrentIndex(index)
@@ -460,36 +436,26 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 //                            .setType(GPreviewBuilder.IndicatorType.Number)
 //                            .start();
 
-                    GPreviewBuilder.from(ArticleDetailActivity02.this)
-                            .setData(images)
-                            .setCurrentIndex(index)
-                            .setUserFragment(PicturePreviewFragment.class)
-                            .setDrag(true, 0.6f)
-                            .setSingleFling(true)
-                            .setType(GPreviewBuilder.IndicatorType.Number)
-                            .start();
-
-
-                }
+                GPreviewBuilder.from(ArticleDetailActivity02.this)
+                        .setData(images)
+                        .setCurrentIndex(index)
+                        .setUserFragment(PicturePreviewFragment.class)
+                        .setDrag(true, 0.6f)
+                        .setSingleFling(true)
+                        .setType(GPreviewBuilder.IndicatorType.Number)
+                        .start();
             });
         }
-//        @JavascriptInterface
-//        public void viewImgEvent(final String imgs) {
-//            Log.i("test",imgs);
-//        }
-//        @JavascriptInterface
-//        public void viewImgEvent(final String imgs[],final int index) {
-//        }
     }
 
     private void getRelatedPosts() {//相关文章
         String url = ServerInfo.serviceIP + ServerInfo.getRelatedRecommend;
         Map<String, String> params = new HashMap<>();
-        params.put("post_id", "" + mArticleId);
+        params.put("post_id", String.valueOf(mArticleId));
         params.put("is_mixed", "1");
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
             @Override
-            public void onResponse(Call call, String response) throws IOException {
+            public void onResponse(Call call, String response) {
                 Message msg = Message.obtain();
                 msg.what = MSG_GET_RELATED_POST;
                 msg.obj = response;
@@ -509,9 +475,9 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         }
         String url = ServerInfo.serviceIP + ServerInfo.getComentList;
         Map<String, String> params = new HashMap<>();
-        params.put("post_id", "" + mArticleId);
-        params.put("page", "" + currentPage);
-        params.put("page_size", "" + Constant.PAGE_SIZE);
+        params.put("post_id", String.valueOf(mArticleId));
+        params.put("page", String.valueOf(currentPage));
+        params.put("page_size", String.valueOf(Constant.PAGE_SIZE));
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
@@ -559,7 +525,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     private void deleteComment(Comment comment) {
         String url = ServerInfo.serviceIP + ServerInfo.getComentList;
         Map<String, String> params = new HashMap<>();
-        params.put("id", "" + comment.getId());
+        params.put("id", String.valueOf(comment.getId()));
         OkHttpUtils.delete(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
@@ -581,7 +547,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     private void writeComments(String content, String parentId, String topCommentId) {
         String url = ServerInfo.serviceIP + ServerInfo.getComentList;
         Map<String, String> params = new HashMap<>();
-        params.put("post_id", "" + mArticleId);
+        params.put("post_id", String.valueOf(mArticleId));
         params.put("type", "1");
         params.put("content", content);
         params.put("parent_id", parentId);
@@ -610,7 +576,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     public void attention(final boolean follow) {
         String url = ServerInfo.serviceIP + ServerInfo.attention;
         Map<String, String> params = new HashMap<>();
-        params.put("id", "" + mArticle.getMerchant_id());
+        params.put("id", String.valueOf(mArticle.getMerchant_id()));
         if (follow) {
             params.put("type", "1");
         } else {
@@ -637,22 +603,6 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         if (event.getEventName().equals("onFontSizeChanged")) {
             init();
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        EventBus.getDefault().unregister(this);
-//        mHeadViewHolder.webView.destroy();
-        if (mHeadViewHolder.webView != null) {
-            ViewParent parent = mHeadViewHolder.webView.getParent();
-            if (parent != null) {
-                ((ViewGroup) parent).removeView(mHeadViewHolder.webView);
-            }
-            mHeadViewHolder.webView.removeAllViews();
-            mHeadViewHolder.webView.destroy();
-            mHeadViewHolder.webView = null;
-        }
-        super.onDestroy();
     }
 
     @OnClick({R.id.writeComment, R.id.commentNumLayout, R.id.refresh})
@@ -728,7 +678,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                     llm.setStackFromEnd(false);
                 }
                 break;
-            case R.id.refresh:
+            case R.id.refresh://没有网络时，中间的刷新按钮
                 init();
                 break;
         }
@@ -741,7 +691,6 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
-//                    mViewSkeletonScreen.hide();//暂不隐藏，等onPageFinished时才隐藏
                     networkError.setVisibility(View.GONE);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         mArticle = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), Article.class);
@@ -749,9 +698,21 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         if (noData.getVisibility() == View.VISIBLE) {
                             noData.setVisibility(View.GONE);
                         }
-//                        articleVoices();//朗读文章 todo 此三个接口调用等WebView加载完成onPageFinished再执行
-//                        getComments(0);//获取评论列表
+
+//                        int size = 1;//小图
+//                        int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 0);
+//                        if (netLoad == 0 || CommonUtils.getNetWorkType(this) == NETWORKTYPE_WIFI) {
+//                            size = 2;//大图
+//                        }
+//                        String js = "javascript:_renderRich('" + mArticle.getArticle().getContent() + "','" + CommonUtils.getFontSize() + "','" + size + "')";//
+//                        runOnUiThread(() -> {
+//                            mHeadViewHolder.webView.loadUrl(js);//todo
+////                                mViewSkeletonScreen.hide();//隐藏骨骼图
+//                        });
+
 //                        getRelatedPosts();//相关推荐
+//                        getComments(0);//获取评论列表
+//                        articleVoices();//朗读文章   此三个接口调用等WebView加载完成onPageFinished再执行
                         if (mArticle.getAuthor_info() != null && mArticle.getAuthor_info().getMerchant() != null) {
                             if (!TextUtils.isEmpty(mArticle.getAuthor_info().getMerchant().getLogo())) {
                                 Uri uri = Uri.parse(mArticle.getAuthor_info().getMerchant().getLogo());
@@ -828,11 +789,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                             }
                         });
                         mHeadViewHolder.playTimes.setText(String.format(Locale.CHINESE, "%s人阅读", CommonUtils.getShowNumber(mArticle.getView())));
-                        if (mArticle.getIs_likes() == 0) {
-                            mHeadViewHolder.praiseSum.setActivated(true);
-                        } else {
-                            mHeadViewHolder.praiseSum.setActivated(false);
-                        }
+                        mHeadViewHolder.praiseSum.setActivated(mArticle.getIs_likes() == 0);
                         mHeadViewHolder.praiseSum.setText(String.valueOf(mArticle.getLike()));
                         if (mArticle.getIs_collection() == 0) {
                             mHeadViewHolder.collect.setActivated(true);
@@ -850,7 +807,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                                     it.putExtra("jump_url", ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
                                     startActivityForResult(it, REQUEST_LOGIN);
                                 } else {
-                                    like(mArticle.getIs_likes() == 0);
+                                    like(mArticle.getIs_likes() == 0);//点赞/取消赞
                                 }
                             }
                         });
@@ -965,6 +922,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                mHeadViewHolder.divide_line.setVisibility(View.VISIBLE);//网页加载完成才显示分割线，以免出现闪屏问题
             }
             break;
             case MSG_GET_COMMENTS: {// 获取评论列表
@@ -995,7 +953,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         @Override
                         public void praiseItem(Comment comment, View v) {
                             if (User.getInstance() != null) {
-                                praise("" + comment.getId(), v);
+                                praise(String.valueOf(comment.getId()), v);
                             } else {
                                 //startActivityForResult(new Intent(ArticleDetailActivity02.this, NewLoginActivity.class), REQUEST_LOGIN);
                                 Intent it = new Intent(ArticleDetailActivity02.this, NewLoginActivity.class);
@@ -1087,7 +1045,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                                                 } else {
                                                     CommonUtils.closeInputMethod(ArticleDetailActivity02.this);
                                                     //发送评论
-                                                    writeComments(text, "" + comment.getId(), "" + comment.getId());
+                                                    writeComments(text, String.valueOf(comment.getId()), String.valueOf(comment.getId()));
                                                     mCommentDialog.dismiss();
                                                 }
                                             }
@@ -1447,11 +1405,11 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         oks.show(this);
     }
 
-    public void shareStatistics(String channel, String postId, String shardUrl) {
+    public void shareStatistics(String channel, String postId, String shardUrl) {//未使用
         String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
         Map<String, String> params = new HashMap<>();
         if (User.getInstance() != null) {
-            params.put("user_id", "" + User.getInstance().getId());
+            params.put("user_id", String.valueOf(User.getInstance().getId()));
         }
         params.put("channel", channel);
         params.put("post_id", postId);
@@ -1473,7 +1431,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
     private void getArticleDetail() {//文章详情
         String url = ServerInfo.serviceIP + ServerInfo.getArticleDetail + mArticleId;
-        Map<String, String> params = new HashMap<>();
+//        Map<String, String> params = new HashMap<>();
         OkHttpUtils.get(url, null, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
@@ -1488,7 +1446,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mViewSkeletonScreen.hide();
+//                        mViewSkeletonScreen.hide();//隐藏骨骼图
                         networkError.setVisibility(View.VISIBLE);
                     }
                 });
@@ -1514,10 +1472,10 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         });
     }
 
-    public void collect(final boolean collect) {//收藏
+    private void collect(final boolean collect) {//收藏
         String url = ServerInfo.serviceIP + ServerInfo.collect01;
         Map<String, String> params = new HashMap<>();
-        params.put("id", "" + mArticleId);
+        params.put("id", String.valueOf(mArticleId));
         if (collect) {
             params.put("type", "1");
         } else {
@@ -1539,10 +1497,10 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         });
     }
 
-    public void like(final boolean like) {//点赞
+    private void like(final boolean like) {//点赞
         String url = ServerInfo.serviceIP + ServerInfo.like;
         Map<String, String> params = new HashMap<>();
-        params.put("id", "" + mArticleId);
+        params.put("id", String.valueOf(mArticleId));
         if (like) {
             params.put("type", "1");
         } else {
@@ -1612,6 +1570,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
 
+        @Override
         public void onHideCustomView() {
             mHeadViewHolder.webView.setVisibility(View.VISIBLE);
             if (mCustomView == null) {
@@ -1626,11 +1585,13 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         }
     }
 
-    private class InsideWebViewClient extends WebViewClient {
+    private class InsideWebViewClient extends WebViewClient {//WebViewClient
+
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//            Log.e("!", "shouldOverrideUrlLoading");
             if (url != null) {
-               String suffix = url.substring(url.lastIndexOf("."));
+                String suffix = url.substring(url.lastIndexOf(".")/*, url.length() - 1*/);
                 if (suffix.equalsIgnoreCase(".pdf") || suffix.equalsIgnoreCase(".doc") || suffix.equalsIgnoreCase(".docx") || suffix.equalsIgnoreCase(".wps")/*|| url.endsWith(".ppt") || url.endsWith(".pptx") || url.endsWith(".xls") || url.endsWith(".xlsx")*/) {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.addCategory(Intent.CATEGORY_BROWSABLE);
@@ -1653,50 +1614,84 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
             if (view.getProgress() == 100) {
-                mViewSkeletonScreen.hide();//隐藏骨骼图
+//                Log.e("!", "getArticleDetail");
+//                getArticleDetail();//文章详情
+
                 getRelatedPosts();//相关推荐
                 articleVoices();//朗读文章
                 getComments(0);//获取评论列表
-                mHeadViewHolder.divide_line.setVisibility(View.VISIBLE);//网页加载完成才显示分割线，以免出现闪屏问题
             }
         }
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        mHeadViewHolder.webView.onPause();
+    public void onResume() {
+        super.onResume();
+        if (mHeadViewHolder.webView != null) mHeadViewHolder.webView.onResume();
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        mHeadViewHolder.webView.onResume();
+    public void onPause() {
+        super.onPause();
+        if (mHeadViewHolder.webView != null) mHeadViewHolder.webView.onPause();
     }
 
     @Override
     public void onBackPressed() {
-        if (mHeadViewHolder.webView.canGoBack()) {
+        if (mHeadViewHolder.webView != null && mHeadViewHolder.webView.canGoBack()) {
             mHeadViewHolder.webView.goBack();
             return;
         }
         super.onBackPressed();
     }
 
+//    @Override
+//    public void finish() {
+//        super.finish();
+//        Log.e("!", "finish");
+//        if (mHeadViewHolder.webView != null) {
+//            ViewParent parent = mHeadViewHolder.webView.getParent();
+//            if (parent != null) {
+//                ((ViewGroup) parent).removeView(mHeadViewHolder.webView);
+//            }
+//            mHeadViewHolder.webView.removeAllViews();
+//            mHeadViewHolder.webView.destroy();
+//            mHeadViewHolder.webView = null;
+//        }
+//    }
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(this);
+//        mHeadViewHolder.webView.destroy();
+//        Log.e("!", "onDestroy：" + (mHeadViewHolder.webView == null));
+        if (mHeadViewHolder.webView != null) {
+            ViewParent parent = mHeadViewHolder.webView.getParent();
+            if (parent != null) {
+                ((ViewGroup) parent).removeView(mHeadViewHolder.webView);
+            }
+            mHeadViewHolder.webView.removeAllViews();
+            mHeadViewHolder.webView.destroy();
+            mHeadViewHolder.webView = null;
+        }
+        super.onDestroy();
+    }
+
     @Override
     public void onConfigurationChanged(@NotNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         switch (newConfig.orientation) {
-            case Configuration.ORIENTATION_LANDSCAPE:
+            case Configuration.ORIENTATION_LANDSCAPE://横屏
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 ImmersionBar.with(this).transparentStatusBar().statusBarDarkFont(true).fitsSystemWindows(false).init();
                 break;
-            case Configuration.ORIENTATION_PORTRAIT:
+            case Configuration.ORIENTATION_PORTRAIT: {//竖屏
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
                 ImmersionBar.with(this).transparentStatusBar().statusBarDarkFont(true).fitsSystemWindows(true).init();
                 break;
+            }
         }
     }
 }

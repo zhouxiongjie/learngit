@@ -3,7 +3,6 @@ package com.shuangling.software.activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,11 +17,9 @@ import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -43,7 +40,6 @@ import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.PreloadWebView;
 import com.shuangling.software.utils.ServerInfo;
-
 import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.File;
@@ -53,7 +49,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
@@ -68,8 +63,6 @@ import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 
 @EnableDragToClose()
 public class GalleriaActivity extends AppCompatActivity implements Handler.Callback {

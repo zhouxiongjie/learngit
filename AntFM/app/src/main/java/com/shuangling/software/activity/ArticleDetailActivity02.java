@@ -276,7 +276,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         }
         refreshLayout.setRefreshFooter(new ClassicsFooter(this));// 评论
         if (mHandler == null) mHandler = new Handler(this);
-        getArticleDetail();//文章详情
+//        getArticleDetail();//文章详情 待WebView加载完成再请求
         imgBack.setOnClickListener(v -> finish());
         imgMore.setOnClickListener(v -> {
             if (mArticle != null) {
@@ -378,33 +378,23 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         ViewGroup headView = (ViewGroup) getLayoutInflater().inflate(R.layout.article_top_layout, recyclerView, false);
         mHeadViewHolder = new HeadViewHolder(headView);// 文章详情页面原生头部、webview、原生阅读次数、点赞、收藏
         mAdapter.addHeaderView(headView);
-        String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;//
-        int size = 1;//小图
-        int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 0);
-        if (netLoad == 0 || CommonUtils.getNetWorkType(this) == NETWORKTYPE_WIFI) {
-            size = 2;//大图
-        }
-        if (User.getInstance() == null) {
-            url = url + "?app=android&size=" + size + "&multiple=" + CommonUtils.getFontSize();
-        } else {
-            url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size + "&multiple=" + CommonUtils.getFontSize();
-        }
-//        WebView webView = mHeadViewHolder.webView;
-//        WebSettings s = webView.getSettings();//to do 临时删除
-//        CommonUtils.setWebviewUserAgent(s);
-//        s.setTextZoom(100);
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-//            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+//        String url = ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId;//
+//        int size = 1;//小图
+//        int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 0);
+//        if (netLoad == 0 || CommonUtils.getNetWorkType(this) == NETWORKTYPE_WIFI) {
+//            size = 2;//大图
 //        }
-//        webView.getSettings().setBlockNetworkImage(false);
-//        s.setJavaScriptEnabled(true);       //js
-//        s.setDomStorageEnabled(true);       //localStorage
+//        if (User.getInstance() == null) {
+//            url = url + "?app=android&size=" + size + "&multiple=" + CommonUtils.getFontSize();
+//        } else {
+//            url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&size=" + size + "&multiple=" + CommonUtils.getFontSize();
+//        }
 
         mHeadViewHolder.webView.setWebChromeClient(new InsideWebChromeClient());//Web浏览器Client
         mHeadViewHolder.webView.setWebViewClient(new InsideWebViewClient());//Web视图Client
         mHeadViewHolder.webView.addJavascriptInterface(new JsToAndroid(), "clientJS");
-        mHeadViewHolder.webView.loadUrl(url);
-//        mHeadViewHolder.webView.loadUrl("file:///android_asset/app_article_static.html");//
+//        mHeadViewHolder.webView.loadUrl(url);
+        mHeadViewHolder.webView.loadUrl("file:///android_asset/app_article_static.html");//
         refreshLayout.setOnLoadMoreListener(refreshLayout -> {//评论
             currentPage++;
             getComments(1);
@@ -699,16 +689,16 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                             noData.setVisibility(View.GONE);
                         }
 
-//                        int size = 1;//小图
-//                        int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 0);
-//                        if (netLoad == 0 || CommonUtils.getNetWorkType(this) == NETWORKTYPE_WIFI) {
-//                            size = 2;//大图
-//                        }
-//                        String js = "javascript:_renderRich('" + mArticle.getArticle().getContent() + "','" + CommonUtils.getFontSize() + "','" + size + "')";//
-//                        runOnUiThread(() -> {
-//                            mHeadViewHolder.webView.loadUrl(js);//todo
-////                                mViewSkeletonScreen.hide();//隐藏骨骼图
-//                        });
+                        int size = 1;//小图
+                        int netLoad = SharedPreferencesUtils.getIntValue(SettingActivity.NET_LOAD, 0);
+                        if (netLoad == 0 || CommonUtils.getNetWorkType(this) == NETWORKTYPE_WIFI) {
+                            size = 2;//大图
+                        }
+                        String js = "javascript:_renderRich('" + mArticle.getArticle().getContent() + "','" + CommonUtils.getFontSize() + "','" + size + "')";//
+                        runOnUiThread(() -> {
+                            mHeadViewHolder.webView.loadUrl(js);//
+//                                mViewSkeletonScreen.hide();//隐藏骨骼图
+                        });
 
 //                        getRelatedPosts();//相关推荐
 //                        getComments(0);//获取评论列表
@@ -1589,7 +1579,6 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-//            Log.e("!", "shouldOverrideUrlLoading");
             if (url != null) {
                 String suffix = url.substring(url.lastIndexOf(".")/*, url.length() - 1*/);
                 if (suffix.equalsIgnoreCase(".pdf") || suffix.equalsIgnoreCase(".doc") || suffix.equalsIgnoreCase(".docx") || suffix.equalsIgnoreCase(".wps")/*|| url.endsWith(".ppt") || url.endsWith(".pptx") || url.endsWith(".xls") || url.endsWith(".xlsx")*/) {
@@ -1614,8 +1603,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
             if (view.getProgress() == 100) {
-//                Log.e("!", "getArticleDetail");
-//                getArticleDetail();//文章详情
+                getArticleDetail();//文章详情
 
                 getRelatedPosts();//相关推荐
                 articleVoices();//朗读文章
@@ -1645,26 +1633,9 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         super.onBackPressed();
     }
 
-//    @Override
-//    public void finish() {
-//        super.finish();
-//        Log.e("!", "finish");
-//        if (mHeadViewHolder.webView != null) {
-//            ViewParent parent = mHeadViewHolder.webView.getParent();
-//            if (parent != null) {
-//                ((ViewGroup) parent).removeView(mHeadViewHolder.webView);
-//            }
-//            mHeadViewHolder.webView.removeAllViews();
-//            mHeadViewHolder.webView.destroy();
-//            mHeadViewHolder.webView = null;
-//        }
-//    }
-
     @Override
     protected void onDestroy() {
         EventBus.getDefault().unregister(this);
-//        mHeadViewHolder.webView.destroy();
-//        Log.e("!", "onDestroy：" + (mHeadViewHolder.webView == null));
         if (mHeadViewHolder.webView != null) {
             ViewParent parent = mHeadViewHolder.webView.getParent();
             if (parent != null) {

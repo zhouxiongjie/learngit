@@ -96,24 +96,6 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
         init();
     }
 
-    private void getGalleriaDetail() {
-        String url = ServerInfo.serviceIP + ServerInfo.getGalleriaDetail + mGalleriaId;
-        Map<String, String> params = new HashMap<>();
-        OkHttpUtils.get(url, null, new OkHttpCallback(this) {
-            @Override
-            public void onResponse(Call call, String response) throws IOException {
-                Message msg = Message.obtain();
-                msg.what = MSG_GET_DETAIL;
-                msg.obj = response;
-                mHandler.sendMessage(msg);
-            }
-
-            @Override
-            public void onFailure(Call call, Exception exception) {
-            }
-        });
-    }
-
     private void init() {
         mHandler = new Handler(this);
         mGalleriaId = getIntent().getIntExtra("galleriaId", 0);
@@ -124,15 +106,6 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
         } else {
             url = url + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android" + "&multiple=" + CommonUtils.getFontSize();
         }
-//        WebSettings s = webView.getSettings();
-//        CommonUtils.setWebviewUserAgent(s);
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-//            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-//        }
-//        webView.getSettings().setBlockNetworkImage(false);
-//        s.setTextZoom(100);
-//        s.setJavaScriptEnabled(true);       //js
-//        s.setDomStorageEnabled(true);       //localStorage
         webView.setWebViewClient(new WebViewClient() {
             // url拦截
             @Override
@@ -207,6 +180,24 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
         webView.addJavascriptInterface(new JsToAndroid(), "clientJS");
         webView.loadUrl(url);
         progressBar.setColor("#001CA0FF", "#1CA0FF");
+    }
+
+    private void getGalleriaDetail() {
+        String url = ServerInfo.serviceIP + ServerInfo.getGalleriaDetail + mGalleriaId;
+//        Map<String, String> params = new HashMap<>();
+        OkHttpUtils.get(url, null, new OkHttpCallback(this) {
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+                Message msg = Message.obtain();
+                msg.what = MSG_GET_DETAIL;
+                msg.obj = response;
+                mHandler.sendMessage(msg);
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+            }
+        });
     }
 
     @Override
@@ -376,89 +367,10 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
             });
         }
 
-
         @JavascriptInterface
         public void download(final String url) {
-            //downloadPic(url);
             CommonUtils.downloadPic(GalleriaActivity.this, url);
         }
-    }
-
-
-    public void downloadPic(final String downloadUrl) {
-        String[] preFix = downloadUrl.split("/");
-        String fileName = preFix[preFix.length - 1];
-
-        File file = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_DOWNLOADS) + File.separator + fileName);
-        if (file.exists()) {
-            file.delete();
-        }
-
-        final FileDownloadListener downloadListener = new FileDownloadListener() {
-            @Override
-            protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                Log.i("test", "pending");
-            }
-
-            @Override
-            protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
-                Log.i("test", "connected");
-            }
-
-            @Override
-            protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-                //StyledDialog.updateProgress(dialog, (int)((long)soFarBytes * 100 / (long)totalBytes), 100, "素材下载中...", true);
-            }
-
-            @Override
-            protected void blockComplete(BaseDownloadTask task) {
-                try {
-
-                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                    Uri uri = Uri.fromFile(file);
-                    intent.setData(uri);
-                    sendBroadcast(intent);
-                    ToastUtils.show("下载成功");
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
-                Log.i("test", ex.toString());
-            }
-
-            @Override
-            protected void completed(BaseDownloadTask task) {
-            }
-
-            @Override
-            protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-            }
-
-            @Override
-            protected void error(BaseDownloadTask task, Throwable e) {
-                Log.i("test", e.toString());
-            }
-
-            @Override
-            protected void warn(BaseDownloadTask task) {
-            }
-        };
-        final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(downloadListener);
-        final List<BaseDownloadTask> tasks = new ArrayList<>();
-        tasks.add(FileDownloader.getImpl().create(downloadUrl).setPath(file.getPath()));
-        //queueSet.setCallbackProgressMinInterval(200);
-        //queueSet.disableCallbackProgressTimes();
-        // 由于是队列任务, 这里是我们假设了现在不需要每个任务都回调`FileDownloadListener#progress`, 我们只关系每个任务是否完成, 所以这里这样设置可以很有效的减少ipc.
-        // 所有任务在下载失败的时候都自动重试一次
-        queueSet.setAutoRetryTimes(1);
-        // 串行执行该任务队列
-        queueSet.downloadSequentially(tasks);
-        //queueSet.downloadTogether(tasks);
-        queueSet.start();
     }
 
     @Override

@@ -68,6 +68,7 @@ import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.fragment.ColumnFragment;
 import com.shuangling.software.fragment.DiscoverFragment;
 import com.shuangling.software.fragment.PersonalCenterFragment;
+import com.shuangling.software.fragment.PersonalCenterFragment01;
 import com.shuangling.software.fragment.RadioListFragment;
 import com.shuangling.software.fragment.RecommendFragment;
 import com.shuangling.software.fragment.ServiceFragment;
@@ -1472,7 +1473,9 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
             lastClickTime = curClickTime;
         } else {
             lastClickTime = curClickTime;
-            super.onBackPressed();
+            //super.onBackPressed();
+            //ComponentActivity.onBack
+            finish();
         }
     }
 
@@ -1828,7 +1831,7 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
                         return new RecommendFragment();
                     case 2:
                         //个人中心
-                        return new PersonalCenterFragment();
+                        return new PersonalCenterFragment01();
                     case 3: {
                         //媒体矩阵
                         DiscoverFragment discoverFragment = new DiscoverFragment();

@@ -9,9 +9,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:padding="5dp"
         android:focusable="true"
         android:focusableInTouchMode="true"
+        android:padding="5dp"
         android:visibility="visible">
 
         <TextView
@@ -36,124 +36,133 @@
             android:drawableLeft="@drawable/ic_search_gray"
             android:drawablePadding="5dp"
             android:hint="请输入搜索内容"
-            android:paddingLeft="10dp"
-            android:singleLine="true"
-            android:inputType="text"
-
-            android:textColor="#999999"
             android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:paddingLeft="10dp"
+
+            android:singleLine="true"
+            android:textColor="#999999"
             android:textSize="@dimen/font_size_24px" />
 
     </RelativeLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-        <ScrollView
-            android:id="@+id/scrollView"
+        android:layout_height="match_parent">
+        <!--        <ScrollView-->
+        <!--            android:id="@+id/scrollView"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="match_parent"-->
+        <!--            android:background="@color/white"-->
+        <!--            android:visibility="visible">-->
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
-            android:visibility="visible">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:padding="10dp">
 
-                <RelativeLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/historyText"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="10dp">
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:text="搜索历史"
+                    android:textColor="#999999"
+                    android:textSize="@dimen/font_size_30px"
+                    android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/historyText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:text="搜索历史"
-                        android:textColor="#999999"
-                        android:textSize="@dimen/font_size_30px"
-                        android:textStyle="bold" />
+                <com.shuangling.software.customview.FontIconView
+                    android:id="@+id/expand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/historyText"
+                    android:text="@string/arrow_down01"
+                    android:textColor="#999999"
+                    android:textSize="@dimen/font_size_28px" />
+
+                <!--                    <TextView-->
+                <!--                        android:id="@+id/clean"-->
+                <!--                        android:layout_width="wrap_content"-->
+                <!--                        android:layout_height="wrap_content"-->
+                <!--                        android:layout_alignParentRight="true"-->
+                <!--                        android:layout_centerVertical="true"-->
+                <!--                        android:text="清空"-->
+                <!--                        android:textColor="?attr/themeColor"-->
+                <!--                        android:textSize="@dimen/font_size_26px" />-->
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true">
 
                     <com.shuangling.software.customview.FontIconView
-                        android:id="@+id/expand"
+                        android:id="@+id/clean"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toRightOf="@+id/historyText"
-                        android:text="@string/arrow_down01"
+                        android:layout_gravity="center_vertical|right"
+                        android:text="&#xe632;"
                         android:textColor="#999999"
-                        android:textSize="@dimen/font_size_36px"/>
+                        android:textSize="@dimen/font_size_36px" />
 
-<!--                    <TextView-->
-<!--                        android:id="@+id/clean"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_alignParentRight="true"-->
-<!--                        android:layout_centerVertical="true"-->
-<!--                        android:text="清空"-->
-<!--                        android:textColor="?attr/themeColor"-->
-<!--                        android:textSize="@dimen/font_size_26px" />-->
-
-                    <FrameLayout
+                    <LinearLayout
+                        android:id="@+id/cleanLayout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true">
+                        android:layout_gravity="right|center_vertical"
+                        android:visibility="gone"
+                        android:orientation="horizontal">
 
-                        <com.shuangling.software.customview.FontIconView
-                            android:id="@+id/clean"
+                        <TextView
+                            android:id="@+id/deleteAll"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="&#xe632;"
-                            android:layout_gravity="center_vertical|right"
-                            android:textColor="#999999"
-                            android:textSize="@dimen/font_size_36px"/>
+                            android:layout_gravity="center_vertical"
+                            android:text="全部删除"
+                            android:textColor="#4D4D4D"
+                            android:textSize="@dimen/font_size_28px" />
 
-                        <LinearLayout
+                        <TextView
+                            android:id="@+id/finish"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="right|center_vertical"
-                            android:orientation="horizontal">
-                            <TextView
-                                android:id="@+id/deleteAll"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="全部删除"
-                                android:textSize="@dimen/font_size_28px"
-                                android:layout_gravity="center_vertical"
-                                android:textColor="#4D4D4D"/>
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginLeft="20dp"
+                            android:text="完成"
+                            android:textColor="#4D4D4D"
+                            android:textSize="@dimen/font_size_28px" />
 
-                            <TextView
-                                android:id="@+id/finish"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_vertical"
-                                android:text="完成"
-                                android:layout_marginLeft="20dp"
-                                android:textSize="@dimen/font_size_28px"
-                                android:textColor="#4D4D4D"/>
+                    </LinearLayout>
 
-                        </LinearLayout>
-
-                    </FrameLayout>
+                </FrameLayout>
 
 
+            </RelativeLayout>
+
+            <GridView
+                android:id="@+id/gridView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="0dp"
+                android:horizontalSpacing="5dp"
+                android:numColumns="2"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="5dp" />
+
+            <!--                <com.shuangling.software.customview.LineWrapLayout-->
+            <!--                    android:id="@+id/historyList"-->
+            <!--                    android:layout_width="match_parent"-->
+            <!--                    android:layout_height="wrap_content" />-->
 
 
-                </RelativeLayout>
-
-                <com.shuangling.software.customview.LineWrapLayout
-                    android:id="@+id/historyList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-
-            </LinearLayout>
-        </ScrollView>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/searchResult"
@@ -161,7 +170,8 @@
             android:layout_height="match_parent"
             android:background="@color/white"
             android:orientation="vertical"
-            android:visibility="gone" >
+            android:visibility="gone">
+
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabPageIndicator"
                 android:layout_width="wrap_content"
@@ -175,8 +185,8 @@
                 app:tabMode="scrollable"
                 app:tabSelectedTextColor="?attr/themeColor"
                 app:tabTextAppearance="@style/TabTextStyle"
-                app:tabTextColor="@color/black"
-                />
+                app:tabTextColor="@color/black" />
+
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/viewPager"
                 android:layout_width="match_parent"
@@ -184,8 +194,6 @@
 
         </LinearLayout>
     </FrameLayout>
-
-
 
 
 </LinearLayout>

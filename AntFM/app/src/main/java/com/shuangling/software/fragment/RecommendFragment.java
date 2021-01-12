@@ -40,6 +40,7 @@ import com.shuangling.software.activity.NewLoginActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.activity.RadioListActivity;
 import com.shuangling.software.activity.SearchActivity;
+import com.shuangling.software.activity.SearchActivity01;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.TvDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
@@ -536,7 +537,7 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
                 }
                 break;
             case R.id.search:
-                startActivity(new Intent(getContext(), SearchActivity.class));
+                startActivity(new Intent(getContext(), SearchActivity01.class));
                 break;
             case R.id.customColumn:
                 if (mRemoteColumns != null) {

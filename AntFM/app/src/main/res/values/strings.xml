@@ -30,6 +30,9 @@
     <string name="arrow_up">&#xe634;</string>
     <string name="arrow_down">&#xe633;</string>
 
+    <string name="arrow_up01">&#xe628;</string>
+    <string name="arrow_down01">&#xe629;</string>
+
     <string name="float_icon_pause">&#xe618;</string>
     <string name="float_icon_play">&#xe610;</string>
 

@@ -30,6 +30,7 @@ import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloadQueueSet;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.mylhyl.circledialog.CircleDialog;
+import com.qmuiteam.qmui.arch.QMUIFragment;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AccountAndSecurityActivity;
@@ -73,7 +74,7 @@ import okhttp3.Call;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
-public class PersonalCenterFragment01 extends SimpleImmersionFragment {
+public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragment*/ {
     public static final int MSG_UPDATE_STATUS = 0x01;
     public static final int MSG_GET_UPDATE_INFO = 0x2;
     @BindView(R.id.headBg)
@@ -110,7 +111,7 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
     LinearLayout feedback;
     @BindView(R.id.setting)
     LinearLayout setting;
-    Unbinder unbinder;
+//    Unbinder unbinder;
     @BindView(R.id.statusBar)
     View statusBar;
     @BindView(R.id.aboutUs)
@@ -124,25 +125,35 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
         mHandler = new Handler(Looper.getMainLooper());
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_personalcenter01, container, false);
-        unbinder = ButterKnife.bind(this, view);
-//        if (MyApplication.getInstance().findNewVerison) {
-//            update.setText("发现新版本");
-//            Drawable drawableRight = getResources().getDrawable(R.drawable.update_red_circle);
-//            update.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableRight, null);
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//        View view = inflater.inflate(R.layout.fragment_personalcenter01, container, false);
+//        unbinder = ButterKnife.bind(this, view);
+////        if (MyApplication.getInstance().findNewVerison) {
+////            update.setText("发现新版本");
+////            Drawable drawableRight = getResources().getDrawable(R.drawable.update_red_circle);
+////            update.setCompoundDrawablesWithIntrinsicBounds(null, null, drawableRight, null);
+////        }
+//        if (MyApplication.aboutUsInfo != null && MyApplication.aboutUsInfo.getAbout_us_status() == 1) {
+//            aboutUs.setVisibility(View.VISIBLE);
 //        }
+//        return view;
+//    }
+
+    @Override
+    protected View onCreateView() {
+        View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_personalcenter01, null);
+        ButterKnife.bind(this, rootView);
         if (MyApplication.aboutUsInfo != null && MyApplication.aboutUsInfo.getAbout_us_status() == 1) {
             aboutUs.setVisibility(View.VISIBLE);
         }
-        return view;
+        return rootView;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        //unbinder.unbind();
     }
 
     @OnClick({R.id.history, R.id.collect, R.id.subscribeNumber, R.id.userLayout, R.id.login, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet, R.id.award, R.id.aboutUs})
@@ -533,8 +544,8 @@ public class PersonalCenterFragment01 extends SimpleImmersionFragment {
                 });
     }
 
-    @Override
-    public void initImmersionBar() {
-        ImmersionBar.with(this).statusBarView(statusBar).statusBarDarkFont(true).init();
-    }
+//    @Override
+//    public void initImmersionBar() {
+//        ImmersionBar.with(this).statusBarView(statusBar).statusBarDarkFont(true).init();
+//    }
 }

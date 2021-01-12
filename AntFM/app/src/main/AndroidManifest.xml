@@ -201,6 +201,11 @@
             android:name=".activity.SearchActivity"
             android:screenOrientation="portrait" >
         </activity>
+
+        <activity
+            android:name=".activity.SearchActivity01"
+            android:screenOrientation="portrait" >
+        </activity>
         <activity
             android:name=".activity.ForgetPasswordActivity"
             android:screenOrientation="portrait" >

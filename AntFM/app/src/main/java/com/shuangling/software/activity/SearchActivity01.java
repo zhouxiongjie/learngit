@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -24,8 +25,8 @@ import com.hjq.toast.ToastUtils;
 import com.jaeger.library.StatusBarUtil;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
+import com.shuangling.software.adapter.SearchHistoryGridViewAdapter;
 import com.shuangling.software.customview.FontIconView;
-import com.shuangling.software.customview.LineWrapLayout;
 import com.shuangling.software.dao.SearchHistoryDaoUtils;
 import com.shuangling.software.entity.SearchHistory;
 import com.shuangling.software.fragment.SearchListFragment;
@@ -53,10 +54,10 @@ public class SearchActivity01 extends AppCompatActivity {
     EditText keyword;
     @BindView(R.id.clean)
     TextView clean;
-    @BindView(R.id.historyList)
-    LineWrapLayout historyList;
-    @BindView(R.id.scrollView)
-    ScrollView scrollView;
+    //    @BindView(R.id.historyList)
+//    LineWrapLayout historyList;
+//    @BindView(R.id.scrollView)
+//    ScrollView scrollView;
     @BindView(R.id.tabPageIndicator)
     TabLayout tabPageIndicator;
     @BindView(R.id.viewPager)
@@ -69,13 +70,22 @@ public class SearchActivity01 extends AppCompatActivity {
     TextView deleteAll;
     @BindView(R.id.finish)
     TextView finish;
+    @BindView(R.id.historyText)
+    TextView historyText;
+    @BindView(R.id.gridView)
+    GridView gridView;
+    @BindView(R.id.cleanLayout)
+    LinearLayout cleanLayout;
+
     private FragmentAdapter mFragmentPagerAdapter;
+    private List<String> mHistory = new ArrayList<>();
+    private SearchHistoryGridViewAdapter mSearchHistoryGridViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_search01);
         StatusBarUtil.setTransparent(this);
         CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
@@ -85,11 +95,42 @@ public class SearchActivity01 extends AppCompatActivity {
     private void updateSearchHistory() {
         //加载历史记录
         List<SearchHistory> history = SearchHistoryDaoUtils.queryAll();
-        List<String> data = new ArrayList<>();
+        mHistory.clear();
         for (int i = 0; i < history.size(); i++) {
-            data.add(history.get(i).getHistoryString());
+            mHistory.add(history.get(i).getHistoryString());
         }
-        historyList.setData(data);
+
+        if (mHistory.size() > 10) {
+            expand.setVisibility(View.VISIBLE);
+        } else {
+            expand.setVisibility(View.GONE);
+        }
+
+        if (mSearchHistoryGridViewAdapter == null) {
+            mSearchHistoryGridViewAdapter = new SearchHistoryGridViewAdapter(this, mHistory);
+            gridView.setAdapter(mSearchHistoryGridViewAdapter);
+            mSearchHistoryGridViewAdapter.setOnItemClickListener(new SearchHistoryGridViewAdapter.OnItemClickListener() {
+                @Override
+                public void onDelete(String history) {
+                    SearchHistoryDaoUtils.deleteHistory(history);
+                    updateSearchHistory();
+
+                }
+
+                @Override
+                public void onItemClick(String history) {
+                    CommonUtils.hideInput(SearchActivity01.this);
+                    keyword.clearFocus();
+                    //开始搜索
+                    keyword.setText(history);
+                    searchResult.setVisibility(View.VISIBLE);
+                    mFragmentPagerAdapter.notifyDataSetChanged();
+                }
+            });
+        } else {
+            mSearchHistoryGridViewAdapter.updateView(mHistory);
+        }
+        //historyList.setData(data);
     }
 
     private void init() {
@@ -98,18 +139,66 @@ public class SearchActivity01 extends AppCompatActivity {
         tabPageIndicator.setupWithViewPager(viewPager);
 //加载历史记录
         updateSearchHistory();
-        historyList.setOnItemClickListener(new LineWrapLayout.OnItemClickListener() {
+
+        historyText.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                String kw = ((TextView) view).getText().toString();
-                CommonUtils.hideInput(SearchActivity01.this);
-                keyword.clearFocus();
-                //开始搜索
-                keyword.setText(kw);
-                searchResult.setVisibility(View.VISIBLE);
-                mFragmentPagerAdapter.notifyDataSetChanged();
+            public void onClick(View v) {
+                if (mSearchHistoryGridViewAdapter != null && expand.getVisibility() == View.VISIBLE) {
+                    if (mSearchHistoryGridViewAdapter.isExpand()) {
+                        mSearchHistoryGridViewAdapter.setExpand(false);
+                        expand.setText(R.string.arrow_down01);
+                    } else {
+                        mSearchHistoryGridViewAdapter.setExpand(true);
+                        expand.setText(R.string.arrow_up01);
+                    }
+                }
             }
         });
+        expand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mSearchHistoryGridViewAdapter != null && expand.getVisibility() == View.VISIBLE) {
+                    if (mSearchHistoryGridViewAdapter.isExpand()) {
+                        mSearchHistoryGridViewAdapter.setExpand(false);
+                        expand.setText(R.string.arrow_down01);
+                    } else {
+                        mSearchHistoryGridViewAdapter.setExpand(true);
+                        expand.setText(R.string.arrow_up01);
+                    }
+                }
+            }
+        });
+
+        clean.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mSearchHistoryGridViewAdapter!=null){
+                    mSearchHistoryGridViewAdapter.setIsEditor(true);
+                }
+                clean.setVisibility(View.GONE);
+                cleanLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+        deleteAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SearchHistoryDaoUtils.cleanAll();
+                updateSearchHistory();
+            }
+        });
+        finish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clean.setVisibility(View.VISIBLE);
+                cleanLayout.setVisibility(View.GONE);
+                if(mSearchHistoryGridViewAdapter!=null){
+                    mSearchHistoryGridViewAdapter.setIsEditor(false);
+                }
+            }
+        });
+
+
         keyword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -163,21 +252,12 @@ public class SearchActivity01 extends AppCompatActivity {
         keyword.requestFocus();
     }
 
-    @OnClick({R.id.searchCancel, R.id.clean})
+    @OnClick({R.id.searchCancel})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.searchCancel:
                 CommonUtils.hideInput(this);
                 finish();
-                break;
-            case R.id.clean:
-                SearchHistoryDaoUtils.cleanAll();
-                List<SearchHistory> history = SearchHistoryDaoUtils.queryAll();
-                List<String> data = new ArrayList<String>();
-                for (int i = 0; i < history.size(); i++) {
-                    data.add(history.get(i).getHistoryString());
-                }
-                historyList.setData(data);
                 break;
         }
     }

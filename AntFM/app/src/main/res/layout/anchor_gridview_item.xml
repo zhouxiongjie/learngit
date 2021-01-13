@@ -8,8 +8,8 @@
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/anchor"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:layout_gravity="center_horizontal"
         fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImage="@drawable/head_placeholder"
@@ -17,7 +17,7 @@
         fresco:failureImage="@drawable/head_placeholder"
         fresco:failureImageScaleType="centerCrop"
         fresco:viewAspectRatio="1"
-        fresco:roundAsCircle="true"
+        fresco:roundAsCircle="false"
         fresco:roundingBorderWidth="0dp"
         fresco:roundingBorderColor="@color/ghostwhite" />
 

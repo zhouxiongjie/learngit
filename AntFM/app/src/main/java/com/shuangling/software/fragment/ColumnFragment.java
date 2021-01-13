@@ -887,7 +887,7 @@ public class ColumnFragment extends QMUIFragment/*SimpleImmersionFragment*/ impl
                                                 SimpleDraweeView anchor = anchorView.findViewById(R.id.anchor);
                                                 if (!TextUtils.isEmpty(content.getCover())) {
                                                     Uri uri = Uri.parse(content.getCover());
-                                                    int width = CommonUtils.dip2px(35);
+                                                    int width = CommonUtils.dip2px(45);
                                                     int height = width;
                                                     ImageLoader.showThumb(uri, anchor, width, height);
                                                 }

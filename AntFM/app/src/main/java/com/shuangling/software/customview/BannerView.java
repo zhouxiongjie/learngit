@@ -197,7 +197,7 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                     T adv = (T) mAutoViews.get(position).getTag();
                     //mAdvertDesc.setText(adv.getTitle());
-                    mAdvertDesc.setText("抗击疫情我们在一起，坚决打赢疫情防控的人民战争...");
+                    mAdvertDesc.setText("抗击疫情我们在一起，坚决打赢疫情防控的人民战争坚决打赢疫情防控的人民战争");
                 }
 
                 @Override

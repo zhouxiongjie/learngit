@@ -27,9 +27,11 @@
         app:fillColor="@color/white"
         app:pageColor="@color/gray"
         app:radius="2.5dp"
+        android:background="@drawable/viewpager_indicator_bg"
         app:strokeColor="@color/gray"
+        android:layout_marginBottom="10dp"
         app:strokeWidth="0dp" />
-    <!--	android:background="@drawable/viewpager_indicator_bg"-->
+    <!--	-->
 
     <TextView
         android:id="@+id/advertDesc"
@@ -38,11 +40,13 @@
         android:layout_above="@+id/autoPageIndicator"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
         android:maxLines="2"
+        android:textStyle="bold"
         android:textColor="@color/white"
-        android:textSize="@dimen/font_size_28px"
+        android:textSize="@dimen/font_size_34px"
         android:visibility="visible"
-        tools:text="抗击疫情我们在一起，坚决打赢疫情防控的人民战争..." />
+        tools:text="抗击疫情我们在一起，坚决打赢疫情防控的人民战争坚决打赢疫情防控的人民战争" />
     <!--	</RelativeLayout>	-->
 </RelativeLayout>

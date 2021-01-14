@@ -70,7 +70,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
     public static final int MSG_GET_DETAIL = 0x2;
     private static final int SHARE_SUCCESS = 0x3;
     private static final int SHARE_FAILED = 0x4;
-//    @BindView(R.id.progressBar)
+//    WebProgress progressBar;
     /*ProgressBar*/ WebProgress progressBar;
     private int mGalleriaId;
 //    @BindView(R.id.webView)

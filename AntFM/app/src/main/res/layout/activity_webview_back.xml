@@ -1,10 +1,16 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<?xml version="1.0" encoding="utf-8"?>
+<com.qmuiteam.qmui.widget.QMUIWindowInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:fitsSystemWindows="true">
 
-    <com.shuangling.software.customview.TopTitleBar
+    <!--<com.qmuiteam.qmui.widget.QMUITopBar
+        android:id="@+id/activtyTitle"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/qmui_topbar_height"
+        android:fitsSystemWindows="true" />-->
+    <com.shuangling.software.customview.TopTitleBar xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/activtyTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,5 +22,27 @@
         layout="@layout/activity_webview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/activtyTitle" />
-</RelativeLayout>
+        android:layout_marginTop="?attr/qmui_topbar_height" />
+</com.qmuiteam.qmui.widget.QMUIWindowInsetLayout>
+
+    <!--
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.shuangling.software.customview.TopTitleBar
+            android:id="@+id/activtyTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FAFAFA"
+            app:canBack="true"
+            app:moreImg="@drawable/ic_more" />
+
+        <include
+            layout="@layout/activity_webview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+    </LinearLayout>-->

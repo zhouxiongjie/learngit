@@ -26,10 +26,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.WebProgress;
@@ -68,8 +68,8 @@ import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 
-@EnableDragToClose()
-public class WebViewBackActivity extends AppCompatActivity implements Handler.Callback {
+//@EnableDragToClose()
+public class WebViewBackActivity extends /*AppCompatActivity*/QMUIActivity implements Handler.Callback {
     private static final int LOGIN_RESULT = 0x1;
     public static final int MSG_GET_DETAIL = 0x2;
     private static final int SHARE_SUCCESS = 0x3;
@@ -90,8 +90,9 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_webview_back);
-        CommonUtils.transparentStatusBar(this);
+//        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+//        QMUIStatusBarHelper.
         FrameLayout fl_content = findViewById(R.id.fl_web_container);
         webView = PreloadWebView.getInstance().getWebView(this);
         fl_content.addView(webView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -658,12 +659,22 @@ public class WebViewBackActivity extends AppCompatActivity implements Handler.Ca
         oks.show(this);
     }
 
+//    @Override
+//    public void onBackPressed() {//todo
+//        if (webView.canGoBack()) {
+//            webView.goBack();
+//        } else {
+//            super.onBackPressed();
+//        }
+//    }
+
+
     @Override
-    public void onBackPressed() {
+    protected void doOnBackPressed() {
         if (webView.canGoBack()) {
             webView.goBack();
         } else {
-            super.onBackPressed();
+            super.doOnBackPressed();
         }
     }
 

@@ -37,6 +37,9 @@ import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.maps.model.LatLng;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.WebProgress;
@@ -80,8 +83,8 @@ import static android.view.View.VISIBLE;
 
 //import com.tencent.smtt.export.external.interfaces.GeolocationPermissionsCallback;
 
-@EnableDragToClose()
-public class CluesActivity extends AppCompatActivity implements Handler.Callback, AMapLocationListener {
+//@EnableDragToClose()
+public class CluesActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback, AMapLocationListener {
     private static final int LOGIN_RESULT = 0x1;
     public static final int MSG_GET_DETAIL = 0x2;
     private static final int SHARE_SUCCESS = 0x3;
@@ -94,6 +97,10 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
     WebView webView;
     //    @BindView(R.id.progressBar)
     /*ProgressBar*/ WebProgress progressBar;
+
+    @BindView(R.id.topbar)
+    QMUITopBarLayout mTopBar;
+
     private Handler mHandler;
     private String mUrl;
     private AMapLocationClient mlocationClient;
@@ -110,9 +117,10 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_webview/*activity_clues*/);
-        CommonUtils.transparentStatusBar(this);
+        setContentView(R.layout./*activity_webview*/activity_clues);
+        //CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this);
         FrameLayout fl_content = findViewById(R.id.fl_web_container);
         webView = PreloadWebView.getInstance().getWebView(this);
         fl_content.addView(webView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -122,7 +130,21 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
         init();
     }
 
+    private void initTopBar() {
+        mTopBar.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                //overridePendingTransition(R.anim.slide_still, R.anim.slide_out_right);
+            }
+        });
+
+        mTopBar.setTitle("报料");
+    }
+
+
     private void init() {
+        initTopBar();
         mUrl = getIntent().getStringExtra("url");
         mUrl = mUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&phone=" + User.getInstance().getPhone() + "&name=" + User.getInstance().getNickname();
         mHandler = new Handler(this);
@@ -684,13 +706,23 @@ public class CluesActivity extends AppCompatActivity implements Handler.Callback
         oks.show(this);
     }
 
+//    @Override
+//    public void onBackPressed() {
+//        if (webView.canGoBack()) {
+//            webView.goBack();
+//        } else {
+//            super.onBackPressed();
+//        }
+//    }
+
     @Override
-    public void onBackPressed() {
+    protected void doOnBackPressed() {
         if (webView.canGoBack()) {
             webView.goBack();
         } else {
-            super.onBackPressed();
+            super.doOnBackPressed();
         }
+
     }
 
     public void shareStatistics(String channel, String postId, String shardUrl) {

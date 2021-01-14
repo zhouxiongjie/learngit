@@ -1473,9 +1473,9 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
             lastClickTime = curClickTime;
         } else {
             lastClickTime = curClickTime;
-            //super.onBackPressed();
+            super.doOnBackPressed();
             //ComponentActivity.onBack
-            finish();
+            //finish();
         }
     }
 

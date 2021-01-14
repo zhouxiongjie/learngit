@@ -105,7 +105,7 @@ public class DiscoverFragment extends QMUIFragment/*SimpleImmersionFragment*/ im
     View statusBar;
     @BindView(R.id.activtyTitle)
     TopTitleBar activtyTitle;
-    @BindView(R.id.progressBar)
+//    @BindView(R.id.progressBar)
     /*ProgressBar*/ WebProgress progressBar;
     private String mUrl;
     private String mTitle;

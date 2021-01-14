@@ -1,45 +1,52 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-	<com.shuangling.software.customview.AutoScrollViewPager
-		android:id="@+id/autoScrollViewPager"
-		android:layout_width="match_parent"  
-		android:layout_height="match_parent"
-		android:layout_centerInParent="true" />
-	<RelativeLayout 
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:background="@drawable/page_indicator_bg"
-		android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
-        android:padding="3dp">
-		<com.shuangling.software.customview.CirclePageIndicator
-			android:id="@+id/autoPageIndicator"
-	        android:layout_height="wrap_content"
-	        android:layout_width="wrap_content"
-			android:background="@drawable/viewpager_indicator_bg"
-	        app:radius="2.5dp"
-            app:dotMargin="10dp"
-            app:strokeWidth="0dp"
-			app:strokeColor="@color/gray"
-			app:pageColor="@color/gray"
-			app:fillColor="@color/white"
-			android:layout_centerHorizontal="true"
-            />
 
-		<TextView
-			android:id="@+id/advertDesc"
-			android:textSize="@dimen/font_size_28px"
-			android:textColor="@color/whitesmoke"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:layout_centerVertical="true"
-			android:maxLines="1"
-			android:layout_below="@+id/autoPageIndicator"
-			android:layout_alignParentLeft="true"
-            android:visibility="gone"/>
-	</RelativeLayout>	
+    <com.shuangling.software.customview.AutoScrollViewPager
+        android:id="@+id/autoScrollViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true" />
+    <!--	<RelativeLayout -->
+    <!--		android:layout_width="wrap_content"-->
+    <!--		android:layout_height="wrap_content"-->
+    <!--		android:background="@drawable/page_indicator_bg"-->
+    <!--		android:layout_centerHorizontal="true"-->
+    <!--        android:layout_alignParentBottom="true"-->
+    <!--        android:layout_marginBottom="10dp"-->
+    <!--        android:padding="3dp">-->
+    <com.shuangling.software.customview.CirclePageIndicator
+        android:id="@+id/autoPageIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        app:dotMargin="10dp"
+        app:fillColor="@color/white"
+        app:pageColor="@color/gray"
+        app:radius="2.5dp"
+        android:background="@drawable/viewpager_indicator_bg"
+        app:strokeColor="@color/gray"
+        android:layout_marginBottom="10dp"
+        app:strokeWidth="0dp" />
+    <!--	-->
+
+    <TextView
+        android:id="@+id/advertDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/autoPageIndicator"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:maxLines="2"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_size_34px"
+        android:visibility="visible"
+        tools:text="抗击疫情我们在一起，坚决打赢疫情防控的人民战争坚决打赢疫情防控的人民战争" />
+    <!--	</RelativeLayout>	-->
 </RelativeLayout>

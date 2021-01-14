@@ -81,9 +81,6 @@ import okhttp3.Call;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-//import com.tencent.smtt.export.external.interfaces.GeolocationPermissionsCallback;
-
-//@EnableDragToClose()
 public class CluesActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback, AMapLocationListener {
     private static final int LOGIN_RESULT = 0x1;
     public static final int MSG_GET_DETAIL = 0x2;
@@ -148,24 +145,6 @@ public class CluesActivity extends QMUIActivity/*AppCompatActivity*/ implements 
         mUrl = getIntent().getStringExtra("url");
         mUrl = mUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android&phone=" + User.getInstance().getPhone() + "&name=" + User.getInstance().getNickname();
         mHandler = new Handler(this);
-//        WebSettings s = webView.getSettings();
-//        CommonUtils.setWebviewUserAgent(s);
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-//            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-//        }
-//        webView.getSettings().setBlockNetworkImage(false);
-//        s.setJavaScriptEnabled(true);       //js
-////启用数据库
-//        s.setDatabaseEnabled(true);
-//        //启用地理定位，默认为true
-//        s.setGeolocationEnabled(true);
-//        //设置定位的数据库路径
-//        String dir = this.getApplicationContext().getDir("database", Context.MODE_PRIVATE).getPath();
-//        s.setGeolocationDatabasePath(dir);
-//        //开启DomStorage缓存
-//        s.setDomStorageEnabled(true);
-//        s.setGeolocationEnabled(true);
-
         webView.setWebViewClient(new WebViewClient() {
             // url拦截
             @Override

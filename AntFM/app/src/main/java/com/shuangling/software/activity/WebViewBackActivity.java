@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,7 +18,6 @@ import android.view.ViewStub;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
-import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
@@ -30,10 +28,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
 import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.WebProgress;
-import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.dialog.ShareDialog;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ShareParameter;
@@ -44,7 +42,6 @@ import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.PreloadWebView;
 import com.shuangling.software.utils.ServerInfo;
-import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -68,7 +65,7 @@ import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 
-//@EnableDragToClose()
+//@EnableDragToClose() //
 public class WebViewBackActivity extends /*AppCompatActivity*/QMUIActivity implements Handler.Callback {
     private static final int LOGIN_RESULT = 0x1;
     public static final int MSG_GET_DETAIL = 0x2;
@@ -76,7 +73,7 @@ public class WebViewBackActivity extends /*AppCompatActivity*/QMUIActivity imple
     private static final int SHARE_FAILED = 0x4;
     private WebView webView;
     @BindView(R.id.activtyTitle)
-    TopTitleBar activtyTitle;
+    /*TopTitleBar*/ QMUITopBarLayout activtyTitle; //
     WebProgress progressBar;
     private Handler mHandler;
     private String mUrl;
@@ -90,9 +87,9 @@ public class WebViewBackActivity extends /*AppCompatActivity*/QMUIActivity imple
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_webview_back);
-//        CommonUtils.transparentStatusBar(this);
+//        CommonUtils.transparentStatusBar(this); //
         ButterKnife.bind(this);
-//        QMUIStatusBarHelper.
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
         FrameLayout fl_content = findViewById(R.id.fl_web_container);
         webView = PreloadWebView.getInstance().getWebView(this);
         fl_content.addView(webView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -103,47 +100,33 @@ public class WebViewBackActivity extends /*AppCompatActivity*/QMUIActivity imple
         EventBus.getDefault().register(this);
         mUrl = getIntent().getStringExtra("url");
         mTitle = getIntent().getStringExtra("title");
-        mAddParams = getIntent().getBooleanExtra("addParams", false);//true 内链
-        if (!mAddParams) {//如果是外链，显示进度条
+        mAddParams = getIntent().getBooleanExtra("addParams", false);
+        if (mAddParams) {//true 内链
+            activtyTitle.addLeftImageButton(R.drawable.icon_back, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+                finish();
+            });
+        }else {//如果是外链，显示进度条、 X
             View stubView = ((ViewStub) findViewById(R.id.viewStub)).inflate();
             progressBar = stubView.findViewById(R.id.progressBar);
-            activtyTitle.setBackImg(R.drawable.float_close_icon);
+            activtyTitle.addLeftImageButton(R.drawable.float_close_icon, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+                finish();
+            });
         }
         mActivityId = getIntent().getIntExtra("activityId", -1);
-        activtyTitle.setTitleText(mTitle);
+        activtyTitle.setTitle(mTitle);
         String url = initUrl(mUrl);
         if (url.startsWith(ServerInfo.activity)) {
-            activtyTitle.setMoreVisibility(true);
-        } else {
-            activtyTitle.setMoreVisibility(false);
+            activtyTitle.addRightImageButton(R.drawable.ic_more, com.qmuiteam.qmui.R.id.right_icon).setOnClickListener(view -> {//
+                String script = "javascript:_getShareEventParmas()";
+                webView.evaluateJavascript(script, responseJson -> {
+                    ShareParameter shareParameter = JSONObject.parseObject(responseJson, ShareParameter.class);
+                    if (shareParameter != null) {
+                        showShareDialog(shareParameter.getShareTitle(), shareParameter.getShareDesc(), shareParameter.getShareLogo(), shareParameter.getShareUrl());
+                    }
+                });
+            });
         }
-        activtyTitle.setMoreAction(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {//sdk>19才有用
-                    String script = "javascript:_getShareEventParmas()";
-                    webView.evaluateJavascript(script, new ValueCallback<String>() {
-                        @Override
-                        public void onReceiveValue(String responseJson) {
-                            ShareParameter shareParameter = JSONObject.parseObject(responseJson, ShareParameter.class);
-                            if (shareParameter != null) {
-                                showShareDialog(shareParameter.getShareTitle(), shareParameter.getShareDesc(), shareParameter.getShareLogo(), shareParameter.getShareUrl());
-                            }
-                        }
-                    });
-                }
-            }
-        });
         mHandler = new Handler(this);
-//        WebSettings s = webView.getSettings();
-//        CommonUtils.setWebviewUserAgent(s);
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-//            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-//        }
-//        webView.getSettings().setBlockNetworkImage(false);
-//        s.setTextZoom(100);
-//        s.setJavaScriptEnabled(true);       //js
-//        s.setDomStorageEnabled(true);       //localStorage
         webView.setWebViewClient(new WebViewClient() {
             // url拦截
             @Override
@@ -221,7 +204,8 @@ public class WebViewBackActivity extends /*AppCompatActivity*/QMUIActivity imple
             public void onReceivedTitle(WebView view, String title) {
                 super.onReceivedTitle(view, title);
                 if (mTitle == null && title != null && !title.startsWith("http")) {
-                    activtyTitle.setTitleText(title);
+//                    activtyTitle.setTitleText(title);
+                    activtyTitle.setTitle(title);
                 }
             }
         });

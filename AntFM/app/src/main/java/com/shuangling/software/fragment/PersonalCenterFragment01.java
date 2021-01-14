@@ -7,23 +7,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-
-import androidx.fragment.app.DialogFragment;
-import androidx.core.content.FileProvider;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.DialogFragment;
+
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.gyf.immersionbar.ImmersionBar;
-import com.gyf.immersionbar.components.SimpleImmersionFragment;
 import com.hjq.toast.ToastUtils;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
@@ -46,7 +42,6 @@ import com.shuangling.software.activity.MyWalletsActivity;
 import com.shuangling.software.activity.NewLoginActivity;
 import com.shuangling.software.activity.SettingActivity;
 import com.shuangling.software.activity.SubscribeActivity;
-import com.shuangling.software.activity.WebViewActivity;
 import com.shuangling.software.activity.WebViewBackActivity;
 import com.shuangling.software.dialog.UpdateDialog;
 import com.shuangling.software.entity.UpdateInfo;
@@ -68,7 +63,6 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
@@ -230,7 +224,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
                 break;
             case R.id.myPublish:
                 if (User.getInstance() != null) {
-                    Intent it = new Intent(getContext(), WebViewActivity.class);
+                    Intent it = new Intent(getContext(), /*WebViewActivity*/WebViewBackActivity.class);
                     it.putExtra("url", ServerInfo.h5HttpsIP + "/publish");
                     it.putExtra("title", "我的发布");
                     startActivity(it);

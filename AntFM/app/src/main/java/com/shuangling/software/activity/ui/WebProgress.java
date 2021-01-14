@@ -282,7 +282,7 @@ public class WebProgress extends FrameLayout {
 
     private void doEnd() {
         if (TAG == FINISH && mCurrentProgress == 100) {
-            setVisibility(INVISIBLE);
+            setVisibility(GONE);
             mCurrentProgress = 0f;
             this.setAlpha(1f);
         }
@@ -318,11 +318,11 @@ public class WebProgress extends FrameLayout {
     public void setProgress(float progress) {
         // fix 同时返回两个 100，产生两次进度条的问题；
         if (TAG == UN_START && progress == 100) {
-            setVisibility(View.INVISIBLE);
+            setVisibility(View.GONE);
             return;
         }
 
-        if (getVisibility() == View.INVISIBLE) {
+        if (getVisibility() == View.GONE) {
             setVisibility(View.VISIBLE);
         }
         if (progress < 95) {

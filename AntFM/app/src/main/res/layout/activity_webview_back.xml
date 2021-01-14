@@ -5,44 +5,30 @@
     android:background="@color/white"
     android:fitsSystemWindows="true">
 
-    <!--<com.qmuiteam.qmui.widget.QMUITopBar
-        android:id="@+id/activtyTitle"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/qmui_topbar_height"
-        android:fitsSystemWindows="true" />-->
-    <com.shuangling.software.customview.TopTitleBar xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/activtyTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FAFAFA"
-        app:canBack="true"
-        app:moreImg="@drawable/ic_more" />
-
-    <include
-        layout="@layout/activity_webview"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/qmui_topbar_height" />
-</com.qmuiteam.qmui.widget.QMUIWindowInsetLayout>
+        android:fitsSystemWindows="true">
 
-    <!--
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <com.shuangling.software.customview.TopTitleBar
+        <com.qmuiteam.qmui.widget.QMUITopBarLayout
             android:id="@+id/activtyTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FAFAFA"
-            app:canBack="true"
-            app:moreImg="@drawable/ic_more" />
+            android:fitsSystemWindows="true" />
 
-        <include
-            layout="@layout/activity_webview"
+        <!--动态承载WebView的容器-->
+        <FrameLayout
+            android:id="@+id/fl_web_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            />
-    </LinearLayout>-->
+            android:layout_below="@id/activtyTitle" />
+
+        <!--progressBar 需要时再inflate-->
+        <ViewStub
+            android:id="@+id/viewStub"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/activtyTitle"
+            android:layout="@layout/progress_web" />
+    </RelativeLayout>
+</com.qmuiteam.qmui.widget.QMUIWindowInsetLayout>

@@ -70,6 +70,8 @@
             android:layout_height="wrap_content"
             android:background="@drawable/video_duration_text_bg"
             android:ellipsize="end"
+            android:drawablePadding="5dp"
+            android:drawableLeft="@drawable/video_play_icon01"
             android:maxLines="1"
             android:textColor="@color/white"
             android:textSize="@dimen/font_size_22px"

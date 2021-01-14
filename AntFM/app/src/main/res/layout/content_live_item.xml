@@ -62,7 +62,7 @@
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/video_placeholder"
             fresco:placeholderImageScaleType="centerCrop"
-            fresco:roundedCornerRadius="2dp"
+            fresco:roundedCornerRadius="4dp"
             fresco:viewAspectRatio="1.778" />
 
         <ImageView

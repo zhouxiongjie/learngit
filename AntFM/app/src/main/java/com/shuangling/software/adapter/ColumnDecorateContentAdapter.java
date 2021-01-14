@@ -586,7 +586,8 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             gallerieOneViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieOneViewHolder.title.setText(content.getTitle());
             CommonUtils.setReadsAndComment(gallerieOneViewHolder.commentNum, content.getComment(), content.getView());
-            gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
+            //gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
+            gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "");
             gallerieOneViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -633,7 +634,8 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             gallerieViewThreeHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieViewThreeHolder.title.setText(content.getTitle());
             CommonUtils.setReadsAndComment(gallerieViewThreeHolder.commentNum, content.getComment(), content.getView());
-            gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
+            //gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
+            gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "");
             gallerieViewThreeHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

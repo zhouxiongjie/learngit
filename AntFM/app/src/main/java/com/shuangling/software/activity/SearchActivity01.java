@@ -143,7 +143,7 @@ public class SearchActivity01 extends AppCompatActivity {
         historyText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mSearchHistoryGridViewAdapter != null && expand.getVisibility() == View.VISIBLE) {
+                if (mSearchHistoryGridViewAdapter != null &&!mSearchHistoryGridViewAdapter.isEditor()&& expand.getVisibility() == View.VISIBLE) {
                     if (mSearchHistoryGridViewAdapter.isExpand()) {
                         mSearchHistoryGridViewAdapter.setExpand(false);
                         expand.setText(R.string.arrow_down01);
@@ -157,7 +157,7 @@ public class SearchActivity01 extends AppCompatActivity {
         expand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mSearchHistoryGridViewAdapter != null && expand.getVisibility() == View.VISIBLE) {
+                if (mSearchHistoryGridViewAdapter != null&&!mSearchHistoryGridViewAdapter.isEditor() && expand.getVisibility() == View.VISIBLE) {
                     if (mSearchHistoryGridViewAdapter.isExpand()) {
                         mSearchHistoryGridViewAdapter.setExpand(false);
                         expand.setText(R.string.arrow_down01);

@@ -379,7 +379,8 @@ public class ProgramContentAdapter extends RecyclerView.Adapter implements View.
             gallerieViewThreeHolder.publishTime.setText(content.getPublish_at());
             gallerieViewThreeHolder.title.setText(content.getTitle());
             gallerieViewThreeHolder.commentNum.setText("" + content.getComment() + "评论");
-            gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
+            gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "");
+            //gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
             gallerieViewThreeHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

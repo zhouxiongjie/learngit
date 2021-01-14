@@ -212,6 +212,28 @@
         <item>@color/cyanBlue</item>
     </integer-array>
 
+
+    <!--分割线颜色-->
+    <color name="divide_6dp_color_light">#F3F4F5</color>
+    <color name="divide_6dp_color_dark">#121212</color>
+    <color name="divide_1px_color_light">#E8E8E8</color>
+    <color name="divide_1px_color_dark">#292929</color>
+
+    <!--卡片标题颜色-->
+    <color name="title_color_one_light">#242424</color>
+    <color name="title_color_one_dark">#292929</color>
+    <!--卡片文本颜色-->
+    <color name="text_color_one_light">#A0A0A0</color>
+    <color name="text_color_one_dark">#292929</color>
+
+    <!--更多文本颜色-->
+    <color name="text_color_two_light">#999999</color>
+    <color name="text_color_two_dark">#999999</color>
+
+
+
+    #242424
+
 </resources>
 
 

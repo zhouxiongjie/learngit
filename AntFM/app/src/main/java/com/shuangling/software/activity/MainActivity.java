@@ -67,7 +67,6 @@ import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.fragment.ColumnFragment;
 import com.shuangling.software.fragment.DiscoverFragment;
-import com.shuangling.software.fragment.PersonalCenterFragment;
 import com.shuangling.software.fragment.PersonalCenterFragment01;
 import com.shuangling.software.fragment.RadioListFragment;
 import com.shuangling.software.fragment.RecommendFragment;
@@ -82,7 +81,6 @@ import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -103,7 +101,7 @@ import okhttp3.Call;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
-@EnableDragToClose()
+//@EnableDragToClose()
 public class MainActivity extends QMUIActivity implements AMapLocationListener, Handler.Callback {
     public static final String TAG = "MainActivity";
     public static final int REQUEST_PERMISSION_CODE = 0x0110;

@@ -14,15 +14,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.RemoteException;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +24,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.player.IPlayer;
@@ -51,6 +50,8 @@ import com.mylhyl.circledialog.params.ButtonParams;
 import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -61,7 +62,6 @@ import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.VideoRecyclerAdapter;
-import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.dialog.ShareDialog;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.Comment;
@@ -128,30 +128,8 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
     TextView attention;
     @BindView(R.id.organizationLayout)
     RelativeLayout organizationLayout;
-    //    @BindView(R.id.videoTitle)
-//    TextView videoTitle;
-//    @BindView(R.id.playTimes)
-//    TextView playTimes;
-//    @BindView(R.id.praiseIcon)
-//    FontIconView praiseIcon;
-//    @BindView(R.id.praise)
-//    TextView praise;
-//    @BindView(R.id.praiseLayout)
-//    LinearLayout praiseLayout;
-//    @BindView(R.id.collectIcon)
-//    FontIconView collectIcon;
-//    @BindView(R.id.collectText)
-//    TextView collectText;
-//    @BindView(R.id.collectLayout)
-//    LinearLayout collectLayout;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    //    @BindView(R.id.commentNum)
-//    TextView commentNum;
-//    @BindView(R.id.commentLayout)
-//    LinearLayout commentLayout;
-//    @BindView(R.id.listView)
-//    MyListView listView;
     @BindView(R.id.writeComment)
     TextView writeComment;
     @BindView(R.id.commentsIcon)
@@ -165,7 +143,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
     //    @BindView(R.id.scrollView)
 //    NestedScrollView scrollView;
     @BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
     @BindView(R.id.noData)
@@ -210,19 +188,26 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
             }
         });
         setTheme(MyApplication.getInstance().getCurrentTheme());
-//        Window window = getWindow();
-//        //After LOLLIPOP not translucent status bar
-//        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//        //Then call setStatusBarColor.
-//        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//        window.setStatusBarColor(getResources().getColor(R.color.white));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_detail);
-        //CommonUtils.setTransparentStatusBar(this);
-        //ImmersionBar.with(this).transparentBar().titleBar(activityTitle).init();
         ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).init();
-        //ImmersionBar.with(this).statusBarDarkFont(true);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
+        activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            doOnBackPressed();
+        });
+        activityTitle.addRightImageButton(R.drawable.ic_more, com.qmuiteam.qmui.R.id.right_icon).setOnClickListener(view -> {//
+            if (mVideoDetail != null) {
+                String url;
+                if (User.getInstance() != null) {
+                    url = ServerInfo.h5IP + "/videos/" + mVideoId + "?from_user_id=" + User.getInstance().getId() + "&from_url=" + ServerInfo.h5IP + "/videos/" + mVideoId;
+                } else {
+                    url = ServerInfo.h5IP + "/videos/" + mVideoId + "?from_url=" + ServerInfo.h5IP + "/videos/" + mVideoId;
+                }
+                showShareDialog(mVideoDetail.getTitle(), mVideoDetail.getDes(), mVideoDetail.getCover(), url);
+                //shareTest();
+            }
+        });
         init();
     }
 
@@ -246,27 +231,6 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
         mNeedTipPlay = SharedPreferencesUtils.getIntValue(SettingActivity.NEED_TIP_PLAY, 0);
         mHandler = new Handler(this);
         mVideoId = getIntent().getIntExtra("videoId", 0);
-        activityTitle.setMoreAction(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mVideoDetail != null) {
-                    String url;
-                    if (User.getInstance() != null) {
-                        url = ServerInfo.h5IP + "/videos/" + mVideoId + "?from_user_id=" + User.getInstance().getId() + "&from_url=" + ServerInfo.h5IP + "/videos/" + mVideoId;
-                    } else {
-                        url = ServerInfo.h5IP + "/videos/" + mVideoId + "?from_url=" + ServerInfo.h5IP + "/videos/" + mVideoId;
-                    }
-                    showShareDialog(mVideoDetail.getTitle(), mVideoDetail.getDes(), mVideoDetail.getCover(), url);
-                    //shareTest();
-                }
-            }
-        });
-        activityTitle.setBackListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
         initAliyunPlayerView();
         getVideoDetail();
         refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
@@ -685,8 +649,20 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
         }
     }
 
+//    @Override
+//    public void onBackPressed() {
+//        if (mNeedResumeAudioPlay) {
+//            FloatWindowUtil.getInstance().visibleWindow();
+//        }
+//        if (aliyunVodPlayerView != null) {
+//            aliyunVodPlayerView.onDestroy();
+//            aliyunVodPlayerView = null;
+//        }
+//        super.onBackPressed();
+//    }
+
     @Override
-    public void onBackPressed() {
+    protected void doOnBackPressed() {
         if (mNeedResumeAudioPlay) {
             FloatWindowUtil.getInstance().visibleWindow();
         }
@@ -694,7 +670,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
             aliyunVodPlayerView.onDestroy();
             aliyunVodPlayerView = null;
         }
-        super.onBackPressed();
+        super.doOnBackPressed();
     }
 
     @Override
@@ -1202,6 +1178,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_LOGIN && resultCode == RESULT_OK) {
             updateStatus();
             getComments(0);

@@ -5,18 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DividerItemDecoration;
-
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -29,11 +17,23 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ethanhua.skeleton.RecyclerViewSkeletonScreen;
 import com.ethanhua.skeleton.Skeleton;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.RefreshState;
@@ -48,7 +48,6 @@ import com.shuangling.software.adapter.ColumnDecorateVideoContentAdapter;
 import com.shuangling.software.adapter.MoudleGridViewAdapter;
 import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.MyGridView;
-import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.BannerInfo;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
@@ -62,7 +61,6 @@ import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
-import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,14 +73,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.Call;
 
-@EnableDragToClose()
-public class ContentActivity extends AppCompatActivity implements Handler.Callback {
+//@EnableDragToClose()
+public class ContentActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback {
     public static final String TAG = "ContentActivity";
     public static final int MSG_UPDATE_LIST = 0x1;
     public static final int MSG_GET_COLUMN_DECORATE = 0x2;
     public static final int MSG_GET_TYPE_CONTENT = 0x3;
     @BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.refreshLayout)
@@ -112,15 +110,20 @@ public class ContentActivity extends AppCompatActivity implements Handler.Callba
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content);
-        CommonUtils.transparentStatusBar(this);
+//        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
+        activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            finish();
+        });
         init();
     }
 
     private void init() {
         mHandler = new Handler(this);
         mColumn = (Column) getIntent().getSerializableExtra("column");
-        activityTitle.setTitleText(mColumn.getName());
+//        activityTitle.setTitleText(mColumn.getName());
+        activityTitle.setTitle(mColumn.getName());
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         divider.setDrawable(ContextCompat.getDrawable(this, R.drawable.recycleview_divider_drawable));

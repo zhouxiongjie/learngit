@@ -6,12 +6,15 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <com.shuangling.software.customview.TopTitleBar
+    <!--<com.shuangling.software.customview.TopTitleBar
         android:id="@+id/activtyTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:canBack="true" />
-
+        app:canBack="true" />-->
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/activity_title"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/qmui_topbar_height" />
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/head"
@@ -32,14 +35,13 @@
         app:viewAspectRatio="1" />
 
 
-
     <LinearLayout
         android:id="@+id/loginLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
         android:layout_marginTop="15dp"
+        android:layout_marginEnd="50dp"
         android:background="@color/white"
         android:orientation="horizontal"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -52,26 +54,26 @@
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:background="@drawable/login_btn_bottom_line_selector"
             android:text="验证码登录"
             android:textColor="@color/login_text_color_selector"
-            android:textSize="@dimen/font_size_30px"
-            android:background="@drawable/login_btn_bottom_line_selector"/>
+            android:textSize="@dimen/font_size_30px" />
 
 
         <Button
             android:id="@+id/accountLogin"
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginStart="50dp"
+            android:layout_weight="1"
+            android:background="@drawable/login_btn_bottom_line_selector"
             android:text="密码登录"
             android:textColor="@color/login_text_color_selector"
-            android:textSize="@dimen/font_size_30px"
-            android:background="@drawable/login_btn_bottom_line_selector"/>
+            android:textSize="@dimen/font_size_30px" />
 
 
     </LinearLayout>
@@ -81,9 +83,9 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="@color/divideColorOne"
-        app:layout_constraintStart_toStartOf="@id/loginLayout"
         app:layout_constraintEnd_toEndOf="@id/loginLayout"
-        app:layout_constraintTop_toBottomOf="@id/loginLayout"/>
+        app:layout_constraintStart_toStartOf="@id/loginLayout"
+        app:layout_constraintTop_toBottomOf="@id/loginLayout" />
 
 
     <androidx.viewpager.widget.ViewPager
@@ -100,12 +102,11 @@
         android:id="@+id/divide1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
         android:paddingLeft="50dp"
         android:paddingRight="50dp"
-        app:layout_constraintBottom_toTopOf="@+id/layout"
-        android:layout_marginBottom="30dp"
         android:visibility="invisible"
-        >
+        app:layout_constraintBottom_toTopOf="@+id/layout">
 
         <ImageView
             android:layout_width="match_parent"
@@ -130,11 +131,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:padding="20dp"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/company"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:padding="20dp"
-        android:visibility="invisible">
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
             android:id="@+id/weiXin"
@@ -161,7 +162,6 @@
 
 
     </LinearLayout>
-
 
 
     <TextView

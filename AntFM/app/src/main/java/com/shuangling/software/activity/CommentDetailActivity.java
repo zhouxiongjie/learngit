@@ -5,17 +5,15 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-
-import androidx.fragment.app.DialogFragment;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
@@ -25,20 +23,21 @@ import com.mylhyl.circledialog.callback.ConfigInput;
 import com.mylhyl.circledialog.params.ButtonParams;
 import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
+import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.LevelTwoCommentAdapter;
-import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.Comment;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
-import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -50,14 +49,14 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
 
-@EnableDragToClose()
-public class CommentDetailActivity extends AppCompatActivity implements Handler.Callback {
+//@EnableDragToClose()
+public class CommentDetailActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback {
     public static final int MSG_GET_COMMENTS = 0x0;
     public static final int MSG_WRITE_COMMENTS = 0x1;
     public static final int MSG_PRAISE = 0x2;
     public static final int MSG_DELETE_COMMENT = 0x3;
     @BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.writeComment)
@@ -79,8 +78,13 @@ public class CommentDetailActivity extends AppCompatActivity implements Handler.
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment_detail);
-        CommonUtils.transparentStatusBar(this);
+//        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
+        activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            finish();
+        });
+        activityTitle.setTitle("评论详情");
         init();
     }
 

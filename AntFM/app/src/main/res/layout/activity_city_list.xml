@@ -4,14 +4,17 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <com.shuangling.software.customview.TopTitleBar
+    <!--<com.shuangling.software.customview.TopTitleBar
         android:id="@+id/activity_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         fresco:canBack="true"
-        fresco:titleText="当前城市-长沙"/>
-
+        fresco:titleText="当前城市-长沙"/>-->
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/activity_title"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/qmui_topbar_height"/>
 
     <com.scwang.smartrefresh.layout.SmartRefreshLayout
         android:id="@+id/refreshLayout"

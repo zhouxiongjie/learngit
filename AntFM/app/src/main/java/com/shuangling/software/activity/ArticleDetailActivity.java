@@ -28,6 +28,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.aliyun.player.IPlayer;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.gyf.immersionbar.ImmersionBar;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.WebProgress;
@@ -70,7 +71,7 @@ import okhttp3.Call;
 import static com.shuangling.software.service.AudioPlayerService.PLAY_ORDER;
 import static com.shuangling.software.utils.CommonUtils.NETWORKTYPE_WIFI;
 
-@EnableDragToClose()
+//@EnableDragToClose()
 public class ArticleDetailActivity extends BaseAudioActivity implements Handler.Callback {
     private static final int LOGIN_RESULT = 0x1;
     public static final int MSG_GET_DETAIL = 0x2;
@@ -103,6 +104,7 @@ public class ArticleDetailActivity extends BaseAudioActivity implements Handler.
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_webview/*activity_article_details*/);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
         //CommonUtils.transparentStatusBar(this);
         ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).keyboardEnable(true)  //解决软键盘与底部输入框冲突问题，默认为false，还有一个重载方法，可以指定软键盘mode
                 .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE).init();

@@ -1,16 +1,23 @@
 package com.shuangling.software.activity;
+
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.FontIconView;
@@ -21,22 +28,25 @@ import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.Call;
-@EnableDragToClose()
-public class CashDetailActivity extends AppCompatActivity implements Handler.Callback {
-public static final String TAG = "MyWalletsActivity";
-private static final int MSG_CASH_DETAIL = 0;
+
+//@EnableDragToClose()
+public class CashDetailActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback {
+    public static final String TAG = "MyWalletsActivity";
+    private static final int MSG_CASH_DETAIL = 0;
     private static final int MSG_CASH_REGULAR = 1;
-@BindView(R.id.activtyTitle)
-    TopTitleBar activtyTitle;
+    @BindView(R.id.activtyTitle)
+    /*TopTitleBar*/ QMUITopBarLayout activtyTitle;
     @BindView(R.id.money)
     TextView money;
     @BindView(R.id.status)
@@ -73,56 +83,68 @@ private static final int MSG_CASH_DETAIL = 0;
     FontIconView typeIcon;
     @BindView(R.id.typeName)
     TextView typeName;
-private int mId;
+    private int mId;
     private Handler mHandler;
     private CashDetail mCashDetail;
-private int mWaitDay;
-@Override
+    private int mWaitDay;
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_cash_detail);
-        CommonUtils.transparentStatusBar(this);
+        setContentView(R.layout.activity_cash_detail);
+//        CommonUtils.transparentStatusBar(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
         ButterKnife.bind(this);
+        activtyTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            finish();
+        });
+        activtyTitle.setTitle("提现详情");
         init();
     }
-private void init() {
+
+    private void init() {
         mHandler = new Handler(this);
         mId = getIntent().getIntExtra("id", 0);
         getCashRegular();
         getCashDetail(mId);
-}
-private void getCashRegular() {
-String url = ServerInfo.emc + ServerInfo.getCashRegular;
+    }
+
+    private void getCashRegular() {
+        String url = ServerInfo.emc + ServerInfo.getCashRegular;
         Map<String, String> params = new HashMap<String, String>();
-OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = mHandler.obtainMessage(MSG_CASH_REGULAR);
+                Message msg = mHandler.obtainMessage(MSG_CASH_REGULAR);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
     }
-private void getCashDetail(int id) {
-String url = ServerInfo.emc + ServerInfo.getCashDetail + id;
+
+    private void getCashDetail(int id) {
+        String url = ServerInfo.emc + ServerInfo.getCashDetail + id;
         Map<String, String> params = new HashMap<String, String>();
-OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = mHandler.obtainMessage(MSG_CASH_DETAIL);
+                Message msg = mHandler.obtainMessage(MSG_CASH_DETAIL);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
     }
-@Override
+
+    @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_CASH_DETAIL:
@@ -136,32 +158,32 @@ Message msg = mHandler.obtainMessage(MSG_CASH_DETAIL);
                                 typeIcon.setText(R.string.ic_zhifubao);
                                 typeIcon.setTextColor(Color.parseColor("#1BA4E5"));
                                 typeName.setText("支付宝");
-                                account.setText( "支付宝("+mCashDetail.getName()+")");
+                                account.setText("支付宝(" + mCashDetail.getName() + ")");
                             } else if (mCashDetail.getType() == 2) {
                                 typeIcon.setText(R.string.ic_weixin);
                                 typeIcon.setTextColor(Color.parseColor("#00C901"));
                                 typeName.setText("微信");
-                                account.setText( "微信("+mCashDetail.getName()+")");
+                                account.setText("微信(" + mCashDetail.getName() + ")");
                             }
-money.setText(String.format("%.2f", (float) mCashDetail.getMoney() / 100));
+                            money.setText(String.format("%.2f", (float) mCashDetail.getMoney() / 100));
                             if (mCashDetail.getStatus() == 1 || mCashDetail.getStatus() == 2) {
                                 status.setText("处理中");
                                 processIcon.setImageResource(R.drawable.ic_success);
                                 processDes.setText("正在处理");
                                 processDes.setTextColor(Color.parseColor("#06B4FD"));
                                 status.setTextColor(Color.parseColor("#EB8C10"));
-SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 Date createAt = dateFormat.parse(mCashDetail.getCreated_at());
                                 Calendar rightNow = Calendar.getInstance();
                                 rightNow.setTime(createAt);
-SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm");
+                                SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm");
                                 String format = sdf.format(rightNow.getTime());
                                 rightNow.add(Calendar.DAY_OF_YEAR, mWaitDay);
                                 String format1 = sdf.format(rightNow.getTime());
                                 finishTime.setText("预计" + format1 + "前");
                                 applyTime.setText(format);
                                 processTime.setText(format);
-} else if (mCashDetail.getStatus() == 3) {
+                            } else if (mCashDetail.getStatus() == 3) {
                                 status.setText("已到账");
                                 status.setTextColor(Color.parseColor("#06B4FD"));
                                 processIcon.setImageResource(R.drawable.ic_success);
@@ -169,19 +191,19 @@ SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm");
                                 processDes.setTextColor(Color.parseColor("#06B4FD"));
                                 finishIcon.setImageResource(R.drawable.ic_success);
                                 finishDes.setTextColor(Color.parseColor("#06B4FD"));
-SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 Date createAt = dateFormat.parse(mCashDetail.getCreated_at());
                                 Calendar rightNow = Calendar.getInstance();
                                 rightNow.setTime(createAt);
                                 SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm");
                                 String format = sdf.format(rightNow.getTime());
-Date sendTime = dateFormat.parse(mCashDetail.getSend_time());
+                                Date sendTime = dateFormat.parse(mCashDetail.getSend_time());
                                 rightNow.setTime(sendTime);
                                 String format1 = sdf.format(rightNow.getTime());
                                 applyTime.setText(format);
                                 processTime.setText(format);
                                 finishTime.setText(format1);
-} else if (mCashDetail.getStatus() == 4) {
+                            } else if (mCashDetail.getStatus() == 4) {
                                 status.setText("失败");
                                 status.setTextColor(Color.parseColor("#F32E0D"));
                                 processIcon.setImageResource(R.drawable.ic_fail);
@@ -193,37 +215,37 @@ Date sendTime = dateFormat.parse(mCashDetail.getSend_time());
                                 processDown.setBackgroundColor(Color.parseColor("#C6C6C8"));
                                 failLayout.setVisibility(View.VISIBLE);
                                 failReason.setText(mCashDetail.getFail_msg());
-SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 Date createAt = dateFormat.parse(mCashDetail.getCreated_at());
                                 Calendar rightNow = Calendar.getInstance();
                                 rightNow.setTime(createAt);
                                 SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm");
                                 String format = sdf.format(rightNow.getTime());
-Date updateAt = dateFormat.parse(mCashDetail.getUpdated_at());
+                                Date updateAt = dateFormat.parse(mCashDetail.getUpdated_at());
                                 rightNow.setTime(updateAt);
                                 String format1 = sdf.format(rightNow.getTime());
                                 applyTime.setText(format);
                                 processTime.setText(format1);
-}
+                            }
                             orderNumber.setText(mCashDetail.getTrade_no());
                             createTime.setText(mCashDetail.getCreated_at());
                             //account.setText("支付宝(" + mCashDetail.getAccount() + ")");
-}
-} else if (jsonObject != null) {
+                        }
+                    } else if (jsonObject != null) {
                         ToastUtils.show(jsonObject.getString("msg"));
                     } else {
                         ToastUtils.show("获取详情失败");
                     }
                 } catch (Exception e) {
-}
+                }
                 break;
             case MSG_CASH_REGULAR:
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-mWaitDay = jsonObject.getJSONObject("data").getInteger("transfer_day");
-if (mCashDetail != null) {
+                        mWaitDay = jsonObject.getJSONObject("data").getInteger("transfer_day");
+                        if (mCashDetail != null) {
                             if (mCashDetail.getStatus() == 1 || mCashDetail.getStatus() == 2) {
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 try {
@@ -234,15 +256,15 @@ if (mCashDetail != null) {
                                     SimpleDateFormat sdf = new SimpleDateFormat("MM-dd HH:mm");
                                     String format = sdf.format(rightNow.getTime());
                                     finishTime.setText("预计" + format + "前");
-} catch (Exception e) {
-}
+                                } catch (Exception e) {
+                                }
                             }
                         }
-}
+                    }
                 } catch (Exception e) {
-}
+                }
                 break;
-}
+        }
         return false;
     }
 }

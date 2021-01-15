@@ -23,13 +23,9 @@ import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -47,12 +43,10 @@ import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
-import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.MyGlideEngine;
 import com.shuangling.software.utils.PreloadWebView;
 import com.shuangling.software.utils.ServerInfo;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-import com.youngfeng.snake.annotations.EnableDragToClose;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 import com.zhihu.matisse.internal.entity.CaptureStrategy;
@@ -77,9 +71,6 @@ import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 import io.reactivex.functions.Consumer;
 import okhttp3.Call;
-
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 
 public class CluesActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback, AMapLocationListener {
     private static final int LOGIN_RESULT = 0x1;

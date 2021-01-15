@@ -7,15 +7,18 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <com.shuangling.software.customview.TopTitleBar
+    <!--<com.shuangling.software.customview.TopTitleBar
         android:id="@+id/activtyTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
         app:canBack="true"
         app:moreText=""
-        app:titleText="提现" />
-
+        app:titleText="提现" />-->
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/activtyTitle"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/qmui_topbar_height"/>
 
 
 

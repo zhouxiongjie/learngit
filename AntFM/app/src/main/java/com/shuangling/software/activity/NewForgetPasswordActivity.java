@@ -1,11 +1,14 @@
 package com.shuangling.software.activity;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
+
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -15,8 +18,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.FontIconView;
@@ -27,18 +34,21 @@ import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
-@EnableDragToClose()
-public class NewForgetPasswordActivity extends AppCompatActivity implements Handler.Callback {
-private static final int MSG_GET_VERIFY_CODE = 0X00;
+
+//@EnableDragToClose()
+public class NewForgetPasswordActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback {
+    private static final int MSG_GET_VERIFY_CODE = 0X00;
     private static final int MSG_RESET_PASSWORD = 0X01;
-private static final int MSG_VERIFY_VERIFY_CODE = 0X02;
+    private static final int MSG_VERIFY_VERIFY_CODE = 0X02;
     @BindView(R.id.countryCode)
     TextView countryCode;
     @BindView(R.id.phoneNum)
@@ -46,10 +56,10 @@ private static final int MSG_VERIFY_VERIFY_CODE = 0X02;
     @BindView(R.id.next)
     Button next;
     @BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.verifyCodeLayout)
     LinearLayout verifyCodeLayout;
-//    @BindView(R.id.tip)
+    //    @BindView(R.id.tip)
 //    TextView tip;
 //    @BindView(R.id.verifyCode)
 //    EditText verifyCode;
@@ -72,41 +82,43 @@ private static final int MSG_VERIFY_VERIFY_CODE = 0X02;
     @BindView(R.id.eye)
     FontIconView eye;
     private Handler mHandler;
-private CountDownTimer mCountDownTimer;
+    private CountDownTimer mCountDownTimer;
     private DialogFragment mDialogFragment;
-private boolean mPasswordVisible=false;
-@Override
+    private boolean mPasswordVisible = false;
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_new_forget_password);
-        CommonUtils.transparentStatusBar(this);
+        setContentView(R.layout.activity_new_forget_password);
+//        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
+        activityTitle.addLeftTextButton("返回", com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            doOnBackPressed();
+        });
         mHandler = new Handler(this);
         init();
     }
-private void init() {
-        activityTitle.setBackListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+
+    private void init() {
         phoneNum.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-}
-@Override
+            }
+
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-}
-@Override
+            }
+
+            @Override
             public void afterTextChanged(Editable s) {
                 String phone = s.toString();
                 if (CommonUtils.isMobileNO(phone)) {
                     next.setEnabled(true);
                 } else {
                     next.setEnabled(false);
-}
+                }
             }
         });
 //        verifyCode.addTextChangedListener(new TextWatcher() {
@@ -134,14 +146,16 @@ private void init() {
 //                }
 //            }
 //        });
-newPassword.addTextChangedListener(new TextWatcher() {
+        newPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-}
-@Override
+            }
+
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-}
-@Override
+            }
+
+            @Override
             public void afterTextChanged(Editable s) {
                 if (TextUtils.isEmpty(s.toString())) {
                     resetPassword.setEnabled(false);
@@ -151,10 +165,10 @@ newPassword.addTextChangedListener(new TextWatcher() {
 //                    } else {
                     resetPassword.setEnabled(true);
 //                    }
-}
+                }
             }
         });
-verifyCodeView.setInputCompleteListener(new VerifyCodeView.InputCompleteListener() {
+        verifyCodeView.setInputCompleteListener(new VerifyCodeView.InputCompleteListener() {
             @Override
             public void inputComplete() {
                 //ToastUtils.show("inputComplete: " + verifyCodeView.getEditContent());
@@ -163,14 +177,16 @@ verifyCodeView.setInputCompleteListener(new VerifyCodeView.InputCompleteListener
 //
 //                }
                 //验证手机验证码
-                verifyVerifyCode(phoneNum.getText().toString(),verifyCodeView.getEditContent());
-}
-@Override
+                verifyVerifyCode(phoneNum.getText().toString(), verifyCodeView.getEditContent());
+            }
+
+            @Override
             public void invalidContent() {
-}
+            }
         });
     }
-@Override
+
+    @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_GET_VERIFY_CODE: {
@@ -179,7 +195,7 @@ verifyCodeView.setInputCompleteListener(new VerifyCodeView.InputCompleteListener
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-inputVerifyCodeLayout.setVisibility(View.VISIBLE);
+                        inputVerifyCodeLayout.setVisibility(View.VISIBLE);
                         //modifyPasswordLayout.setVisibility(View.VISIBLE);
                         verifyCodeLayout.setVisibility(View.GONE);
                         phoneNum01.setText(phoneNum.getText().toString());
@@ -207,7 +223,8 @@ inputVerifyCodeLayout.setVisibility(View.VISIBLE);
                                 timer.setText("重新发送(" + millisUntilFinished / 1000 + ")");
                                 timer.setEnabled(false);
                             }
-@Override
+
+                            @Override
                             public void onFinish() {
                                 timer.setText("重新发送");
                                 timer.setEnabled(true);
@@ -231,7 +248,7 @@ inputVerifyCodeLayout.setVisibility(View.VISIBLE);
                         ToastUtils.show("新密码已设置，请重新登录");
                         startActivity(new Intent(this, MainActivity.class));
                         finish();
-} else if (jsonObject != null) {
+                    } else if (jsonObject != null) {
                         ToastUtils.show(jsonObject.getString("msg"));
                     }
                 } catch (Exception e) {
@@ -239,16 +256,16 @@ inputVerifyCodeLayout.setVisibility(View.VISIBLE);
                 }
             }
             break;
-case MSG_VERIFY_VERIFY_CODE: {
+            case MSG_VERIFY_VERIFY_CODE: {
                 try {
                     mDialogFragment.dismiss();
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-inputVerifyCodeLayout.setVisibility(View.GONE);
+                        inputVerifyCodeLayout.setVisibility(View.GONE);
                         modifyPasswordLayout.setVisibility(View.VISIBLE);
 //verifyCodeLayout.setVisibility(View.GONE);
-} else if (jsonObject != null) {
+                    } else if (jsonObject != null) {
                         ToastUtils.show(jsonObject.getString("msg"));
                     }
                 } catch (Exception e) {
@@ -259,14 +276,15 @@ inputVerifyCodeLayout.setVisibility(View.GONE);
         }
         return false;
     }
-@OnClick({R.id.next, R.id.resetPassword, R.id.timer,R.id.eye})
+
+    @OnClick({R.id.next, R.id.resetPassword, R.id.timer, R.id.eye})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.next:
                 getVerifyCode(phoneNum.getText().toString());
                 break;
             case R.id.resetPassword:
-if(!CommonUtils.isValidPassword(newPassword.getText().toString())){
+                if (!CommonUtils.isValidPassword(newPassword.getText().toString())) {
                     ToastUtils.show("密码需由6-20位数字、字母或符号组成，至少两种");
                     return;
                 }
@@ -276,66 +294,70 @@ if(!CommonUtils.isValidPassword(newPassword.getText().toString())){
                 getVerifyCode(phoneNum.getText().toString());
                 break;
             case R.id.eye:
-                mPasswordVisible=!mPasswordVisible;
-                if(mPasswordVisible){
+                mPasswordVisible = !mPasswordVisible;
+                if (mPasswordVisible) {
                     eye.setText(R.string.password_visible);
                     newPassword.setInputType(InputType.TYPE_CLASS_TEXT);
-                    if(!TextUtils.isEmpty(newPassword.getText().toString())){
+                    if (!TextUtils.isEmpty(newPassword.getText().toString())) {
                         newPassword.setSelection(newPassword.getText().toString().length());//将光标移至文字末尾
                     }
-                }else {
+                } else {
                     eye.setText(R.string.password_invisible);
                     newPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    if(!TextUtils.isEmpty(newPassword.getText().toString())){
+                    if (!TextUtils.isEmpty(newPassword.getText().toString())) {
                         newPassword.setSelection(newPassword.getText().toString().length());//将光标移至文字末尾
                     }
                 }
                 break;
         }
     }
-private void verifyVerifyCode(String phone,String verifyCode) {
-mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
+
+    private void verifyVerifyCode(String phone, String verifyCode) {
+        mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
         String url = ServerInfo.serviceIP + ServerInfo.getVerifyCode;
         Map<String, String> params = new HashMap<String, String>();
         params.put("module", "reset_password");
         params.put("phone", phone);
-        params.put("verification_code",verifyCode);
-OkHttpUtils.put(url, params, new OkHttpCallback(this) {
-@Override
+        params.put("verification_code", verifyCode);
+        OkHttpUtils.put(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = mHandler.obtainMessage(MSG_VERIFY_VERIFY_CODE);
+                Message msg = mHandler.obtainMessage(MSG_VERIFY_VERIFY_CODE);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        try{
+                        try {
                             mDialogFragment.dismiss();
                             ToastUtils.show("服务请求异常");
-                        }catch (Exception e){
-}
-}
+                        } catch (Exception e) {
+                        }
+                    }
                 });
-}
+            }
         });
     }
-private void getVerifyCode(String phone) {
-mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
+
+    private void getVerifyCode(String phone) {
+        mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
         String url = ServerInfo.serviceIP + ServerInfo.getVerifyCode;
         Map<String, String> params = new HashMap<String, String>();
         params.put("module", "reset_password");
         params.put("phone", phone);
-OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
+                Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
@@ -344,58 +366,55 @@ Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
                     }
                 });
                 ToastUtils.show("获取验证码请求异常");
-}
+            }
         });
     }
-private void resetPassword() {
+
+    private void resetPassword() {
         mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
         String url = ServerInfo.serviceIP + ServerInfo.resetPassword;
         Map<String, String> params = new HashMap<String, String>();
         params.put("password", newPassword.getText().toString());
         params.put("verification_code", verifyCodeView.getEditContent());
         params.put("phone", phoneNum.getText().toString());
-OkHttpUtils.post(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = mHandler.obtainMessage(MSG_RESET_PASSWORD);
+                Message msg = mHandler.obtainMessage(MSG_RESET_PASSWORD);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        try{
+                        try {
                             mDialogFragment.dismiss();
                             ToastUtils.show("重置密码请求异常");
-                        }catch (Exception e){
-}
-}
+                        } catch (Exception e) {
+                        }
+                    }
                 });
-}
+            }
         });
     }
-@Override
-    public void onBackPressed() {
+
+    @Override
+    protected void doOnBackPressed() {
         if (mCountDownTimer != null) {
             mCountDownTimer.cancel();
         }
-        if(verifyCodeLayout.getVisibility()==View.VISIBLE){
-            super.onBackPressed();
-        }else if(inputVerifyCodeLayout.getVisibility()==View.VISIBLE){
+        if (verifyCodeLayout.getVisibility() == View.VISIBLE) {
+            super.doOnBackPressed();
+        } else if (inputVerifyCodeLayout.getVisibility() == View.VISIBLE) {
             inputVerifyCodeLayout.setVisibility(View.GONE);
             verifyCodeLayout.setVisibility(View.VISIBLE);
             verifyCodeView.getEditText().setText("");
-        }else{
+        } else {
             modifyPasswordLayout.setVisibility(View.GONE);
             inputVerifyCodeLayout.setVisibility(View.VISIBLE);
         }
-//        if (modifyPasswordLayout.getVisibility() == View.GONE) {
-//            super.onBackPressed();
-//        } else {
-//            modifyPasswordLayout.setVisibility(View.GONE);
-//            verifyCodeLayout.setVisibility(View.VISIBLE);
-//        }
     }
 }

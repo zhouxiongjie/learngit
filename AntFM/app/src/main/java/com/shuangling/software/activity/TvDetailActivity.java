@@ -1,7 +1,5 @@
 package com.shuangling.software.activity;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
+
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -10,7 +8,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.RemoteException;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +24,9 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.player.IPlayer;
@@ -35,13 +35,14 @@ import com.aliyun.vodplayerview.constants.PlayParameter;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.RadioGroupAdapter;
 import com.shuangling.software.adapter.RadioListAdapter;
 import com.shuangling.software.adapter.RadioProgramListAdapter;
 import com.shuangling.software.customview.FontIconView;
-import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.dialog.ShareDialog;
 import com.shuangling.software.entity.RadioDetail;
 import com.shuangling.software.entity.RadioSet;
@@ -53,12 +54,13 @@ import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
-import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -73,19 +75,21 @@ import cn.sharesdk.wechat.favorite.WechatFavorite;
 import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
+
 import static android.widget.ExpandableListView.PACKED_POSITION_TYPE_CHILD;
 import static android.widget.ExpandableListView.PACKED_POSITION_TYPE_NULL;
-@EnableDragToClose()
+
+//@EnableDragToClose()
 public class TvDetailActivity extends BaseAudioActivity implements Handler.Callback {
-public static final String TAG = "RadioDetailActivity";
-public static final int MSG_GET_RADIO_DETAIL = 0x00;
-public static final int MSG_COLLECT_CALLBACK = 0x01;
-public static final int MSG_UPDATE_COLLECT_STATUS = 0x02;
-public static final int MSG_GET_RADIO_LIST = 0x3;
-public static final int REQUEST_LOGIN = 0x04;
-private static final int SHARE_SUCCESS = 0x5;
-private static final int SHARE_FAILED = 0x6;
-private static final String DEFAULT_URL = "http://player.alicdn.com/video/aliyunmedia.mp4";
+    public static final String TAG = "RadioDetailActivity";
+    public static final int MSG_GET_RADIO_DETAIL = 0x00;
+    public static final int MSG_COLLECT_CALLBACK = 0x01;
+    public static final int MSG_UPDATE_COLLECT_STATUS = 0x02;
+    public static final int MSG_GET_RADIO_LIST = 0x3;
+    public static final int REQUEST_LOGIN = 0x04;
+    private static final int SHARE_SUCCESS = 0x5;
+    private static final int SHARE_FAILED = 0x6;
+    private static final String DEFAULT_URL = "http://player.alicdn.com/video/aliyunmedia.mp4";
     @BindView(R.id.aliyunVodPlayerView)
     AliyunVodPlayerView aliyunVodPlayerView;
     @BindView(R.id.collect)
@@ -113,14 +117,14 @@ private static final String DEFAULT_URL = "http://player.alicdn.com/video/aliyun
     @BindView(R.id.selectChannelLayout)
     LinearLayout selectChannelLayout;
     @BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
-//    @BindView(R.id.flow)
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
+    //    @BindView(R.id.flow)
 //    TextView flow;
 //    @BindView(R.id.goOn)
 //    TextView goOn;
 //    @BindView(R.id.flowLayout)
 //    RelativeLayout flowLayout;
-private Handler mHandler;
+    private Handler mHandler;
     //private Radio mRadio;
     private int mRadioId;
     private List<RadioSet> mRadioSetList;
@@ -128,107 +132,112 @@ private Handler mHandler;
     private boolean mShowSelectChannel = false;
     private RadioGroupAdapter mRadioGroupAdapter;
     private RadioListAdapter mRadioListAdapter;
-private int mNetPlay;
+    private int mNetPlay;
     private int mNeedTipPlay;
-    private boolean mNeedResumeAudioPlay=false;
+    private boolean mNeedResumeAudioPlay = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setmOnServiceConnectionListener(new OnServiceConnectionListener() {
             @Override
             public void onServiceConnection(IAudioPlayer audioPlayer) {
-                try{
-                    if(audioPlayer.getPlayerState()==IPlayer.started||audioPlayer.getPlayerState()==IPlayer.paused){
+                try {
+                    if (audioPlayer.getPlayerState() == IPlayer.started || audioPlayer.getPlayerState() == IPlayer.paused) {
                         audioPlayer.pause();
-                        mNeedResumeAudioPlay=true;
+                        mNeedResumeAudioPlay = true;
                         FloatWindowUtil.getInstance().hideWindow();
                     }
-                }catch (RemoteException e){
-}
-}
+                } catch (RemoteException e) {
+                }
+            }
         });
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_tv_detail);
+        setContentView(R.layout.activity_tv_detail);
         //CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
-        init();
-}
-private void init() {
-mHandler = new Handler(this);
-        //mRadio = getIntent().getParcelableExtra("Radio");
-        mRadioId = getIntent().getIntExtra("radioId", 0);
-        activityTitle.setBackListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
+        activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            doOnBackPressed();
         });
-        activityTitle.setMoreAction(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mRadioDetail != null) {
-ShareDialog dialog = ShareDialog.getInstance(false,false);
-                    dialog.setIsHideSecondGroup(true);
+        activityTitle.addRightImageButton(R.drawable.ic_more, com.qmuiteam.qmui.R.id.right_icon).setOnClickListener(view -> {//
+            if (mRadioDetail != null) {
+                ShareDialog dialog = ShareDialog.getInstance(false, false);
+                dialog.setIsHideSecondGroup(true);
 //                    dialog.setIsShowPosterButton(false);
 //                    dialog.setIsShowReport(true);
 //                    dialog.setIsShowCollect(false);
 //                    dialog.setIsShowCopyLink(false);
 //                    dialog.setIsShowFontSize(false);
 //                    dialog.setIsShowRefresh(false);
-dialog.setShareHandler(new ShareDialog.ShareHandler() {
-                        @Override
-                        public void onShare(String platform) {
-String url;
-                            if(User.getInstance()!=null){
-                                url=ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId()+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId();
-                            }else{
-                                url=ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId()+"?from_url="+ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId();
-                            }
-                            showShare(platform,mRadioDetail.getChannel().getName(), mRadioDetail.getChannel().getDes(), mRadioDetail.getChannel().getLogo(), url);
-}
-@Override
-                        public void poster() {
-}
-@Override
-                        public void report() {
-}
-@Override
-                        public void copyLink() {
-}
-@Override
-                        public void refresh() {
+                dialog.setShareHandler(new ShareDialog.ShareHandler() {
+                    @Override
+                    public void onShare(String platform) {
+                        String url;
+                        if (User.getInstance() != null) {
+                            url = ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId() + "?from_user_id=" + User.getInstance().getId() + "&from_url=" + ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId();
+                        } else {
+                            url = ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId() + "?from_url=" + ServerInfo.h5IP + "/lives/" + mRadioDetail.getChannel().getId();
                         }
-@Override
-                        public void collectContent() {
-}
-                    });
-                    dialog.show(getSupportFragmentManager(), "ShareDialog");
+                        showShare(platform, mRadioDetail.getChannel().getName(), mRadioDetail.getChannel().getDes(), mRadioDetail.getChannel().getLogo(), url);
+                    }
+
+                    @Override
+                    public void poster() {
+                    }
+
+                    @Override
+                    public void report() {
+                    }
+
+                    @Override
+                    public void copyLink() {
+                    }
+
+                    @Override
+                    public void refresh() {
+                    }
+
+                    @Override
+                    public void collectContent() {
+                    }
+                });
+                dialog.show(getSupportFragmentManager(), "ShareDialog");
 //shareTest();
-                }
-}
+            }
         });
+        init();
+    }
+
+    private void init() {
+        mHandler = new Handler(this);
+        //mRadio = getIntent().getParcelableExtra("Radio");
+        mRadioId = getIntent().getIntExtra("radioId", 0);
         getRadioDetail();
         getRadioList();
         initAliyunPlayerView();
-}
-public void getRadioList() {
-String url = ServerInfo.serviceIP + ServerInfo.getRadioList;
+    }
+
+    public void getRadioList() {
+        String url = ServerInfo.serviceIP + ServerInfo.getRadioList;
         Map<String, String> params = new HashMap<>();
         params.put("type", "2");
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_GET_RADIO_LIST;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
-}
-private void initAliyunPlayerView() {
+    }
+
+    private void initAliyunPlayerView() {
         //保持屏幕敞亮
         ViewGroup.LayoutParams lp = aliyunVodPlayerView.getLayoutParams();
         lp.width = CommonUtils.getScreenWidth();
@@ -241,14 +250,14 @@ private void initAliyunPlayerView() {
         aliyunVodPlayerView.setTheme(AliyunVodPlayerView.Theme.Blue);
         //mAliyunVodPlayerView.setCirclePlay(true);
         aliyunVodPlayerView.setAutoPlay(true);
-if(mNetPlay==0){
+        if (mNetPlay == 0) {
             //每次提醒
             aliyunVodPlayerView.setShowFlowTip(true);
-        }else{
+        } else {
             //提醒一次
-            if(mNeedTipPlay==1) {
+            if (mNeedTipPlay == 1) {
                 aliyunVodPlayerView.setShowFlowTip(true);
-            }else{
+            } else {
                 aliyunVodPlayerView.setShowFlowTip(false);
             }
         }
@@ -258,38 +267,43 @@ if(mNetPlay==0){
                 SharedPreferencesUtils.putIntValue(SettingActivity.NEED_TIP_PLAY, 0);
             }
         });
-}
-private void getRadioDetail() {
-String url = ServerInfo.serviceIP + ServerInfo.getRadioDetail;
+    }
+
+    private void getRadioDetail() {
+        String url = ServerInfo.serviceIP + ServerInfo.getRadioDetail;
         Map<String, String> params = new HashMap<>();
         params.put("channel_id", "" + mRadioId);
-OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_GET_RADIO_DETAIL;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
     }
-private void addRadioHistory() {
-String url = ServerInfo.serviceIP + ServerInfo.addRadioHistory;
+
+    private void addRadioHistory() {
+        String url = ServerInfo.serviceIP + ServerInfo.addRadioHistory;
         Map<String, String> params = new HashMap<>();
         params.put("id", "" + mRadioId);
-OkHttpUtils.put(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.put(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
     }
-public void collect() {
+
+    public void collect() {
         if (mRadioDetail == null) {
             return;
         }
@@ -297,36 +311,40 @@ public void collect() {
         Map<String, String> params = new HashMap<>();
         params.put("channel_id", "" + mRadioDetail.getChannel().getId());
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_COLLECT_CALLBACK;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
-}
-public void updateCollectStatus() {
+    }
+
+    public void updateCollectStatus() {
         String url = ServerInfo.serviceIP + ServerInfo.getRadioDetail;
         Map<String, String> params = new HashMap<>();
         params.put("channel_id", "" + mRadioId);
-OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_UPDATE_COLLECT_STATUS;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
     }
-private void setPlaySource(String url,String title) {
+
+    private void setPlaySource(String url, String title) {
 //        if ("localSource".equals(PlayParameter.PLAY_PARAM_TYPE)) {
 //            AliyunLocalSource.AliyunLocalSourceBuilder alsb = new AliyunLocalSource.AliyunLocalSourceBuilder();
 //            PlayParameter.PLAY_PARAM_URL = url;
@@ -339,12 +357,13 @@ private void setPlaySource(String url,String title) {
 //            aliyunVodPlayerView.setLocalSource(localSource);
 //
 //        }
-UrlSource urlSource = new UrlSource();
+        UrlSource urlSource = new UrlSource();
         urlSource.setUri(url);
         urlSource.setTitle(title);
         aliyunVodPlayerView.setLocalSource(urlSource);
     }
-private void updatePlayerViewMode() {
+
+    private void updatePlayerViewMode() {
         if (aliyunVodPlayerView != null) {
             int orientation = getResources().getConfiguration().orientation;
             if (orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -353,7 +372,7 @@ private void updatePlayerViewMode() {
                 //                if (!isStrangePhone()) {
                 //                    getSupportActionBar().show();
                 //                }
-this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 aliyunVodPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 //设置view的布局，宽高之类
                 LinearLayout.LayoutParams aliVcVideoViewLayoutParams = (LinearLayout.LayoutParams) aliyunVodPlayerView
@@ -365,7 +384,7 @@ this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 //                }
                 activityTitle.setVisibility(View.VISIBLE);
                 aliyunVodPlayerView.setBackBtnVisiable(View.INVISIBLE);
-} else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 //转到横屏了。
                 //隐藏状态栏
                 if (!isStrangePhone()) {
@@ -389,9 +408,10 @@ this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 activityTitle.setVisibility(View.GONE);
                 aliyunVodPlayerView.setBackBtnVisiable(View.VISIBLE);
             }
-}
+        }
     }
-private boolean isStrangePhone() {
+
+    private boolean isStrangePhone() {
         boolean strangePhone = "mx5".equalsIgnoreCase(Build.DEVICE)
                 || "Redmi Note2".equalsIgnoreCase(Build.DEVICE)
                 || "Z00A_1".equalsIgnoreCase(Build.DEVICE)
@@ -399,34 +419,50 @@ private boolean isStrangePhone() {
                 || "hermes".equalsIgnoreCase(Build.DEVICE)
                 || ("V4".equalsIgnoreCase(Build.DEVICE) && "Meitu".equalsIgnoreCase(Build.MANUFACTURER))
                 || ("m1metal".equalsIgnoreCase(Build.DEVICE) && "Meizu".equalsIgnoreCase(Build.MANUFACTURER));
-return strangePhone;
+        return strangePhone;
     }
-@Override
+
+    @Override
     protected void onResume() {
         super.onResume();
-updatePlayerViewMode();
+        updatePlayerViewMode();
         if (aliyunVodPlayerView != null) {
             aliyunVodPlayerView.onResume();
         }
     }
-@Override
+
+    @Override
     protected void onDestroy() {
-        if(mNeedResumeAudioPlay){
+        if (mNeedResumeAudioPlay) {
 //            try{
-FloatWindowUtil.getInstance().visibleWindow();
+            FloatWindowUtil.getInstance().visibleWindow();
 //                mAudioPlayer.start();
 //            }catch (RemoteException e){
 //
 //            }
-}
+        }
         if (aliyunVodPlayerView != null) {
             aliyunVodPlayerView.onDestroy();
             aliyunVodPlayerView = null;
         }
         super.onDestroy();
-}
-@Override
-    public void onBackPressed() {
+    }
+
+//    @Override
+//    public void onBackPressed() {
+//        if (mNeedResumeAudioPlay) {
+//            FloatWindowUtil.getInstance().visibleWindow();
+//        }
+//        if (aliyunVodPlayerView != null) {
+//            aliyunVodPlayerView.onStop();
+//            aliyunVodPlayerView.onDestroy();
+//            aliyunVodPlayerView = null;
+//        }
+//        super.onBackPressed();
+//    }
+
+    @Override
+    protected void doOnBackPressed() {
         if (mNeedResumeAudioPlay) {
             FloatWindowUtil.getInstance().visibleWindow();
         }
@@ -435,49 +471,54 @@ FloatWindowUtil.getInstance().visibleWindow();
             aliyunVodPlayerView.onDestroy();
             aliyunVodPlayerView = null;
         }
-        super.onBackPressed();
+        super.doOnBackPressed();
     }
-@Override
+
+    @Override
     protected void onStop() {
         super.onStop();
-if (aliyunVodPlayerView != null) {
+        if (aliyunVodPlayerView != null) {
             aliyunVodPlayerView.onStop();
         }
-}
-@Override
+    }
+
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         updatePlayerViewMode();
     }
-@OnClick({R.id.collect, R.id.selectChannel})
+
+    @OnClick({R.id.collect, R.id.selectChannel})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.collect:
                 if (User.getInstance() != null) {
                     collect();
                 } else {
-                    Intent it=new Intent(this, NewLoginActivity.class);
-                    it.putExtra("jump_url",ServerInfo.h5IP+"/lives/"+mRadioId);
+                    Intent it = new Intent(this, NewLoginActivity.class);
+                    it.putExtra("jump_url", ServerInfo.h5IP + "/lives/" + mRadioId);
                     startActivityForResult(it, REQUEST_LOGIN);
                 }
-break;
+                break;
             case R.id.selectChannel:
                 mShowSelectChannel = !mShowSelectChannel;
                 if (mShowSelectChannel) {
-orientation.setText(getResources().getString(R.string.arrow_down));
+                    orientation.setText(getResources().getString(R.string.arrow_down));
                     Animation animation = AnimationUtils.loadAnimation(this, R.anim.select_channel_enter_anim);
                     animation.setAnimationListener(new Animation.AnimationListener() {
                         @Override
                         public void onAnimationStart(Animation animation) {
                             selectChannelLayout.setVisibility(View.VISIBLE);
                         }
-@Override
+
+                        @Override
                         public void onAnimationEnd(Animation animation) {
                             selectChannelLayout.clearAnimation();
                         }
-@Override
+
+                        @Override
                         public void onAnimationRepeat(Animation animation) {
-}
+                        }
                     });
                     selectChannelLayout.startAnimation(animation);
                 } else {
@@ -488,29 +529,32 @@ orientation.setText(getResources().getString(R.string.arrow_down));
                         public void onAnimationStart(Animation animation) {
                             selectChannelLayout.setVisibility(View.GONE);
                         }
-@Override
+
+                        @Override
                         public void onAnimationEnd(Animation animation) {
                             selectChannelLayout.clearAnimation();
                         }
-@Override
+
+                        @Override
                         public void onAnimationRepeat(Animation animation) {
-}
+                        }
                     });
                     selectChannelLayout.startAnimation(animation);
                 }
                 break;
-}
+        }
     }
-@Override
+
+    @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_GET_RADIO_DETAIL:
-try {
+                try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-mRadioDetail = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), RadioDetail.class);
-channelName.setText(mRadioDetail.getChannel().getName());
+                        mRadioDetail = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), RadioDetail.class);
+                        channelName.setText(mRadioDetail.getChannel().getName());
                         if (mRadioDetail.getCollection() == 1) {
                             //collect.setTextColor(getResources().getColor(R.color.textColorEleven));
                             collect.setActivated(true);
@@ -518,7 +562,7 @@ channelName.setText(mRadioDetail.getChannel().getName());
                             //collect.setTextColor(CommonUtils.getThemeColor(this));
                             collect.setActivated(false);
                         }
-RadioProgramListAdapter adapter = new RadioProgramListAdapter(this, mRadioDetail.getProgram_list().get(1));
+                        RadioProgramListAdapter adapter = new RadioProgramListAdapter(this, mRadioDetail.getProgram_list().get(1));
                         adapter.setType(1);
                         adapter.setInPlayBean(mRadioDetail.getIn_play());
                         programList.setAdapter(adapter);
@@ -542,10 +586,10 @@ RadioProgramListAdapter adapter = new RadioProgramListAdapter(this, mRadioDetail
                                 }
                             }
                         });
-                        mNetPlay=SharedPreferencesUtils.getIntValue(SettingActivity.NET_PLAY,0);
-                        mNeedTipPlay=SharedPreferencesUtils.getIntValue(SettingActivity.NEED_TIP_PLAY,0);
-                        setPlaySource(mRadioDetail.getChannel().getStream(),mRadioDetail.getChannel().getName());
-addRadioHistory();
+                        mNetPlay = SharedPreferencesUtils.getIntValue(SettingActivity.NET_PLAY, 0);
+                        mNeedTipPlay = SharedPreferencesUtils.getIntValue(SettingActivity.NEED_TIP_PLAY, 0);
+                        setPlaySource(mRadioDetail.getChannel().getStream(), mRadioDetail.getChannel().getName());
+                        addRadioHistory();
 //                        if (CommonUtils.getNetWorkType(this) == CommonUtils.NETWORKTYPE_MOBILE) {
 //                            if (mNetPlay == 0) {
 //                                //每次提醒
@@ -568,9 +612,9 @@ addRadioHistory();
 //                            flowLayout.setVisibility(View.GONE);
 //                            setPlaySource(mRadioDetail.getChannel().getStream());
 //                        }
-}
-} catch (Exception e) {
-}
+                    }
+                } catch (Exception e) {
+                }
                 break;
             case MSG_COLLECT_CALLBACK:
                 try {
@@ -585,41 +629,41 @@ addRadioHistory();
                             //collect.setTextColor(CommonUtils.getThemeColor(this));
                             collect.setActivated(false);
                         }
-}
-} catch (Exception e) {
-}
+                    }
+                } catch (Exception e) {
+                }
                 break;
             case MSG_UPDATE_COLLECT_STATUS:
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-mRadioDetail = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), RadioDetail.class);
-if (mRadioDetail.getCollection() == 1) {
+                        mRadioDetail = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), RadioDetail.class);
+                        if (mRadioDetail.getCollection() == 1) {
                             //collect.setTextColor(getResources().getColor(R.color.textColorEleven));
                             collect.setActivated(true);
                         } else {
                             //collect.setTextColor(CommonUtils.getThemeColor(this));
                             collect.setActivated(false);
                         }
-}
-} catch (Exception e) {
-}
+                    }
+                } catch (Exception e) {
+                }
                 break;
             case MSG_GET_RADIO_LIST:
-String result = (String) msg.obj;
+                String result = (String) msg.obj;
                 try {
-JSONObject jsonObject = JSONObject.parseObject(result);
+                    JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-mRadioSetList = JSONArray.parseArray(jsonObject.getJSONArray("data").toJSONString(), RadioSet.class);
-Iterator<RadioSet> iterator = mRadioSetList.iterator();
+                        mRadioSetList = JSONArray.parseArray(jsonObject.getJSONArray("data").toJSONString(), RadioSet.class);
+                        Iterator<RadioSet> iterator = mRadioSetList.iterator();
                         while (iterator.hasNext()) {
                             RadioSet radioSet = iterator.next();
-                            if (radioSet.getList()==null||radioSet.getList().size()==0) {
+                            if (radioSet.getList() == null || radioSet.getList().size() == 0) {
                                 iterator.remove();
                             }
                         }
-if (mRadioGroupAdapter == null) {
+                        if (mRadioGroupAdapter == null) {
                             mRadioGroupAdapter = new RadioGroupAdapter(this, mRadioSetList);
                             categoryList.setAdapter(mRadioGroupAdapter);
                             categoryList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -632,19 +676,19 @@ if (mRadioGroupAdapter == null) {
                         } else {
                             mRadioGroupAdapter.updateListView(mRadioSetList);
                         }
-if (mRadioListAdapter == null) {
+                        if (mRadioListAdapter == null) {
                             mRadioListAdapter = new RadioListAdapter(this, mRadioSetList);
                             contentList.setAdapter(mRadioListAdapter);
                             for (int i = 0; i < mRadioListAdapter.getGroupCount(); i++) {
                                 contentList.expandGroup(i);
                             }
-contentList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+                            contentList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
                                 @Override
                                 public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
                                     return true;
                                 }
                             });
-contentList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                            contentList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                                 @Override
                                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 //选择了某台
@@ -652,20 +696,20 @@ contentList.setOnChildClickListener(new ExpandableListView.OnChildClickListener(
 //                                    getRadioDetail();
 //
 //                                    return true;
-if(childPosition<mRadioSetList.get(groupPosition).getList().size()){
+                                    if (childPosition < mRadioSetList.get(groupPosition).getList().size()) {
                                         mRadioId = mRadioSetList.get(groupPosition).getList().get(childPosition).getId();
                                         getRadioDetail();
-}
+                                    }
                                     return true;
-}
+                                }
                             });
-} else {
+                        } else {
                             mRadioListAdapter.updateListView(mRadioSetList);
                         }
-contentList.setOnScrollListener(new AbsListView.OnScrollListener() {
+                        contentList.setOnScrollListener(new AbsListView.OnScrollListener() {
                             @Override
                             public void onScrollStateChanged(AbsListView view, int scrollState) {
-switch (scrollState) {
+                                switch (scrollState) {
                                     // 当不滚动时
                                     case AbsListView.OnScrollListener.SCROLL_STATE_IDLE:
                                         int flatPosition = contentList.getFirstVisiblePosition();
@@ -686,28 +730,30 @@ switch (scrollState) {
                                         } else {
                                             Log.i("FooLabel", "positionType was NULL - header/footer?");
                                         }
-break;
+                                        break;
                                 }
                             }
-@Override
+
+                            @Override
                             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-}
+                            }
                         });
-mRadioGroupAdapter.setSelected(mRadioGroupAdapter.getItem(0));
-}
-} catch (Exception e) {
+                        mRadioGroupAdapter.setSelected(mRadioGroupAdapter.getItem(0));
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
-}
-break;
+                }
+                break;
         }
         return false;
     }
-private void showShare(String platform,final String title, final String desc, final String logo, final String url) {
+
+    private void showShare(String platform, final String title, final String desc, final String logo, final String url) {
         final String cover;
-        if(logo.startsWith("http://")){
-            cover=logo.replace("http://","https://");
-        }else{
-            cover=logo;
+        if (logo.startsWith("http://")) {
+            cover = logo.replace("http://", "https://");
+        } else {
+            cover = logo;
         }
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
@@ -726,23 +772,23 @@ private void showShare(String platform,final String title, final String desc, fi
             @Override
             public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
                 //点击新浪微博
-                String chanel="1";
+                String chanel = "1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
-                    chanel="2";
+                    chanel = "2";
                     //限制微博分享的文字不能超过20
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setText(title + url);
                 } else if (QQ.NAME.equals(platform.getName())) {
-                    chanel="3";
+                    chanel = "3";
                     paramsToShare.setTitle(title);
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setTitleUrl(url);
                     paramsToShare.setText(desc);
-} else if (Wechat.NAME.equals(platform.getName())) {
+                } else if (Wechat.NAME.equals(platform.getName())) {
                     paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                     paramsToShare.setTitle(title);
                     paramsToShare.setUrl(url);
@@ -750,7 +796,7 @@ private void showShare(String platform,final String title, final String desc, fi
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setText(desc);
-Log.d("ShareSDK", paramsToShare.toMap().toString());
+                    Log.d("ShareSDK", paramsToShare.toMap().toString());
                 } else if (WechatMoments.NAME.equals(platform.getName())) {
                     paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                     paramsToShare.setTitle(title);
@@ -766,7 +812,7 @@ Log.d("ShareSDK", paramsToShare.toMap().toString());
                         paramsToShare.setImageUrl(cover);
                     }
                 }
-                shareStatistics(chanel,""+mRadioDetail.getChannel().getId(),url);
+                shareStatistics(chanel, "" + mRadioDetail.getChannel().getId(), url);
             }
         });
         oks.setCallback(new PlatformActionListener() {
@@ -777,31 +823,35 @@ Log.d("ShareSDK", paramsToShare.toMap().toString());
                 msg.obj = arg2.getMessage();
                 mHandler.sendMessage(msg);
             }
+
             @Override
             public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
                 Message msg = Message.obtain();
                 msg.what = SHARE_SUCCESS;
                 mHandler.sendMessage(msg);
-}
+            }
+
             @Override
             public void onCancel(Platform arg0, int arg1) {
-}
+            }
         });
         // 启动分享GUI
         oks.show(this);
     }
-@Override
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_LOGIN && resultCode == RESULT_OK) {
             updateCollectStatus();
         }
         //super.onActivityResult(requestCode, resultCode, data);
     }
-public void shareStatistics(String channel,String postId,String shardUrl) {
-String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
+
+    public void shareStatistics(String channel, String postId, String shardUrl) {
+        String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
         Map<String, String> params = new HashMap<>();
-        if(User.getInstance()!=null){
-            params.put("user_id", ""+User.getInstance().getId());
+        if (User.getInstance() != null) {
+            params.put("user_id", "" + User.getInstance().getId());
         }
         params.put("channel", channel);
         params.put("post_id", postId);
@@ -809,14 +859,15 @@ String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
         params.put("type", "1");
         params.put("shard_url", shardUrl);
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
-@Override
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-                Log.i("test",response);
+                Log.i("test", response);
             }
-@Override
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-                Log.i("test",exception.toString());
-}
+                Log.i("test", exception.toString());
+            }
         });
-}
+    }
 }

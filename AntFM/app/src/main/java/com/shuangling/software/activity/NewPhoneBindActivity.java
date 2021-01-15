@@ -1,10 +1,9 @@
 package com.shuangling.software.activity;
+
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
-import androidx.fragment.app.DialogFragment;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -12,31 +11,38 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.fragment.app.DialogFragment;
+
 import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
-import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
-import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
-@EnableDragToClose()
-public class NewPhoneBindActivity extends AppCompatActivity implements Handler.Callback {
-public static final String TAG = NewPhoneBindActivity.class.getName();
-private static final int MSG_GET_VERIFY_CODE = 0x00;
+
+//@EnableDragToClose()
+public class NewPhoneBindActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback {
+    public static final String TAG = NewPhoneBindActivity.class.getName();
+    private static final int MSG_GET_VERIFY_CODE = 0x00;
     private static final int MSG_GET_BIND_PHONE = 0x01;
     @BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.tip)
     TextView tip;
     @BindView(R.id.phoneNum)
@@ -47,97 +53,111 @@ private static final int MSG_GET_VERIFY_CODE = 0x00;
     TextView timer;
     @BindView(R.id.phoneBind)
     Button phoneBind;
-private DialogFragment mDialogFragment;
-private Handler mHandler;
+    private DialogFragment mDialogFragment;
+    private Handler mHandler;
     private CountDownTimer mCountDownTimer;
-@Override
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_new_phone_bind);
-        CommonUtils.transparentStatusBar(this);
+        setContentView(R.layout.activity_new_phone_bind);
+//        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
-init();
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
+        activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            finish();
+        });
+        init();
     }
-private void init() {
+
+    private void init() {
         mHandler = new Handler(this);
-phoneNum.addTextChangedListener(new TextWatcher() {
+        phoneNum.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-}
-@Override
+            }
+
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-}
-@Override
+            }
+
+            @Override
             public void afterTextChanged(Editable s) {
                 String phone = s.toString();
                 if (CommonUtils.isMobileNO(phone)) {
                     timer.setEnabled(true);
                 } else {
                     timer.setEnabled(false);
-}
+                }
             }
         });
-verifyCode.addTextChangedListener(new TextWatcher() {
+        verifyCode.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-}
-@Override
+            }
+
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-}
-@Override
+            }
+
+            @Override
             public void afterTextChanged(Editable s) {
                 String verifyCode = s.toString();
                 if (!TextUtils.isEmpty(verifyCode)) {
                     phoneBind.setEnabled(true);
-                }else{
+                } else {
                     phoneBind.setEnabled(false);
                 }
-}
+            }
         });
     }
-private void getVerifyCode() {
+
+    private void getVerifyCode() {
         mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
-String url = ServerInfo.serviceIP + ServerInfo.getVerifyCode;
+        String url = ServerInfo.serviceIP + ServerInfo.getVerifyCode;
         Map<String, String> params = new HashMap<String, String>();
         params.put("module", "update_phone");
         params.put("phone", phoneNum.getText().toString());
-OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
+                Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        try{
+                        try {
                             mDialogFragment.dismiss();
                             ToastUtils.show("IO异常");
-                        }catch (Exception e){
-}
-}
+                        } catch (Exception e) {
+                        }
+                    }
                 });
-}
+            }
         });
     }
-private void bindPhone() {
-        mDialogFragment=CommonUtils.showLoadingDialog(getSupportFragmentManager());
+
+    private void bindPhone() {
+        mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
         String url = ServerInfo.serviceIP + ServerInfo.modifyPhone;
         Map<String, String> params = new HashMap<String, String>();
         params.put("verification_code", verifyCode.getText().toString());
         params.put("phone", phoneNum.getText().toString());
-OkHttpUtils.put(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.put(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = mHandler.obtainMessage(MSG_GET_BIND_PHONE);
+                Message msg = mHandler.obtainMessage(MSG_GET_BIND_PHONE);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
@@ -146,10 +166,11 @@ Message msg = mHandler.obtainMessage(MSG_GET_BIND_PHONE);
                         ToastUtils.show("IO异常");
                     }
                 });
-}
+            }
         });
     }
-@Override
+
+    @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_GET_VERIFY_CODE: {
@@ -167,7 +188,8 @@ Message msg = mHandler.obtainMessage(MSG_GET_BIND_PHONE);
                                 timer.setText("(" + millisUntilFinished / 1000 + ")重新发送");
                                 timer.setEnabled(false);
                             }
-@Override
+
+                            @Override
                             public void onFinish() {
                                 timer.setText("重新发送");
                                 timer.setEnabled(true);
@@ -180,7 +202,7 @@ Message msg = mHandler.obtainMessage(MSG_GET_BIND_PHONE);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-}
+            }
             break;
             case MSG_GET_BIND_PHONE:
                 try {
@@ -199,10 +221,11 @@ Message msg = mHandler.obtainMessage(MSG_GET_BIND_PHONE);
                 break;
             default:
                 break;
-}
+        }
         return false;
     }
-@OnClick({R.id.timer, R.id.phoneBind})
+
+    @OnClick({R.id.timer, R.id.phoneBind})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.timer:

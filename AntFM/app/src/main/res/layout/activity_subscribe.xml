@@ -7,15 +7,18 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-    <com.shuangling.software.customview.TopTitleBar
+    <!--<com.shuangling.software.customview.TopTitleBar
         android:id="@+id/activtyTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
         app:canBack="true"
         app:moreText=""
-        app:titleText="我的订阅" />
-
+        app:titleText="我的订阅" />-->
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/activity_title"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/qmui_topbar_height"/>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -28,13 +31,13 @@
             app:srlEnableLoadMore="true">
 
             <!--<com.scwang.smartrefresh.layout.header.ClassicsHeader-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--app:srlAccentColor="@android:color/black"-->
-                <!--app:srlClassicsSpinnerStyle="Translate"-->
-                <!--app:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
-                <!--app:srlDrawableProgressSize="20dp"-->
-                <!--app:srlPrimaryColor="@color/transparent" />-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:srlAccentColor="@android:color/black"-->
+            <!--app:srlClassicsSpinnerStyle="Translate"-->
+            <!--app:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
+            <!--app:srlDrawableProgressSize="20dp"-->
+            <!--app:srlPrimaryColor="@color/transparent" />-->
 
             <androidx.recyclerview.widget.RecyclerView
 
@@ -44,13 +47,13 @@
                 android:background="@color/white" />
 
             <!--<com.scwang.smartrefresh.layout.footer.ClassicsFooter-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--app:srlAccentColor="@android:color/black"-->
-                <!--app:srlClassicsSpinnerStyle="Translate"-->
-                <!--app:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
-                <!--app:srlDrawableProgressSize="20dp"-->
-                <!--app:srlPrimaryColor="@color/transparent" />-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:srlAccentColor="@android:color/black"-->
+            <!--app:srlClassicsSpinnerStyle="Translate"-->
+            <!--app:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
+            <!--app:srlDrawableProgressSize="20dp"-->
+            <!--app:srlPrimaryColor="@color/transparent" />-->
 
 
         </com.scwang.smartrefresh.layout.SmartRefreshLayout>
@@ -80,8 +83,6 @@
 
         </LinearLayout>
     </RelativeLayout>
-
-
 
 
 </LinearLayout>

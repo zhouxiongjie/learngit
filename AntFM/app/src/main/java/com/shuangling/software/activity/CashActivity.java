@@ -24,7 +24,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
+import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.shuangling.software.MyApplication;
@@ -64,8 +67,8 @@ import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.wechat.friends.Wechat;
 import okhttp3.Call;
 
-@EnableDragToClose()
-public class CashActivity extends AppCompatActivity implements Handler.Callback, PlatformActionListener {
+//@EnableDragToClose()
+public class CashActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback, PlatformActionListener {
     public static final String TAG = "CashActivity";
     private static final int MSG_ACCOUNT_DETAIL = 0;
     private static final int MSG_TAKE_CASH = 1;
@@ -76,7 +79,7 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
     private static final int MSG_AUTH_ERROR = 6;
     private static final int MSG_AUTH_COMPLETE = 7;
     @BindView(R.id.activtyTitle)
-    TopTitleBar activtyTitle;
+    /*TopTitleBar*/ QMUITopBarLayout activtyTitle;
     @BindView(R.id.money)
     TextView money;
     @BindView(R.id.zfbSelectedIcon)
@@ -123,8 +126,13 @@ public class CashActivity extends AppCompatActivity implements Handler.Callback,
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cash);
-        CommonUtils.transparentStatusBar(this);
+//        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
+        activtyTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            finish();
+        });
+        activtyTitle.setTitle("提现");
         init();
     }
 

@@ -9,10 +9,11 @@ import android.os.IBinder;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.service.IAudioPlayer;
 
-public class BaseAudioActivity extends AppCompatActivity {
+public class BaseAudioActivity extends QMUIActivity/*AppCompatActivity*/ {
     public static final String TAG = "BaseAudioActivity";
     public IAudioPlayer mAudioPlayer;
     public OnServiceConnectionListener mOnServiceConnectionListener;

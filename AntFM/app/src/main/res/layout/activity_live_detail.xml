@@ -1,15 +1,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <FrameLayout android:id="@+id/player_container"
-        android:layout_height="200dp"
+    <FrameLayout
+        android:id="@+id/player_container"
         android:layout_width="match_parent"
+        android:layout_height="200dp"
         android:orientation="horizontal">
 
 
@@ -17,18 +17,16 @@
             android:id="@+id/aliyunVodPlayerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible"
-            >
-        </com.aliyun.vodplayerview.widget.AliyunVodPlayerView>
+            android:visibility="visible" />
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/cover"
             android:layout_width="match_parent"
-            fresco:viewAspectRatio="1"
             android:layout_height="match_parent"
+            fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/article_placeholder"
             fresco:placeholderImageScaleType="centerCrop"
-            fresco:actualImageScaleType="centerCrop" />
+            fresco:viewAspectRatio="1" />
 
         <FrameLayout
             android:id="@+id/host_leave"
@@ -52,50 +50,47 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="主播暂不在播哦~"
-                    android:textColor="#ffffff"
-                    android:textSize="15sp"
                     android:layout_gravity="center_horizontal|center_vertical"
                     android:layout_marginTop="15dp"
-                   />
+                    android:text="主播暂不在播哦~"
+                    android:textColor="#ffffff"
+                    android:textSize="15sp" />
 
             </FrameLayout>
+
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/host_header"
                 android:layout_width="63dp"
                 android:layout_height="63dp"
-                fresco:viewAspectRatio="1"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:layout_marginBottom="45.5dp"
                 app:roundAsCircle="true"
-                app:roundingBorderWidth="1dp"
                 app:roundingBorderColor="#ffffff"
+                app:roundingBorderWidth="1dp"
+                fresco:actualImageScaleType="centerCrop"
                 fresco:placeholderImage="@drawable/article_placeholder"
                 fresco:placeholderImageScaleType="centerCrop"
-                fresco:actualImageScaleType="centerCrop"
-                android:layout_gravity="center_horizontal|center_vertical"
-                android:layout_marginBottom="45.5dp" />
+                fresco:viewAspectRatio="1" />
 
 
         </FrameLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
+            android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:visibility="gone"
-                >
+                android:visibility="gone">
 
                 <Button
                     android:layout_width="wrap_content"
-                    android:text="预约"
+                    android:layout_height="30dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginBottom="20dp"
-                    android:layout_height="30dp"/>
-
+                    android:text="预约" />
 
 
             </LinearLayout>
@@ -103,52 +98,55 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:layout_marginTop="15dp"
                 android:layout_marginRight="15dp"
-                android:layout_alignParentRight="true"
                 android:orientation="horizontal">
-                <LinearLayout android:layout_width="wrap_content"
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/live_type_bg">
 
                     <TextView
                         android:id="@+id/status"
-                        android:text="直播"
-                        android:layout_gravity="center_vertical"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="直播"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/font_size_22px"/>
+                        android:textSize="@dimen/font_size_22px" />
 
                 </LinearLayout>
 
 
                 <LinearLayout
-                    android:layout_marginLeft="6dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
                     android:background="@drawable/live_type_bg">
 
                     <com.aliyun.apsara.alivclittlevideo.view.video.FontIconView
+                        android:id="@+id/fiv_close"
+                        layout_gravity="left|top"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:id="@+id/fiv_close"
+                        android:gravity="center"
                         android:text="&#xe61e;"
                         android:textColor="#ffffff"
-                        android:gravity="center"
-                        layout_gravity="left|top"
-                        android:textSize="11sp"/>
+                        android:textSize="11sp" />
+
                     <TextView
 
                         android:id="@+id/audit"
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:maxLines="1"
                         android:text="37.3万人"
                         android:textColor="@color/white"
-                        android:textSize="@dimen/font_size_22px"/>
+                        android:textSize="@dimen/font_size_22px" />
                 </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
@@ -156,37 +154,35 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
-    </LinearLayout>
+        </LinearLayout>
     </FrameLayout>
 
 
-
     <RelativeLayout
-        android:layout_below="@+id/player_container"
         android:id="@+id/adverts"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/player_container" />
 
     <RelativeLayout
         android:id="@+id/tab_container"
-        android:layout_below="@+id/player_container"
         android:layout_width="match_parent"
-        android:layout_height="40dp">
+        android:layout_height="40dp"
+        android:layout_below="@+id/player_container">
 
         <TextView
             android:id="@+id/attention"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:background="?attr/themeColor"
+            android:padding="10dp"
             android:text="关注"
             android:textColor="@color/white"
-            android:background="?attr/themeColor"
             android:textSize="@dimen/font_size_30px"
-            android:padding="10dp"
-            android:layout_alignParentRight="true"
-            android:visibility="gone"
-            />
+            android:visibility="gone" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabPageIndicator"
@@ -200,10 +196,10 @@
             app:tabIndicatorFullWidth="false"
             app:tabIndicatorHeight="2dp"
             app:tabMode="scrollable"
-            app:tabSelectedTextColor="?attr/themeColor"
-
-             app:tabPaddingStart="0dp"
             app:tabPaddingEnd="0dp"
+
+            app:tabPaddingStart="0dp"
+            app:tabSelectedTextColor="?attr/themeColor"
             app:tabTextColor="@color/black" />
 
         <!--app:tabTextAppearance="@style/TabTextStyle"-->
@@ -211,13 +207,11 @@
 
     <androidx.viewpager.widget.ViewPager
 
-        android:layout_below="@+id/tab_container"
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F5F8FF"/>
-
-
+        android:layout_below="@+id/tab_container"
+        android:background="#F5F8FF" />
 
 
 </LinearLayout>

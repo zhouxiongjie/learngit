@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewStub;
@@ -17,17 +16,15 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.WebProgress;
-import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
-import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.PreloadWebView;
 import com.shuangling.software.utils.ServerInfo;
-import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -37,10 +34,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.Call;
 
-@EnableDragToClose()
-public class AdvertActivity extends AppCompatActivity {
+//@EnableDragToClose()
+public class AdvertActivity extends QMUIActivity/*AppCompatActivity*/ {
     @BindView(R.id.activtyTitle)
-    TopTitleBar activtyTitle;
+    /*TopTitleBar*/ QMUITopBarLayout activtyTitle;
     WebProgress progressBar;
     WebView webView;
     private int mAdvertId;
@@ -50,8 +47,9 @@ public class AdvertActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // 保持Activity处于唤醒状态
         setContentView(R.layout.activity_webview_back);
-        CommonUtils.transparentStatusBar(this);
+//        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
         FrameLayout fl_content = findViewById(R.id.fl_web_container);
         webView = PreloadWebView.getInstance().getWebView(this);
         fl_content.addView(webView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -63,20 +61,9 @@ public class AdvertActivity extends AppCompatActivity {
     private void initData() {
         String url = getIntent().getStringExtra("url");
         mAdvertId = getIntent().getIntExtra("id", 0);
-        activtyTitle.setBackListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
+        activtyTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            doOnBackPressed();
         });
-//        WebSettings s = webView.getSettings();
-//        CommonUtils.setWebviewUserAgent(s);
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-//            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-//        }
-//        webView.getSettings().setBlockNetworkImage(false);
-//        s.setJavaScriptEnabled(true);       //js
-//        s.setDomStorageEnabled(true);       //localStorage
         webView.setWebViewClient(new WebViewClient() {
             // url拦截
             @Override
@@ -175,11 +162,18 @@ public class AdvertActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+//    @Override
+//    public void onBackPressed() {
+//        Intent it = new Intent(this, MainActivity.class);
+//        startActivity(it);
+//        super.onBackPressed();
+//    }
+
     @Override
-    public void onBackPressed() {
+    protected void doOnBackPressed() {
+        super.doOnBackPressed();
         Intent it = new Intent(this, MainActivity.class);
         startActivity(it);
-        super.onBackPressed();
     }
 
     public void clickAdert() {

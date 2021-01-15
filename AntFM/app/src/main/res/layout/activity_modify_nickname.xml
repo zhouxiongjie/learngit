@@ -8,14 +8,17 @@
     android:background="@color/whitesmoke"
     android:orientation="vertical">
 
-    <com.shuangling.software.customview.TopTitleBar
+    <!--<com.shuangling.software.customview.TopTitleBar
         android:id="@+id/activity_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         fresco:canBack="true"
         fresco:titleText="修改昵称"
-        fresco:moreText="保存"/>
-
+        fresco:moreText="保存"/>-->
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/activity_title"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/qmui_topbar_height"/>
 
     <LinearLayout
         android:layout_width="match_parent"

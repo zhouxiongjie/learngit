@@ -6,20 +6,23 @@
     android:orientation="vertical">
 
 
-    <com.shuangling.software.customview.TopTitleBar
+    <!--<com.shuangling.software.customview.TopTitleBar
         android:id="@+id/activity_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         fresco:moreImg="@drawable/ic_more"
-        fresco:canBack="true" />
+        fresco:canBack="true" />-->
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/activity_title"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/qmui_topbar_height" />
 
 
     <com.aliyun.vodplayerview.widget.AliyunVodPlayerView
         android:id="@+id/aliyunVodPlayerView"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        />
+        android:layout_height="200dp" />
 
 
     <RelativeLayout
@@ -38,22 +41,22 @@
             android:textSize="@dimen/font_size_14sp" />
 
         <!--<com.shuangling.software.customview.FontIconView-->
-            <!--android:id="@+id/collect"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginEnd="20dp"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:layout_toStartOf="@+id/selectChannel"-->
-            <!--android:text="&#xe62e;"-->
-            <!--android:textColor="@color/textColorEleven"-->
-            <!--android:textSize="@dimen/font_size_40px" />-->
+        <!--android:id="@+id/collect"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginEnd="20dp"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_toStartOf="@+id/selectChannel"-->
+        <!--android:text="&#xe62e;"-->
+        <!--android:textColor="@color/textColorEleven"-->
+        <!--android:textSize="@dimen/font_size_40px" />-->
 
         <ImageView
             android:id="@+id/collect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
             android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
             android:layout_toStartOf="@+id/selectChannel"
             android:background="@drawable/collect_selector" />
 
@@ -70,8 +73,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="选台"
                 android:layout_gravity="center_vertical"
+                android:text="选台"
                 android:textColor="@color/textColorTwo"
                 android:textSize="@dimen/font_size_26px" />
 
@@ -95,6 +98,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -112,35 +116,35 @@
                     android:id="@+id/yesterday"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="昨天"
+                    android:background="@drawable/radio_button_bg_selector"
+                    android:button="@null"
                     android:gravity="center"
                     android:padding="15dp"
-                    android:button="@null"
-                    android:textColor="@color/radio_button_text_selector"
-                    android:background="@drawable/radio_button_bg_selector" />
+                    android:text="昨天"
+                    android:textColor="@color/radio_button_text_selector" />
 
                 <RadioButton
                     android:id="@+id/today"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="今天"
+                    android:background="@drawable/radio_button_bg_selector"
+                    android:button="@null"
                     android:checked="true"
                     android:gravity="center"
                     android:padding="15dp"
-                    android:button="@null"
-                    android:textColor="@color/radio_button_text_selector"
-                    android:background="@drawable/radio_button_bg_selector" />
+                    android:text="今天"
+                    android:textColor="@color/radio_button_text_selector" />
 
                 <RadioButton
                     android:id="@+id/tomorrow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="明天"
+                    android:background="@drawable/radio_button_bg_selector"
+                    android:button="@null"
                     android:gravity="center"
                     android:padding="15dp"
-                    android:button="@null"
-                    android:textColor="@color/radio_button_text_selector"
-                    android:background="@drawable/radio_button_bg_selector" />
+                    android:text="明天"
+                    android:textColor="@color/radio_button_text_selector" />
 
 
             </RadioGroup>
@@ -160,14 +164,12 @@
         </LinearLayout>
 
 
-
-
         <LinearLayout
             android:id="@+id/selectChannelLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
             android:background="@color/white"
+            android:orientation="horizontal"
             android:visibility="gone">
 
             <ListView

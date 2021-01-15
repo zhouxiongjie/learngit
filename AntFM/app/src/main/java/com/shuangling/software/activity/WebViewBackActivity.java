@@ -100,9 +100,9 @@ public class WebViewBackActivity extends /*AppCompatActivity*/QMUIActivity imple
         EventBus.getDefault().register(this);
         mUrl = getIntent().getStringExtra("url");
         mTitle = getIntent().getStringExtra("title");
-        mAddParams = getIntent().getBooleanExtra("addParams", false);
+        mAddParams = getIntent().getBooleanExtra("addParams", true);
         if (mAddParams) {//true 内链
-            activtyTitle.addLeftImageButton(R.drawable.icon_back, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            activtyTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
                 finish();
             });
         }else {//如果是外链，显示进度条、 X

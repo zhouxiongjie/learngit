@@ -1,14 +1,18 @@
 package com.shuangling.software.activity;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
 import com.google.android.material.tabs.TabLayout;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -18,10 +22,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.alibaba.fastjson.JSONObject;
 import com.bumptech.glide.Glide;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.ArrowRectangleView;
@@ -45,30 +52,33 @@ import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
-@EnableDragToClose()
+
+//@EnableDragToClose()
 public class OrganizationDetailActivity extends BaseAudioActivity implements Handler.Callback {
-public static final String TAG = "AnchorDetailActivity";
-public static final int MSG_GET_ORGANIZATION_DETAIL = 0x1;
-public static final int MSG_GET_RECOMMEND_ORGANIZATION = 0x2;
-public static final int MSG_ATTENTION_CALLBACK = 0x3;
-public static final int MSG_ATTENTION_OTHER_CALLBACK = 0x4;
-public static final int MSG_GET_ORGANIZATION_MENUS = 0x5;
-public static final int REQUEST_LOGIN = 0x6;
-public static final int MSG_GET_ANCHOR_COLUMN = 0x7;
-public static final int MSG_GET_ORGANIZATION_LIVE=0x8;
-private static final int[] category = new int[]{R.string.radio, R.string.anchor, R.string.article, R.string.album, R.string.video, R.string.special, R.string.photo};
+    public static final String TAG = "AnchorDetailActivity";
+    public static final int MSG_GET_ORGANIZATION_DETAIL = 0x1;
+    public static final int MSG_GET_RECOMMEND_ORGANIZATION = 0x2;
+    public static final int MSG_ATTENTION_CALLBACK = 0x3;
+    public static final int MSG_ATTENTION_OTHER_CALLBACK = 0x4;
+    public static final int MSG_GET_ORGANIZATION_MENUS = 0x5;
+    public static final int REQUEST_LOGIN = 0x6;
+    public static final int MSG_GET_ANCHOR_COLUMN = 0x7;
+    public static final int MSG_GET_ORGANIZATION_LIVE = 0x8;
+    private static final int[] category = new int[]{R.string.radio, R.string.anchor, R.string.article, R.string.album, R.string.video, R.string.special, R.string.photo};
     //private static final int[] category = new int[]{ R.string.article,R.string.album, R.string.video, R.string.special, R.string.photo};
-@BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+    @BindView(R.id.activity_title)
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.logo)
     SimpleDraweeView logo;
     @BindView(R.id.count)
@@ -101,119 +111,135 @@ private static final int[] category = new int[]{R.string.radio, R.string.anchor,
     LinearLayout noData;
     @BindView(R.id.layout)
     LinearLayout layout;
-private FragmentAdapter mFragmentPagerAdapter;
-private int mOrganizationId;
+    private FragmentAdapter mFragmentPagerAdapter;
+    private int mOrganizationId;
     private Organization mOrganization;
-private List<Organization> mOrganizations;
+    private List<Organization> mOrganizations;
     private List<OrganizationMenus> mOrganizationMenus;
     public List<AnchorOrganizationColumn> mColumns;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
-private Handler mHandler;
-private PopupMenu mPopupMenu;
-@Override
+    private Handler mHandler;
+    private PopupMenu mPopupMenu;
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_organization_detail);
-        CommonUtils.transparentStatusBar(this);
+        setContentView(R.layout.activity_organization_detail);
+//        CommonUtils.transparentStatusBar(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
+        activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            finish();
+        });
         ButterKnife.bind(this);
         mHandler = new Handler(this);
-init();
+        init();
         getOrganizationDetail();
         getOrganizationMenus();
         getOrganizationLive();
-}
-private void init() {
+    }
+
+    private void init() {
         mOrganizationId = getIntent().getIntExtra("organizationId", 0);
         getColumn();
 //        mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager());
 //        viewPager.setAdapter(mFragmentPagerAdapter);
 //        tabPageIndicator.setupWithViewPager(viewPager);
     }
-private void initFragment() {
+
+    private void initFragment() {
         mFragments.clear();
         if (mColumns != null && mColumns.size() > 0) {
-mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager(), mColumns);
+            mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager(), mColumns);
             viewPager.setAdapter(mFragmentPagerAdapter);
             tabPageIndicator.setupWithViewPager(viewPager);
-if (mColumns.size() > 5) {
+            if (mColumns.size() > 5) {
                 tabPageIndicator.setTabMode(TabLayout.MODE_SCROLLABLE);
             } else {
                 tabPageIndicator.setTabMode(TabLayout.MODE_FIXED);
             }
         }
-}
-private void getColumn() {
-String url = ServerInfo.serviceIP + ServerInfo.getAnchorOrOrganizationColumn + mOrganizationId;
+    }
+
+    private void getColumn() {
+        String url = ServerInfo.serviceIP + ServerInfo.getAnchorOrOrganizationColumn + mOrganizationId;
         Map<String, String> params = new HashMap<>();
-        params.put("mode","all");
+        params.put("mode", "all");
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_GET_ANCHOR_COLUMN;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
     }
-private void getOrganizationLive() {
-String url = ServerInfo.serviceIP + ServerInfo.getAnchorOrOrganizationLive + mOrganizationId;
+
+    private void getOrganizationLive() {
+        String url = ServerInfo.serviceIP + ServerInfo.getAnchorOrOrganizationLive + mOrganizationId;
         Map<String, String> params = new HashMap<>();
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_GET_ORGANIZATION_LIVE;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
     }
-private void getOrganizationDetail() {
-String url = ServerInfo.serviceIP + ServerInfo.anchorDetail + mOrganizationId;
+
+    private void getOrganizationDetail() {
+        String url = ServerInfo.serviceIP + ServerInfo.anchorDetail + mOrganizationId;
         Map<String, String> params = new HashMap<>();
         params.put("type", "1");
-        params.put("mode","all");
+        params.put("mode", "all");
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_GET_ORGANIZATION_DETAIL;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
     }
-private void getOrganizationMenus() {
+
+    private void getOrganizationMenus() {
         mOrganizationId = getIntent().getIntExtra("organizationId", 0);
-String url = ServerInfo.serviceIP + ServerInfo.getOrganizationMenus + mOrganizationId;
+        String url = ServerInfo.serviceIP + ServerInfo.getOrganizationMenus + mOrganizationId;
         Map<String, String> params = new HashMap<>();
         params.put("type", "1");
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_GET_ORGANIZATION_MENUS;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
     }
-public void attention(final boolean attention) {
-String url = ServerInfo.serviceIP + ServerInfo.attention;
+
+    public void attention(final boolean attention) {
+        String url = ServerInfo.serviceIP + ServerInfo.attention;
         Map<String, String> params = new HashMap<>();
         params.put("id", "" + mOrganization.getId());
         if (attention) {
@@ -221,22 +247,24 @@ String url = ServerInfo.serviceIP + ServerInfo.attention;
         } else {
             params.put("type", "0");
         }
-OkHttpUtils.post(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_ATTENTION_CALLBACK;
                 msg.arg1 = attention ? 1 : 0;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
-}
-public void attention(Organization organization, final boolean follow, final View view) {
-String url = ServerInfo.serviceIP + ServerInfo.attention;
+    }
+
+    public void attention(Organization organization, final boolean follow, final View view) {
+        String url = ServerInfo.serviceIP + ServerInfo.attention;
         Map<String, String> params = new HashMap<>();
         params.put("id", "" + organization.getId());
         if (follow) {
@@ -244,10 +272,10 @@ String url = ServerInfo.serviceIP + ServerInfo.attention;
         } else {
             params.put("type", "0");
         }
-OkHttpUtils.post(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_ATTENTION_OTHER_CALLBACK;
                 msg.arg1 = follow ? 1 : 0;
                 Bundle bundle = new Bundle();
@@ -255,31 +283,35 @@ Message msg = Message.obtain();
                 msg.setData(bundle);
                 msg.obj = view;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
-}
-private void getRecommendOrganization() {
-String url = ServerInfo.serviceIP + ServerInfo.getRecommendAnchor + mOrganizationId;
+    }
+
+    private void getRecommendOrganization() {
+        String url = ServerInfo.serviceIP + ServerInfo.getRecommendAnchor + mOrganizationId;
         Map<String, String> params = new HashMap<>();
         params.put("page", "1");
         params.put("page_size", "" + Constant.PAGE_SIZE);
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_GET_RECOMMEND_ORGANIZATION;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
     }
-@Override
+
+    @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_GET_ORGANIZATION_DETAIL:
@@ -287,7 +319,7 @@ Message msg = Message.obtain();
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-mOrganization = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), Organization.class);
+                        mOrganization = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), Organization.class);
                         if (!TextUtils.isEmpty(mOrganization.getLogo())) {
                             Uri uri = Uri.parse(mOrganization.getLogo());
                             int width = CommonUtils.dip2px(90);
@@ -295,18 +327,19 @@ mOrganization = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONSt
                             ImageLoader.showThumb(uri, logo, width, height);
                         }
                         authentication.setText(mOrganization.getName() + "官方账号");
-                        activityTitle.setTitleText(mOrganization.getName());
+//                        activityTitle.setTitleText(mOrganization.getName());
+                        activityTitle.setTitle(mOrganization.getName());
                         if (mOrganization.getOthers() != null) {
                             count.setText("" + mOrganization.getOthers().getCount());
                             follows.setText("" + mOrganization.getOthers().getFollows());
                             likes.setText("" + mOrganization.getOthers().getLikes());
                         }
-if (!TextUtils.isEmpty(mOrganization.getDes())) {
+                        if (!TextUtils.isEmpty(mOrganization.getDes())) {
                             desc.setText(mOrganization.getDes());
                         } else {
                             desc.setText("暂无简介");
                         }
-if (mOrganization.getIs_follow() == 0) {
+                        if (mOrganization.getIs_follow() == 0) {
                             attention.setText("关注");
                             attention.setActivated(true);
                             more.setActivated(true);
@@ -315,7 +348,7 @@ if (mOrganization.getIs_follow() == 0) {
                             attention.setText("已关注");
                             more.setActivated(false);
                         }
-attention.setOnClickListener(new View.OnClickListener() {
+                        attention.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if (User.getInstance() == null) {
@@ -325,7 +358,7 @@ attention.setOnClickListener(new View.OnClickListener() {
                                 }
                             }
                         });
-more.setOnClickListener(new View.OnClickListener() {
+                        more.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if (anchors.getVisibility() == View.GONE) {
@@ -334,23 +367,23 @@ more.setOnClickListener(new View.OnClickListener() {
                                     anchorsLayout.removeAllViews();
                                     anchors.setVisibility(View.GONE);
                                     more.setImageResource(R.drawable.anchor_more_down_selector);
-}
-}
+                                }
+                            }
                         });
-}
-} catch (Exception e) {
-}
-break;
+                    }
+                } catch (Exception e) {
+                }
+                break;
             case MSG_GET_ORGANIZATION_MENUS:
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-mOrganizationMenus = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), OrganizationMenus.class);
-if (mOrganizationMenus.size() > 0 && mOrganizationMenus.get(0).getContent() != null) {
-for (int i = 0; i < mOrganizationMenus.get(0).getContent().size(); i++) {
-final OrganizationMenus.ContentBean contentBean = mOrganizationMenus.get(0).getContent().get(i);
-LayoutInflater inflater = getLayoutInflater();
+                        mOrganizationMenus = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), OrganizationMenus.class);
+                        if (mOrganizationMenus.size() > 0 && mOrganizationMenus.get(0).getContent() != null) {
+                            for (int i = 0; i < mOrganizationMenus.get(0).getContent().size(); i++) {
+                                final OrganizationMenus.ContentBean contentBean = mOrganizationMenus.get(0).getContent().get(i);
+                                LayoutInflater inflater = getLayoutInflater();
                                 View view = inflater.inflate(R.layout.menu_item, menus, false);
                                 TextView menu = view.findViewById(R.id.menu);
                                 ImageView divide = view.findViewById(R.id.divide);
@@ -358,7 +391,7 @@ LayoutInflater inflater = getLayoutInflater();
                                     divide.setVisibility(View.INVISIBLE);
                                 }
                                 menu.setText(contentBean.getName());
-view.setOnClickListener(new View.OnClickListener() {
+                                view.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         if (contentBean.getAction() == 1) {
@@ -366,7 +399,7 @@ view.setOnClickListener(new View.OnClickListener() {
                                             if (contentBean.getChilds() != null && contentBean.getChilds().size() > 0) {
                                                 //
                                                 ArrowRectangleView menuLayout = (ArrowRectangleView) getLayoutInflater().inflate(R.layout.level_two_menu, null);
-for (int j = 0; j < contentBean.getChilds().size(); j++) {
+                                                for (int j = 0; j < contentBean.getChilds().size(); j++) {
                                                     TextView textView = new TextView(OrganizationDetailActivity.this);
                                                     int paddingLeftRight = CommonUtils.dip2px(10);
                                                     int paddingTopBottom = CommonUtils.dip2px(5);
@@ -379,7 +412,7 @@ for (int j = 0; j < contentBean.getChilds().size(); j++) {
                                                     textView.setTag(contentBean.getChilds().get(j));
                                                     menuLayout.addView(textView, new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                                                 }
-mPopupMenu = new PopupMenu((ViewGroup) menuLayout);
+                                                mPopupMenu = new PopupMenu((ViewGroup) menuLayout);
                                                 mPopupMenu.setMenuItemBackgroundColor(0xffb1df83);
                                                 mPopupMenu.setMenuItemHoverBackgroundColor(0x22000000);
                                                 mPopupMenu.setOnMenuItemSelectedListener(new PopupMenu.OnMenuItemSelectedListener() {
@@ -396,10 +429,10 @@ mPopupMenu = new PopupMenu((ViewGroup) menuLayout);
                                                 } else {
                                                     // based on bottom-left, need take menu width and menu icon width into account
                                                     //mPopupMenu.show(menus, (int) 0, (int)0);
-menuLayout.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                                                    menuLayout.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
                                                     int measuredWidth = menuLayout.getMeasuredWidth();
                                                     int measuredHeight = menuLayout.getMeasuredHeight();
-int[] location = new int[2];
+                                                    int[] location = new int[2];
                                                     v.getLocationOnScreen(location);
                                                     //popupWindow.showAsDropDown(v);//在v的下面
                                                     //显示在上方
@@ -411,9 +444,9 @@ int[] location = new int[2];
                                                     //显示在下方
                                                     //popupWindow.showAtLocation(v,Gravity.NO_GRAVITY,location[0]+v.getWidth(),location[1]);
                                                     mPopupMenu.setAnimationStyle(android.R.style.Animation_Translucent);//设置动画
-}
-}
-} else {
+                                                }
+                                            }
+                                        } else {
                                             //跳转链接
                                             Intent it = new Intent(OrganizationDetailActivity.this, WebViewActivity.class);
                                             it.putExtra("url", contentBean.getUrl());
@@ -424,18 +457,18 @@ int[] location = new int[2];
                                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
                                 lp.weight = 1;
                                 menus.addView(view, lp);
-}
-}
-}
-} catch (Exception e) {
-}
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                }
                 break;
-case MSG_GET_RECOMMEND_ORGANIZATION:
+            case MSG_GET_RECOMMEND_ORGANIZATION:
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-mOrganizations = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), Organization.class);
+                        mOrganizations = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), Organization.class);
                         if (mOrganizations.size() > 0) {
                             more.setImageResource(R.drawable.anchor_more_up_selector);
                             anchorsLayout.removeAllViews();
@@ -449,9 +482,9 @@ mOrganizations = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONA
                             } else {
                                 anchorLogo.setVisibility(View.GONE);
                             }
-for (int i = 0; i < mOrganizations.size(); i++) {
+                            for (int i = 0; i < mOrganizations.size(); i++) {
                                 final Organization organization = mOrganizations.get(i);
-LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip2px(120), LinearLayout.LayoutParams.WRAP_CONTENT);
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip2px(120), LinearLayout.LayoutParams.WRAP_CONTENT);
                                 int marginLeft;
                                 if (i == 0) {
                                     marginLeft = CommonUtils.dip2px(20);
@@ -473,14 +506,14 @@ LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip
                                 } else {
                                     attention.setActivated(false);
                                 }
-anchorView.setOnClickListener(new View.OnClickListener() {
+                                anchorView.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
 //                                        Intent it = new Intent(OrganizationDetailActivity.this, OrganizationDetailActivity.class);
 //                                        it.putExtra("organizationId", organization.getId());
 //                                        startActivity(it);
-Intent it = new Intent(OrganizationDetailActivity.this, WebViewActivity.class);
-                                        it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+organization.getId());
+                                        Intent it = new Intent(OrganizationDetailActivity.this, WebViewActivity.class);
+                                        it.putExtra("url", ServerInfo.h5HttpsIP + "/orgs/" + organization.getId());
                                         startActivity(it);
                                     }
                                 });
@@ -493,9 +526,9 @@ Intent it = new Intent(OrganizationDetailActivity.this, WebViewActivity.class);
                                         } else {
                                             attention(organization, organization.getIs_follow() == 0, v);
                                         }
-}
+                                    }
                                 });
-if (!TextUtils.isEmpty(organization.getLogo())) {
+                                if (!TextUtils.isEmpty(organization.getLogo())) {
                                     Uri uri = Uri.parse(organization.getLogo());
                                     int width = CommonUtils.dip2px(65);
                                     int height = width;
@@ -503,43 +536,43 @@ if (!TextUtils.isEmpty(organization.getLogo())) {
                                 }
                                 anchorName.setText(organization.getName());
                                 desc.setText(organization.getDes());
-anchorsLayout.addView(anchorView, i, params);
+                                anchorsLayout.addView(anchorView, i, params);
                             }
                             //更多
-LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip2px(120), LinearLayout.LayoutParams.WRAP_CONTENT);
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip2px(120), LinearLayout.LayoutParams.WRAP_CONTENT);
                             int margin = CommonUtils.dip2px(5);
                             params.setMargins(margin, margin, margin, margin);
                             params.gravity = Gravity.CENTER_VERTICAL;
                             View more = LayoutInflater.from(this).inflate(R.layout.more_item_layout, anchorsLayout, false);
-more.setOnClickListener(new View.OnClickListener() {
+                            more.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     Intent it = new Intent(OrganizationDetailActivity.this, MoreAnchorOrOrganizationActivity.class);
                                     it.putExtra("type", 1);
                                     it.putExtra("orderBy", 1);
                                     startActivity(it);
-}
+                                }
                             });
-anchorsLayout.addView(more, params);
+                            anchorsLayout.addView(more, params);
                         }
-}
-} catch (Exception e) {
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
-case MSG_ATTENTION_CALLBACK:
+            case MSG_ATTENTION_CALLBACK:
                 try {
                     String result = (String) msg.obj;
                     boolean follow = msg.arg1 == 1 ? true : false;
-JSONObject jsonObject = JSONObject.parseObject(result);
+                    JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         ToastUtils.show(jsonObject.getString("msg"));
-if (follow) {
+                        if (follow) {
                             attention.setText("已关注");
                             attention.setActivated(false);
                             more.setActivated(false);
                             mOrganization.setIs_follow(1);
-if (anchors.getVisibility() == View.GONE) {
+                            if (anchors.getVisibility() == View.GONE) {
                                 getRecommendOrganization();
                             }
                         } else {
@@ -553,15 +586,15 @@ if (anchors.getVisibility() == View.GONE) {
                                 more.setImageResource(R.drawable.anchor_more_down_selector);
                             }
                         }
-}
-} catch (Exception e) {
-}
+                    }
+                } catch (Exception e) {
+                }
                 break;
             case MSG_ATTENTION_OTHER_CALLBACK:
                 try {
                     String result = msg.getData().getString("response");
                     boolean follow = msg.arg1 == 1 ? true : false;
-JSONObject jsonObject = JSONObject.parseObject(result);
+                    JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         ToastUtils.show(jsonObject.getString("msg"));
                         TextView attention = (TextView) msg.obj;
@@ -574,25 +607,25 @@ JSONObject jsonObject = JSONObject.parseObject(result);
                             attention.setText("关注");
                             attention.setActivated(true);
                             organization.setIs_follow(0);
-}
-}
-} catch (Exception e) {
-}
+                        }
+                    }
+                } catch (Exception e) {
+                }
                 break;
             case MSG_GET_ANCHOR_COLUMN:
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-mColumns = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), AnchorOrganizationColumn.class);
-if (mColumns == null || mColumns.size() == 0) {
+                        mColumns = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), AnchorOrganizationColumn.class);
+                        if (mColumns == null || mColumns.size() == 0) {
                             noData.setVisibility(View.VISIBLE);
                         } else {
                             noData.setVisibility(View.GONE);
                             initFragment();
                         }
                     }
-} catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
@@ -601,12 +634,12 @@ if (mColumns == null || mColumns.size() == 0) {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-final LiveInfo liveInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), LiveInfo.class);
-if (liveInfo != null) {
+                        final LiveInfo liveInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), LiveInfo.class);
+                        if (liveInfo != null) {
                             LayoutInflater inflater = LayoutInflater.from(this);
                             View root = inflater.inflate(R.layout.anchor_or_organization_live_item, layout, false);
-ViewHolder vh = new ViewHolder(root);
-if (!TextUtils.isEmpty(liveInfo.getCover())) {
+                            ViewHolder vh = new ViewHolder(root);
+                            if (!TextUtils.isEmpty(liveInfo.getCover())) {
                                 Uri uri = Uri.parse(liveInfo.getCover());
                                 int width = CommonUtils.getScreenWidth();
                                 int height = (int) (9f * width / 16f);
@@ -615,7 +648,7 @@ if (!TextUtils.isEmpty(liveInfo.getCover())) {
                                 ImageLoader.showThumb(vh.logo, R.drawable.video_placeholder);
                             }
                             Glide.with(this).load(R.drawable.wave).into(vh.statusIcon);
-vh.title.setText(liveInfo.getTitle());
+                            vh.title.setText(liveInfo.getTitle());
                             vh.popularity.setVisibility(View.GONE);
                             if (liveInfo.getLive() != null) {
                                 vh.popularity.setText(liveInfo.getLive().getPopularity() + "人气");
@@ -632,8 +665,8 @@ vh.title.setText(liveInfo.getTitle());
                                     vh.type.setText("教育");
                                     vh.typeIcon.setText(R.string.live_shop);
                                 }
-}
-vh.root.setOnClickListener(new View.OnClickListener() {
+                            }
+                            vh.root.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
                                     Intent it = new Intent(OrganizationDetailActivity.this, WebViewBackActivity.class);
@@ -641,21 +674,23 @@ vh.root.setOnClickListener(new View.OnClickListener() {
                                     startActivity(it);
                                 }
                             });
-layout.addView(root,4);
+                            layout.addView(root, 4);
                         }
-}
-} catch (Exception e) {
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-break;
+                break;
         }
         return false;
     }
-@Override
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
     }
-@OnClick({R.id.attention, R.id.more})
+
+    @OnClick({R.id.attention, R.id.more})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.attention:
@@ -664,25 +699,30 @@ break;
                 break;
         }
     }
-public class FragmentAdapter extends FragmentStatePagerAdapter {
-private FragmentManager fm;
+
+    public class FragmentAdapter extends FragmentStatePagerAdapter {
+        private FragmentManager fm;
         private List<AnchorOrganizationColumn> mColumns;
-public FragmentAdapter(FragmentManager fm) {
+
+        public FragmentAdapter(FragmentManager fm) {
             super(fm);
             this.fm = fm;
         }
-public FragmentAdapter(FragmentManager fm, List<AnchorOrganizationColumn> columns) {
+
+        public FragmentAdapter(FragmentManager fm, List<AnchorOrganizationColumn> columns) {
             super(fm);
             this.fm = fm;
             mColumns = columns;
-}
-@Override
+        }
+
+        @Override
         public int getCount() {
             return mColumns.size();
         }
-@Override
+
+        @Override
         public Fragment getItem(int position) {
-if (mColumns.get(position).getType() == 2 || mColumns.get(position).getType() == 6) {
+            if (mColumns.get(position).getType() == 2 || mColumns.get(position).getType() == 6) {
                 //电台
                 ProgramRadioFragment fragment = new ProgramRadioFragment();
                 Bundle bundle = new Bundle();
@@ -706,23 +746,27 @@ if (mColumns.get(position).getType() == 2 || mColumns.get(position).getType() ==
                 fragment.setArguments(bundle);
                 return fragment;
             }
-}
-@Override
+        }
+
+        @Override
         public CharSequence getPageTitle(int position) {
             return mColumns.get(position).getName();
         }
-@Override
+
+        @Override
         public int getItemPosition(Object object) {
             return POSITION_NONE;
         }
-@Override
+
+        @Override
         public Object instantiateItem(ViewGroup container, final int position) {
             //得到缓存的fragment
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
-return fragment;
+            return fragment;
         }
-}
-class ViewHolder {
+    }
+
+    class ViewHolder {
         @BindView(R.id.logo)
         SimpleDraweeView logo;
         @BindView(R.id.playIcon)
@@ -743,7 +787,8 @@ class ViewHolder {
         LinearLayout root;
         @BindView(R.id.title)
         TextView title;
-ViewHolder(View view) {
+
+        ViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
     }

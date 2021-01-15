@@ -55,6 +55,7 @@ import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
 import com.previewlibrary.GPreviewBuilder;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -126,7 +127,7 @@ import static android.os.Environment.DIRECTORY_PICTURES;
 import static com.shuangling.software.service.AudioPlayerService.PLAY_ORDER;
 import static com.shuangling.software.utils.CommonUtils.NETWORKTYPE_WIFI;
 
-@EnableDragToClose()
+//@EnableDragToClose()
 public class ArticleDetailActivity02 extends BaseAudioActivity implements Handler.Callback {
     public static final String TAG = "ArticleDetailActivity02";
     public static final int MSG_GET_RELATED_POST = 0x1;//相关文章
@@ -204,7 +205,8 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_detail02);
-        CommonUtils.transparentStatusBar(this);
+//        CommonUtils.transparentStatusBar(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
         ButterKnife.bind(this);
         EventBus.getDefault().register(this);
         mArticleId = getIntent().getIntExtra("articleId", 0);
@@ -1624,13 +1626,22 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         if (mHeadViewHolder.webView != null) mHeadViewHolder.webView.onPause();
     }
 
+//    @Override
+//    public void onBackPressed() {
+//        if (mHeadViewHolder.webView != null && mHeadViewHolder.webView.canGoBack()) {
+//            mHeadViewHolder.webView.goBack();
+//            return;
+//        }
+//        super.onBackPressed();
+//    }
+
     @Override
-    public void onBackPressed() {
+    protected void doOnBackPressed() {
         if (mHeadViewHolder.webView != null && mHeadViewHolder.webView.canGoBack()) {
             mHeadViewHolder.webView.goBack();
             return;
         }
-        super.onBackPressed();
+        super.doOnBackPressed();
     }
 
     @Override

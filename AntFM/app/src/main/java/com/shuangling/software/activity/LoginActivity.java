@@ -1,4 +1,5 @@
 package com.shuangling.software.activity;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -6,11 +7,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -22,15 +18,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
-import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
@@ -39,13 +43,15 @@ import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
-import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -57,16 +63,17 @@ import cn.sharesdk.sina.weibo.SinaWeibo;
 import cn.sharesdk.tencent.qq.QQ;
 import cn.sharesdk.wechat.friends.Wechat;
 import okhttp3.Call;
-@EnableDragToClose()
-public class LoginActivity extends AppCompatActivity implements Handler.Callback, PlatformActionListener {
-private static final int MSG_AUTH_CANCEL = 0;
+
+//@EnableDragToClose()
+public class LoginActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback, PlatformActionListener {
+    private static final int MSG_AUTH_CANCEL = 0;
     private static final int MSG_AUTH_ERROR = 1;
     private static final int MSG_AUTH_COMPLETE = 2;
-private static final int MSG_LOGIN_CALLBACK = 3;
+    private static final int MSG_LOGIN_CALLBACK = 3;
     private static final int MSG_GET_VERIFY_CODE = 4;
     private static final int LOGIN_VERIFY_REQUEST = 5;
     private static final int MSG_VERIFY_CODE_LOGIN_CALLBACK = 6;
-@BindView(R.id.verifyCodeLogin)
+    @BindView(R.id.verifyCodeLogin)
     Button verifyCodeLogin;
     @BindView(R.id.accountLogin)
     Button accountLogin;
@@ -78,55 +85,57 @@ private static final int MSG_LOGIN_CALLBACK = 3;
     ImageView qq;
     @BindView(R.id.weiBo)
     ImageView weiBo;
-    @BindView(R.id.activtyTitle)
-    TopTitleBar activtyTitle;
+    @BindView(R.id.activity_title)
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.head)
     SimpleDraweeView head;
-private List<View> mLoginViews = new ArrayList<View>();
+    private List<View> mLoginViews = new ArrayList<View>();
     private Handler mHandler;
-private String mPhoneNumber;
+    private String mPhoneNumber;
     private DialogFragment mDialogFragment;
     private VerifyCodeViewHolder verifyCodeViewHolder;
     private AccountViewHolder accountViewHolder;
     private CountDownTimer mCountDownTimer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_login);
-        CommonUtils.transparentStatusBar(this);
+        setContentView(R.layout.activity_login);
+//        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
+        activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            doOnBackPressed();
+        });
         mHandler = new Handler(this);
-init();
-}
-private void init() {
-if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getH5_logo())) {
+        init();
+    }
+
+    private void init() {
+        if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getH5_logo())) {
             Uri uri = Uri.parse(MyApplication.getInstance().getStation().getH5_logo());
             ImageLoader.showThumb(uri, head, CommonUtils.dip2px(70), CommonUtils.dip2px(70));
         }
-activtyTitle.setBackListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
-View verifyCodeLoginView = LayoutInflater.from(this).inflate(R.layout.veritfy_code_login, null);
+        View verifyCodeLoginView = LayoutInflater.from(this).inflate(R.layout.veritfy_code_login, null);
         verifyCodeViewHolder = new VerifyCodeViewHolder(verifyCodeLoginView);
         verifyCodeViewHolder.phoneNum.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-}
-@Override
+            }
+
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-}
-@Override
+            }
+
+            @Override
             public void afterTextChanged(Editable s) {
 //                if (CommonUtils.isMobileNO(s.toString())) {
 //                    verifyCodeViewHolder.login.setEnabled(true);
 //                } else {
 //                    verifyCodeViewHolder.login.setEnabled(false);
 //                }
-String phone = s.toString();
+                String phone = s.toString();
                 if (CommonUtils.isMobileNO(phone)) {
                     if (!TextUtils.isEmpty(verifyCodeViewHolder.verifyCode.getText().toString())) {
                         verifyCodeViewHolder.login.setEnabled(true);
@@ -134,23 +143,25 @@ String phone = s.toString();
                         verifyCodeViewHolder.login.setEnabled(false);
                     }
                 }
-}
+            }
         });
-verifyCodeViewHolder.verifyCode.addTextChangedListener(new TextWatcher() {
+        verifyCodeViewHolder.verifyCode.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-}
-@Override
+            }
+
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-}
-@Override
+            }
+
+            @Override
             public void afterTextChanged(Editable s) {
 //                if (CommonUtils.isMobileNO(s.toString())) {
 //                    verifyCodeViewHolder.login.setEnabled(true);
 //                } else {
 //                    verifyCodeViewHolder.login.setEnabled(false);
 //                }
-String phone=verifyCodeViewHolder.phoneNum.getText().toString();
+                String phone = verifyCodeViewHolder.phoneNum.getText().toString();
                 String verifyCode = s.toString();
                 if (CommonUtils.isMobileNO(phone)) {
                     if (!TextUtils.isEmpty(verifyCode)) {
@@ -159,9 +170,9 @@ String phone=verifyCodeViewHolder.phoneNum.getText().toString();
                         verifyCodeViewHolder.login.setEnabled(false);
                     }
                 }
-}
+            }
         });
-verifyCodeViewHolder.timer.setOnClickListener(new View.OnClickListener() {
+        verifyCodeViewHolder.timer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mPhoneNumber = verifyCodeViewHolder.phoneNum.getText().toString();
@@ -170,27 +181,29 @@ verifyCodeViewHolder.timer.setOnClickListener(new View.OnClickListener() {
                 } else {
                     ToastUtils.show("请输入正确的手机号码");
                 }
-}
+            }
         });
-verifyCodeViewHolder.login.setOnClickListener(new View.OnClickListener() {
+        verifyCodeViewHolder.login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String phone=verifyCodeViewHolder.phoneNum.getText().toString();
-                String verifyCode=verifyCodeViewHolder.verifyCode.getText().toString();
+                String phone = verifyCodeViewHolder.phoneNum.getText().toString();
+                String verifyCode = verifyCodeViewHolder.verifyCode.getText().toString();
                 CommonUtils.hideInput(LoginActivity.this);
-                verifyCodeLogin(phone,verifyCode);
-}
+                verifyCodeLogin(phone, verifyCode);
+            }
         });
-View accountPwdLoginView = LayoutInflater.from(this).inflate(R.layout.account_password_login, null);
+        View accountPwdLoginView = LayoutInflater.from(this).inflate(R.layout.account_password_login, null);
         accountViewHolder = new AccountViewHolder(accountPwdLoginView);
         accountViewHolder.phoneNum.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-}
-@Override
+            }
+
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-}
-@Override
+            }
+
+            @Override
             public void afterTextChanged(Editable s) {
                 String phone = s.toString();
                 if (CommonUtils.isMobileNO(phone)) {
@@ -200,16 +213,18 @@ View accountPwdLoginView = LayoutInflater.from(this).inflate(R.layout.account_pa
                         accountViewHolder.login.setEnabled(false);
                     }
                 }
-}
+            }
         });
         accountViewHolder.password.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-}
-@Override
+            }
+
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-}
-@Override
+            }
+
+            @Override
             public void afterTextChanged(Editable s) {
                 String phone = accountViewHolder.phoneNum.getText().toString();
                 if (CommonUtils.isMobileNO(phone)) {
@@ -226,7 +241,7 @@ View accountPwdLoginView = LayoutInflater.from(this).inflate(R.layout.account_pa
             public void onClick(View v) {
                 CommonUtils.hideInput(LoginActivity.this);
                 accountLogin(accountViewHolder.phoneNum.getText().toString(), accountViewHolder.password.getText().toString());
-}
+            }
         });
         accountViewHolder.forgetPassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -236,31 +251,35 @@ View accountPwdLoginView = LayoutInflater.from(this).inflate(R.layout.account_pa
         });
         mLoginViews.add(verifyCodeLoginView);
         mLoginViews.add(accountPwdLoginView);
-viewPager.setAdapter(new PagerAdapter() {
-@Override
+        viewPager.setAdapter(new PagerAdapter() {
+            @Override
             public void destroyItem(ViewGroup container, int position, Object object) {
                 container.removeView(mLoginViews.get(position));
             }
-@Override
+
+            @Override
             public Object instantiateItem(ViewGroup container, int position) {
                 View view = mLoginViews.get(position);
                 container.addView(view);
                 return view;
             }
-@Override
+
+            @Override
             public boolean isViewFromObject(View arg0, Object arg1) {
                 return arg0 == arg1;
             }
-@Override
+
+            @Override
             public int getCount() {
                 return mLoginViews.size();
             }
-});
+        });
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
-}
-@Override
+            }
+
+            @Override
             public void onPageSelected(int i) {
                 if (i == 0) {
                     verifyCodeLogin.setSelected(true);
@@ -270,20 +289,22 @@ viewPager.setAdapter(new PagerAdapter() {
                     accountLogin.setSelected(true);
                 }
             }
-@Override
+
+            @Override
             public void onPageScrollStateChanged(int i) {
-}
+            }
         });
         verifyCodeLogin.setSelected(true);
     }
-@OnClick({R.id.verifyCodeLogin, R.id.accountLogin, R.id.weiXin, R.id.qq, R.id.weiBo})
+
+    @OnClick({R.id.verifyCodeLogin, R.id.accountLogin, R.id.weiXin, R.id.qq, R.id.weiBo})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.verifyCodeLogin:
                 verifyCodeLogin.setSelected(true);
                 accountLogin.setSelected(false);
                 viewPager.setCurrentItem(0);
-                if(TextUtils.isEmpty(verifyCodeViewHolder.phoneNum.getText().toString().trim())&&!TextUtils.isEmpty(accountViewHolder.phoneNum.getText().toString().trim())){
+                if (TextUtils.isEmpty(verifyCodeViewHolder.phoneNum.getText().toString().trim()) && !TextUtils.isEmpty(accountViewHolder.phoneNum.getText().toString().trim())) {
                     verifyCodeViewHolder.phoneNum.setText(accountViewHolder.phoneNum.getText().toString());
                 }
                 break;
@@ -291,7 +312,7 @@ viewPager.setAdapter(new PagerAdapter() {
                 accountLogin.setSelected(true);
                 verifyCodeLogin.setSelected(false);
                 viewPager.setCurrentItem(1);
-                if(!TextUtils.isEmpty(verifyCodeViewHolder.phoneNum.getText().toString().trim())&&TextUtils.isEmpty(accountViewHolder.phoneNum.getText().toString().trim())){
+                if (!TextUtils.isEmpty(verifyCodeViewHolder.phoneNum.getText().toString().trim()) && TextUtils.isEmpty(accountViewHolder.phoneNum.getText().toString().trim())) {
                     accountViewHolder.phoneNum.setText(verifyCodeViewHolder.phoneNum.getText().toString());
                 }
                 break;
@@ -311,7 +332,8 @@ viewPager.setAdapter(new PagerAdapter() {
                 break;
         }
     }
-//    授权登录
+
+    //    授权登录
     private void authorize(Platform plat) {
         if (plat == null) {
             return;
@@ -321,16 +343,18 @@ viewPager.setAdapter(new PagerAdapter() {
         plat.SSOSetting(false);
         //获取用户资料
         plat.showUser(null);
-}
-@Override
+    }
+
+    @Override
     public void onComplete(Platform platform, int action, HashMap<String, Object> hashMap) {
-if (action == Platform.ACTION_USER_INFOR) {
+        if (action == Platform.ACTION_USER_INFOR) {
             Message msg = mHandler.obtainMessage(MSG_AUTH_COMPLETE);
             msg.obj = platform;
             mHandler.sendMessage(msg);
         }
-}
-@Override
+    }
+
+    @Override
     public void onError(Platform platform, int action, Throwable throwable) {
         if (action == Platform.ACTION_USER_INFOR) {
             mHandler.sendEmptyMessage(MSG_AUTH_ERROR);
@@ -342,13 +366,15 @@ if (action == Platform.ACTION_USER_INFOR) {
         }
         throwable.printStackTrace();
     }
-@Override
+
+    @Override
     public void onCancel(Platform platform, int action) {
         if (action == Platform.ACTION_USER_INFOR) {
             mHandler.sendEmptyMessage(MSG_AUTH_CANCEL);
         }
     }
-@Override
+
+    @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_AUTH_CANCEL: {
@@ -380,7 +406,7 @@ if (action == Platform.ACTION_USER_INFOR) {
                 } else {
                     type = "WX";
                 }
-}
+            }
             break;
             case MSG_LOGIN_CALLBACK: {
                 try {
@@ -397,7 +423,8 @@ if (action == Platform.ACTION_USER_INFOR) {
                             public void onSuccess(String s) {
                                 Log.i("bindAccount-onSuccess", s);
                             }
-@Override
+
+                            @Override
                             public void onFailed(String s, String s1) {
                                 Log.i("bindAccount-onFailed", s);
                                 Log.i("bindAccount-onFailed", s1);
@@ -415,7 +442,7 @@ if (action == Platform.ACTION_USER_INFOR) {
                 }
             }
             break;
-            case MSG_VERIFY_CODE_LOGIN_CALLBACK:{
+            case MSG_VERIFY_CODE_LOGIN_CALLBACK: {
                 try {
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
@@ -423,23 +450,24 @@ if (action == Platform.ACTION_USER_INFOR) {
                         User user = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), User.class);
                         User.setInstance(user);
                         SharedPreferencesUtils.saveUser(user);
-final CloudPushService pushService = PushServiceFactory.getCloudPushService();
+                        final CloudPushService pushService = PushServiceFactory.getCloudPushService();
                         pushService.bindAccount(user.getUsername(), new CommonCallback() {
                             @Override
                             public void onSuccess(String s) {
-                                Log.i("bindAccount-onSuccess",s);
+                                Log.i("bindAccount-onSuccess", s);
                             }
-@Override
+
+                            @Override
                             public void onFailed(String s, String s1) {
-                                Log.i("bindAccount-onFailed",s);
-                                Log.i("bindAccount-onFailed",s1);
+                                Log.i("bindAccount-onFailed", s);
+                                Log.i("bindAccount-onFailed", s1);
                             }
                         });
                         ToastUtils.show("登录成功");
                         setResult(RESULT_OK);
                         EventBus.getDefault().post(new CommonEvent("OnLoginSuccess"));
                         finish();
-                    }else{
+                    } else {
                         ToastUtils.show(jsonObject.getString("msg"));
                     }
                 } catch (Exception e) {
@@ -447,7 +475,7 @@ final CloudPushService pushService = PushServiceFactory.getCloudPushService();
                 }
             }
             break;
-case MSG_GET_VERIFY_CODE: {
+            case MSG_GET_VERIFY_CODE: {
                 try {
                     mDialogFragment.dismiss();
                     String result = (String) msg.obj;
@@ -459,33 +487,35 @@ case MSG_GET_VERIFY_CODE: {
 //                    } else if (jsonObject != null) {
 //                        ToastUtils.show(jsonObject.getString("msg"));
 //                    }
-if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-mCountDownTimer = new CountDownTimer(60 * 1000, 500) {
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        mCountDownTimer = new CountDownTimer(60 * 1000, 500) {
                             @Override
                             public void onTick(long millisUntilFinished) {
                                 verifyCodeViewHolder.timer.setText("(" + millisUntilFinished / 1000 + ")重新发送");
                                 verifyCodeViewHolder.timer.setEnabled(false);
                             }
-@Override
+
+                            @Override
                             public void onFinish() {
                                 verifyCodeViewHolder.timer.setText("重新发送");
                                 verifyCodeViewHolder.timer.setEnabled(true);
                             }
                         };
                         mCountDownTimer.start();
-} else if (jsonObject != null) {
+                    } else if (jsonObject != null) {
                         ToastUtils.show(jsonObject.getString("msg"));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-}
+            }
             break;
         }
         return false;
     }
-static class AccountViewHolder {
-//        @BindView(R.id.countryCode)
+
+    static class AccountViewHolder {
+        //        @BindView(R.id.countryCode)
 //        TextView countryCode;
         @BindView(R.id.phoneNum)
         EditText phoneNum;
@@ -495,12 +525,14 @@ static class AccountViewHolder {
         Button login;
         @BindView(R.id.forgetPassword)
         TextView forgetPassword;
-AccountViewHolder(View view) {
+
+        AccountViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
     }
-static class VerifyCodeViewHolder {
-@BindView(R.id.countryCode)
+
+    static class VerifyCodeViewHolder {
+        @BindView(R.id.countryCode)
         TextView countryCode;
         @BindView(R.id.phoneNum)
         EditText phoneNum;
@@ -510,76 +542,83 @@ static class VerifyCodeViewHolder {
         TextView timer;
         @BindView(R.id.login)
         Button login;
-VerifyCodeViewHolder(View view) {
+
+        VerifyCodeViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
     }
-private void verifyCodeLogin(String phone, String verifyCode) {
-String url = ServerInfo.serviceIP + ServerInfo.login;
+
+    private void verifyCodeLogin(String phone, String verifyCode) {
+        String url = ServerInfo.serviceIP + ServerInfo.login;
         Map<String, String> params = new HashMap<String, String>();
         params.put("type", "1");
         params.put("phone", phone);
         params.put("verification_code", verifyCode);
-        params.put("from_url", SharedPreferencesUtils.getStringValue("from_url",null));
-        params.put("from_user_id", SharedPreferencesUtils.getStringValue("from_user_id",null));
-OkHttpUtils.post(url, params, new OkHttpCallback(this) {
-@Override
+        params.put("from_url", SharedPreferencesUtils.getStringValue("from_url", null));
+        params.put("from_user_id", SharedPreferencesUtils.getStringValue("from_user_id", null));
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = mHandler.obtainMessage(MSG_VERIFY_CODE_LOGIN_CALLBACK);
+                Message msg = mHandler.obtainMessage(MSG_VERIFY_CODE_LOGIN_CALLBACK);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-ToastUtils.show("登录异常");
-}
+                ToastUtils.show("登录异常");
+            }
         });
     }
-private void accountLogin(String phone, String pwd) {
-mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
+
+    private void accountLogin(String phone, String pwd) {
+        mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
         String url = ServerInfo.serviceIP + ServerInfo.login;
         Map<String, String> params = new HashMap<String, String>();
         params.put("type", "0");
         params.put("phone", "" + phone);
         params.put("password", pwd);
-        params.put("from_url", SharedPreferencesUtils.getStringValue("from_url",null));
-        params.put("from_user_id", SharedPreferencesUtils.getStringValue("from_user_id",null));
-OkHttpUtils.post(url, params, new OkHttpCallback(this) {
-@Override
+        params.put("from_url", SharedPreferencesUtils.getStringValue("from_url", null));
+        params.put("from_user_id", SharedPreferencesUtils.getStringValue("from_user_id", null));
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = mHandler.obtainMessage(MSG_LOGIN_CALLBACK);
+                Message msg = mHandler.obtainMessage(MSG_LOGIN_CALLBACK);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        try{
+                        try {
                             mDialogFragment.dismiss();
                             ToastUtils.show("登录异常");
-                        }catch (Exception e){
-}
-}
+                        } catch (Exception e) {
+                        }
+                    }
                 });
-}
+            }
         });
     }
-private void getVerifyCode(String phone) {
+
+    private void getVerifyCode(String phone) {
         mDialogFragment = CommonUtils.showLoadingDialog(getSupportFragmentManager());
-String url = ServerInfo.serviceIP + ServerInfo.getVerifyCode;
+        String url = ServerInfo.serviceIP + ServerInfo.getVerifyCode;
         Map<String, String> params = new HashMap<String, String>();
         params.put("module", "login");
         params.put("phone", phone);
-OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
+                Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
@@ -587,20 +626,32 @@ Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
                         mDialogFragment.dismiss();
                     }
                 });
-ToastUtils.show("获取验证码请求异常");
-}
+                ToastUtils.show("获取验证码请求异常");
+            }
         });
     }
-@Override
-    public void onBackPressed() {
+
+//    @Override
+//    public void onBackPressed() {
+//        User.setInstance(null);
+//        if (mCountDownTimer != null) {
+//            mCountDownTimer.cancel();
+//        }
+//        super.onBackPressed();
+//    }
+
+    @Override
+    protected void doOnBackPressed() {
         User.setInstance(null);
         if (mCountDownTimer != null) {
             mCountDownTimer.cancel();
         }
-        super.onBackPressed();
+        super.doOnBackPressed();
     }
-@Override
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LOGIN_VERIFY_REQUEST && resultCode == RESULT_OK) {
             setResult(Activity.RESULT_OK);
             finish();

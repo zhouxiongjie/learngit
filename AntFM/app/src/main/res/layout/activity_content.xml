@@ -1,33 +1,36 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ptr="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <com.shuangling.software.customview.TopTitleBar
+    <!--<com.shuangling.software.customview.TopTitleBar
         android:id="@+id/activity_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        ptr:canBack="true" />
+        ptr:canBack="true" />-->
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/activity_title"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/qmui_topbar_height" />
 
     <com.scwang.smartrefresh.layout.SmartRefreshLayout
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/activity_title"
-        ptr:srlEnableScrollContentWhenLoaded="true"
         ptr:srlEnableFooterFollowWhenLoadFinished="true"
-        ptr:srlEnableLoadMore="true">
+        ptr:srlEnableLoadMore="true"
+        ptr:srlEnableScrollContentWhenLoaded="true">
         <!--<com.scwang.smartrefresh.layout.header.ClassicsHeader-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--ptr:srlAccentColor="@android:color/black"-->
-            <!--ptr:srlClassicsSpinnerStyle="FixedBehind"-->
-            <!--ptr:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
-            <!--ptr:srlDrawableProgressSize="20dp"-->
-            <!--ptr:srlPrimaryColor="@color/transparent" />-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--ptr:srlAccentColor="@android:color/black"-->
+        <!--ptr:srlClassicsSpinnerStyle="FixedBehind"-->
+        <!--ptr:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
+        <!--ptr:srlDrawableProgressSize="20dp"-->
+        <!--ptr:srlPrimaryColor="@color/transparent" />-->
 
         <androidx.recyclerview.widget.RecyclerView
 
@@ -37,13 +40,13 @@
             android:background="@color/white" />
 
         <!--<com.scwang.smartrefresh.layout.footer.ClassicsFooter-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--ptr:srlAccentColor="@android:color/black"-->
-            <!--ptr:srlClassicsSpinnerStyle="FixedBehind"-->
-            <!--ptr:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
-            <!--ptr:srlDrawableProgressSize="20dp"-->
-            <!--ptr:srlPrimaryColor="@color/transparent" />-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--ptr:srlAccentColor="@android:color/black"-->
+        <!--ptr:srlClassicsSpinnerStyle="FixedBehind"-->
+        <!--ptr:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
+        <!--ptr:srlDrawableProgressSize="20dp"-->
+        <!--ptr:srlPrimaryColor="@color/transparent" />-->
 
 
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
@@ -68,12 +71,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/logo"
-            android:layout_marginBottom="10dp"
             android:layout_centerHorizontal="true"
-            android:textColor="#666666"
-            android:textSize="@dimen/font_size_28px"
             android:layout_gravity="center_horizontal"
-            android:text="暂无内容信息~" />
+            android:layout_marginBottom="10dp"
+            android:text="暂无内容信息~"
+            android:textColor="#666666"
+            android:textSize="@dimen/font_size_28px" />
 
 
     </RelativeLayout>

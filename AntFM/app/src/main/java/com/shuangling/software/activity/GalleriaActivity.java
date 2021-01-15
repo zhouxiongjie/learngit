@@ -30,6 +30,8 @@ import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloadQueueSet;
 import com.liulishuo.filedownloader.FileDownloader;
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.WebProgress;
@@ -64,8 +66,8 @@ import okhttp3.Call;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
-@EnableDragToClose()
-public class GalleriaActivity extends AppCompatActivity implements Handler.Callback {
+//@EnableDragToClose()
+public class GalleriaActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback {
     private static final int LOGIN_RESULT = 0x1;
     public static final int MSG_GET_DETAIL = 0x2;
     private static final int SHARE_SUCCESS = 0x3;
@@ -86,6 +88,7 @@ public class GalleriaActivity extends AppCompatActivity implements Handler.Callb
         setContentView(R.layout.activity_webview/*activity_galleria*/);
         //CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
         ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).keyboardEnable(true)  //解决软键盘与底部输入框冲突问题，默认为false，还有一个重载方法，可以指定软键盘mode
                 .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE).init();
         FrameLayout fl_content = findViewById(R.id.fl_web_container);

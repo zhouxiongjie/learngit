@@ -7,69 +7,70 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-
-
-    <com.shuangling.software.customview.TopTitleBar
+    <!-- <com.shuangling.software.customview.TopTitleBar
+         android:id="@+id/activity_title"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_alignParentTop="true"
+         fresco:moreImg="@drawable/ic_more"
+         fresco:canBack="true" />-->
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
         android:id="@+id/activity_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        fresco:moreImg="@drawable/ic_more"
-        fresco:canBack="true" />
-
+        android:layout_height="?attr/qmui_topbar_height"
+        android:layout_alignParentTop="true" />
 
     <com.aliyun.vodplayerview.widget.AliyunVodPlayerView
         android:id="@+id/aliyunVodPlayerView"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:layout_below="@+id/activity_title"
-        />
+        android:layout_below="@id/activity_title" />
 
 
     <!--<FrameLayout-->
-        <!--android:id="@+id/frameLayout"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="200dp"-->
-        <!--android:layout_below="@+id/activity_title">-->
-        <!--<com.aliyun.vodplayerview.widget.AliyunVodPlayerView-->
-            <!--android:id="@+id/aliyunVodPlayerView"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-             <!--/>-->
-        <!--<RelativeLayout-->
-            <!--android:id="@+id/flowLayout"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:visibility="gone">-->
-            <!--<LinearLayout-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_centerInParent="true"-->
-                <!--android:orientation="vertical">-->
+    <!--android:id="@+id/frameLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="200dp"-->
+    <!--android:layout_below="@+id/activity_title">-->
+    <!--<com.aliyun.vodplayerview.widget.AliyunVodPlayerView-->
+    <!--android:id="@+id/aliyunVodPlayerView"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--/>-->
+    <!--<RelativeLayout-->
+    <!--android:id="@+id/flowLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:visibility="gone">-->
+    <!--<LinearLayout-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_centerInParent="true"-->
+    <!--android:orientation="vertical">-->
 
-                <!--<TextView-->
-                    <!--android:id="@+id/flow"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:textSize="@dimen/font_size_30px"-->
-                    <!--android:textColor="#CCCCCC"-->
-                    <!--android:layout_gravity="center_horizontal"-->
-                    <!--android:text="播放将消耗7.85M流量,请注意流量使用"/>-->
+    <!--<TextView-->
+    <!--android:id="@+id/flow"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textSize="@dimen/font_size_30px"-->
+    <!--android:textColor="#CCCCCC"-->
+    <!--android:layout_gravity="center_horizontal"-->
+    <!--android:text="播放将消耗7.85M流量,请注意流量使用"/>-->
 
-                <!--<TextView-->
-                    <!--android:id="@+id/goOn"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_gravity="center_horizontal"-->
-                    <!--android:layout_marginTop="10dp"-->
-                    <!--android:textSize="@dimen/font_size_26px"-->
-                    <!--android:textColor="@color/white"-->
-                    <!--android:text="继续播放"-->
-                    <!--android:background="@drawable/go_on_bg"/>-->
+    <!--<TextView-->
+    <!--android:id="@+id/goOn"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_horizontal"-->
+    <!--android:layout_marginTop="10dp"-->
+    <!--android:textSize="@dimen/font_size_26px"-->
+    <!--android:textColor="@color/white"-->
+    <!--android:text="继续播放"-->
+    <!--android:background="@drawable/go_on_bg"/>-->
 
-            <!--</LinearLayout>-->
+    <!--</LinearLayout>-->
 
-        <!--</RelativeLayout>-->
+    <!--</RelativeLayout>-->
     <!--</FrameLayout>-->
 
     <RelativeLayout
@@ -134,12 +135,12 @@
             android:id="@+id/attention"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minWidth="60dp"
-            android:minHeight="29dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:background="@drawable/subscribe_text_bg"
             android:gravity="center"
+            android:minWidth="60dp"
+            android:minHeight="29dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:text="关注"
@@ -153,16 +154,15 @@
         android:id="@+id/refreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/organizationLayout"
         android:layout_above="@+id/bottom"
-        fresco:srlEnableRefresh="false"
-        fresco:srlEnableLoadMore="true">
+        android:layout_below="@+id/organizationLayout"
+        fresco:srlEnableLoadMore="true"
+        fresco:srlEnableRefresh="false">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
+            android:layout_height="match_parent" />
 
 
         <!--<com.scwang.smartrefresh.layout.footer.ClassicsFooter-->
@@ -179,162 +179,157 @@
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
 
+    <!-- <android.support.v4.widget.NestedScrollView-->
+    <!--android:id="@+id/scrollView"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_below="@+id/organizationLayout"-->
+    <!--android:layout_above="@+id/bottom">-->
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:descendantFocusability="blocksDescendants"-->
+    <!--android:orientation="vertical">-->
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:orientation="vertical"-->
+
+    <!--android:padding="10dp">-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/videoTitle"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="视频名称视频名称视频名称视频名称"-->
+    <!--android:textColor="@color/textColorTwo"-->
+    <!--android:textSize="@dimen/font_size_34px"-->
+    <!--android:textStyle="bold"/>-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/playTimes"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:text="25万次播放"-->
+    <!--android:textColor="@color/textColorSeven"-->
+    <!--android:textSize="@dimen/font_size_22px" />-->
+
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_horizontal"-->
+    <!--android:orientation="horizontal">-->
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/praiseLayout"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:background="@drawable/praise_and_collect_bg"-->
+    <!--android:orientation="horizontal">-->
+
+    <!--<com.shuangling.software.customview.FontIconView-->
+    <!--android:id="@+id/praiseIcon"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_vertical"-->
+    <!--android:text="&#xe617;"-->
+    <!--android:textColor="@color/main_bottom_text_selector"-->
+    <!--android:textSize="@dimen/font_size_50px" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/praise"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_vertical"-->
+    <!--android:layout_marginStart="15dp"-->
+    <!--android:text="666" />-->
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/collectLayout"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginStart="40dp"-->
+    <!--android:background="@drawable/praise_and_collect_bg"-->
+    <!--android:orientation="horizontal">-->
+
+    <!--<com.shuangling.software.customview.FontIconView-->
+    <!--android:id="@+id/collectIcon"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_vertical"-->
+    <!--android:text="&#xe62e;"-->
+    <!--android:textColor="@color/main_bottom_text_selector"-->
+    <!--android:textSize="@dimen/font_size_50px" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/collectText"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_vertical"-->
+    <!--android:layout_marginStart="15dp"-->
+    <!--android:text="666" />-->
+    <!--</LinearLayout>-->
+
+    <!--</LinearLayout>-->
+
+    <!--<com.shuangling.software.customview.MyRecyclerView-->
+    <!--android:id="@+id/recommend"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginTop="20dp"-->
+    <!--android:nestedScrollingEnabled="false" />-->
+
+    <!--<ImageView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="6dp"-->
+    <!--android:background="@color/divideColorTwo" />-->
 
 
+    <!--<LinearLayout-->
+    <!--android:id="@+id/commentLayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:orientation="horizontal"-->
+    <!--android:padding="10dp">-->
 
 
+    <!--<TextView-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:text="全部评论"-->
+    <!--android:textColor="@color/black"-->
+    <!--android:textSize="@dimen/font_size_36px"-->
+    <!--android:textStyle="bold" />-->
 
-   <!-- <android.support.v4.widget.NestedScrollView-->
-        <!--android:id="@+id/scrollView"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_below="@+id/organizationLayout"-->
-        <!--android:layout_above="@+id/bottom">-->
+    <!--<TextView-->
+    <!--android:id="@+id/commentNum"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:text="(12)"-->
+    <!--android:textColor="@color/black"-->
+    <!--android:textSize="@dimen/font_size_36px"-->
+    <!--android:textStyle="bold" />-->
 
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:descendantFocusability="blocksDescendants"-->
-            <!--android:orientation="vertical">-->
-
-            <!--<LinearLayout-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:orientation="vertical"-->
-
-                <!--android:padding="10dp">-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/videoTitle"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="视频名称视频名称视频名称视频名称"-->
-                    <!--android:textColor="@color/textColorTwo"-->
-                    <!--android:textSize="@dimen/font_size_34px"-->
-                    <!--android:textStyle="bold"/>-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/playTimes"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="25万次播放"-->
-                    <!--android:textColor="@color/textColorSeven"-->
-                    <!--android:textSize="@dimen/font_size_22px" />-->
-
-            <!--</LinearLayout>-->
-
-            <!--<LinearLayout-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="center_horizontal"-->
-                <!--android:orientation="horizontal">-->
-
-                <!--<LinearLayout-->
-                    <!--android:id="@+id/praiseLayout"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:background="@drawable/praise_and_collect_bg"-->
-                    <!--android:orientation="horizontal">-->
-
-                    <!--<com.shuangling.software.customview.FontIconView-->
-                        <!--android:id="@+id/praiseIcon"-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:layout_gravity="center_vertical"-->
-                        <!--android:text="&#xe617;"-->
-                        <!--android:textColor="@color/main_bottom_text_selector"-->
-                        <!--android:textSize="@dimen/font_size_50px" />-->
-
-                    <!--<TextView-->
-                        <!--android:id="@+id/praise"-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:layout_gravity="center_vertical"-->
-                        <!--android:layout_marginStart="15dp"-->
-                        <!--android:text="666" />-->
-                <!--</LinearLayout>-->
-
-                <!--<LinearLayout-->
-                    <!--android:id="@+id/collectLayout"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginStart="40dp"-->
-                    <!--android:background="@drawable/praise_and_collect_bg"-->
-                    <!--android:orientation="horizontal">-->
-
-                    <!--<com.shuangling.software.customview.FontIconView-->
-                        <!--android:id="@+id/collectIcon"-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:layout_gravity="center_vertical"-->
-                        <!--android:text="&#xe62e;"-->
-                        <!--android:textColor="@color/main_bottom_text_selector"-->
-                        <!--android:textSize="@dimen/font_size_50px" />-->
-
-                    <!--<TextView-->
-                        <!--android:id="@+id/collectText"-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:layout_gravity="center_vertical"-->
-                        <!--android:layout_marginStart="15dp"-->
-                        <!--android:text="666" />-->
-                <!--</LinearLayout>-->
-
-            <!--</LinearLayout>-->
-
-            <!--<com.shuangling.software.customview.MyRecyclerView-->
-                <!--android:id="@+id/recommend"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="20dp"-->
-                <!--android:nestedScrollingEnabled="false" />-->
-
-            <!--<ImageView-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="6dp"-->
-                <!--android:background="@color/divideColorTwo" />-->
+    <!--</LinearLayout>-->
 
 
-            <!--<LinearLayout-->
-                <!--android:id="@+id/commentLayout"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:orientation="horizontal"-->
-                <!--android:padding="10dp">-->
+    <!--<com.shuangling.software.customview.MyListView-->
+    <!--android:id="@+id/listView"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:divider="@drawable/recycleview_divider_drawable"-->
+    <!--android:nestedScrollingEnabled="false">-->
 
+    <!--</com.shuangling.software.customview.MyListView>-->
 
-                <!--<TextView-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_centerVertical="true"-->
-                    <!--android:text="全部评论"-->
-                    <!--android:textColor="@color/black"-->
-                    <!--android:textSize="@dimen/font_size_36px"-->
-                    <!--android:textStyle="bold" />-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/commentNum"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_centerVertical="true"-->
-                    <!--android:text="(12)"-->
-                    <!--android:textColor="@color/black"-->
-                    <!--android:textSize="@dimen/font_size_36px"-->
-                    <!--android:textStyle="bold" />-->
-
-            <!--</LinearLayout>-->
-
-
-            <!--<com.shuangling.software.customview.MyListView-->
-                <!--android:id="@+id/listView"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:divider="@drawable/recycleview_divider_drawable"-->
-                <!--android:nestedScrollingEnabled="false">-->
-
-            <!--</com.shuangling.software.customview.MyListView>-->
-
-        <!--</LinearLayout>-->
+    <!--</LinearLayout>-->
     <!--</android.support.v4.widget.NestedScrollView>-->
 
 
@@ -374,9 +369,9 @@
                 android:id="@+id/commentNumLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="5dp"
+                android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true">
+                android:layout_marginRight="5dp">
 
                 <ImageView
                     android:id="@+id/commentsIcon"
@@ -413,8 +408,8 @@
         android:id="@+id/noData"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
         android:layout_below="@+id/activity_title"
+        android:background="@color/white"
         android:visibility="gone">
 
         <ImageView
@@ -429,22 +424,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/logo"
-            android:layout_marginBottom="10dp"
             android:layout_centerHorizontal="true"
-            android:textColor="#666666"
-            android:textSize="@dimen/font_size_28px"
             android:layout_gravity="center_horizontal"
-            android:text="该内容已不存在~" />
+            android:layout_marginBottom="10dp"
+            android:text="该内容已不存在~"
+            android:textColor="#666666"
+            android:textSize="@dimen/font_size_28px" />
 
 
     </RelativeLayout>
 
 
     <include
+        layout="@layout/network_error"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/activity_title"
-        layout="@layout/network_error" />
+        android:layout_below="@+id/activity_title" />
 
 </RelativeLayout>
 

@@ -13,7 +13,10 @@ import androidx.fragment.app.DialogFragment;
 
 import com.alibaba.fastjson.JSON;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.shuangling.software.MyApplication;
@@ -47,11 +50,11 @@ import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.wechat.friends.Wechat;
 import okhttp3.Call;
 
-@EnableDragToClose()
-public class AccountAndSecurityActivity extends AppCompatActivity implements PlatformActionListener {
+//@EnableDragToClose()
+public class AccountAndSecurityActivity extends QMUIActivity/*AppCompatActivity*/ implements PlatformActionListener {
     public static final String TAG = AccountAndSecurityActivity.class.getName();
     @BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.phoneNum)
     TextView phoneNum;
     @BindView(R.id.phoneBind)
@@ -75,8 +78,13 @@ public class AccountAndSecurityActivity extends AppCompatActivity implements Pla
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_and_security);
-        CommonUtils.transparentStatusBar(this);
+//        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
+        activityTitle.setTitle("账号与安全");
+        activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            finish();
+        });
     }
 
     private void setUserInfo() {

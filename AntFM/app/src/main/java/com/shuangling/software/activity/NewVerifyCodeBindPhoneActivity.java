@@ -4,26 +4,25 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
-
-import androidx.fragment.app.DialogFragment;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.fragment.app.DialogFragment;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.sdk.android.push.CloudPushService;
 import com.alibaba.sdk.android.push.CommonCallback;
 import com.alibaba.sdk.android.push.noonesdk.PushServiceFactory;
 import com.hjq.toast.ToastUtils;
-import com.mylhyl.circledialog.CircleDialog;
+import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
-import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.customview.VerifyCodeView;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
@@ -33,7 +32,6 @@ import com.shuangling.software.utils.AppManager;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
-import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -46,13 +44,13 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
 
-@EnableDragToClose()
-public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements Handler.Callback {
+//@EnableDragToClose()
+public class NewVerifyCodeBindPhoneActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback {
     private static final int MSG_GET_VERIFY_CODE = 0X00;
     private static final int MSG_WEIXIN_LOGIN_CALLBACK = 0X01;
     private static final int MSG_BIND_PHONE = 0X02;
     @BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.phoneNum)
     TextView phoneNum;
     @BindView(R.id.timer)
@@ -75,8 +73,12 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_verify_code_login);
-        CommonUtils.transparentStatusBar(this);
+//        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
+        activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            doOnBackPressed();
+        });
         mHandler = new Handler(this);
         AppManager.addActivity(this);
         init();
@@ -105,12 +107,6 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
             }
         };
         mCountDownTimer.start();
-        activityTitle.setBackListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
         verifyCodeView.setInputCompleteListener(new VerifyCodeView.InputCompleteListener() {
             @Override
             public void inputComplete() {
@@ -389,12 +385,13 @@ public class NewVerifyCodeBindPhoneActivity extends AppCompatActivity implements
 //            }
 //        });
 //    }
+
     @Override
-    public void onBackPressed() {
+    protected void doOnBackPressed() {
         if (mCountDownTimer != null) {
             mCountDownTimer.cancel();
         }
-        super.onBackPressed();
+        super.doOnBackPressed();
     }
 
     @OnClick({R.id.timer})

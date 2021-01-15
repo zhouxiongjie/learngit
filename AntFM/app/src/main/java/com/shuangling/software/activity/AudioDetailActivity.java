@@ -14,15 +14,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.provider.Settings;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -33,6 +24,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.player.IPlayer;
@@ -46,7 +44,10 @@ import com.mylhyl.circledialog.callback.ConfigInput;
 import com.mylhyl.circledialog.params.ButtonParams;
 import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
+import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -58,7 +59,6 @@ import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.AudioRecyclerAdapter;
 import com.shuangling.software.customview.FontIconView;
-import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.dialog.AudioListDialog;
 import com.shuangling.software.dialog.AudioSpeedDialog;
 import com.shuangling.software.dialog.AudioTimerDialog;
@@ -80,7 +80,6 @@ import com.shuangling.software.utils.FloatWindowUtil;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
-import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -111,8 +110,8 @@ import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 
-@EnableDragToClose()
-public class AudioDetailActivity extends AppCompatActivity implements Handler.Callback, View.OnClickListener {
+//@EnableDragToClose()
+public class AudioDetailActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback, View.OnClickListener {
     public static final String TAG = "AlbumDetailActivity";
     public static final int MSG_GET_AUDIO_DETAIL = 0x1;
     public static final int MSG_GET_AUDIOS_LIST = 0x2;
@@ -129,7 +128,7 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     public static final int REQUEST_REPORT = 0xd;
     public static final int REQUEST_PERMISSION_CODE = 0x0110;
     @BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.divideOne)
     ImageView divideOne;
     @BindView(R.id.recyclerView)
@@ -209,8 +208,71 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_audio_detail);
-        CommonUtils.transparentStatusBar(this);
+//        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
+        activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            finish();
+        });
+//        activityTitle.setTitle("");
+        activityTitle.addRightImageButton(R.drawable.ic_more, com.qmuiteam.qmui.R.id.right_icon).setOnClickListener(view -> {//
+            if (mAudioDetail != null) {
+                ShareDialog dialog = ShareDialog.getInstance(false, mAudioDetail.getIs_user_report() != 0);
+                dialog.setIsHideSecondGroup(false);
+                dialog.setIsShowPosterButton(false);
+                dialog.setIsShowReport(true);
+                dialog.setIsShowCollect(false);
+                dialog.setIsShowCopyLink(false);
+                dialog.setIsShowFontSize(false);
+                dialog.setIsShowRefresh(false);
+                dialog.setShareHandler(new ShareDialog.ShareHandler() {
+                    @Override
+                    public void onShare(String platform) {
+                        if (mAudioDetail != null) {
+                            String url;
+                            if (User.getInstance() != null) {
+                                url = ServerInfo.h5IP + "/audios/" + mAudioId + "?from_user_id=" + User.getInstance().getId() + "&from_url=" + ServerInfo.h5IP + "/audios/" + mAudioId;
+                            } else {
+                                url = ServerInfo.h5IP + "/audios/" + mAudioId + "?from_url=" + ServerInfo.h5IP + "/audios/" + mAudioId;
+                            }
+                            showShare(platform, mAudioDetail.getAlbum().get(0).getTitle(), mAudioDetail.getTitle(), mAudioDetail.getAlbum().get(0).getCover(), url);
+                        }
+                    }
+
+                    @Override
+                    public void poster() {
+                    }
+
+                    @Override
+                    public void report() {
+                        if (User.getInstance() == null) {
+                            Intent it = new Intent(AudioDetailActivity.this, NewLoginActivity.class);
+                            it.putExtra("jump_url", ServerInfo.h5IP + "/audios/" + mAudioId);
+                            startActivityForResult(it, REQUEST_LOGIN);
+                        } else {
+                            Intent it = new Intent(AudioDetailActivity.this, ReportActivity.class);
+                            it.putExtra("id", "" + mAudioDetail.getId());
+                            startActivityForResult(it, REQUEST_REPORT);
+                        }
+                    }
+
+                    @Override
+                    public void copyLink() {
+//获取剪贴板管理器：
+                    }
+
+                    @Override
+                    public void refresh() {
+                        init();
+                    }
+
+                    @Override
+                    public void collectContent() {
+                    }
+                });
+                dialog.show(getSupportFragmentManager(), "ShareDialog");
+            }
+        });
         init();
     }
 
@@ -269,81 +331,13 @@ public class AudioDetailActivity extends AppCompatActivity implements Handler.Ca
     }
 
     private void init() {
+
         refreshLayout.setRefreshFooter(new ClassicsFooter(this));//设置
         mNetPlay = SharedPreferencesUtils.getIntValue(SettingActivity.NET_PLAY, 0);
         mNeedTipPlay = SharedPreferencesUtils.getIntValue(SettingActivity.NEED_TIP_PLAY, 0);
         mHandler = new Handler(this);
         EventBus.getDefault().register(this);
         mAudioId = getIntent().getIntExtra("audioId", 0);
-        activityTitle.setMoreAction(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mAudioDetail != null) {
-                    ShareDialog dialog = ShareDialog.getInstance(false, mAudioDetail.getIs_user_report() == 0 ? false : true);
-                    dialog.setIsHideSecondGroup(false);
-                    dialog.setIsShowPosterButton(false);
-                    dialog.setIsShowReport(true);
-                    dialog.setIsShowCollect(false);
-                    dialog.setIsShowCopyLink(false);
-                    dialog.setIsShowFontSize(false);
-                    dialog.setIsShowRefresh(false);
-                    dialog.setShareHandler(new ShareDialog.ShareHandler() {
-                        @Override
-                        public void onShare(String platform) {
-                            if (mAudioDetail != null) {
-                                String url;
-                                if (User.getInstance() != null) {
-                                    url = ServerInfo.h5IP + "/audios/" + mAudioId + "?from_user_id=" + User.getInstance().getId() + "&from_url=" + ServerInfo.h5IP + "/audios/" + mAudioId;
-                                } else {
-                                    url = ServerInfo.h5IP + "/audios/" + mAudioId + "?from_url=" + ServerInfo.h5IP + "/audios/" + mAudioId;
-                                }
-                                showShare(platform, mAudioDetail.getAlbum().get(0).getTitle(), mAudioDetail.getTitle(), mAudioDetail.getAlbum().get(0).getCover(), url);
-                            }
-                        }
-
-                        @Override
-                        public void poster() {
-                        }
-
-                        @Override
-                        public void report() {
-                            if (User.getInstance() == null) {
-                                Intent it = new Intent(AudioDetailActivity.this, NewLoginActivity.class);
-                                it.putExtra("jump_url", ServerInfo.h5IP + "/audios/" + mAudioId);
-                                startActivityForResult(it, REQUEST_LOGIN);
-                            } else {
-                                Intent it = new Intent(AudioDetailActivity.this, ReportActivity.class);
-                                it.putExtra("id", "" + mAudioDetail.getId());
-                                startActivityForResult(it, REQUEST_REPORT);
-                            }
-                        }
-
-                        @Override
-                        public void copyLink() {
-//获取剪贴板管理器：
-                        }
-
-                        @Override
-                        public void refresh() {
-                            init();
-                        }
-
-                        @Override
-                        public void collectContent() {
-                        }
-                    });
-                    dialog.show(getSupportFragmentManager(), "ShareDialog");
-//                    String url;
-//                    if(User.getInstance()!=null){
-//                        url=ServerInfo.h5IP + "/audios/" + mAudioId+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP + "/audios/" + mAudioId;
-//                    }else{
-//                        url=ServerInfo.h5IP + "/audios/" + mAudioId+"?from_url="+ServerInfo.h5IP + "/audios/" + mAudioId;
-//                    }
-//
-//                    showShare(mAudioDetail.getAlbum().get(0).getTitle(), mAudioDetail.getTitle(), mAudioDetail.getAlbum().get(0).getCover(), url);
-                }
-            }
-        });
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mAdapter = new AudioRecyclerAdapter(this);
         DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);

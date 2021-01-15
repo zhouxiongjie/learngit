@@ -1,27 +1,31 @@
 package com.shuangling.software.activity;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import com.google.android.material.tabs.TabLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.android.material.tabs.TabLayout;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
-import com.shuangling.software.customview.TopTitleBar;
 import com.shuangling.software.dialog.ShareDialog;
 import com.shuangling.software.entity.Album;
 import com.shuangling.software.entity.User;
@@ -32,11 +36,12 @@ import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
-import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.sharesdk.framework.Platform;
@@ -50,26 +55,27 @@ import cn.sharesdk.wechat.favorite.WechatFavorite;
 import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
-@EnableDragToClose()
+
+//@EnableDragToClose()
 public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Callback {
-private static final String[] category = new String[]{"简介", "节目"};
-public static final int MSG_GET_ALBUM_DETAIL = 0x1;
-public static final int MSG_SUBSCRIBE_CALLBACK = 0x2;
-public static final int REQUEST_LOGIN = 0x3;
-private static final int SHARE_SUCCESS = 0x4;
-private static final int SHARE_FAILED = 0x5;
-public static final int REQUEST_REPORT = 0x6;
-@BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+    private static final String[] category = new String[]{"简介", "节目"};
+    public static final int MSG_GET_ALBUM_DETAIL = 0x1;
+    public static final int MSG_SUBSCRIBE_CALLBACK = 0x2;
+    public static final int REQUEST_LOGIN = 0x3;
+    private static final int SHARE_SUCCESS = 0x4;
+    private static final int SHARE_FAILED = 0x5;
+    public static final int REQUEST_REPORT = 0x6;
+    @BindView(R.id.activity_title)
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.logo)
     SimpleDraweeView logo;
-    @BindView(R.id.title)
-    TextView title;
+//    @BindView(R.id.title)
+//    TextView title;
     @BindView(R.id.head)
     SimpleDraweeView head;
     @BindView(R.id.subscribe)
     TextView subscribe;
-@BindView(R.id.viewPager)
+    @BindView(R.id.viewPager)
     ViewPager viewPager;
     @BindView(R.id.name)
     TextView name;
@@ -77,96 +83,102 @@ public static final int REQUEST_REPORT = 0x6;
     TextView albumTitle;
     @BindView(R.id.tabPageIndicator)
     TabLayout tabPageIndicator;
-private Handler mHandler;
-private int mAlbumId;
+    private Handler mHandler;
+    private int mAlbumId;
     private Album mAlbum;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
     private FragmentAdapter mFragmentAdapter;
-@Override
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         setContentView(R.layout.activity_album_detail);
         super.onCreate(savedInstanceState);
-ButterKnife.bind(this);
-        CommonUtils.transparentStatusBar(this);
+        ButterKnife.bind(this);
+//        CommonUtils.transparentStatusBar(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
         mHandler = new Handler(this);
-getAlbumDetail();
-activityTitle.setMoreAction(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-if (mAlbum != null) {
-                    ShareDialog dialog = ShareDialog.getInstance( false,mAlbum.getIs_user_report() == 0 ? false : true);
-                    dialog.setIsHideSecondGroup(false);
-                    dialog.setIsShowPosterButton(false);
-                    dialog.setIsShowReport(true);
-                    dialog.setIsShowCollect(false);
-                    dialog.setIsShowCopyLink(false);
-                    dialog.setIsShowFontSize(false);
-                    dialog.setIsShowRefresh(false);
-                    dialog.setShareHandler(new ShareDialog.ShareHandler() {
-                        @Override
-                        public void onShare(String platform) {
-if (mAlbum != null) {
-String url;
-                                if(User.getInstance()!=null){
-                                    url=ServerInfo.h5IP+"/albums/"+mAlbumId+"?from_user_id="+User.getInstance().getId()+"&from_url="+ServerInfo.h5IP+"/albums/"+mAlbumId;
-                                }else{
-                                    url=ServerInfo.h5IP+"/albums/"+mAlbumId+"?from_url="+ServerInfo.h5IP+"/albums/"+mAlbumId;
-                                }
-showShare(platform,mAlbum.getTitle(),mAlbum.getDes(),mAlbum.getCover(),url);
-}
-}
-@Override
-                        public void poster() {
-}
-@Override
-                        public void report() {
-                            if (User.getInstance() == null) {
-                                Intent it=new Intent(AlbumDetailActivity.this, NewLoginActivity.class);
-                                startActivityForResult(it, REQUEST_LOGIN);
-                            }else{
-                                Intent it=new Intent(AlbumDetailActivity.this,ReportActivity.class);
-                                it.putExtra("id",""+mAlbum.getId());
-                                startActivityForResult(it,REQUEST_REPORT);
-                            }
-}
-@Override
-                        public void copyLink() {
-}
-@Override
-                        public void refresh() {
-}
-@Override
-                        public void collectContent() {
-}
-                    });
-                    dialog.show(getSupportFragmentManager(), "ShareDialog");
-                }
-//                if(mAlbum!=null){
-//
-//                    //shareTest();
-//                }
-}
+        getAlbumDetail();
+        activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            finish();
         });
-}
-private void getAlbumDetail() {
+        activityTitle.addRightImageButton(R.drawable.ic_more, com.qmuiteam.qmui.R.id.right_icon).setOnClickListener(view -> {//
+            if (mAlbum != null) {
+                ShareDialog dialog = ShareDialog.getInstance(false, mAlbum.getIs_user_report() != 0);
+                dialog.setIsHideSecondGroup(false);
+                dialog.setIsShowPosterButton(false);
+                dialog.setIsShowReport(true);
+                dialog.setIsShowCollect(false);
+                dialog.setIsShowCopyLink(false);
+                dialog.setIsShowFontSize(false);
+                dialog.setIsShowRefresh(false);
+                dialog.setShareHandler(new ShareDialog.ShareHandler() {
+                    @Override
+                    public void onShare(String platform) {
+                        if (mAlbum != null) {
+                            String url;
+                            if (User.getInstance() != null) {
+                                url = ServerInfo.h5IP + "/albums/" + mAlbumId + "?from_user_id=" + User.getInstance().getId() + "&from_url=" + ServerInfo.h5IP + "/albums/" + mAlbumId;
+                            } else {
+                                url = ServerInfo.h5IP + "/albums/" + mAlbumId + "?from_url=" + ServerInfo.h5IP + "/albums/" + mAlbumId;
+                            }
+                            showShare(platform, mAlbum.getTitle(), mAlbum.getDes(), mAlbum.getCover(), url);
+                        }
+                    }
+
+                    @Override
+                    public void poster() {
+                    }
+
+                    @Override
+                    public void report() {
+                        if (User.getInstance() == null) {
+                            Intent it = new Intent(AlbumDetailActivity.this, NewLoginActivity.class);
+                            startActivityForResult(it, REQUEST_LOGIN);
+                        } else {
+                            Intent it = new Intent(AlbumDetailActivity.this, ReportActivity.class);
+                            it.putExtra("id", "" + mAlbum.getId());
+                            startActivityForResult(it, REQUEST_REPORT);
+                        }
+                    }
+
+                    @Override
+                    public void copyLink() {
+                    }
+
+                    @Override
+                    public void refresh() {
+                    }
+
+                    @Override
+                    public void collectContent() {
+                    }
+                });
+                dialog.show(getSupportFragmentManager(), "ShareDialog");
+            }
+        });
+    }
+
+    private void getAlbumDetail() {
         mAlbumId = getIntent().getIntExtra("albumId", 0);
-String url = ServerInfo.serviceIP + ServerInfo.getAlbumDetail + mAlbumId;
+        String url = ServerInfo.serviceIP + ServerInfo.getAlbumDetail + mAlbumId;
         OkHttpUtils.get(url, null, new OkHttpCallback(this) {
-@Override
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_GET_ALBUM_DETAIL;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
     }
-public void subscribe(final boolean subscribe) {
-String url = ServerInfo.serviceIP + ServerInfo.subscribes;
+
+    public void subscribe(final boolean subscribe) {
+        String url = ServerInfo.serviceIP + ServerInfo.subscribes;
         Map<String, String> params = new HashMap<>();
         params.put("id", "" + mAlbum.getId());
         if (subscribe) {
@@ -174,21 +186,23 @@ String url = ServerInfo.serviceIP + ServerInfo.subscribes;
         } else {
             params.put("type", "0");
         }
-OkHttpUtils.post(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_SUBSCRIBE_CALLBACK;
                 msg.arg1 = subscribe ? 1 : 0;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
-}
-@Override
+    }
+
+    @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_GET_ALBUM_DETAIL:
@@ -196,8 +210,8 @@ Message msg = Message.obtain();
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-mAlbum = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), Album.class);
-if (!TextUtils.isEmpty(mAlbum.getCover())) {
+                        mAlbum = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), Album.class);
+                        if (!TextUtils.isEmpty(mAlbum.getCover())) {
                             Uri uri = Uri.parse(mAlbum.getCover());
                             int width = (int) getResources().getDimension(R.dimen.article_right_image_width);
                             int height = width;
@@ -214,52 +228,52 @@ if (!TextUtils.isEmpty(mAlbum.getCover())) {
                                 ImageLoader.showThumb(uri, head, width, height);
                             }
                         }
-head.setOnClickListener(new View.OnClickListener() {
+                        head.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if (mAlbum.getAuthor_info() != null && mAlbum.getAuthor_info().getMerchant() != null) {
 //                                    Intent it = new Intent(AlbumDetailActivity.this, OrganizationDetailActivity.class);
 //                                    it.putExtra("organizationId", mAlbum.getAuthor_info().getMerchant().getId());
 //                                    startActivity(it);
-Intent it = new Intent(AlbumDetailActivity.this, WebViewActivity.class);
-                                    it.putExtra("url", ServerInfo.h5HttpsIP+"/orgs/"+mAlbum.getAuthor_info().getMerchant().getId());
+                                    Intent it = new Intent(AlbumDetailActivity.this, WebViewActivity.class);
+                                    it.putExtra("url", ServerInfo.h5HttpsIP + "/orgs/" + mAlbum.getAuthor_info().getMerchant().getId());
                                     startActivity(it);
                                 }
-}
+                            }
                         });
-if (mAlbum.getIs_sub() == 1) {
+                        if (mAlbum.getIs_sub() == 1) {
                             subscribe.setText(getResources().getString(R.string.has_subscribe));
                             subscribe.setActivated(false);
                         } else {
                             subscribe.setText(getResources().getString(R.string.subscribe));
                             subscribe.setActivated(true);
                         }
-subscribe.setOnClickListener(new View.OnClickListener() {
+                        subscribe.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if (User.getInstance() == null) {
-                                    Intent it=new Intent(AlbumDetailActivity.this, NewLoginActivity.class);
-                                    it.putExtra("jump_url",ServerInfo.h5IP + "/albums/"+mAlbumId);
+                                    Intent it = new Intent(AlbumDetailActivity.this, NewLoginActivity.class);
+                                    it.putExtra("jump_url", ServerInfo.h5IP + "/albums/" + mAlbumId);
                                     startActivityForResult(it, REQUEST_LOGIN);
-} else {
+                                } else {
                                     subscribe(mAlbum.getIs_sub() == 0);
                                 }
                             }
                         });
                         albumTitle.setText(mAlbum.getTitle());
                         initFragment();
-}
-} catch (Exception e) {
-}
-break;
+                    }
+                } catch (Exception e) {
+                }
+                break;
             case MSG_SUBSCRIBE_CALLBACK:
                 try {
                     String result = (String) msg.obj;
                     boolean sub = msg.arg1 == 1 ? true : false;
-JSONObject jsonObject = JSONObject.parseObject(result);
+                    JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         ToastUtils.show(jsonObject.getString("msg"));
-if (sub) {
+                        if (sub) {
                             subscribe.setText("已订阅");
                             subscribe.setActivated(false);
                             mAlbum.setIs_sub(1);
@@ -267,15 +281,16 @@ if (sub) {
                             subscribe.setText("订阅");
                             subscribe.setActivated(true);
                             mAlbum.setIs_sub(0);
-}
-}
-} catch (Exception e) {
-}
+                        }
+                    }
+                } catch (Exception e) {
+                }
                 break;
         }
         return false;
     }
-private void initFragment() {
+
+    private void initFragment() {
         if (mFragmentAdapter != null) {
             return;
         }
@@ -283,20 +298,24 @@ private void initFragment() {
         viewPager.setAdapter(mFragmentAdapter);
         tabPageIndicator.setupWithViewPager(viewPager);
         viewPager.setCurrentItem(1);
-}
-public class FragmentAdapter extends FragmentStatePagerAdapter {
-private FragmentManager fm;
-public FragmentAdapter(FragmentManager fm) {
+    }
+
+    public class FragmentAdapter extends FragmentStatePagerAdapter {
+        private FragmentManager fm;
+
+        public FragmentAdapter(FragmentManager fm) {
             super(fm);
             this.fm = fm;
         }
-@Override
+
+        @Override
         public int getCount() {
             return category.length;
         }
-@Override
+
+        @Override
         public Fragment getItem(int position) {
-if (position == 0) {
+            if (position == 0) {
                 AlbumIntroduceFragment introduceFragment = new AlbumIntroduceFragment();
                 Bundle introduceData = new Bundle();
                 introduceData.putString("introduction", mAlbum.getDes());
@@ -311,42 +330,48 @@ if (position == 0) {
                 return audiosFragment;
             }
         }
-@Override
+
+        @Override
         public CharSequence getPageTitle(int position) {
             return category[position];
         }
-@Override
+
+        @Override
         public int getItemPosition(Object object) {
             return POSITION_NONE;
         }
-@Override
+
+        @Override
         public Object instantiateItem(ViewGroup container, final int position) {
             //得到缓存的fragment
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
             return fragment;
         }
-}
-@Override
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
     }
-@Override
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_LOGIN && resultCode == Activity.RESULT_OK) {
             getAlbumDetail();
-        }else if(requestCode==REQUEST_REPORT&& resultCode == Activity.RESULT_OK){
-            if(mAlbum!=null){
+        } else if (requestCode == REQUEST_REPORT && resultCode == Activity.RESULT_OK) {
+            if (mAlbum != null) {
                 mAlbum.setIs_user_report(1);
             }
-}
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
-private void showShare(String platform,final String title, final String desc, final String logo, final String url) {
+
+    private void showShare(String platform, final String title, final String desc, final String logo, final String url) {
         final String cover;
-        if(logo.startsWith("http://")){
-            cover=logo.replace("http://","https://");
-        }else{
-            cover=logo;
+        if (logo.startsWith("http://")) {
+            cover = logo.replace("http://", "https://");
+        } else {
+            cover = logo;
         }
         OnekeyShare oks = new OnekeyShare();
         //关闭sso授权
@@ -365,23 +390,23 @@ private void showShare(String platform,final String title, final String desc, fi
             @Override
             public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
                 //点击新浪微博
-                String chanel="1";
+                String chanel = "1";
                 if (SinaWeibo.NAME.equals(platform.getName())) {
                     //限制微博分享的文字不能超过20
-                    chanel="2";
+                    chanel = "2";
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setText(title + url);
                 } else if (QQ.NAME.equals(platform.getName())) {
-                    chanel="3";
+                    chanel = "3";
                     paramsToShare.setTitle(title);
                     if (!TextUtils.isEmpty(cover)) {
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setTitleUrl(url);
                     paramsToShare.setText(desc);
-} else if (Wechat.NAME.equals(platform.getName())) {
+                } else if (Wechat.NAME.equals(platform.getName())) {
                     paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                     paramsToShare.setTitle(title);
                     paramsToShare.setUrl(url);
@@ -389,7 +414,7 @@ private void showShare(String platform,final String title, final String desc, fi
                         paramsToShare.setImageUrl(cover);
                     }
                     paramsToShare.setText(desc);
-Log.d("ShareSDK", paramsToShare.toMap().toString());
+                    Log.d("ShareSDK", paramsToShare.toMap().toString());
                 } else if (WechatMoments.NAME.equals(platform.getName())) {
                     paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
                     paramsToShare.setTitle(title);
@@ -405,7 +430,7 @@ Log.d("ShareSDK", paramsToShare.toMap().toString());
                         paramsToShare.setImageUrl(cover);
                     }
                 }
-                shareStatistics(chanel,""+mAlbum.getId(),url);
+                shareStatistics(chanel, "" + mAlbum.getId(), url);
             }
         });
         oks.setCallback(new PlatformActionListener() {
@@ -416,20 +441,23 @@ Log.d("ShareSDK", paramsToShare.toMap().toString());
                 msg.obj = arg2.getMessage();
                 mHandler.sendMessage(msg);
             }
+
             @Override
             public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
                 Message msg = Message.obtain();
                 msg.what = SHARE_SUCCESS;
                 mHandler.sendMessage(msg);
-}
+            }
+
             @Override
             public void onCancel(Platform arg0, int arg1) {
-}
+            }
         });
         // 启动分享GUI
         oks.show(this);
     }
-public void shareTest(){
+
+    public void shareTest() {
         OnekeyShare oks = new OnekeyShare();
         oks.disableSSOWhenAuthorize();
         oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
@@ -445,8 +473,8 @@ public void shareTest(){
                     //paramsToShare.setImageUrl("http://sl-cms.static.slradio.cn/merchants/1/imges/FaD108PBeCCB7mPiJy8Xyj69KfFbpXnx1552461501810.jpg");
                     paramsToShare.setUrl("http://www-cms-c.review.slradio.cn/albums/61");
                     paramsToShare.setShareType(Platform.SHARE_WEBPAGE);
-Log.d("ShareSDK", paramsToShare.toMap().toString());
-}
+                    Log.d("ShareSDK", paramsToShare.toMap().toString());
+                }
                 if ("WechatMoments".equals(platform.getName())) {
                     paramsToShare.setTitle("标题");
                     paramsToShare.setText("我是共用的参数，这几个平台都有text参数要求，提取出来啦");
@@ -466,39 +494,42 @@ Log.d("ShareSDK", paramsToShare.toMap().toString());
                     paramsToShare.setText("我是共用的参数，这几个平台都有text参数要求，提取出来啦");
                     paramsToShare.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
                 }
-                if("Twitter".equals(platform.getName())){
+                if ("Twitter".equals(platform.getName())) {
                     paramsToShare.setText("我是共用的参数，这几个平台都有text参数要求，提取出来啦");
                     paramsToShare.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
                     /*paramsToShare.setUrl("http://sharesdk.cn");*/
                 }
             }
         });
-oks.setCallback(new PlatformActionListener() {
+        oks.setCallback(new PlatformActionListener() {
             @Override
             public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
                 Log.d("ShareLogin", "onComplete ---->  分享成功");
                 platform.getName();
                 Toast.makeText(AlbumDetailActivity.this, "HHHHHHHHHH", Toast.LENGTH_SHORT).show();
             }
-@Override
+
+            @Override
             public void onError(Platform platform, int i, Throwable throwable) {
                 Log.d("ShareLogin", "onError ---->  失败" + throwable.getStackTrace());
                 Log.d("ShareLogin", "onError ---->  失败" + throwable.getMessage());
                 throwable.printStackTrace();
             }
-@Override
+
+            @Override
             public void onCancel(Platform platform, int i) {
                 Log.d("ShareLogin", "onCancel ---->  分享取消");
             }
         });
 // 启动分享GUI
         oks.show(this);
-}
-public void shareStatistics(String channel,String postId,String shardUrl) {
-String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
+    }
+
+    public void shareStatistics(String channel, String postId, String shardUrl) {
+        String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
         Map<String, String> params = new HashMap<>();
-        if(User.getInstance()!=null){
-            params.put("user_id", ""+User.getInstance().getId());
+        if (User.getInstance() != null) {
+            params.put("user_id", "" + User.getInstance().getId());
         }
         params.put("channel", channel);
         params.put("post_id", postId);
@@ -506,14 +537,15 @@ String url = ServerInfo.serviceIP + ServerInfo.shareStatistics;
         params.put("type", "1");
         params.put("shard_url", shardUrl);
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
-@Override
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-                Log.i("test",response);
+                Log.i("test", response);
             }
-@Override
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-                Log.i("test",exception.toString());
-}
+                Log.i("test", exception.toString());
+            }
         });
-}
+    }
 }

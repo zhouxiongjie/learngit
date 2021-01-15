@@ -42,6 +42,7 @@ import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.shuangling.software.MyApplication;
@@ -145,12 +146,9 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live_detail);
-        //CommonUtils.setTransparentStatusBar(this);
-        //ImmersionBar.with(this).transparentBar().titleBar(activityTitle).init();
-        //ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).init();
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
         ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).keyboardEnable(true)  //解决软键盘与底部输入框冲突问题，默认为false，还有一个重载方法，可以指定软键盘mode
                 .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING).init();
-        //ImmersionBar.with(this).statusBarDarkFont(true);
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
         init();
@@ -173,8 +171,6 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         initAliyunPlayerView();
         getLiveDetail();
         getAdvertises();
-//getDetail();
-//joinChannel();
     }
 
     private void getMenus() {
@@ -788,13 +784,22 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         }
     }
 
+//    @Override
+//    public void onBackPressed() {
+//        if (aliyunVodPlayerView != null) {
+//            aliyunVodPlayerView.onDestroy();
+//            aliyunVodPlayerView = null;
+//        }
+//        super.onBackPressed();
+//    }
+
     @Override
-    public void onBackPressed() {
+    protected void doOnBackPressed() {
         if (aliyunVodPlayerView != null) {
             aliyunVodPlayerView.onDestroy();
             aliyunVodPlayerView = null;
         }
-        super.onBackPressed();
+        super.doOnBackPressed();
     }
 
     @Override

@@ -13,7 +13,7 @@
         <com.qmuiteam.qmui.widget.QMUITopBarLayout
             android:id="@+id/activtyTitle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="?attr/qmui_topbar_height"
             android:fitsSystemWindows="true" />
 
         <!--动态承载WebView的容器-->

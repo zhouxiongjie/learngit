@@ -227,6 +227,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
                     Intent it = new Intent(getContext(), /*WebViewActivity*/WebViewBackActivity.class);
                     it.putExtra("url", ServerInfo.h5HttpsIP + "/publish");
                     it.putExtra("title", "我的发布");
+                    it.putExtra("addParams", true);
                     startActivity(it);
                 } else {
                     Intent it = new Intent(getContext(), NewLoginActivity.class);
@@ -263,6 +264,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
                     Intent it = new Intent(getContext(), WebViewBackActivity.class);
                     it.putExtra("url", ServerInfo.activity + "my-prize");
                     it.putExtra("title", "奖品");
+                    it.putExtra("addParams", true);
                     startActivity(it);
                 } else {
                     Intent it = new Intent(getContext(), NewLoginActivity.class);
@@ -273,6 +275,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
                 Intent it = new Intent(getContext(), WebViewBackActivity.class);
                 it.putExtra("url", ServerInfo.h5IP + "/about");
                 it.putExtra("title", "关于我们");
+                it.putExtra("addParams", true);
                 startActivity(it);
                 break;
         }

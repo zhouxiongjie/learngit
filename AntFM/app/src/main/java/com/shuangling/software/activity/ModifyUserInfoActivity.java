@@ -43,8 +43,10 @@ import com.bigkoo.pickerview.view.OptionsPickerView;
 import com.bigkoo.pickerview.view.TimePickerView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.qmuiteam.qmui.arch.QMUIFragmentActivity;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -94,15 +96,15 @@ import okhttp3.Call;
 
 import static android.os.Environment.DIRECTORY_PICTURES;
 
-@EnableDragToClose()
-public class ModifyUserInfoActivity extends QMUIFragmentActivity implements Handler.Callback, OSSCompletedCallback<PutObjectRequest, PutObjectResult> {
+//@EnableDragToClose()
+public class ModifyUserInfoActivity extends QMUIActivity/*QMUIFragmentActivity*/ implements Handler.Callback, OSSCompletedCallback<PutObjectRequest, PutObjectResult> {
     public static final String TAG = ModifyUserInfoActivity.class.getName();
     private static final int CHOOSE_PHOTO = 0x0;
     private static final int TACK_PHOTO = 0x1;
     private static final int CUT_OK = 0x02;
     private static final int MSG_UPLOAD_HEAD = 0x03;
     @BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+    /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.head)
     SimpleDraweeView head;
     @BindView(R.id.headRightIcon)
@@ -146,8 +148,12 @@ public class ModifyUserInfoActivity extends QMUIFragmentActivity implements Hand
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modify_userinfo);
-        CommonUtils.transparentStatusBar(this);
+//        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
+            finish();
+        });
+        activityTitle.setTitle("编辑资料");
         init();
         initCity();
         getOSSinfo();

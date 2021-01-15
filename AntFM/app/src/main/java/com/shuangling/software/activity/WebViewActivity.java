@@ -28,6 +28,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.WebProgress;
@@ -77,8 +79,8 @@ import okhttp3.Call;
  * 机构、作者的首页，显示作者信息、关注按钮、文章等列表
  *
  */
-@EnableDragToClose()
-public class WebViewActivity extends AppCompatActivity implements Handler.Callback {
+//@EnableDragToClose()
+public class WebViewActivity extends QMUIActivity implements Handler.Callback {
     private static final int LOGIN_RESULT = 0x1;
     public static final int MSG_GET_DETAIL = 0x2;
     private static final int SHARE_SUCCESS = 0x3;
@@ -102,7 +104,8 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_webview);
-        CommonUtils.transparentStatusBar(this);
+        //CommonUtils.transparentStatusBar(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this);
         ButterKnife.bind(this);
         FrameLayout fl_content = findViewById(R.id.fl_web_container);
         webView = PreloadWebView.getInstance().getWebView(this);
@@ -783,12 +786,21 @@ public class WebViewActivity extends AppCompatActivity implements Handler.Callba
         oks.show(this);
     }
 
+//    @Override
+//    public void onBackPressed() {
+//        if (webView.canGoBack()) {
+//            webView.goBack();
+//        } else {
+//            super.onBackPressed();
+//        }
+//    }
+
     @Override
-    public void onBackPressed() {
+    protected void doOnBackPressed() {
         if (webView.canGoBack()) {
             webView.goBack();
         } else {
-            super.onBackPressed();
+            super.doOnBackPressed();
         }
     }
 

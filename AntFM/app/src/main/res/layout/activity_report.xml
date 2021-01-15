@@ -4,20 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:background="@color/white"
     android:orientation="vertical">
 
 
-    <com.shuangling.software.customview.TopTitleBar
-        android:id="@+id/activity_title"
+<!--    <com.shuangling.software.customview.TopTitleBar-->
+<!--        android:id="@+id/activity_title"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:canBack="true"-->
+<!--        app:titleText="举报" />-->
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:canBack="true"
-        app:titleText="举报" />
+        android:fitsSystemWindows="true" />
 
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
+
         android:background="@color/divideColorOne" />
 
     <ScrollView

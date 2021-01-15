@@ -23,6 +23,8 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabLayout;
 import com.hjq.toast.ToastUtils;
 import com.jaeger.library.StatusBarUtil;
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.SearchHistoryGridViewAdapter;
@@ -44,8 +46,8 @@ import butterknife.OnClick;
 //import androidx.fragment.app.Fragment;
 //import androidx.appcompat.app.AppCompatActivity;
 
-@EnableDragToClose()
-public class SearchActivity01 extends AppCompatActivity {
+//@EnableDragToClose()
+public class SearchActivity01 extends QMUIActivity {
     public static final String TAG = "SearchActivity";
     private static final int[] searchCategory = new int[]{R.string.all, R.string.article, R.string.video, R.string.little_video, R.string.audio, R.string.album, R.string.photo, R.string.special, R.string.organization, R.string.anchor, R.string.tv, R.string.radio};
     @BindView(R.id.searchCancel)
@@ -86,8 +88,9 @@ public class SearchActivity01 extends AppCompatActivity {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search01);
-        StatusBarUtil.setTransparent(this);
-        CommonUtils.transparentStatusBar(this);
+        //StatusBarUtil.setTransparent(this);
+        //CommonUtils.transparentStatusBar(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this);
         ButterKnife.bind(this);
         init();
     }

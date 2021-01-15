@@ -27,8 +27,8 @@ import butterknife.OnClick;
 import okhttp3.Call;
 @EnableDragToClose()
 public class PhoneBindActivity extends AppCompatActivity implements Handler.Callback {
-public static final String TAG = PhoneBindActivity.class.getName();
-private static final int MSG_GET_VERIFY_CODE=4;
+    public static final String TAG = PhoneBindActivity.class.getName();
+    private static final int MSG_GET_VERIFY_CODE=4;
     @BindView(R.id.activity_title)
     TopTitleBar activityTitle;
     @BindView(R.id.phoneNum)
@@ -37,37 +37,37 @@ private static final int MSG_GET_VERIFY_CODE=4;
     TextView changePhone;
     @BindView(R.id.root)
     LinearLayout root;
-private DialogFragment mDialogFragment;
-private Handler mHandler;
-@Override
+    private DialogFragment mDialogFragment;
+    private Handler mHandler;
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_phone_bind);
+        setContentView(R.layout.activity_phone_bind);
         CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
-init();
+        init();
     }
-private void init() {
+    private void init() {
         mHandler = new Handler(this);
         String phone=""+User.getInstance().getPhone();
         String sub=phone.substring(3,7);
         phoneNum.setText(phone.replace(sub,"****"));
-}
-private void getVerifyCode(String phone) {
+    }
+    private void getVerifyCode(String phone) {
         mDialogFragment=CommonUtils.showLoadingDialog(getSupportFragmentManager());
-String url = ServerInfo.serviceIP + ServerInfo.getVerifyCode;
+        String url = ServerInfo.serviceIP + ServerInfo.getVerifyCode;
         Map<String, String> params = new HashMap<String, String>();
         params.put("module", "update_phone");
         params.put("phone", phone);
-OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
+                Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+            @Override
             public void onFailure(final Call call, Exception exception) {
                 mHandler.post(new Runnable() {
                     @Override
@@ -76,13 +76,13 @@ Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
                             mDialogFragment.dismiss();
                             ToastUtils.show("获取验证码请求异常");
                         }catch (Exception e){
-}
-}
+                        }
+                    }
                 });
-}
+            }
         });
     }
-@Override
+    @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_GET_VERIFY_CODE: {
@@ -91,7 +91,7 @@ Message msg = mHandler.obtainMessage(MSG_GET_VERIFY_CODE);
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-Intent it=new Intent(this,VerifyCodeLoginActivity.class);
+                        Intent it=new Intent(this,VerifyCodeLoginActivity.class);
                         it.putExtra("PhoneNumber",""+User.getInstance().getPhone());
                         it.putExtra("PageCategory", VerifyCodeLoginActivity.PageCategory.VerifyBindPhone.ordinal());
                         startActivity(it);
@@ -102,14 +102,14 @@ Intent it=new Intent(this,VerifyCodeLoginActivity.class);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-}
+            }
             break;
             default:
                 break;
-}
+        }
         return false;
     }
-@OnClick(R.id.changePhone)
+    @OnClick(R.id.changePhone)
     public void onViewClicked() {
         getVerifyCode(""+User.getInstance().getPhone());
     }

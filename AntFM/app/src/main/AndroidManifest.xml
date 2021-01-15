@@ -162,11 +162,6 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait" >
         </activity>
-        <activity
-            android:name=".activity.SingleAudioDetailActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait" >
-        </activity>
 
 
         <activity
@@ -216,10 +211,6 @@
             android:windowSoftInputMode="stateVisible|adjustResize">
         </activity>
 
-        <activity
-            android:name=".activity.VerifyCodeLoginActivity"
-            android:screenOrientation="portrait" >
-        </activity>
         <activity
             android:name=".activity.NewVerifyCodeLoginActivity"
             android:screenOrientation="portrait"
@@ -295,11 +286,12 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".activity.PhoneBindActivity"
+            android:name=".activity.NewPhoneBindActivity"
             android:screenOrientation="portrait" >
         </activity>
+
         <activity
-            android:name=".activity.NewPhoneBindActivity"
+            android:name=".activity.PhoneBindActivity"
             android:screenOrientation="portrait" >
         </activity>
         <activity

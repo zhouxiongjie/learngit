@@ -1,4 +1,5 @@
 package com.shuangling.software.activity;
+
 import android.os.Bundle;
 //import com.google.android.material.tabs.TabLayout;
 //import androidx.fragment.app.Fragment;
@@ -21,9 +22,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
 import com.google.android.material.tabs.TabLayout;
 import com.hjq.toast.ToastUtils;
 import com.jaeger.library.StatusBarUtil;
+import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.LineWrapLayout;
@@ -32,16 +35,19 @@ import com.shuangling.software.entity.SearchHistory;
 import com.shuangling.software.fragment.SearchListFragment;
 import com.shuangling.software.utils.CommonUtils;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-@EnableDragToClose()
-public class SearchActivity extends AppCompatActivity {
-public static final String TAG = "SearchActivity";
-private static final int[] searchCategory = new int[]{R.string.all,R.string.article,R.string.video,R.string.little_video,R.string.audio,R.string.album,R.string.photo,R.string.special,R.string.organization,R.string.anchor,R.string.tv,R.string.radio};
-@BindView(R.id.searchCancel)
+
+//@EnableDragToClose()
+public class SearchActivity extends QMUIActivity {
+    public static final String TAG = "SearchActivity";
+    private static final int[] searchCategory = new int[]{R.string.all, R.string.article, R.string.video, R.string.little_video, R.string.audio, R.string.album, R.string.photo, R.string.special, R.string.organization, R.string.anchor, R.string.tv, R.string.radio};
+    @BindView(R.id.searchCancel)
     TextView searchCancel;
     @BindView(R.id.keyword)
     EditText keyword;
@@ -57,27 +63,30 @@ private static final int[] searchCategory = new int[]{R.string.all,R.string.arti
     ViewPager viewPager;
     @BindView(R.id.searchResult)
     LinearLayout searchResult;
-private FragmentAdapter mFragmentPagerAdapter;
-@Override
+    private FragmentAdapter mFragmentPagerAdapter;
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_search);
-        StatusBarUtil.setTransparent(this);
+        setContentView(R.layout.activity_search);
+        //StatusBarUtil.setTransparent(this);
         CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
-init();
-}
-private void updateSearchHistory(){
+        init();
+    }
+
+    private void updateSearchHistory() {
         //加载历史记录
-        List<SearchHistory> history =SearchHistoryDaoUtils.queryAll();
+        List<SearchHistory> history = SearchHistoryDaoUtils.queryAll();
         List<String> data = new ArrayList<>();
-        for(int i=0;i<history.size();i++){
-            data.add(history.get(i).getHistoryString()) ;
+        for (int i = 0; i < history.size(); i++) {
+            data.add(history.get(i).getHistoryString());
         }
         historyList.setData(data);
     }
-private void init() {
+
+    private void init() {
         mFragmentPagerAdapter = new FragmentAdapter(getSupportFragmentManager());
         viewPager.setAdapter(mFragmentPagerAdapter);
         tabPageIndicator.setupWithViewPager(viewPager);
@@ -86,33 +95,33 @@ private void init() {
         historyList.setOnItemClickListener(new LineWrapLayout.OnItemClickListener() {
             @Override
             public void onClick(View view) {
-                String kw=((TextView) view).getText().toString();
+                String kw = ((TextView) view).getText().toString();
                 CommonUtils.hideInput(SearchActivity.this);
                 keyword.clearFocus();
                 //开始搜索
                 keyword.setText(kw);
                 searchResult.setVisibility(View.VISIBLE);
                 mFragmentPagerAdapter.notifyDataSetChanged();
-}
+            }
         });
-keyword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        keyword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH){
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     CommonUtils.hideInput(SearchActivity.this);
                     keyword.clearFocus();
-                    String str=v.getText().toString();
-                    if(str.length()>0){
+                    String str = v.getText().toString();
+                    if (str.length() > 0) {
                         //1.添加历史记录
                         //2.返回跟上一个页面搜索关键字
                         SearchHistory searchHistory;
-List<SearchHistory> list=SearchHistoryDaoUtils.queryAll(str);
-                        if(list.size()>0){
-                            searchHistory=list.get(0);
+                        List<SearchHistory> list = SearchHistoryDaoUtils.queryAll(str);
+                        if (list.size() > 0) {
+                            searchHistory = list.get(0);
                             searchHistory.setHistoryString(str);
                             searchHistory.setCreateTime(CommonUtils.getDateTimeString());
-                        }else{
-                            searchHistory=new SearchHistory();
+                        } else {
+                            searchHistory = new SearchHistory();
                             searchHistory.setHistoryString(str);
                             searchHistory.setCreateTime(CommonUtils.getDateTimeString());
                         }
@@ -120,10 +129,10 @@ List<SearchHistory> list=SearchHistoryDaoUtils.queryAll(str);
                         //开始搜索
                         searchResult.setVisibility(View.VISIBLE);
                         mFragmentPagerAdapter.notifyDataSetChanged();
-}else{
+                    } else {
                         ToastUtils.show("请输入搜索关键字");
                     }
-return true;
+                    return true;
                 }
                 return false;
             }
@@ -131,13 +140,15 @@ return true;
         keyword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-}
-@Override
+            }
+
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
-@Override
+
+            @Override
             public void afterTextChanged(Editable s) {
-                if(TextUtils.isEmpty(s.toString())){
+                if (TextUtils.isEmpty(s.toString())) {
                     searchResult.setVisibility(View.GONE);
                     updateSearchHistory();
                 }
@@ -145,7 +156,8 @@ return true;
         });
         keyword.requestFocus();
     }
-@OnClick({R.id.searchCancel, R.id.clean})
+
+    @OnClick({R.id.searchCancel, R.id.clean})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.searchCancel:
@@ -154,43 +166,50 @@ return true;
                 break;
             case R.id.clean:
                 SearchHistoryDaoUtils.cleanAll();
-List<SearchHistory> history =SearchHistoryDaoUtils.queryAll();
+                List<SearchHistory> history = SearchHistoryDaoUtils.queryAll();
                 List<String> data = new ArrayList<String>();
-                for(int i=0;i<history.size();i++){
-                    data.add(history.get(i).getHistoryString()) ;
+                for (int i = 0; i < history.size(); i++) {
+                    data.add(history.get(i).getHistoryString());
                 }
                 historyList.setData(data);
                 break;
         }
     }
-public class FragmentAdapter extends FragmentStatePagerAdapter {
-private FragmentManager fm;
-public FragmentAdapter(FragmentManager fm) {
+
+    public class FragmentAdapter extends FragmentStatePagerAdapter {
+        private FragmentManager fm;
+
+        public FragmentAdapter(FragmentManager fm) {
             super(fm);
             this.fm = fm;
         }
-@Override
+
+        @Override
         public int getCount() {
             return searchCategory.length;
         }
-@Override
+
+        @Override
         public Fragment getItem(int position) {
-SearchListFragment fragment = new SearchListFragment();
+            SearchListFragment fragment = new SearchListFragment();
             Bundle bundle = new Bundle();
             bundle.putInt("search_type", searchCategory[position]);
             bundle.putString("keyword", keyword.getText().toString());
             fragment.setArguments(bundle);
             return fragment;
         }
-@Override
+
+        @Override
         public CharSequence getPageTitle(int position) {
             return getResources().getString(searchCategory[position]);
         }
-@Override
+
+        @Override
         public int getItemPosition(Object object) {
             return POSITION_NONE;
         }
-@Override
+
+        @Override
         public Object instantiateItem(ViewGroup container, final int position) {
             //得到缓存的fragment
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
@@ -207,5 +226,5 @@ SearchListFragment fragment = new SearchListFragment();
 //            ft.commit();
             return fragment;
         }
-}
+    }
 }

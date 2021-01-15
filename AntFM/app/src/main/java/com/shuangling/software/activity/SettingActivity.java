@@ -36,7 +36,10 @@ import com.mylhyl.circledialog.callback.ConfigTitle;
 import com.mylhyl.circledialog.params.DialogParams;
 import com.mylhyl.circledialog.params.ItemsParams;
 import com.mylhyl.circledialog.params.TitleParams;
+import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
@@ -76,13 +79,15 @@ import okhttp3.Call;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
-@EnableDragToClose()
-public class SettingActivity extends AppCompatActivity {
+//@EnableDragToClose()
+public class SettingActivity extends QMUIActivity {
     public static final String NET_LOAD = "net_load";
     public static final String NET_PLAY = "net_play";
     public static final String NEED_TIP_PLAY = "need_tip_play";
-    @BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+    //    @BindView(R.id.activity_title)
+//    TopTitleBar activityTitle;
+    @BindView(R.id.topbar)
+    QMUITopBarLayout mTopBar;
     @BindView(R.id.cacheSize)
     TextView cacheSize;
     @BindView(R.id.clearCache)
@@ -116,12 +121,13 @@ public class SettingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
         setContentView(R.layout.activity_setting);
-        CommonUtils.transparentStatusBar(this);
+        //CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
     }
 
     private void init() {
+        initTopBar();
         mHandler = new Handler(getMainLooper());
         version.setText("V" + getVersionName());
         if (MyApplication.getInstance().findNewVerison) {
@@ -156,6 +162,30 @@ public class SettingActivity extends AppCompatActivity {
         } catch (Exception e) {
             cacheSize.setText("0KB");
         }
+    }
+
+    private void initTopBar() {
+
+        QMUIStatusBarHelper.setStatusBarLightMode(this);
+
+        mTopBar.setTitle("设置");
+
+
+        mTopBar.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+//        mTopBar.addRightImageButton(R.drawable.ic_more, com.qmuiteam.qmui.R.id.right_icon).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -262,7 +292,7 @@ public class SettingActivity extends AppCompatActivity {
                                 netLoadDesc.setText(items[position]);
                             }
                         });
-                for(int i=0;i<items.length;i++){
+                for (int i = 0; i < items.length; i++) {
                     builder.addItem(items[i]);
                 }
                 builder.build().show();
@@ -322,7 +352,7 @@ public class SettingActivity extends AppCompatActivity {
                                 netPlayDesc.setText(items[position]);
                             }
                         });
-                for(int i=0;i<items.length;i++){
+                for (int i = 0; i < items.length; i++) {
                     builder.addItem(items[i]);
                 }
                 builder.build().show();

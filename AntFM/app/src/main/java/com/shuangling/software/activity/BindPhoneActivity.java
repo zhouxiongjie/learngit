@@ -312,7 +312,7 @@ public class BindPhoneActivity extends QMUIActivity/*AppCompatActivity*/ impleme
     @Override
     protected void doOnBackPressed() {
         if (User.getInstance() != null) {
-            super.onBackPressed();
+            super.doOnBackPressed();
         }
     }
 

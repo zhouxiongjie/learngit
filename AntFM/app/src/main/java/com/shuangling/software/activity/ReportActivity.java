@@ -28,6 +28,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hjq.toast.ToastUtils;
 import com.previewlibrary.GPreviewBuilder;
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.arch.QMUIFragment;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.FontIconView;
@@ -61,10 +65,12 @@ import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
-public class ReportActivity extends AppCompatActivity {
+public class ReportActivity extends QMUIActivity {
     private static final int CHOOSE_PHOTO = 0x0;
-    @BindView(R.id.activity_title)
-    TopTitleBar activityTitle;
+//    @BindView(R.id.activity_title)
+//    TopTitleBar activityTitle;
+    @BindView(R.id.topbar)
+    QMUITopBarLayout mTopBar;
     @BindView(R.id.reason)
     MyGridView reason;
     @BindView(R.id.desc)
@@ -89,11 +95,12 @@ public class ReportActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
         ButterKnife.bind(this);
-        CommonUtils.transparentStatusBar(this);
+        //CommonUtils.transparentStatusBar(this);
         init();
     }
 
     private void init() {
+        initTopBar();
         mId = getIntent().getStringExtra("id");
         getReason();
         desc.addTextChangedListener(new TextWatcher() {
@@ -112,6 +119,28 @@ public class ReportActivity extends AppCompatActivity {
         });
         mMaterialGridAdapter = new MaterialGridAdapter(this);
         material.setAdapter(mMaterialGridAdapter);
+    }
+
+    private void initTopBar() {
+        mTopBar.setTitle("举报");
+        QMUIStatusBarHelper.setStatusBarLightMode(this);
+
+
+        mTopBar.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+//        mTopBar.addRightImageButton(R.drawable.ic_more, com.qmuiteam.qmui.R.id.right_icon).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+
+
     }
 
     private void getReason() {
@@ -422,6 +451,7 @@ public class ReportActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // TODO Auto-generated method stub
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CHOOSE_PHOTO) {
             if (resultCode == RESULT_OK && data != null) {
                 List<String> paths = Matisse.obtainPathResult(data);

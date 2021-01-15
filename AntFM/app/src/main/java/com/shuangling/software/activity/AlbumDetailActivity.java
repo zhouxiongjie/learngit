@@ -36,7 +36,6 @@ import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,7 +55,6 @@ import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 
-//@EnableDragToClose()
 public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Callback {
     private static final String[] category = new String[]{"简介", "节目"};
     public static final int MSG_GET_ALBUM_DETAIL = 0x1;
@@ -67,6 +65,7 @@ public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Ca
     public static final int REQUEST_REPORT = 0x6;
     @BindView(R.id.activity_title)
     /*TopTitleBar*/ QMUITopBarLayout activityTitle;
+
     @BindView(R.id.logo)
     SimpleDraweeView logo;
 //    @BindView(R.id.title)
@@ -95,6 +94,7 @@ public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Ca
         setContentView(R.layout.activity_album_detail);
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
+
 //        CommonUtils.transparentStatusBar(this);
         QMUIStatusBarHelper.setStatusBarLightMode(this); //
         mHandler = new Handler(this);

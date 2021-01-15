@@ -2,6 +2,7 @@ package com.shuangling.software.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -485,8 +487,12 @@ public class ColumnDecorateVideoContentAdapter extends RecyclerView.Adapter impl
                 int spanSize = manager.getSpanSizeLookup().getSpanSize(position);
                 if (maxSpanCount == 2 && spanSize == 1) {
                     videoViewHolder.playIcon.setVisibility(View.GONE);
+                    Drawable drawableLeft = ContextCompat.getDrawable(mContext, R.drawable.video_play_icon01);
+                    videoViewHolder.duration.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, null, null, null);
+
                 } else {
                     videoViewHolder.playIcon.setVisibility(View.VISIBLE);
+                    videoViewHolder.duration.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                 }
             }
             videoViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
@@ -554,7 +560,8 @@ public class ColumnDecorateVideoContentAdapter extends RecyclerView.Adapter impl
             gallerieOneViewHolder.title.setText(content.getTitle());
             //gallerieOneViewHolder.commentNum.setText("" + content.getComment() + "评论");
             CommonUtils.setReadsAndComment(gallerieOneViewHolder.commentNum, content.getComment(), content.getView());
-            gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
+            //gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
+            gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "");
             gallerieOneViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -615,7 +622,8 @@ public class ColumnDecorateVideoContentAdapter extends RecyclerView.Adapter impl
             gallerieViewThreeHolder.title.setText(content.getTitle());
             //gallerieViewThreeHolder.commentNum.setText("" + content.getComment() + "评论");
             CommonUtils.setReadsAndComment(gallerieViewThreeHolder.commentNum, content.getComment(), content.getView());
-            gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
+            //gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
+            gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "");
             gallerieViewThreeHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

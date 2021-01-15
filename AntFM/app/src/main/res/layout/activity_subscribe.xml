@@ -4,21 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="@color/white"
     android:orientation="vertical">
 
-    <!--<com.shuangling.software.customview.TopTitleBar
-        android:id="@+id/activtyTitle"
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:canBack="true"
-        app:moreText=""
-        app:titleText="我的订阅" />-->
-    <com.qmuiteam.qmui.widget.QMUITopBarLayout
-        android:id="@+id/activity_title"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/qmui_topbar_height"/>
+        android:fitsSystemWindows="true" />
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

@@ -39,6 +39,7 @@ import okhttp3.Call;
 public class PhoneBindActivity extends QMUIActivity/*AppCompatActivity*/ implements Handler.Callback {
     public static final String TAG = PhoneBindActivity.class.getName();
     private static final int MSG_GET_VERIFY_CODE = 4;
+
     @BindView(R.id.activity_title)
     /*TopTitleBar*/ QMUITopBarLayout activityTitle;
     @BindView(R.id.phoneNum)
@@ -95,13 +96,13 @@ public class PhoneBindActivity extends QMUIActivity/*AppCompatActivity*/ impleme
                             mDialogFragment.dismiss();
                             ToastUtils.show("获取验证码请求异常");
                         } catch (Exception e) {
+
                         }
                     }
                 });
             }
         });
     }
-
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
@@ -113,6 +114,7 @@ public class PhoneBindActivity extends QMUIActivity/*AppCompatActivity*/ impleme
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         Intent it = new Intent(this, VerifyCodeLoginActivity.class);
                         it.putExtra("PhoneNumber", "" + User.getInstance().getPhone());
+
                         it.putExtra("PageCategory", VerifyCodeLoginActivity.PageCategory.VerifyBindPhone.ordinal());
                         startActivity(it);
                         finish();
@@ -129,7 +131,6 @@ public class PhoneBindActivity extends QMUIActivity/*AppCompatActivity*/ impleme
         }
         return false;
     }
-
     @OnClick(R.id.changePhone)
     public void onViewClicked() {
         getVerifyCode("" + User.getInstance().getPhone());

@@ -72,7 +72,7 @@ android {
             storeFile file("../keystore/yjhlq.jks")
             storePassword "123456"
             keyAlias "yjhlq"
-            keyPassword "123456"
+            keyPassword "123456" 
         }
         fcg {
             storeFile file("../keystore/fcg.jks")

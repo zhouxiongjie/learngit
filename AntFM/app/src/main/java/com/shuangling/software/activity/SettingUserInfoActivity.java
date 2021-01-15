@@ -73,14 +73,15 @@ import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
 import static android.os.Environment.DIRECTORY_PICTURES;
+
 @EnableDragToClose()
 public class SettingUserInfoActivity extends AppCompatActivity implements Handler.Callback, OSSCompletedCallback<PutObjectRequest, PutObjectResult> {
-public static final String TAG = SettingUserInfoActivity.class.getName();
-private static final int CHOOSE_PHOTO = 0x0;
+    public static final String TAG = SettingUserInfoActivity.class.getName();
+    private static final int CHOOSE_PHOTO = 0x0;
     private static final int TACK_PHOTO = 0x1;
     private static final int CUT_OK = 0x02;
     private static final int MSG_UPLOAD_HEAD = 0x03;
-@BindView(R.id.head)
+    @BindView(R.id.head)
     SimpleDraweeView head;
     @BindView(R.id.nickName)
     EditText nickName;
@@ -90,104 +91,113 @@ private static final int CHOOSE_PHOTO = 0x0;
     FontIconView eye;
     @BindView(R.id.confirm)
     Button confirm;
-private File tempFile;
+    private File tempFile;
     private Handler mHandler;
-private OssInfo mOssInfo;
+    private OssInfo mOssInfo;
     //OSS的上传下载
     private OssService mOssService;
     private Map<String, String> mUserInfo = new HashMap<>();
     private Uri uritempFile;
-    private boolean mPasswordVisible=false;
-@Override
+    private boolean mPasswordVisible = false;
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting_userinfo);
         CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
-        mHandler=new Handler(this);
+        mHandler = new Handler(this);
         AppManager.addActivity(this);
         init();
         getOSSinfo();
     }
-private void init() {
+
+    private void init() {
         nickName.setText("");
-        if (User.getInstance()!=null&&!TextUtils.isEmpty(User.getInstance().getAvatar())) {
+        if (User.getInstance() != null && !TextUtils.isEmpty(User.getInstance().getAvatar())) {
             Uri uri = Uri.parse(User.getInstance().getAvatar());
             ImageLoader.showThumb(uri, head, CommonUtils.dip2px(120), CommonUtils.dip2px(120));
         }
         confirm.setEnabled(false);
-nickName.addTextChangedListener(new TextWatcher() {
+        nickName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-}
-@Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-}
-@Override
-            public void afterTextChanged(Editable s) {
-String nickname = s.toString();
-                mUserInfo.put("nickname",nickname);
-                String pwd=password.getText().toString();
-                if (!TextUtils.isEmpty(nickname)&&!TextUtils.isEmpty(pwd)) {
-                    confirm.setEnabled(true);
-                }else{
-                    confirm.setEnabled(false);
-                }
-}
-        });
-password.addTextChangedListener(new TextWatcher() {
+            }
+
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-}
-@Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-}
-@Override
+            }
+
+            @Override
             public void afterTextChanged(Editable s) {
-String pwd = s.toString();
-                String nickname=nickName.getText().toString();
-                if (!TextUtils.isEmpty(nickname)&&!TextUtils.isEmpty(pwd)) {
+                String nickname = s.toString();
+                mUserInfo.put("nickname", nickname);
+                String pwd = password.getText().toString();
+                if (!TextUtils.isEmpty(nickname) && !TextUtils.isEmpty(pwd)) {
                     confirm.setEnabled(true);
-                }else{
+                } else {
                     confirm.setEnabled(false);
                 }
             }
         });
-}
-public void modifyUerInfo() {
-String url = ServerInfo.serviceIP + ServerInfo.modifyUserInfo;
+        password.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String pwd = s.toString();
+                String nickname = nickName.getText().toString();
+                if (!TextUtils.isEmpty(nickname) && !TextUtils.isEmpty(pwd)) {
+                    confirm.setEnabled(true);
+                } else {
+                    confirm.setEnabled(false);
+                }
+            }
+        });
+    }
+
+    public void modifyUerInfo() {
+        String url = ServerInfo.serviceIP + ServerInfo.modifyUserInfo;
         OkHttpUtils.put(url, mUserInfo, new OkHttpCallback(this) {
-@Override
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-String result = response;
+                String result = response;
                 final JSONObject jsonObject = JSONObject.parseObject(result);
                 if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                     User.getInstance().setAvatar(mUserInfo.get("avatar"));
                     User.getInstance().setNickname(mUserInfo.get("nickname"));
                     SharedPreferencesUtils.saveUser(User.getInstance());
                     setPassword();
-}
-}
-@Override
+                }
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-mHandler.post(new Runnable() {
+                mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-ToastUtils.show("修改用户信息失败，请稍后重试");
-}
+                        ToastUtils.show("修改用户信息失败，请稍后重试");
+                    }
                 });
             }
         });
-}
-public void setPassword() {
-String url = ServerInfo.serviceIP + ServerInfo.settingPwd;
-Map<String, String> params = new HashMap<>();
-        params.put("password",password.getText().toString());
+    }
+
+    public void setPassword() {
+        String url = ServerInfo.serviceIP + ServerInfo.settingPwd;
+        Map<String, String> params = new HashMap<>();
+        params.put("password", password.getText().toString());
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
-@Override
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-String result = response;
+                String result = response;
                 final JSONObject jsonObject = JSONObject.parseObject(result);
                 if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                     mHandler.post(new Runnable() {
@@ -197,7 +207,7 @@ String result = response;
                             AppManager.finishAllActivity();
                         }
                     });
-}else{
+                } else {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -205,51 +215,53 @@ String result = response;
                         }
                     });
                 }
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
-}
-@Override
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-if (requestCode == TACK_PHOTO) {
+        if (requestCode == TACK_PHOTO) {
             if (resultCode == RESULT_OK && data != null) {
                 //保存图片信息
                 String path = data.getStringExtra("path");
                 File file = new File(path);
                 //clipImage(Uri.fromFile(file));
-} else {
+            } else {
                 Toast.makeText(this, "用户取消拍照", Toast.LENGTH_SHORT).show();
             }
         } else if (requestCode == CHOOSE_PHOTO) {
-if (resultCode == RESULT_OK && data != null) {
-List<String> paths = Matisse.obtainPathResult(data);
+            if (resultCode == RESULT_OK && data != null) {
+                List<String> paths = Matisse.obtainPathResult(data);
                 //List<Uri> selects = Matisse.obtainResult(data);
                 //File file = new File(CommonUtils.getRealFilePath(this, selects.get(0)));
                 File file = new File(paths.get(0));
                 clipImage(Uri.fromFile(file));
-} else {
+            } else {
                 ToastUtils.show("用户取消拍照");
             }
-} else if (requestCode == CUT_OK) {
+        } else if (requestCode == CUT_OK) {
             if (resultCode == RESULT_OK && data != null) {
-try{
+                try {
                     Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uritempFile));
                     Random rand = new Random();
                     int randNum = rand.nextInt(1000);
-                    tempFile = new File(CommonUtils.getStoragePrivateDirectory(DIRECTORY_PICTURES), CommonUtils.getCurrentTimeString()+randNum+".jpg");
+                    tempFile = new File(CommonUtils.getStoragePrivateDirectory(DIRECTORY_PICTURES), CommonUtils.getCurrentTimeString() + randNum + ".jpg");
                     CommonUtils.saveBitmap(tempFile.getAbsolutePath(), bitmap);
                     //saveBitmapToFile(bitmap);
 //
                     // 2.把图片文件file上传到服务器
-                    if(mOssInfo != null&&mOssService!=null){
-                        mOssService.asyncUploadFile(mOssInfo.getDir()+tempFile.getName(),tempFile.getAbsolutePath(),null,this);
-                    }else{
+                    if (mOssInfo != null && mOssService != null) {
+                        mOssService.asyncUploadFile(mOssInfo.getDir() + tempFile.getName(), tempFile.getAbsolutePath(), null, this);
+                    } else {
                         ToastUtils.show("OSS初始化失败,请稍后再试");
                     }
-                }catch (Exception e){
-}
+                } catch (Exception e) {
+                }
 // 获取裁剪的图片数据
 //                Bundle extras = data.getExtras();
 //                if (extras != null) {
@@ -269,9 +281,10 @@ try{
 //
 //                }
             }
-}
+        }
     }
-/**
+
+    /**
      * 调用系统的裁剪方法
      */
     private void clipImage(Uri uri) {
@@ -288,23 +301,25 @@ try{
         intent.putExtra("outputY", 150);
         //intent.putExtra("return-data", true);
         // 你待会裁剪完之后需要获取数据   startActivityForResult
-        uritempFile = Uri.parse("file://" + "/" + CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES) + File.separator  + "small.jpg");
+        uritempFile = Uri.parse("file://" + "/" + CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES) + File.separator + "small.jpg");
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uritempFile);
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
         startActivityForResult(intent, CUT_OK);
     }
-@Override
+
+    @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_UPLOAD_HEAD: {
-}
+            }
             break;
             default:
                 break;
-}
+        }
         return false;
     }
-@OnClick({R.id.head,  R.id.confirm,R.id.eye})
+
+    @OnClick({R.id.head, R.id.confirm, R.id.eye})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.head: {
@@ -312,7 +327,7 @@ try{
 //                    ToastUtils.show("OSS上传服务初始化失败，请稍后再试");
 //                    return;
 //                }
-RxPermissions rxPermissions = new RxPermissions(SettingUserInfoActivity.this);
+                RxPermissions rxPermissions = new RxPermissions(SettingUserInfoActivity.this);
                 rxPermissions.request(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .subscribe(new Consumer<Boolean>() {
                             @Override
@@ -336,65 +351,67 @@ RxPermissions rxPermissions = new RxPermissions(SettingUserInfoActivity.this);
                                 }
                             }
                         });
-}
+            }
             break;
             case R.id.confirm: {
-if(TextUtils.isEmpty(mUserInfo.get("nickname"))){
+                if (TextUtils.isEmpty(mUserInfo.get("nickname"))) {
                     ToastUtils.show("请输入昵称");
                     return;
                 }
-if(TextUtils.isEmpty(password.getText().toString())){
+                if (TextUtils.isEmpty(password.getText().toString())) {
                     ToastUtils.show("请输入密码");
                     return;
                 }
-                if(!CommonUtils.isValidPassword(password.getText().toString())){
+                if (!CommonUtils.isValidPassword(password.getText().toString())) {
                     ToastUtils.show("密码需由6-20位数字、字母或符号组成，至少两种");
                     return;
                 }
-modifyUerInfo();
-}
+                modifyUerInfo();
+            }
             break;
             case R.id.eye:
-                mPasswordVisible=!mPasswordVisible;
-                if(mPasswordVisible){
+                mPasswordVisible = !mPasswordVisible;
+                if (mPasswordVisible) {
                     eye.setText(R.string.password_visible);
                     password.setInputType(InputType.TYPE_CLASS_TEXT);
-                    if(!TextUtils.isEmpty(password.getText().toString())){
+                    if (!TextUtils.isEmpty(password.getText().toString())) {
                         password.setSelection(password.getText().toString().length());//将光标移至文字末尾
                     }
-}else {
+                } else {
                     eye.setText(R.string.password_invisible);
                     password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                    if(!TextUtils.isEmpty(password.getText().toString())){
+                    if (!TextUtils.isEmpty(password.getText().toString())) {
                         password.setSelection(password.getText().toString().length());//将光标移至文字末尾
                     }
                 }
                 break;
-}
+        }
     }
-@Override
+
+    @Override
     public void onSuccess(PutObjectRequest request, PutObjectResult result) {
         Log.d("PutObject", "UploadSuccess");
-Log.d("ETag", result.getETag());
+        Log.d("ETag", result.getETag());
         Log.d("RequestId", result.getRequestId());
-long upload_end = System.currentTimeMillis();
-        mUserInfo.put("avatar",mOssInfo.getHost() + "/" + mOssInfo.getDir() + tempFile.getName());
+        long upload_end = System.currentTimeMillis();
+        mUserInfo.put("avatar", mOssInfo.getHost() + "/" + mOssInfo.getDir() + tempFile.getName());
         //modifyUerInfo("avatar", mOssInfo.getHost() + "/" + mOssInfo.getDir() + tempFile.getName());
-long id=Thread.currentThread().getId();
+        long id = Thread.currentThread().getId();
         mHandler.post(new Runnable() {
             @Override
             public void run() {
                 if (!TextUtils.isEmpty(mUserInfo.get("avatar"))) {
                     Uri uri = Uri.parse(mUserInfo.get("avatar"));
                     ImageLoader.showThumb(uri, head, CommonUtils.dip2px(120), CommonUtils.dip2px(120));
-}
+                }
             }
         });
-}
-@Override
+    }
+
+    @Override
     public void onFailure(PutObjectRequest request, ClientException clientException, ServiceException serviceException) {
         String info = "";
-if (serviceException != null) {
+        if (serviceException != null) {
             // 服务异常
             Log.e("ErrorCode", serviceException.getErrorCode());
             Log.e("RequestId", serviceException.getRequestId());
@@ -402,27 +419,30 @@ if (serviceException != null) {
             Log.e("RawMessage", serviceException.getRawMessage());
             info = serviceException.toString();
         }
-}
-public void getOSSinfo() {
-String url = ServerInfo.serviceIP + ServerInfo.appOss;
-Map<String, String> params = new HashMap<>();
-OkHttpUtils.get(url, null, new OkHttpCallback(this) {
-@Override
+    }
+
+    public void getOSSinfo() {
+        String url = ServerInfo.serviceIP + ServerInfo.appOss;
+        Map<String, String> params = new HashMap<>();
+        OkHttpUtils.get(url, null, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-String result = response;
+                String result = response;
                 final JSONObject jsonObject = JSONObject.parseObject(result);
                 if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                     mOssInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), OssInfo.class);
                     mOssService = initOSS(mOssInfo.getHost(), mOssInfo.getBucket(), mOssInfo.getAccess_key_id(), mOssInfo.getAccess_key_secret(), mOssInfo.getExpiration(), mOssInfo.getSecurity_token());
                     //mOssService.setCallbackAddress(Config.callbackAddress);
                 }
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
-}
-public OssService initOSS(String endpoint, String bucket, String accessKey, String accessKeySecret, String expiration,
+    }
+
+    public OssService initOSS(String endpoint, String bucket, String accessKey, String accessKeySecret, String expiration,
                               String securityToken) {
 //        移动端是不安全环境，不建议直接使用阿里云主账号ak，sk的方式。建议使用STS方式。具体参
 //        https://help.aliyun.com/document_detail/31920.html
@@ -435,10 +455,10 @@ public OssService initOSS(String endpoint, String bucket, String accessKey, Stri
 //        如果用STS鉴权模式，推荐使用OSSAuthCredentialProvider方式直接访问鉴权应用服务器，token过期后可以自动更新。
 //        详见：https://help.aliyun.com/document_detail/31920.html
 //        OSSClient的生命周期和应用程序的生命周期保持一致即可。在应用程序启动时创建一个ossClient，在应用程序结束时销毁即可。
-OSSAKSKCredentialProvider oSSAKSKCredentialProvider;
+        OSSAKSKCredentialProvider oSSAKSKCredentialProvider;
         //使用自己的获取STSToken的类
-oSSAKSKCredentialProvider = new OSSAKSKCredentialProvider(accessKey, accessKeySecret, securityToken, expiration);
-ClientConfiguration conf = new ClientConfiguration();
+        oSSAKSKCredentialProvider = new OSSAKSKCredentialProvider(accessKey, accessKeySecret, securityToken, expiration);
+        ClientConfiguration conf = new ClientConfiguration();
         conf.setConnectionTimeout(15 * 1000); // 连接超时，默认15秒
         conf.setSocketTimeout(15 * 1000); // socket超时，默认15秒
         conf.setMaxConcurrentRequest(5); // 最大并发请求书，默认5个
@@ -446,12 +466,14 @@ ClientConfiguration conf = new ClientConfiguration();
         OSS oss = new OSSClient(getApplicationContext(), endpoint, new OSSStsTokenCredentialProvider(accessKey, accessKeySecret, securityToken), conf);
         OSSLog.enableLog();
         return new OssService(oss, bucket);
-}
-@Override
+    }
+
+    @Override
     public void onBackPressed() {
         return;
     }
-@Override
+
+    @Override
     protected void onDestroy() {
         AppManager.removeActivity(this);
         super.onDestroy();

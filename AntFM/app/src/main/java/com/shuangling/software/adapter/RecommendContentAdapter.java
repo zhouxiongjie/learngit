@@ -289,7 +289,8 @@ if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(0))) {
             gallerieOneViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieOneViewHolder.title.setText(content.getTitle());
             gallerieOneViewHolder.commentNum.setText("" + content.getComment() + "评论");
-            gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
+            gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "");
+            //gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
             gallerieOneViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -324,7 +325,8 @@ if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(0))) {
             gallerieViewThreeHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieViewThreeHolder.title.setText(content.getTitle());
             gallerieViewThreeHolder.commentNum.setText("" + content.getComment() + "评论");
-            gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
+            //gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
+            gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "");
             gallerieViewThreeHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

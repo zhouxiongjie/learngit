@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.fastjson.JSONObject;
 import com.gyf.immersionbar.ImmersionBar;
+import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.WebProgress;
@@ -53,8 +54,8 @@ import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 
-@EnableDragToClose()
-public class SpecialDetailActivity extends AppCompatActivity implements Handler.Callback {
+//@EnableDragToClose()
+public class SpecialDetailActivity extends QMUIActivity implements Handler.Callback {
     private static final int LOGIN_RESULT = 0x1;
     public static final int MSG_GET_DETAIL = 0x2;
     private static final int SHARE_SUCCESS = 0x3;

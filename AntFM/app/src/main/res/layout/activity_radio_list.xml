@@ -3,15 +3,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <com.shuangling.software.customview.TopTitleBar
-        android:id="@+id/activity_title"
+<!--    <com.shuangling.software.customview.TopTitleBar-->
+<!--        android:id="@+id/activity_title"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentTop="true"-->
+<!--        fresco:canBack="true"-->
+<!--        fresco:titleText="电台" />-->
+
+    <com.qmuiteam.qmui.widget.QMUITopBarLayout
+        android:id="@+id/topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        fresco:canBack="true"
-        fresco:titleText="电台" />
+        android:fitsSystemWindows="true"/>
 
     <LinearLayout
         android:layout_width="match_parent"

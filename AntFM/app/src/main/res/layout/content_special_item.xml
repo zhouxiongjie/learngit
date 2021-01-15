@@ -41,7 +41,7 @@
             android:layout_width="@dimen/article_right_image_width"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            fresco:roundedCornerRadius="2dp"
+            fresco:roundedCornerRadius="4dp"
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/article_placeholder"
             fresco:placeholderImageScaleType="centerCrop"

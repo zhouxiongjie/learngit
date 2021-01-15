@@ -1,16 +1,23 @@
 package com.shuangling.software.activity;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.View;
 import android.widget.LinearLayout;
+
 import com.alibaba.fastjson.JSONObject;
+import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.constant.RefreshState;
@@ -26,42 +33,53 @@ import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 import com.youngfeng.snake.annotations.EnableDragToClose;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.Call;
-@EnableDragToClose()
-public class SubscribeActivity extends AppCompatActivity implements Handler.Callback {
-public static final int MSG_UPDATE_LIST = 0x1;
+
+//@EnableDragToClose()
+public class SubscribeActivity extends QMUIActivity implements Handler.Callback {
+    public static final int MSG_UPDATE_LIST = 0x1;
     @BindView(R.id.noData)
     LinearLayout noData;
-public enum GetContent {
+
+    public enum GetContent {
         Refresh,
         LoadMore,
         Normal
-    }@BindView(R.id.activtyTitle)
-    TopTitleBar activtyTitle;
+    }
+
+//    @BindView(R.id.activtyTitle)
+//    TopTitleBar activtyTitle;
+    @BindView(R.id.topbar)
+    QMUITopBarLayout mTopBar;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.refreshLayout)
     SmartRefreshLayout refreshLayout;
-private int mCurrentPage = 1;
+    private int mCurrentPage = 1;
     private Handler mHandler;
     private List<Subscribe> mSubscribes;
     private SubscribeAdapter mAdapter;
-@Override
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_subscribe);
-        CommonUtils.transparentStatusBar(this);
+        setContentView(R.layout.activity_subscribe);
+        //CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
         init();
     }
-private void init() {
+
+    private void init() {
+        initTopBar();
         mHandler = new Handler(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
@@ -86,15 +104,37 @@ private void init() {
         //recyclerView.setAdapter(mAdapter);
         getContent(GetContent.Normal);
     }
-public void getContent(final GetContent getContent) {
-String url = ServerInfo.serviceIP + ServerInfo.mySubscribes;
-Map<String, String> params = new HashMap<>();
+
+    private void initTopBar() {
+        mTopBar.setTitle("我的订阅");
+        QMUIStatusBarHelper.setStatusBarLightMode(this);
+
+        mTopBar.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+//        mTopBar.addRightImageButton(R.drawable.ic_more, com.qmuiteam.qmui.R.id.right_icon).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+
+
+    }
+
+    public void getContent(final GetContent getContent) {
+        String url = ServerInfo.serviceIP + ServerInfo.mySubscribes;
+        Map<String, String> params = new HashMap<>();
         params.put("page", "" + mCurrentPage);
         params.put("page_size", "" + Integer.MAX_VALUE);
-OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-                try{
+                try {
                     if (getContent == GetContent.Refresh) {
                         if (refreshLayout.getState() == RefreshState.Refreshing) {
                             refreshLayout.finishRefresh();
@@ -104,17 +144,18 @@ OkHttpUtils.get(url, params, new OkHttpCallback(this) {
                             refreshLayout.finishLoadMore();
                         }
                     }
-                }catch (Exception e){
-}
-Message msg = Message.obtain();
+                } catch (Exception e) {
+                }
+                Message msg = Message.obtain();
                 msg.what = MSG_UPDATE_LIST;
                 msg.arg1 = getContent.ordinal();
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-try{
+                try {
                     if (getContent == GetContent.Refresh) {
                         if (refreshLayout.getState() == RefreshState.Refreshing) {
                             refreshLayout.finishRefresh();
@@ -124,12 +165,13 @@ try{
                             refreshLayout.finishLoadMore();
                         }
                     }
-                }catch (Exception e){
-}
-}
+                } catch (Exception e) {
+                }
+            }
         });
-}
-@Override
+    }
+
+    @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_UPDATE_LIST:
@@ -138,17 +180,17 @@ try{
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         mSubscribes = JSONObject.parseArray(jsonObject.getJSONObject("data").getJSONArray("data").toJSONString(), Subscribe.class);
-if (mSubscribes.size() == 0) {
+                        if (mSubscribes.size() == 0) {
                             noData.setVisibility(View.VISIBLE);
                         } else {
                             noData.setVisibility(View.GONE);
                         }
-if (mAdapter == null) {
+                        if (mAdapter == null) {
                             mAdapter = new SubscribeAdapter(this, mSubscribes);
                             mAdapter.setOnItemClickListener(new SubscribeAdapter.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(int pos) {
-}
+                                }
                             });
                             //设置添加或删除item时的动画，这里使用默认动画
                             recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -160,7 +202,7 @@ if (mAdapter == null) {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-}
+                }
                 break;
         }
         return false;

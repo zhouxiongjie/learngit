@@ -32,6 +32,7 @@ import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
+import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.Advert;
@@ -55,7 +56,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
 
-public class StartupActivity extends Activity implements Handler.Callback {
+public class StartupActivity extends QMUIActivity implements Handler.Callback {
     public static final int MSG_GET_ADVERT = 0x00;
     @BindView(R.id.background)
     ImageView background;

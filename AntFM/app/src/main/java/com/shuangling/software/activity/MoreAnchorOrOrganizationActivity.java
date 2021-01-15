@@ -53,7 +53,7 @@ public class MoreAnchorOrOrganizationActivity extends AppCompatActivity implemen
         Normal
     }
 
-    @BindView(R.id.activity_title)
+    @BindView(R.id.topbar)
     /*TopTitleBar*/ QMUITopBarLayout activity_title;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;

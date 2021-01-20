@@ -43,6 +43,7 @@
             android:layout_centerVertical="true"
             android:ellipsize="end"
             android:textStyle="bold"
+            android:maxLines="2"
             tools:text="伊金霍洛旗新闻坚持时事政治、地方特色，伊金霍洛旗新闻坚持时事政治、地方特色，大力开展文化运动，呼吁大家爱岗敬业伊金霍洛旗新闻坚持时事政治、地方特色，大力开展文化运动，呼吁大家爱岗敬业"
             android:textColor="@color/textColorTwo"
             android:textSize="@dimen/font_size_17sp" />
@@ -61,6 +62,17 @@
 
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/playTimes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="25万次播放"
+        android:textColor="@color/textColorSeven"
+        android:textSize="@dimen/font_size_24px" />
+
 
     <TextView
         android:id="@+id/reads"
@@ -75,16 +87,7 @@
         android:textColor="@color/textColorSeven"
         android:textSize="@dimen/font_size_24px" />
 
-    <TextView
-        android:id="@+id/playTimes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp"
-        android:text="25万次播放"
-        android:textColor="@color/textColorSeven"
-        android:textSize="@dimen/font_size_24px" />
+
 
     <LinearLayout
         android:layout_width="wrap_content"

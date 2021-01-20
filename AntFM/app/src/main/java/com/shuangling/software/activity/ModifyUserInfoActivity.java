@@ -46,6 +46,7 @@ import com.hjq.toast.ToastUtils;
 import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.qmuiteam.qmui.arch.QMUIFragmentActivity;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
 import com.qmuiteam.qmui.widget.dialog.QMUIBottomSheet;
 import com.shuangling.software.MyApplication;
@@ -150,6 +151,7 @@ public class ModifyUserInfoActivity extends QMUIActivity/*QMUIFragmentActivity*/
         setContentView(R.layout.activity_modify_userinfo);
 //        CommonUtils.transparentStatusBar(this);
         ButterKnife.bind(this);
+        QMUIStatusBarHelper.setStatusBarLightMode(this); //
         activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
             finish();
         });

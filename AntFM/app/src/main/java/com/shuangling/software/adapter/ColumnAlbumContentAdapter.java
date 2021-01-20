@@ -84,9 +84,9 @@ public class ColumnAlbumContentAdapter extends RecyclerView.Adapter implements V
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_ALBUM_NORMAL) {
-            return new AlbumViewHolder(inflater.inflate(R.layout.content_album_item, parent, false));
+            return new AlbumViewHolder(inflater.inflate(R.layout.content_album_item01, parent, false));
         } else {
-            return new AlbumSquareViewHolder(inflater.inflate(R.layout.scrollview_album_item_layout, parent, false));
+            return new AlbumSquareViewHolder(inflater.inflate(R.layout.scrollview_album_item_layout01, parent, false));
         }
     }
 
@@ -96,7 +96,7 @@ public class ColumnAlbumContentAdapter extends RecyclerView.Adapter implements V
         int itemViewType = getItemViewType(position);
         if (itemViewType == TYPE_ALBUM_NORMAL) {
             final AlbumViewHolder albumViewHolder = (AlbumViewHolder) holder;
-            albumViewHolder.root.setPadding(CommonUtils.dip2px(5), CommonUtils.dip2px(10), CommonUtils.dip2px(5), CommonUtils.dip2px(10));
+            //albumViewHolder.root.setPadding(CommonUtils.dip2px(10), CommonUtils.dip2px(10), CommonUtils.dip2px(10), CommonUtils.dip2px(10));
             if (!TextUtils.isEmpty(content.getCover())) {
                 int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                 int height = (int) (2f * width / 3f);

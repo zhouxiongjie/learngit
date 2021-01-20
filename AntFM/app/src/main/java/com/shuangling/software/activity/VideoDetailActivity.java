@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.player.IPlayer;
 import com.aliyun.player.source.VidAuth;
+import com.aliyun.vodplayerview.activity.AliyunPlayerSkinActivity;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 import com.ethanhua.skeleton.Skeleton;
@@ -167,7 +168,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
     private int mNeedTipPlay;
     private boolean mNeedResumeAudioPlay = false;
     private VideoRecyclerAdapter mAdapter;
-    private boolean mIsInBackground = false;
+
     private int currentPage = 1;
     private Comment currentComment;
     private ViewSkeletonScreen mViewSkeletonScreen;
@@ -258,6 +259,15 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                 if (mVideoDetail.getVideo() != null) {
                     addPlayTimes(mVideoDetail.getVideo().getPost_id());
                 }
+            }
+        });
+
+        aliyunVodPlayerView.setOnCompletionListener(new IPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion() {
+
+                //aliyunVodPlayerView.reTry();
+
             }
         });
 //
@@ -622,7 +632,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
     @Override
     protected void onResume() {
         super.onResume();
-        mIsInBackground = false;
+
         updatePlayerViewMode();
         if (aliyunVodPlayerView != null) {
             aliyunVodPlayerView.setAutoPlay(true);
@@ -633,7 +643,6 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
     @Override
     protected void onStop() {
         super.onStop();
-        mIsInBackground = true;
         if (aliyunVodPlayerView != null) {
             aliyunVodPlayerView.setAutoPlay(false);
             aliyunVodPlayerView.onStop();
@@ -1167,7 +1176,9 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                         vidAuth.setRegion("cn-shanghai");
                         aliyunVodPlayerView.setAuthInfo(vidAuth);
                     } else if (jsonObject != null) {
-                        ToastUtils.show(jsonObject.getString("msg"));
+                        //ToastUtils.show(jsonObject.getString("msg"));
+                        ToastUtils.show("播放失败");
+
                     }
                 } catch (Exception e) {
                 }

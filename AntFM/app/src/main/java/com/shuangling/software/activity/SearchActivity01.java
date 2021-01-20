@@ -24,7 +24,10 @@ import com.google.android.material.tabs.TabLayout;
 import com.hjq.toast.ToastUtils;
 import com.jaeger.library.StatusBarUtil;
 import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.skin.QMUISkinManager;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialog;
+import com.qmuiteam.qmui.widget.dialog.QMUIDialogAction;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.SearchHistoryGridViewAdapter;
@@ -115,8 +118,30 @@ public class SearchActivity01 extends QMUIActivity {
             mSearchHistoryGridViewAdapter.setOnItemClickListener(new SearchHistoryGridViewAdapter.OnItemClickListener() {
                 @Override
                 public void onDelete(String history) {
-                    SearchHistoryDaoUtils.deleteHistory(history);
-                    updateSearchHistory();
+
+                    new QMUIDialog.MessageDialogBuilder(SearchActivity01.this)
+                            .setTitle("确认删除?")
+                            .setMessage("是否删除搜索历史")
+                            .setCanceledOnTouchOutside(false)
+                            .setCancelable(false)
+                            .setSkinManager(QMUISkinManager.defaultInstance(SearchActivity01.this))
+                            .addAction("取消", new QMUIDialogAction.ActionListener() {
+                                @Override
+                                public void onClick(QMUIDialog dialog, int index) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .addAction(0, "确定", QMUIDialogAction.ACTION_PROP_NEGATIVE, new QMUIDialogAction.ActionListener() {
+                                @Override
+                                public void onClick(QMUIDialog dialog, int index) {
+                                    SearchHistoryDaoUtils.deleteHistory(history);
+                                    updateSearchHistory();
+                                    dialog.dismiss();
+                                }
+                            })
+                            .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+
+
 
                 }
 
@@ -186,8 +211,28 @@ public class SearchActivity01 extends QMUIActivity {
         deleteAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SearchHistoryDaoUtils.cleanAll();
-                updateSearchHistory();
+                new QMUIDialog.MessageDialogBuilder(SearchActivity01.this)
+                        .setTitle("确认删除?")
+                        .setMessage("是否删除搜索历史")
+                        .setCanceledOnTouchOutside(false)
+                        .setCancelable(false)
+                        .setSkinManager(QMUISkinManager.defaultInstance(SearchActivity01.this))
+                        .addAction("取消", new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .addAction(0, "确定", QMUIDialogAction.ACTION_PROP_NEGATIVE, new QMUIDialogAction.ActionListener() {
+                            @Override
+                            public void onClick(QMUIDialog dialog, int index) {
+                                SearchHistoryDaoUtils.cleanAll();
+                                updateSearchHistory();
+                                dialog.dismiss();
+                            }
+                        })
+                        .create(com.qmuiteam.qmui.R.style.QMUI_Dialog).show();
+
             }
         });
         finish.setOnClickListener(new View.OnClickListener() {

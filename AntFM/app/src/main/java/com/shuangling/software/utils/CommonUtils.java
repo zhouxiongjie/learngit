@@ -1343,7 +1343,7 @@ public class CommonUtils {
                     Uri uri = Uri.fromFile(file);
                     intent.setData(uri);
                     context.sendBroadcast(intent);
-                    ToastUtils.show("下载成功");
+                    ToastUtils.show("保存图片成功");
 
                 } catch (Exception e) {
                     e.printStackTrace();

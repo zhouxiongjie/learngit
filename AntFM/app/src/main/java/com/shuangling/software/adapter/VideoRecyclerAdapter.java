@@ -170,10 +170,12 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
                             //viewHolder.videoTitle.setMaxLines(Integer.MAX_VALUE);
                             viewHolder.playTimes.setVisibility(View.VISIBLE);
                             viewHolder.showMore.setImageResource(R.drawable.more_up);
+                            viewHolder.videoTitle.setMaxLines(Integer.MAX_VALUE);
                         } else {
                             viewHolder.playTimes.setVisibility(View.GONE);
                             //viewHolder.videoTitle.setMaxLines(1);
                             viewHolder.showMore.setImageResource(R.drawable.more_down);
+                            viewHolder.videoTitle.setMaxLines(2);
                         }
                     }
                 });

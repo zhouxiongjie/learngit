@@ -63,6 +63,8 @@
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/video_placeholder"
             fresco:placeholderImageScaleType="centerCrop"
+            fresco:roundingBorderWidth="1px"
+            fresco:roundingBorderColor="#EAEAEA"
             fresco:viewAspectRatio="1.778" />
 
         <ImageView
@@ -124,12 +126,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="10dp"
-            android:background="@drawable/top_text_bg"
+
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@string/top"
             android:textColor="@color/textColorFour"
-            android:textSize="@dimen/font_size_18px"
+            android:textSize="@dimen/font_size_24px"
             android:visibility="gone"/>
 
         <TextView

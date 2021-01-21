@@ -1305,6 +1305,7 @@ public class ColumnFragment extends QMUIFragment/*SimpleImmersionFragment*/ impl
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
                                 recyclerView.setLayoutManager(manager);
+                                recyclerView.setPadding(CommonUtils.dip2px(7.5f),0,CommonUtils.dip2px(7.5f),0);
                                 DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
@@ -1328,6 +1329,7 @@ public class ColumnFragment extends QMUIFragment/*SimpleImmersionFragment*/ impl
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
                                 recyclerView.setLayoutManager(manager);
+                                recyclerView.setPadding(CommonUtils.dip2px(7.5f),0,CommonUtils.dip2px(7.5f),0);
                                 DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);

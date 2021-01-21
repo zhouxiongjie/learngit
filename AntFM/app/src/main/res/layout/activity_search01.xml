@@ -76,7 +76,7 @@
                     android:layout_centerVertical="true"
                     android:text="搜索历史"
                     android:textColor="#999999"
-                    android:textSize="@dimen/font_size_30px"
+                    android:textSize="@dimen/font_size_28px"
                     android:textStyle="bold" />
 
                 <com.shuangling.software.customview.FontIconView

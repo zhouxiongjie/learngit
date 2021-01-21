@@ -1,10 +1,12 @@
 package com.aliyun.vodplayerview.view.tipsview;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+
 import com.aliyun.player.bean.ErrorCode;
 import com.aliyun.utils.VcPlayerLog;
 import com.aliyun.vodplayer.R;
@@ -13,12 +15,13 @@ import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 /*
  * Copyright (C) 2010-2018 Alibaba Group Holding Limited.
  */
+
 /**
  * 提示对话框的管理器。
  * 用于管理{@link ErrorView} ，{@link LoadingView} ，{@link NetChangeView} , {@link ReplayView}等view的显示/隐藏等。
  */
 public class TipsView extends RelativeLayout implements ITheme {
-private static final String TAG = TipsView.class.getSimpleName();
+    private static final String TAG = TipsView.class.getSimpleName();
     //错误码
     private int mErrorCode;
     //错误提示
@@ -35,7 +38,7 @@ private static final String TAG = TipsView.class.getSimpleName();
     private OnTipClickListener mOnTipClickListener = null;
     //当前的主题
     private AliyunVodPlayerView.Theme mCurrentTheme;
-//网络变化监听事件。
+    //网络变化监听事件。
     private NetChangeView.OnNetChangeClickListener onNetChangeClickListener = new NetChangeView.OnNetChangeClickListener() {
         @Override
         public void onContinuePlay() {
@@ -43,7 +46,8 @@ private static final String TAG = TipsView.class.getSimpleName();
                 mOnTipClickListener.onContinuePlay();
             }
         }
-@Override
+
+        @Override
         public void onStopPlay() {
             if (mOnTipClickListener != null) {
                 mOnTipClickListener.onStopPlay();
@@ -61,10 +65,10 @@ private static final String TAG = TipsView.class.getSimpleName();
                 } else {
                     mOnTipClickListener.onRetryPlay();
                 }
-}
+            }
         }
     };
-//重播点击事件
+    //重播点击事件
     private ReplayView.OnReplayClickListener onReplayClickListener = new ReplayView.OnReplayClickListener() {
         @Override
         public void onReplay() {
@@ -73,16 +77,20 @@ private static final String TAG = TipsView.class.getSimpleName();
             }
         }
     };
-public TipsView(Context context) {
+
+    public TipsView(Context context) {
         super(context);
     }
-public TipsView(Context context, AttributeSet attrs) {
+
+    public TipsView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
-public TipsView(Context context, AttributeSet attrs, int defStyleAttr) {
+
+    public TipsView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
-/**
+
+    /**
      * 显示网络变化提示
      */
     public void showNetChangeTipView() {
@@ -91,14 +99,15 @@ public TipsView(Context context, AttributeSet attrs, int defStyleAttr) {
             mNetChangeView.setOnNetChangeClickListener(onNetChangeClickListener);
             addSubView(mNetChangeView);
         }
-if (mErrorView != null && mErrorView.getVisibility() == VISIBLE) {
+        if (mErrorView != null && mErrorView.getVisibility() == VISIBLE) {
             //显示错误对话框了，那么网络切换的对话框就不显示了。
             //都出错了，还显示网络切换，没有意义
         } else {
             mNetChangeView.setVisibility(VISIBLE);
         }
-}
-/**
+    }
+
+    /**
      * 显示错误提示
      *
      * @param errorCode  错误码
@@ -114,14 +123,16 @@ if (mErrorView != null && mErrorView.getVisibility() == VISIBLE) {
 //出现错误了，先把网络的对话框关闭掉。防止同时显示多个对话框。
         //都出错了，还显示网络切换，没有意义
         hideNetChangeTipView();
-mErrorCode = errorCode;
+        mErrorCode = errorCode;
         mErrorView.updateTips(errorCode, errorEvent, errorMsg);
         mErrorView.setVisibility(VISIBLE);
-Log.d(TAG, " errorCode = " + mErrorCode);
+        Log.d(TAG, " errorCode = " + mErrorCode);
     }
-/**
+
+    /**
      * 显示错误提示,不显示错误码
-     * @param msg   错误信息
+     *
+     * @param msg 错误信息
      */
     public void showErrorTipViewWithoutCode(String msg) {
         if (mErrorView == null) {
@@ -130,11 +141,12 @@ Log.d(TAG, " errorCode = " + mErrorCode);
             mErrorView.setOnRetryClickListener(onRetryClickListener);
             addSubView(mErrorView);
         }
-if (mErrorView.getVisibility() != VISIBLE) {
+        if (mErrorView.getVisibility() != VISIBLE) {
             mErrorView.setVisibility(VISIBLE);
         }
     }
-/**
+
+    /**
      * 显示重播view
      */
     public void showReplayTipView() {
@@ -143,11 +155,12 @@ if (mErrorView.getVisibility() != VISIBLE) {
             mReplayView.setOnReplayClickListener(onReplayClickListener);
             addSubView(mReplayView);
         }
-if (mReplayView.getVisibility() != VISIBLE) {
+        if (mReplayView.getVisibility() != VISIBLE) {
             mReplayView.setVisibility(VISIBLE);
         }
     }
-/**
+
+    /**
      * 显示缓冲加载view
      */
     public void showBufferLoadingTipView() {
@@ -159,7 +172,8 @@ if (mReplayView.getVisibility() != VISIBLE) {
             mBufferLoadingView.setVisibility(VISIBLE);
         }
     }
-/**
+
+    /**
      * 更新缓冲加载的进度
      *
      * @param percent 进度百分比
@@ -168,7 +182,8 @@ if (mReplayView.getVisibility() != VISIBLE) {
         showBufferLoadingTipView();
         mBufferLoadingView.updateLoadingPercent(percent);
     }
-/**
+
+    /**
      * 显示网络加载view
      */
     public void showNetLoadingTipView() {
@@ -177,11 +192,12 @@ if (mReplayView.getVisibility() != VISIBLE) {
             mNetLoadingView.setOnlyLoading();
             addSubView(mNetLoadingView);
         }
-if (mNetLoadingView.getVisibility() != VISIBLE) {
+        if (mNetLoadingView.getVisibility() != VISIBLE) {
             mNetLoadingView.setVisibility(VISIBLE);
         }
     }
-/**
+
+    /**
      * 把新增的view添加进来，居中添加
      *
      * @param subView 子view
@@ -195,7 +211,8 @@ if (mNetLoadingView.getVisibility() != VISIBLE) {
             ((ITheme) subView).setTheme(mCurrentTheme);
         }
     }
-/**
+
+    /**
      * 隐藏所有的tip
      */
     public void hideAll() {
@@ -205,7 +222,8 @@ if (mNetLoadingView.getVisibility() != VISIBLE) {
         hideBufferLoadingTipView();
         hideNetLoadingTipView();
     }
-/**
+
+    /**
      * 隐藏缓冲加载的tip
      */
     public void hideBufferLoadingTipView() {
@@ -217,7 +235,8 @@ if (mNetLoadingView.getVisibility() != VISIBLE) {
             mBufferLoadingView.setVisibility(INVISIBLE);
         }
     }
-/**
+
+    /**
      * 隐藏网络加载的tip
      */
     public void hideNetLoadingTipView() {
@@ -225,7 +244,8 @@ if (mNetLoadingView.getVisibility() != VISIBLE) {
             mNetLoadingView.setVisibility(INVISIBLE);
         }
     }
-/**
+
+    /**
      * 隐藏重播的tip
      */
     public void hideReplayTipView() {
@@ -233,7 +253,8 @@ if (mNetLoadingView.getVisibility() != VISIBLE) {
             mReplayView.setVisibility(INVISIBLE);
         }
     }
-/**
+
+    /**
      * 隐藏网络变化的tip
      */
     public void hideNetChangeTipView() {
@@ -241,7 +262,8 @@ if (mNetLoadingView.getVisibility() != VISIBLE) {
             mNetChangeView.setVisibility(INVISIBLE);
         }
     }
-/**
+
+    /**
      * 隐藏错误的tip
      */
     public void hideErrorTipView() {
@@ -249,7 +271,8 @@ if (mNetLoadingView.getVisibility() != VISIBLE) {
             mErrorView.setVisibility(INVISIBLE);
         }
     }
-/**
+
+    /**
      * 错误的tip是否在显示，如果在显示的话，其他的tip就不提示了。
      *
      * @return true：是
@@ -261,7 +284,8 @@ if (mNetLoadingView.getVisibility() != VISIBLE) {
             return false;
         }
     }
-/**
+
+    /**
      * 隐藏网络错误tip
      */
     public void hideNetErrorTipView() {
@@ -272,9 +296,10 @@ if (mNetLoadingView.getVisibility() != VISIBLE) {
 //            mErrorView.setVisibility(INVISIBLE);
 //        }
     }
-@Override
+
+    @Override
     public void setTheme(AliyunVodPlayerView.Theme theme) {
-mCurrentTheme = theme;
+        mCurrentTheme = theme;
         //判断子view是不是实现了ITheme的接口，从而达到更新主题的目的
         int childCount = getChildCount();
         for (int i = 0; i < childCount; i++) {
@@ -284,7 +309,8 @@ mCurrentTheme = theme;
             }
         }
     }
-/**
+
+    /**
      * 提示view中的点击操作
      */
     public interface OnTipClickListener {
@@ -292,24 +318,29 @@ mCurrentTheme = theme;
          * 继续播放
          */
         void onContinuePlay();
-/**
+
+        /**
          * 停止播放
          */
         void onStopPlay();
-/**
+
+        /**
          * 重试播放
          */
         void onRetryPlay();
-/**
+
+        /**
          * 重播
          */
         void onReplay();
-/**
+
+        /**
          * 刷新sts
          */
         void onRefreshSts();
     }
-/**
+
+    /**
      * 设置提示view中的点击操作 监听
      *
      * @param l 监听事件

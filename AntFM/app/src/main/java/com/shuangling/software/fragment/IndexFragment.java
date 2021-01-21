@@ -910,12 +910,14 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                             } else if (animated == 5) {
                                 //三图
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
-                                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) recyclerView.getLayoutParams();
-                                lp.leftMargin = CommonUtils.dip2px(5);
-                                lp.rightMargin = CommonUtils.dip2px(5);
-                                recyclerView.setLayoutParams(lp);
+//                                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) recyclerView.getLayoutParams();
+////                                lp.leftMargin = CommonUtils.dip2px(5);
+////                                lp.rightMargin = CommonUtils.dip2px(5);
+//                                recyclerView.setLayoutParams(lp);
+//                                recyclerView.setPadding(CommonUtils.dip2px(5),0,CommonUtils.dip2px(5),0);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
                                 recyclerView.setLayoutManager(manager);
+                                recyclerView.setPadding(CommonUtils.dip2px(7.5f),0,CommonUtils.dip2px(7.5f),0);
                                 DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
@@ -937,12 +939,14 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                             } else if (animated == 9) {
                                 //三图+5图
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
-                                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) recyclerView.getLayoutParams();
-                                lp.leftMargin = CommonUtils.dip2px(5);
-                                lp.rightMargin = CommonUtils.dip2px(5);
-                                recyclerView.setLayoutParams(lp);
+//                                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) recyclerView.getLayoutParams();
+//                                lp.leftMargin = CommonUtils.dip2px(5);
+//                                lp.rightMargin = CommonUtils.dip2px(5);
+//
+//                                recyclerView.setLayoutParams(lp);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
                                 recyclerView.setLayoutManager(manager);
+                                recyclerView.setPadding(CommonUtils.dip2px(7.5f),0,CommonUtils.dip2px(7.5f),0);
                                 DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);

@@ -58,13 +58,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             fresco:roundedCornerRadius="4dp"
-            fresco:roundTopLeft="true"
-            fresco:roundTopRight="false"
-            fresco:roundBottomLeft="true"
-            fresco:roundBottomRight="false"
+
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/video_placeholder"
             fresco:placeholderImageScaleType="centerCrop"
+            fresco:roundingBorderWidth="1px"
+            fresco:roundingBorderColor="#EAEAEA"
             fresco:viewAspectRatio="1.5" />
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/pic2"
@@ -72,32 +71,30 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             fresco:roundedCornerRadius="4dp"
-            fresco:roundTopLeft="false"
-            fresco:roundTopRight="false"
-            fresco:roundBottomLeft="false"
-            fresco:roundBottomRight="false"
+
             fresco:actualImageScaleType="centerCrop"
             fresco:placeholderImage="@drawable/video_placeholder"
             fresco:placeholderImageScaleType="centerCrop"
             fresco:viewAspectRatio="1.5"
-            android:layout_marginStart="5dp"/>
+            fresco:roundingBorderWidth="1px"
+            fresco:roundingBorderColor="#EAEAEA"
+            android:layout_marginStart="3dp"/>
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="5dp">
+            android:layout_marginStart="3dp">
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/pic3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 fresco:roundedCornerRadius="4dp"
-                fresco:roundTopLeft="false"
-                fresco:roundTopRight="true"
-                fresco:roundBottomLeft="false"
-                fresco:roundBottomRight="true"
+
                 fresco:actualImageScaleType="centerCrop"
                 fresco:placeholderImage="@drawable/video_placeholder"
                 fresco:placeholderImageScaleType="centerCrop"
+                fresco:roundingBorderWidth="1px"
+                fresco:roundingBorderColor="#EAEAEA"
                 fresco:viewAspectRatio="1.5" />
 
             <TextView
@@ -139,12 +136,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="10dp"
-            android:background="@drawable/top_text_bg"
+
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@string/top"
             android:textColor="@color/textColorFour"
-            android:textSize="@dimen/font_size_18px"
+            android:textSize="@dimen/font_size_24px"
             android:visibility="gone"/>
 
         <TextView

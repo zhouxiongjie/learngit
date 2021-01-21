@@ -1,18 +1,23 @@
 package com.aliyun.vodplayerview.view.tipsview;
+
 import android.content.Context;
 import android.content.res.Resources;
+
 import androidx.core.content.ContextCompat;
+
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.aliyun.vodplayerview.theme.ITheme;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 import com.aliyun.vodplayer.R;
 /*
  * Copyright (C) 2010-2018 Alibaba Group Holding Limited.
  */
+
 /**
  * 重播提示对话框。播放结束的时候会显示这个界面
  */
@@ -21,26 +26,30 @@ public class ReplayView extends RelativeLayout implements ITheme {
     private TextView mReplayBtn;
     //重播事件监听
     private OnReplayClickListener mOnReplayClickListener = null;
-public ReplayView(Context context) {
+
+    public ReplayView(Context context) {
         super(context);
         init();
     }
-public ReplayView(Context context, AttributeSet attrs) {
+
+    public ReplayView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
-public ReplayView(Context context, AttributeSet attrs, int defStyleAttr) {
+
+    public ReplayView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
-private void init() {
+
+    private void init() {
         LayoutInflater inflater = (LayoutInflater) getContext()
                 .getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         Resources resources = getContext().getResources();
-View view = inflater.inflate(R.layout.alivc_dialog_replay, null);
+        View view = inflater.inflate(R.layout.alivc_dialog_replay, null);
         int viewWidth = resources.getDimensionPixelSize(R.dimen.alivc_player_dialog_err_width);
         int viewHeight = resources.getDimensionPixelSize(R.dimen.alivc_player_dialog_err_height);
-LayoutParams params = new LayoutParams(viewWidth, viewHeight);
+        LayoutParams params = new LayoutParams(viewWidth, viewHeight);
         addView(view, params);
 //设置监听
         mReplayBtn = (TextView) view.findViewById(R.id.replay);
@@ -52,8 +61,9 @@ LayoutParams params = new LayoutParams(viewWidth, viewHeight);
                 }
             }
         });
-}
-@Override
+    }
+
+    @Override
     public void setTheme(AliyunVodPlayerView.Theme theme) {
         //更新主题
         if (theme == AliyunVodPlayerView.Theme.Blue) {
@@ -70,7 +80,8 @@ LayoutParams params = new LayoutParams(viewWidth, viewHeight);
             mReplayBtn.setTextColor(ContextCompat.getColor(getContext(), R.color.alivc_player_theme_red));
         }
     }
-/**
+
+    /**
      * 重播点击事件
      */
     public interface OnReplayClickListener {
@@ -79,7 +90,8 @@ LayoutParams params = new LayoutParams(viewWidth, viewHeight);
          */
         void onReplay();
     }
-/**
+
+    /**
      * 设置重播事件监听
      *
      * @param l 重播事件

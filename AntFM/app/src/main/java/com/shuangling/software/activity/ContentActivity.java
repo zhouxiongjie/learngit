@@ -972,6 +972,7 @@ public class ContentActivity extends QMUIActivity/*AppCompatActivity*/ implement
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
                                 GridLayoutManager manager = new GridLayoutManager(this, 3);
                                 recyclerView.setLayoutManager(manager);
+                                recyclerView.setPadding(CommonUtils.dip2px(7.5f),0,CommonUtils.dip2px(7.5f),0);
                                 DividerItemDecoration divider = new DividerItemDecoration(ContentActivity.this, DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(ContentActivity.this, R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
@@ -995,6 +996,7 @@ public class ContentActivity extends QMUIActivity/*AppCompatActivity*/ implement
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
                                 GridLayoutManager manager = new GridLayoutManager(this, 3);
                                 recyclerView.setLayoutManager(manager);
+                                recyclerView.setPadding(CommonUtils.dip2px(7.5f),0,CommonUtils.dip2px(7.5f),0);
                                 DividerItemDecoration divider = new DividerItemDecoration(ContentActivity.this, DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(ContentActivity.this, R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);

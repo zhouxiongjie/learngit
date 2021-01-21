@@ -89,8 +89,8 @@
             <!--android:layout_below="@+id/aliyunVodPlayerView"-->
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/organizationLogo"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 fresco:actualImageScaleType="centerCrop"
@@ -127,7 +127,7 @@
                 android:layout_toEndOf="@id/organization"
                 android:background="@drawable/attention_bg"
                 android:minWidth="36dp"
-                android:minHeight="24dp">
+                android:minHeight="23dp">
 
                 <com.shuangling.software.customview.FontIconView
                     android:id="@+id/attentionIcon"

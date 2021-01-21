@@ -120,6 +120,11 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
 
             SimpleDraweeView logo = banner.findViewById(R.id.logo);
             SimpleDraweeView mask = banner.findViewById(R.id.mask);
+            if(TextUtils.isEmpty(data.getTitle())){
+                mask.setVisibility(GONE);
+            }else{
+                mask.setVisibility(VISIBLE);
+            }
             if (mMode == 1) {
                 //大图模式
                 GenericDraweeHierarchy hierarchy = logo.getHierarchy();
@@ -132,6 +137,8 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
                     Uri uri = Uri.parse(data.getLogo() + CommonUtils.getOssResize(width, height));
                     ImageLoader.showThumb(uri, logo, width, height);
                 }
+
+
             } else {
                 //卡片模式
                 GenericDraweeHierarchy hierarchy = logo.getHierarchy();
@@ -238,17 +245,17 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
         int height;
         if (lp.width > 0 || lp.width == ViewGroup.LayoutParams.MATCH_PARENT) {
             // xml文件中设置了该view的准确宽度值，例如android:layout_width="150dp"
-            width = View.MeasureSpec.makeMeasureSpec(lp.width, View.MeasureSpec.EXACTLY);
+            width = MeasureSpec.makeMeasureSpec(lp.width, MeasureSpec.EXACTLY);
         } else {
             // xml文件中使用wrap_content设定该view宽度，例如android:layout_width="wrap_content"
-            width = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+            width = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
         }
         if (lp.height > 0 || lp.width == ViewGroup.LayoutParams.MATCH_PARENT) {
             // xml文件中设置了该view的准确高度值，例如android:layout_height="50dp"
-            height = View.MeasureSpec.makeMeasureSpec(lp.height, View.MeasureSpec.EXACTLY);
+            height = MeasureSpec.makeMeasureSpec(lp.height, MeasureSpec.EXACTLY);
         } else {
             // xml文件中使用wrap_content设定该view高度，例如android:layout_height="wrap_content"
-            height = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+            height = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
         }
         v.measure(width, height);
     }

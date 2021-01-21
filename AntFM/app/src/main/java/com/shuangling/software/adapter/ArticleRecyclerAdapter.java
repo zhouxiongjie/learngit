@@ -81,9 +81,13 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter implements View
         return mHeadViewHolder;
     }
 
+    private int loadTimes;
+
     public void setTotalComments(int totalComments) {
         this.mTotalComments = totalComments;
-        notifyDataSetChanged();
+//        loadTimes++;
+//        if (loadTimes >= 3)
+            notifyDataSetChanged();
     }
 
     public void setAudioDetail(AudioDetail audioDetail) {
@@ -92,11 +96,15 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter implements View
 
     public void setPostContents(List<ColumnContent> postContents) {
         this.mPostContents = postContents;
+//        loadTimes++;
+//        if (loadTimes >= 3)
         notifyDataSetChanged();
     }
 
     public void setComments(List<Comment> mComments) {
         this.mComments = mComments;
+//        loadTimes++;
+//        if (loadTimes >= 3)
         notifyDataSetChanged();
     }
 
@@ -819,6 +827,7 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter implements View
     static class CommentTopViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.commentNum)
         TextView commentNum;
+
         CommentTopViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);

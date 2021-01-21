@@ -11,8 +11,8 @@
         android:layout_height="match_parent"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:paddingTop="48dp"
-        android:paddingBottom="40dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginBottom="40dp"
         fresco:srlEnableLoadMore="true"
         fresco:srlEnableRefresh="false">
 
@@ -39,15 +39,7 @@
     <include
         layout="@layout/network_error"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" /><!--todo 改成ViewStub-->
-
-    <!--<ViewStub
-        android:id="@+id/viewStub"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout="@layout/network_error"
-        android:layout_above="@+id/bottom"
-        android:layout_below="@+id/titleBar"/>-->
+        android:layout_height="match_parent" />
 
     <!--顶部导航栏 背景颜色与Activity默认背景颜色相同-->
     <RelativeLayout
@@ -148,8 +140,10 @@
             </RelativeLayout>
         </RelativeLayout>
     </RelativeLayout>
+
     <!--底部评论框-->
     <LinearLayout
+        android:id="@+id/ll_bottomBar"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_gravity="bottom"

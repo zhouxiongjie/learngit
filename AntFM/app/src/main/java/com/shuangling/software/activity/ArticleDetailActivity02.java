@@ -40,10 +40,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ethanhua.skeleton.Skeleton;
+import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
@@ -88,7 +91,6 @@ import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.shuangling.software.utils.TimeUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -193,7 +195,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     private int currentPage = 1;
     private Article mArticle;
     private ArticleVoicesInfo mArticleVoicesInfo;
-    //    private ViewSkeletonScreen mViewSkeletonScreen;
+    private ViewSkeletonScreen mViewSkeletonScreen;
     private boolean firstTime = true;
     private boolean isPlaying = false;
     private int mScrollY;
@@ -263,15 +265,15 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     }
 
     private void init() {
-//        if (mViewSkeletonScreen == null) {
-//            mViewSkeletonScreen = Skeleton.bind(root)//骨骼图
-//                    .load(R.layout.skeleton_article_detail)
-//                    .shimmer(false)
-//                    .angle(20)
-//                    .duration(1000)
-//                    .color(R.color.shimmer_color)
-//                    .show();
-//        }
+        if (mViewSkeletonScreen == null) {
+            mViewSkeletonScreen = Skeleton.bind(refreshLayout)//骨骼图
+                    .load(R.layout.skeleton_article_detail)
+                    .shimmer(false)
+                    .angle(20)
+                    .duration(1000)
+                    .color(R.color.shimmer_color)
+                    .show();
+        }
         if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getLogo2())) {
             Uri uri = Uri.parse(MyApplication.getInstance().getStation().getLogo2());
             ImageLoader.showThumb(uri, logo, CommonUtils.dip2px(161), CommonUtils.dip2px(28));//Toolbar中间的图片
@@ -356,6 +358,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mAdapter = new ArticleRecyclerAdapter(this);//
         recyclerView.setAdapter(mAdapter);
+        if(recyclerView.getItemAnimator() != null) ((SimpleItemAnimator)recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -699,7 +702,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         String js = "javascript:_renderRich('" + mArticle.getArticle().getContent() + "','" + CommonUtils.getFontSize() + "','" + size + "')";//
                         runOnUiThread(() -> {
                             mHeadViewHolder.webView.loadUrl(js);//
-//                                mViewSkeletonScreen.hide();//隐藏骨骼图
+                            mViewSkeletonScreen.hide();//隐藏骨骼图
                         });
 
 //                        getRelatedPosts();//相关推荐
@@ -824,6 +827,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         //资源不存在
                         noData.setVisibility(View.VISIBLE);
                         refreshLayout.setVisibility(View.GONE);
+                        findViewById(R.id.ll_bottomBar).setVisibility(View.GONE);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

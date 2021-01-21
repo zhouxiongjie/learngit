@@ -459,6 +459,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
             @Override
             public void onFailure(Call call, Exception exception) {
+                mViewSkeletonScreen.hide();//getRelatedPosts onFailure
             }
         });
     }
@@ -485,6 +486,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
             @Override
             public void onFailure(Call call, Exception exception) {
+                mViewSkeletonScreen.hide();//getComments onFailure
             }
         });
     }
@@ -702,12 +704,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         String js = "javascript:_renderRich('" + mArticle.getArticle().getContent() + "','" + CommonUtils.getFontSize() + "','" + size + "')";//
                         runOnUiThread(() -> {
                             mHeadViewHolder.webView.loadUrl(js);//
-                            mViewSkeletonScreen.hide();//隐藏骨骼图
                         });
-
-//                        getRelatedPosts();//相关推荐
-//                        getComments(0);//获取评论列表
-//                        articleVoices();//朗读文章   此三个接口调用等WebView加载完成onPageFinished再执行
                         if (mArticle.getAuthor_info() != null && mArticle.getAuthor_info().getMerchant() != null) {
                             if (!TextUtils.isEmpty(mArticle.getAuthor_info().getMerchant().getLogo())) {
                                 Uri uri = Uri.parse(mArticle.getAuthor_info().getMerchant().getLogo());
@@ -829,6 +826,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         refreshLayout.setVisibility(View.GONE);
                         findViewById(R.id.ll_bottomBar).setVisibility(View.GONE);
                     }
+                    getRelatedPostsArticleVoicesGetComments();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -914,6 +912,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                             }
                         }
                         mAdapter.setPostContents(mPostContents);//相关推荐
+                        mViewSkeletonScreen.hide();//获取相关文章
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1050,6 +1049,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                             }
                         }
                     });
+                    mViewSkeletonScreen.hide();//
                 }
             }
             break;
@@ -1442,12 +1442,14 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-//                        mViewSkeletonScreen.hide();//隐藏骨骼图
+                        mViewSkeletonScreen.hide();//getArticleDetail onFailure
                         networkError.setVisibility(View.VISIBLE);
                     }
                 });
             }
         });
+
+
     }
 
     private void articleVoices() {//朗读文章
@@ -1464,6 +1466,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
             @Override
             public void onFailure(Call call, Exception exception) {
+                mViewSkeletonScreen.hide();//articleVoices onFailure
             }
         });
     }
@@ -1610,12 +1613,14 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
             super.onPageFinished(view, url);
             if (view.getProgress() == 100) {
                 getArticleDetail();//文章详情
-
-                getRelatedPosts();//相关推荐
-                articleVoices();//朗读文章
-                getComments(0);//获取评论列表
             }
         }
+    }
+
+    private void getRelatedPostsArticleVoicesGetComments(){
+        getRelatedPosts();//相关推荐
+        articleVoices();//朗读文章
+        getComments(0);//获取评论列表
     }
 
     @Override

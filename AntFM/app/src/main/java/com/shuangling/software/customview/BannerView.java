@@ -120,6 +120,11 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
 
             SimpleDraweeView logo = banner.findViewById(R.id.logo);
             SimpleDraweeView mask = banner.findViewById(R.id.mask);
+            if(TextUtils.isEmpty(data.getTitle())){
+                mask.setVisibility(GONE);
+            }else{
+                mask.setVisibility(VISIBLE);
+            }
             if (mMode == 1) {
                 //大图模式
                 GenericDraweeHierarchy hierarchy = logo.getHierarchy();
@@ -132,6 +137,8 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
                     Uri uri = Uri.parse(data.getLogo() + CommonUtils.getOssResize(width, height));
                     ImageLoader.showThumb(uri, logo, width, height);
                 }
+
+
             } else {
                 //卡片模式
                 GenericDraweeHierarchy hierarchy = logo.getHierarchy();

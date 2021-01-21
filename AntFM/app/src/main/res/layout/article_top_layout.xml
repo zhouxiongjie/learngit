@@ -107,12 +107,7 @@
         android:id="@+id/fl_web_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-         /><!--android:minHeight="500dp"-->
-    <!--<android.webkit.WebView
-        android:id="@+id/webView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="500dp"/>-->
+        android:minHeight="500dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"

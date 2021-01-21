@@ -27,6 +27,7 @@ import com.liulishuo.filedownloader.FileDownloadQueueSet;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.mylhyl.circledialog.CircleDialog;
 import com.qmuiteam.qmui.arch.QMUIFragment;
+import com.shuangling.software.BuildConfig;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AccountAndSecurityActivity;
@@ -140,6 +141,11 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
         ButterKnife.bind(this, rootView);
         if (MyApplication.aboutUsInfo != null && MyApplication.aboutUsInfo.getAbout_us_status() == 1) {
             aboutUs.setVisibility(View.VISIBLE);
+        }
+        switch (BuildConfig.FLAVOR) {
+            case "ltsj":
+                wallet.setVisibility(View.VISIBLE);
+                break;
         }
         return rootView;
     }

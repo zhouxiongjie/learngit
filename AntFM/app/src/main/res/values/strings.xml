@@ -124,6 +124,7 @@
 
     <string name="kicked_by_admin">您被管理员踢出房间！！！</string>
 
+    <string name="gift_tip">送出%1$s</string>
 
     <string name="reply">已回复</string>
     <string name="pending_reply">待回复</string>

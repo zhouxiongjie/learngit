@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <RelativeLayout
+        android:id="@+id/a"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/viewerNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/inputbox_bg"
+            android:gravity="center"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:text="32"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/font_size_24px" />
+
+        <!--<HorizontalScrollView-->
+        <!--android:layout_width="150dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginLeft="2dp"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_toLeftOf="@+id/viewerNumber"-->
+        <!--android:layout_marginRight="2dp"-->
+        <!--android:scrollbars="none">-->
+
+        <LinearLayout
+            android:id="@+id/viewerContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/viewerNumber"
+            android:orientation="horizontal" />
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/inputbox_bg"
+            android:orientation="horizontal"
+            android:padding="2dp">
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/head"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
+                app:actualImageScaleType="centerCrop"
+                app:failureImage="@drawable/ic_user3"
+                app:failureImageScaleType="centerCrop"
+                app:placeholderImage="@drawable/ic_user3"
+                app:placeholderImageScaleType="centerCrop"
+                app:roundAsCircle="true"
+                app:roundingBorderColor="@color/white"
+                app:roundingBorderWidth="0dp"
+                app:viewAspectRatio="1" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/font_size_24px"
+                    android:textStyle="bold"
+                    tools:text="热心市民" />
+
+                <TextView
+                    android:id="@+id/praiseNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#BFBFBF"
+                    android:textSize="@dimen/font_size_16px"
+                    tools:text="5.2万本场点赞" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/a"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp">
+
+        <TextView
+            android:id="@+id/hotRange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/inputbox_bg"
+            android:drawableStart="@drawable/ic_hot"
+            android:drawablePadding="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="热度榜"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/font_size_24px" />
+
+
+        <TextView
+            android:id="@+id/inviteRange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/inputbox_bg"
+            android:drawableStart="@drawable/ic_crown"
+            android:drawablePadding="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="邀请榜"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/font_size_24px" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/giftContainer"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_above="@+id/chat_msg_list"
+        android:animateLayoutChanges="true"
+        android:background="#00000000"
+        android:gravity="bottom"
+        android:orientation="vertical" />
+
+
+       <FrameLayout
+        android:id="@+id/redPacket"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="80dp"
+        android:layout_marginRight="20dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/shakeRedPacket"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/shake_red_packet"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/redPacketStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:background="@drawable/red_packet_status_bg"
+            android:textColor="#871101"
+            android:textSize="@dimen/font_size_18px"
+            tools:text="进行中" />
+    </FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chat_msg_list"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="60dp"
+        android:transcriptMode="normal">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <ImageButton
+        android:id="@+id/more_msg_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/chat_msg_list"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/push_btn_more_msg"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/bottomLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true">
+
+
+        <LinearLayout
+            android:id="@+id/bottomBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/chatBtn"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="@drawable/inputbox_bg"
+                android:gravity="left|center_vertical"
+                android:paddingLeft="10dp"
+                android:text="点击消息框可回复观众哦"
+                android:textColor="#BFBFBF"
+                android:textSize="@dimen/font_size_30px" />
+
+            <ImageButton
+                android:id="@+id/goods"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:background="@drawable/inputbox_bg"
+                android:padding="0dp"
+                android:src="@drawable/ic_goods" />
+
+            <ImageButton
+                android:id="@+id/invite"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:background="@drawable/inputbox_bg"
+                android:padding="0dp"
+                android:src="@drawable/ic_invite"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/more"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:background="@drawable/inputbox_bg"
+                android:padding="0dp"
+                android:src="@drawable/ic_more01" />
+
+            <ImageButton
+                android:id="@+id/exist"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:background="@drawable/inputbox_bg"
+                android:padding="0dp"
+                android:src="@drawable/ic_exist" />
+
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/chatInput"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/bg_inputbox"
+            android:hint="和粉丝聊两句呗!"
+            android:imeOptions="actionSend"
+            android:inputType="text"
+            android:padding="8dp"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+
+
+
+</RelativeLayout>
+
+
+

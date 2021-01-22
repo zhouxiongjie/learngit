@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-[{"outputType":{"type":"APK"},"apkInfo":{"type":"MAIN","splits":[],"versionCode":300,"versionName":"3.0.0","enabled":true,"outputFile":"ltsj-vnull-2021-01-21-15.00.apk","fullName":"ltsjRelease","baseName":"ltsj-release"},"path":"ltsj-vnull-2021-01-21-15.00.apk","properties":{}}]
-=======
-[{"outputType":{"type":"APK"},"apkInfo":{"type":"MAIN","splits":[],"versionCode":300,"versionName":"3.0.0","enabled":true,"outputFile":"ltsj-vnull-2021-01-20-11.20.apk","fullName":"ltsjRelease","baseName":"ltsj-release"},"path":"ltsj-vnull-2021-01-20-11.20.apk","properties":{}}]
->>>>>>> c6dc05c715d8b8f1a6c5b464786a105ec1723614
+[{"outputType":{"type":"APK"},"apkInfo":{"type":"MAIN","splits":[],"versionCode":300,"versionName":"3.0.0","enabled":true,"outputFile":"ltsj-vnull-2021-01-22-11.41.apk","fullName":"ltsjRelease","baseName":"ltsj-release"},"path":"ltsj-vnull-2021-01-22-11.41.apk","properties":{}}]

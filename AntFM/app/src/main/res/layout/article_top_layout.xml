@@ -113,7 +113,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="5dp"><!--android:id="@+id/ll_play_praise_collect"-->
+        android:paddingBottom="5dp"> <!--android:id="@+id/ll_play_praise_collect"-->
 
         <TextView
             android:id="@+id/playTimes"
@@ -167,7 +167,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:drawablePadding="10dp"
-                    android:text="已收藏"
+                    tools:text="已收藏"
                     android:textColor="@color/collect_color_selector"
                     android:textSize="@dimen/font_size_12sp"
                     app:drawableStartCompat="@drawable/collect_selector" />

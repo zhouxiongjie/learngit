@@ -198,7 +198,7 @@ public class SpecialDetailActivity extends QMUIActivity implements Handler.Callb
         });
         webView.addJavascriptInterface(new JsToAndroid(), "clientJS");
         webView.loadUrl(url);
-        progressBar.setColor("#001CA0FF", "#1CA0FF");
+        progressBar.setColor(CommonUtils.getTranslucentThemeColor(this),CommonUtils.getThemeColor(this));
     }
 
     @Override

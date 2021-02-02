@@ -348,8 +348,15 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         } else {
                             if (mArticle.getIs_collection() == 0) {
                                 collect(true);
+                                mArticle.setIs_collection(1);
+                                mHeadViewHolder.collect.setActivated(false);
+                                mHeadViewHolder.collect.setText("已收藏");
+
                             } else {
                                 collect(false);
+                                mArticle.setIs_collection(1);
+                                mHeadViewHolder.collect.setActivated(false);
+                                mHeadViewHolder.collect.setText("已收藏");
                             }
                         }
                     }
@@ -462,7 +469,8 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                if (mViewSkeletonScreen != null) mViewSkeletonScreen.hide();//getRelatedPosts onFailure
+                if (mViewSkeletonScreen != null)
+                    mViewSkeletonScreen.hide();//getRelatedPosts onFailure
             }
         });
     }
@@ -708,6 +716,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         runOnUiThread(() -> {
                             mHeadViewHolder.webView.loadUrl(js);//
                         });
+//                        mViewSkeletonScreen.hide();
                         if (mArticle.getAuthor_info() != null && mArticle.getAuthor_info().getMerchant() != null) {
                             if (!TextUtils.isEmpty(mArticle.getAuthor_info().getMerchant().getLogo())) {
                                 Uri uri = Uri.parse(mArticle.getAuthor_info().getMerchant().getLogo());
@@ -802,7 +811,34 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                                     it.putExtra("jump_url", ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
                                     startActivityForResult(it, REQUEST_LOGIN);
                                 } else {
+                                    if(mArticle.getIs_likes() == 0){
+                                        int num=mArticle.getLike();
+                                        num++;
+                                        like(true);
+                                        mArticle.setIs_likes(1);
+                                        mHeadViewHolder.praiseSum.setText(""+num);
+                                        mHeadViewHolder.praiseSum.setActivated(false);
+                                        //ToastUtils.show(jsonObject.getString("msg"));
+                                        mArticle.setLike(num);
+
+
+                                    }else{
+                                        int num=mArticle.getLike();
+                                        num--;
+                                        like(false);
+                                        mArticle.setIs_likes(0);
+                                        mHeadViewHolder.praiseSum.setText(""+num);
+                                        mHeadViewHolder.praiseSum.setActivated(true);
+                                        //ToastUtils.show(jsonObject.getString("msg"));
+                                        mArticle.setLike(num);
+
+
+                                        like(false);
+                                    }
+
                                     like(mArticle.getIs_likes() == 0);//点赞/取消赞
+
+
                                 }
                             }
                         });
@@ -815,10 +851,19 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                                     it.putExtra("jump_url", ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
                                     startActivityForResult(it, REQUEST_LOGIN);
                                 } else {
+
+
                                     if (mArticle.getIs_collection() == 0) {
                                         collect(true);
+                                        mArticle.setIs_collection(1);
+                                        mHeadViewHolder.collect.setActivated(false);
+                                        mHeadViewHolder.collect.setText("已收藏");
+
                                     } else {
                                         collect(false);
+                                        mArticle.setIs_collection(0);
+                                        mHeadViewHolder.collect.setActivated(true);
+                                        mHeadViewHolder.collect.setText("收藏");
                                     }
                                 }
                             }
@@ -915,13 +960,9 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                             }
                         }
                         mAdapter.setPostContents(mPostContents);//相关推荐
-                        if (mViewSkeletonScreen != null) {
-//                            new Handler().postDelayed(new Runnable(){
-//                                public void run() {
-                                    mViewSkeletonScreen.hide();//获取相关文章
-//                                }
-//                            }, 100);
-                        }
+//                        if (mViewSkeletonScreen != null) {
+//                            mViewSkeletonScreen.hide();//获取相关文章
+//                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1057,13 +1098,13 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                             }
                         }
                     });
-//                    if (mViewSkeletonScreen != null) {
+                    if (mViewSkeletonScreen != null) {
 //                        new Handler().postDelayed(new Runnable(){
 //                            public void run() {
-//                                mViewSkeletonScreen.hide();//获取评论列表
+                        mViewSkeletonScreen.hide();//获取评论列表
 //                            }
 //                        }, 100);
-//                    }
+                    }
                     mHeadViewHolder.divide_line.setVisibility(View.VISIBLE);//网页加载完成才显示分割线，以免出现闪屏问题
                 }
             }
@@ -1143,16 +1184,15 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         ToastUtils.show(jsonObject.getString("msg"));
+                        mArticle.setLike(jsonObject.getInteger("data"));
                         if (like) {
                             //praiseIcon.setTextColor(CommonUtils.getThemeColor(this));
                             mArticle.setIs_likes(1);
-                            mArticle.setLike(mArticle.getLike() + 1);
                             mHeadViewHolder.praiseSum.setText(String.valueOf(mArticle.getLike()));
                             mHeadViewHolder.praiseSum.setActivated(false);
                         } else {
                             //praiseIcon.setTextColor(getResources().getColor(R.color.textColorEleven));
                             mArticle.setIs_likes(0);
-                            mArticle.setLike(mArticle.getLike() - 1);
                             mHeadViewHolder.praiseSum.setText(String.valueOf(mArticle.getLike()));
                             mHeadViewHolder.praiseSum.setActivated(true);
                         }
@@ -1457,7 +1497,8 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (mViewSkeletonScreen != null) mViewSkeletonScreen.hide();//getArticleDetail onFailure
+                        if (mViewSkeletonScreen != null)
+                            mViewSkeletonScreen.hide();//getArticleDetail onFailure
                         networkError.setVisibility(View.VISIBLE);
                         findViewById(R.id.ll_bottomBar).setVisibility(View.GONE);
                     }
@@ -1482,7 +1523,8 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                if (mViewSkeletonScreen != null) mViewSkeletonScreen.hide();//articleVoices onFailure
+                if (mViewSkeletonScreen != null)
+                    mViewSkeletonScreen.hide();//articleVoices onFailure
             }
         });
     }
@@ -1499,11 +1541,11 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Message msg = Message.obtain();
-                msg.what = MSG_COLLECT_CALLBACK;
-                msg.arg1 = collect ? 1 : 0;
-                msg.obj = response;
-                mHandler.sendMessage(msg);
+//                Message msg = Message.obtain();
+//                msg.what = MSG_COLLECT_CALLBACK;
+//                msg.arg1 = collect ? 1 : 0;
+//                msg.obj = response;
+//                mHandler.sendMessage(msg);
             }
 
             @Override
@@ -1524,11 +1566,11 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Message msg = Message.obtain();
-                msg.what = MSG_LIKE_CALLBACK;
-                msg.arg1 = like ? 1 : 0;
-                msg.obj = response;
-                mHandler.sendMessage(msg);
+//                Message msg = Message.obtain();
+//                msg.what = MSG_LIKE_CALLBACK;
+//                msg.arg1 = like ? 1 : 0;
+//                msg.obj = response;
+//                mHandler.sendMessage(msg);
             }
 
             @Override

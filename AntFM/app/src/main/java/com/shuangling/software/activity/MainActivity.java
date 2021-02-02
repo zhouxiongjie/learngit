@@ -161,10 +161,9 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //setTheme(MyApplication.getInstance().getCurrentTheme());
+        setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         //QMUISkinManager manager=getSkinManager();
         QMUISkinManager skinManager = QMUISkinManager.defaultInstance(this);
        // setSkinManager(skinManager);
@@ -967,7 +966,7 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
 
                                         int index = (int) v.getTag();
                                         if (mViewPager != null && mViewPager.getAdapter().getCount() >= index + 1) {
-                                            mViewPager.setCurrentItem(index);
+                                            mViewPager.setCurrentItem(index,false);
                                         }
 
 

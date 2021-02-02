@@ -1,25 +1,25 @@
 package com.shuangling.software.utils;
 public class ServerInfo {
 
-	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
-
-	public static String h5IP="http://cms.staging.slradio.cn";
-
-	public static String h5HttpsIP="https://cms.staging.slradio.cn";
-
-	public static String activity="https://asc.staging.slradio.cn/";
-
-	public static String scs="https://scs.staging.slradio.cn";
-
-	public static String emc="http://api-emc.staging.slradio.cn";
-
-	public static String vms="http://api-vms.staging.slradio.cn";
-
-	public static String live="http://api-live.staging.slradio.cn";
-
-	public static String echo_server="http://echo-live.staging.slradio.cn";
-
-	public static String mlive="http://live-m.staging.slradio.cn";
+//	public static String serviceIP="http://api-cms.staging.slradio.cn";  		//测试环境
+//
+//	public static String h5IP="http://cms.staging.slradio.cn";
+//
+//	public static String h5HttpsIP="https://cms.staging.slradio.cn";
+//
+//	public static String activity="https://asc.staging.slradio.cn/";
+//
+//	public static String scs="https://scs.staging.slradio.cn";
+//
+//	public static String emc="http://api-emc.staging.slradio.cn";
+//
+//	public static String vms="http://api-vms.staging.slradio.cn";
+//
+//	public static String live="http://api-live.staging.slradio.cn";
+//
+//	public static String echo_server="http://echo-live.staging.slradio.cn";
+//
+//	public static String mlive="http://live-m.staging.slradio.cn";
 
 
 //	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
@@ -43,25 +43,28 @@ public class ServerInfo {
 //	public static String mlive="http://live-m.review.slradio.cn";
 
 
-//	public static String serviceIP="http://api-cms.on-radio.cn";
-//
-//	public static String h5IP="http://cms.on-radio.cn";
-//
-//	public static String h5HttpsIP="http://cms.on-radio.cn";
-//
-//	public static String activity="http://asc.on-radio.cn/";
-//
-//	public static String scs="http://scs.on-radio.cn";
-//
-//	public static String emc="http://api-emc.on-radio.cn";
-//
-//	public static String vms="http://api-vms.on-radio.cn";
-//
-//	public static String live="http://api-live.on-radio.cn";
-//
-//	public static String echo_server="http://echo-live.on-radio.cn";
-//
-//	public static String mlive="http://live-m.on-radio.cn";
+	public static String serviceIP="http://api-cms.on-radio.cn";
+
+	public static String h5IP="http://cms.on-radio.cn";
+
+	public static String h5HttpsIP="http://cms.on-radio.cn";
+
+	public static String activity="http://asc.on-radio.cn/";
+
+	public static String scs="http://scs.on-radio.cn";
+
+	public static String emc="http://api-emc.on-radio.cn";
+
+	public static String vms="http://api-vms.on-radio.cn";
+
+	public static String live="http://api-live.on-radio.cn";
+
+	public static String echo_server="http://echo-live.on-radio.cn";
+
+	public static String mlive="http://live-m.on-radio.cn";
+
+
+
 //	public static String serviceIP="http://api-cms.edu.slradio.cn";
 //
 //	public static String h5IP="http://cms.edu.slradio.cn";

@@ -162,6 +162,15 @@ public class CommonUtils {
         return color;
     }
 
+    public static @ColorInt
+    int getTranslucentThemeColor(Context context) {
+        int[] attrs = new int[]{R.attr.translucentThemeColor};
+        TypedArray typedArray = context.obtainStyledAttributes(attrs);
+        int color = typedArray.getColor(0, 0xffffffff);
+        typedArray.recycle();
+        return color;
+    }
+
     public static String saveBitmap(Bitmap b) {
         String path = getStoragePrivateDirectory(Environment.DIRECTORY_PICTURES);
         long dataTake = System.currentTimeMillis();

@@ -101,7 +101,7 @@ import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 import okhttp3.Call;
 
-public class VideoDetailActivity extends BaseAudioActivity implements Handler.Callback {
+public class VideoDetailActivity extends BaseAudioActivity2 implements Handler.Callback {
     public static final int MSG_GET_VIDEO_DETAIL = 0x00;
     public static final int MSG_COLLECT_CALLBACK = 0x01;
     public static final int MSG_UPDATE_STATUS = 0x02;
@@ -195,7 +195,8 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
         ButterKnife.bind(this);
         QMUIStatusBarHelper.setStatusBarLightMode(this); //
         activityTitle.addLeftImageButton(R.drawable.ic_left, com.qmuiteam.qmui.R.id.qmui_topbar_item_left_back).setOnClickListener(view -> { //
-            doOnBackPressed();
+//            doOnBackPressed();
+            onBackPressed();
         });
         activityTitle.addRightImageButton(R.drawable.ic_more, com.qmuiteam.qmui.R.id.right_icon).setOnClickListener(view -> {//
             if (mVideoDetail != null) {
@@ -425,11 +426,11 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Message msg = Message.obtain();
-                msg.what = MSG_COLLECT_CALLBACK;
-                msg.arg1 = collect ? 1 : 0;
-                msg.obj = response;
-                mHandler.sendMessage(msg);
+//                Message msg = Message.obtain();
+//                msg.what = MSG_COLLECT_CALLBACK;
+//                msg.arg1 = collect ? 1 : 0;
+//                msg.obj = response;
+//                mHandler.sendMessage(msg);
             }
 
             @Override
@@ -450,11 +451,11 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Message msg = Message.obtain();
-                msg.what = MSG_LIKE_CALLBACK;
-                msg.arg1 = like ? 1 : 0;
-                msg.obj = response;
-                mHandler.sendMessage(msg);
+//                Message msg = Message.obtain();
+//                msg.what = MSG_LIKE_CALLBACK;
+//                msg.arg1 = like ? 1 : 0;
+//                msg.obj = response;
+//                mHandler.sendMessage(msg);
             }
 
             @Override
@@ -658,20 +659,8 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
         }
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        if (mNeedResumeAudioPlay) {
-//            FloatWindowUtil.getInstance().visibleWindow();
-//        }
-//        if (aliyunVodPlayerView != null) {
-//            aliyunVodPlayerView.onDestroy();
-//            aliyunVodPlayerView = null;
-//        }
-//        super.onBackPressed();
-//    }
-
     @Override
-    protected void doOnBackPressed() {
+    public void onBackPressed() {
         if (mNeedResumeAudioPlay) {
             FloatWindowUtil.getInstance().visibleWindow();
         }
@@ -679,8 +668,20 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
             aliyunVodPlayerView.onDestroy();
             aliyunVodPlayerView = null;
         }
-        super.doOnBackPressed();
+        super.onBackPressed();
     }
+
+//    @Override
+//    protected void doOnBackPressed() {
+//        if (mNeedResumeAudioPlay) {
+//            FloatWindowUtil.getInstance().visibleWindow();
+//        }
+//        if (aliyunVodPlayerView != null) {
+//            aliyunVodPlayerView.onDestroy();
+//            aliyunVodPlayerView = null;
+//        }
+//        super.doOnBackPressed();
+//    }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -741,9 +742,25 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                                         startActivityForResult(it, REQUEST_LOGIN);
                                     } else {
                                         if (mVideoDetail.getIs_likes() == 0) {
+                                            int num=mVideoDetail.getLike();
+                                            num++;
                                             like(true);
+
+                                            mVideoDetail.setLike(num);
+                                            mVideoDetail.setIs_likes(1);
+                                            mAdapter.setVideoDetail(mVideoDetail);
+
+
                                         } else {
+
+                                            int num=mVideoDetail.getLike();
+                                            num--;
                                             like(false);
+
+                                            mVideoDetail.setLike(num);
+                                            mVideoDetail.setIs_likes(0);
+                                            mAdapter.setVideoDetail(mVideoDetail);
+
                                         }
                                     }
                                 }
@@ -759,8 +776,14 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                                     } else {
                                         if (mVideoDetail.getIs_collection() == 0) {
                                             collect(true);
+
+                                            mVideoDetail.setIs_collection(1);
+                                            mAdapter.setVideoDetail(mVideoDetail);
+
                                         } else {
                                             collect(false);
+                                            mVideoDetail.setIs_collection(0);
+                                            mAdapter.setVideoDetail(mVideoDetail);
                                         }
                                     }
                                 }
@@ -1150,14 +1173,13 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         ToastUtils.show(jsonObject.getString("msg"));
+                        mVideoDetail.setLike(jsonObject.getInteger("data"));
                         if (like) {
                             //praiseIcon.setTextColor(CommonUtils.getThemeColor(this));
                             mVideoDetail.setIs_likes(1);
-                            mVideoDetail.setLike(mVideoDetail.getLike() + 1);
                         } else {
                             //praiseIcon.setTextColor(getResources().getColor(R.color.textColorEleven));
                             mVideoDetail.setIs_likes(0);
-                            mVideoDetail.setLike(mVideoDetail.getLike() - 1);
                         }
                         mAdapter.setVideoDetail(mVideoDetail);
                     }

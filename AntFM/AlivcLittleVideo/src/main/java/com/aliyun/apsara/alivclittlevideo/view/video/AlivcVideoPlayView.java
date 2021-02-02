@@ -1,6 +1,8 @@
 package com.aliyun.apsara.alivclittlevideo.view.video;
+
 import android.app.Dialog;
 import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -13,6 +15,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
 import com.aliyun.apsara.alivclittlevideo.net.data.LittleMineVideoInfo;
 import com.aliyun.apsara.alivclittlevideo.sts.StsTokenInfo;
 import com.aliyun.apsara.alivclittlevideo.view.video.videolist.AlivcVideoListView;
@@ -21,35 +24,44 @@ import com.aliyun.apsara.alivclittlevideo.view.video.videolist.OnTimeExpiredErro
 import com.aliyun.downloader.AliMediaDownloader;
 import com.aliyun.player.IPlayer;
 import com.aliyun.player.source.StsInfo;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import com.aliyun.apsara.alivclittlevideo.utils.DensityUtils;
+
 /**
  * 播放界面, 负责initPlayerSDK以及各种view
  *
  * @author xlx
  */
 public class AlivcVideoPlayView extends FrameLayout {
-private static final String TAG = "AlivcVideoPlayView";
+    private static final String TAG = "AlivcVideoPlayView";
     private Context context;
     private AlivcVideoListView videoListView;
-private StsInfo stsInfo;
-public StsInfo getStsInfo() {
+    private StsInfo stsInfo;
+
+    public StsInfo getStsInfo() {
         return stsInfo;
     }
-public void setStsInfo(StsInfo stsInfo) {
+
+    public void setStsInfo(StsInfo stsInfo) {
         this.stsInfo = stsInfo;
         videoListView.setStsInfo(stsInfo);
     }
-private LittleVideoListAdapter.OnItemBtnClick onItemBtnClick;
-public void playVideoAtPostion(int position){
+
+    private LittleVideoListAdapter.OnItemBtnClick onItemBtnClick;
+
+    public void playVideoAtPostion(int position) {
         videoListView.playVideoAtPosition(position);
     }
-public void setOnItemBtnClick(LittleVideoListAdapter.OnItemBtnClick onItemBtnClick) {
+
+    public void setOnItemBtnClick(LittleVideoListAdapter.OnItemBtnClick onItemBtnClick) {
         this.onItemBtnClick = onItemBtnClick;
         mVideoAdapter.setItemBtnClick(onItemBtnClick);
     }
-/**
+
+    /**
      * 刷新数据listener (下拉刷新和上拉加载)
      */
     private AlivcVideoListView.OnRefreshDataListener onRefreshDataListener;
@@ -57,32 +69,37 @@ public void setOnItemBtnClick(LittleVideoListAdapter.OnItemBtnClick onItemBtnCli
      * 视频缓冲加载view
      */
     private LoadingView mLoadingView;
-/**
+    /**
      * 视频删除点击事件
      */
     private OnVideoDeleteListener mOutOnVideoDeleteListener;
     private LittleVideoListAdapter mVideoAdapter;
-public AlivcVideoPlayView(@NonNull Context context) {
+
+    public AlivcVideoPlayView(@NonNull Context context) {
         this(context, null);
     }
-public AlivcVideoPlayView(@NonNull Context context, @Nullable AttributeSet attrs) {
+
+    public AlivcVideoPlayView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
         init();
     }
-private void init() {
+
+    private void init() {
         initPlayListView();
         initLoadingView();
     }
+
     private Dialog mDownloadDialog;
-private TextView mTvProgress;
+    private TextView mTvProgress;
     private FrameLayout mDownloadContent;
-/**
+    /**
      * 下载sdk核心类
      */
     private AliMediaDownloader mDownloadManager;
-private int mClickPosition;
-/**
+    private int mClickPosition;
+
+    /**
      * 初始化视频列表
      */
     private void initPlayListView() {
@@ -102,25 +119,29 @@ private int mClickPosition;
                     onRefreshDataListener.onRefresh();
                 }
             }
-@Override
+
+            @Override
             public void onLoadMore() {
                 if (onRefreshDataListener != null) {
                     onRefreshDataListener.onLoadMore();
                 }
             }
-@Override
+
+            @Override
             public void onExitVideo() {
                 if (onRefreshDataListener != null) {
                     onRefreshDataListener.onExitVideo();
                 }
             }
-@Override
+
+            @Override
             public void onSTSExpired() {
                 if (onRefreshDataListener != null) {
                     onRefreshDataListener.onSTSExpired();
                 }
             }
-@Override
+
+            @Override
             public void onPlayAtPosition(int position) {
                 if (onRefreshDataListener != null) {
                     onRefreshDataListener.onPlayAtPosition(position);
@@ -133,17 +154,19 @@ private int mClickPosition;
             public void onLoadingBegin() {
                 mLoadingView.start();
             }
-@Override
+
+            @Override
             public void onLoadingEnd() {
                 mLoadingView.cancle();
             }
-@Override
+
+            @Override
             public void onLoadingProgress(int var1, float var2) {
-}
+            }
         });
         //设置鉴权过期监听，刷新鉴权信息
         videoListView.setTimeExpiredErrorListener(new OnTimeExpiredErrorListener() {
-@Override
+            @Override
             public void onTimeExpiredError() {
                 if (mStsInfoExpiredListener != null) {
                     mStsInfoExpiredListener.onTimeExpired();
@@ -153,15 +176,18 @@ private int mClickPosition;
         //添加到布局中
         addSubView(videoListView);
     }
-/**
+
+    /**
      * 播放、下载、上传过程中鉴权过期时提供的回调消息
      */
     private OnStsInfoExpiredListener mStsInfoExpiredListener;
-public void setOnStsInfoExpiredListener(
-        OnStsInfoExpiredListener mTimeExpiredErrorListener) {
+
+    public void setOnStsInfoExpiredListener(
+            OnStsInfoExpiredListener mTimeExpiredErrorListener) {
         this.mStsInfoExpiredListener = mTimeExpiredErrorListener;
     }
-private void initLoadingView() {
+
+    private void initLoadingView() {
         mLoadingView = new LoadingView(context);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
                 5);
@@ -169,7 +195,8 @@ private void initLoadingView() {
         params.gravity = Gravity.BOTTOM;
         addView(mLoadingView, params);
     }
-/**
+
+    /**
      * addSubView 添加子view到布局中
      *
      * @param view 子view
@@ -179,7 +206,8 @@ private void initLoadingView() {
                 FrameLayout.LayoutParams.MATCH_PARENT);
         addView(view, params);
     }
-/**
+
+    /**
      * 刷新视频列表数据
      *
      * @param datas
@@ -190,8 +218,9 @@ private void initLoadingView() {
         videoListView.refreshData(videoList);
         //取消加载loading
         mLoadingView.cancle();
-}
-/**
+    }
+
+    /**
      * 刷新视频列表数据
      *
      * @param datas
@@ -204,7 +233,8 @@ private void initLoadingView() {
         //取消加载loading
         mLoadingView.cancle();
     }
-/**
+
+    /**
      * 添加更多视频
      *
      * @param datas
@@ -216,7 +246,8 @@ private void initLoadingView() {
         //取消加载loading
         mLoadingView.cancle();
     }
-/**
+
+    /**
      * 设置下拉刷新数据listener
      *
      * @param listener OnRefreshDataListener
@@ -224,18 +255,23 @@ private void initLoadingView() {
     public void setOnRefreshDataListener(AlivcVideoListView.OnRefreshDataListener listener) {
         this.onRefreshDataListener = listener;
     }
-public void onStart() {
-}
-public void onResume() {
+
+    public void onStart() {
+    }
+
+    public void onResume() {
         videoListView.setOnBackground(false);
-}
-public void onStop() {
+    }
+
+    public void onStop() {
         mLoadingView.cancle();
     }
-public void onPause() {
-videoListView.setOnBackground(true);
-}
-public void onDestroy() {
+
+    public void onPause() {
+        videoListView.setOnBackground(true);
+    }
+
+    public void onDestroy() {
         context = null;
         if (mDownloadManager != null) {
             mDownloadManager.setOnCompletionListener(null);
@@ -246,44 +282,49 @@ public void onDestroy() {
             mDownloadManager = null;
         }
     }
-/**
+
+    /**
      * 视频列表获取失败
      */
     public void loadFailure() {
         mLoadingView.cancle();
         videoListView.loadFailure();
     }
-private FragmentActivity mActivity;
-private FragmentManager getFragmentManager() {
+
+    private FragmentActivity mActivity;
+
+    private FragmentManager getFragmentManager() {
         FragmentManager fm = null;
         if (mActivity != null) {
             fm = mActivity.getSupportFragmentManager();
         } else {
             Context mContext = getContext();
             if (mContext instanceof FragmentActivity) {
-                fm = ((FragmentActivity)mContext).getSupportFragmentManager();
+                fm = ((FragmentActivity) mContext).getSupportFragmentManager();
             }
         }
         return fm;
     }
-/**
+
+    /**
      * 刷新sts信息
      *
      * @param tokenInfo
      */
     public void refreshStsInfo(StsTokenInfo tokenInfo) {
-        if(videoListView != null){
+        if (videoListView != null) {
             String currentUid = videoListView.getCurrentUid();
-            if(!TextUtils.isEmpty(currentUid) && tokenInfo != null){
+            if (!TextUtils.isEmpty(currentUid) && tokenInfo != null) {
                 StsInfo stsInfo = new StsInfo();
                 stsInfo.setAccessKeyId(tokenInfo.getAccessKeyId());
                 stsInfo.setAccessKeySecret(tokenInfo.getAccessKeySecret());
                 stsInfo.setSecurityToken(tokenInfo.getSecurityToken());
-                videoListView.moveTo(currentUid,stsInfo);
+                videoListView.moveTo(currentUid, stsInfo);
             }
         }
     }
-/**
+
+    /**
      * 删除按钮点击listener
      */
     public interface OnVideoDeleteListener {
@@ -294,17 +335,20 @@ private FragmentManager getFragmentManager() {
          */
         void onDeleteClick(LittleMineVideoInfo.VideoListBean videoId);
     }
-public void setOnVideoDeleteListener(
-        OnVideoDeleteListener mOutOnVideoDeleteListener) {
+
+    public void setOnVideoDeleteListener(
+            OnVideoDeleteListener mOutOnVideoDeleteListener) {
         this.mOutOnVideoDeleteListener = mOutOnVideoDeleteListener;
     }
+
     /**
      * 移除当前播放的视频
      */
     public void removeCurrentPlayVideo() {
         videoListView.removeCurrentPlayVideo();
     }
-public  LittleVideoListAdapter.MyHolder getPlayPager() {
-       return videoListView.getPlayPager();
+
+    public LittleVideoListAdapter.MyHolder getPlayPager() {
+        return videoListView.getPlayPager();
     }
 }

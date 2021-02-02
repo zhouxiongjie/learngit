@@ -213,7 +213,7 @@ public class WebViewBackActivity extends /*AppCompatActivity*/QMUIActivity imple
         webView.loadUrl(url);
         if (progressBar != null) {
             progressBar.show();
-            progressBar.setColor("#001CA0FF", "#1CA0FF");
+            progressBar.setColor(CommonUtils.getTranslucentThemeColor(this),CommonUtils.getThemeColor(this));
         }
     }
 

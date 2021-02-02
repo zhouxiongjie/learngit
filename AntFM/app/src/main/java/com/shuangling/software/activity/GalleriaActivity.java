@@ -182,7 +182,7 @@ public class GalleriaActivity extends QMUIActivity/*AppCompatActivity*/ implemen
         });
         webView.addJavascriptInterface(new JsToAndroid(), "clientJS");
         webView.loadUrl(url);
-        progressBar.setColor("#001CA0FF", "#1CA0FF");
+        progressBar.setColor(CommonUtils.getTranslucentThemeColor(this),CommonUtils.getThemeColor(this));
     }
 
     private void getGalleriaDetail() {

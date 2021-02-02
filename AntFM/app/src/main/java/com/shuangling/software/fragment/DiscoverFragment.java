@@ -29,7 +29,6 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
@@ -86,9 +85,6 @@ import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 import io.reactivex.functions.Consumer;
 import okhttp3.Call;
-
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 
 public class DiscoverFragment extends QMUIFragment/*SimpleImmersionFragment*/ implements Handler.Callback {
     private static final int LOGIN_RESULT = 0x1;
@@ -353,7 +349,7 @@ public class DiscoverFragment extends QMUIFragment/*SimpleImmersionFragment*/ im
         });
         webView.addJavascriptInterface(new JsToAndroid(), "clientJS");
         webView.loadUrl(url);
-        progressBar.setColor("#001CA0FF", "#1CA0FF");
+        progressBar.setColor(CommonUtils.getTranslucentThemeColor(getActivity()),CommonUtils.getThemeColor(getActivity()));
     }
 
     private void showShareDialog(final String title, final String desc, final String logo, final String url) {

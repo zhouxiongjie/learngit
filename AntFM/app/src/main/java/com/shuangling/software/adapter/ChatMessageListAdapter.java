@@ -1,13 +1,16 @@
 package com.shuangling.software.adapter;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -17,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.facebook.common.logging.FLog;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
@@ -31,23 +35,29 @@ import com.shuangling.software.entity.ChatMessage;
 import com.shuangling.software.utils.ChatMessageManager;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
+
 import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 public class ChatMessageListAdapter extends RecyclerView.Adapter {
-public static final int TYPE_HEADER = 0;
+    public static final int TYPE_HEADER = 0;
     public static final int TYPE_TEXT = 1;
     public static final int TYPE_PICTURE = 2;
-private LayoutInflater inflater;
+    private LayoutInflater inflater;
     private Activity mContext;
     private OnItemReply mOnItemReply;
-public interface OnItemReply {
+
+    public interface OnItemReply {
         void replyItem(ChatMessage message);
     }
-public void setOnItemReply(OnItemReply onItemReply) {
+
+    public void setOnItemReply(OnItemReply onItemReply) {
         this.mOnItemReply = onItemReply;
     }
-//ArrayList<ChatMessage> msgList = new ArrayList<>();
+
+    //ArrayList<ChatMessage> msgList = new ArrayList<>();
 //    int directionType = 0; //0竖屏 1横屏
 //    public void showChatMsg(ChatMessage msg) {
 //        msgList.add(msg);
@@ -72,21 +82,22 @@ public void setOnItemReply(OnItemReply onItemReply) {
 //        inflater = LayoutInflater.from(context);
 //        msgList.addAll(msg);
 //    }
-public ChatMessageListAdapter(Activity context) {
+    public ChatMessageListAdapter(Activity context) {
         //this.directionType = directionType;
         mContext = context;
         inflater = LayoutInflater.from(context);
     }
-@NonNull
+
+    @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-if (viewType == TYPE_HEADER) {
+        if (viewType == TYPE_HEADER) {
             return new HeaderViewHolder(inflater.inflate(R.layout.chat_msg_header, viewGroup, false));
 //            if (directionType == 1) {
 //                hvh.content.setBackground(null);
 //            }
 //            return hvh;
-} else if (viewType == TYPE_TEXT) {
+        } else if (viewType == TYPE_TEXT) {
             return new TextViewHolder(inflater.inflate(R.layout.chat_msg_text, viewGroup, false));
 //            if (directionType == 1) {
 //                tvh.layout.setBackground(null);
@@ -99,13 +110,14 @@ if (viewType == TYPE_HEADER) {
 //            }
 //            return pvh;
         }
-}
-@Override
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
-int viewType = getItemViewType(position);
+        int viewType = getItemViewType(position);
         if (viewType == TYPE_HEADER) {
-} else if (viewType == TYPE_TEXT) {
-TextViewHolder vh = (TextViewHolder) viewHolder;
+        } else if (viewType == TYPE_TEXT) {
+            TextViewHolder vh = (TextViewHolder) viewHolder;
             vh.root.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
@@ -114,7 +126,7 @@ TextViewHolder vh = (TextViewHolder) viewHolder;
                 }
             });
             ChatMessage msg = ChatMessageManager.getInstance().getMessageList().get(position - 1);
-if (!TextUtils.isEmpty(msg.getUserLog())) {
+            if (!TextUtils.isEmpty(msg.getUserLog())) {
                 Uri uri = Uri.parse(msg.getUserLog());
                 int width = CommonUtils.dip2px(30);
                 int height = width;
@@ -122,7 +134,7 @@ if (!TextUtils.isEmpty(msg.getUserLog())) {
             } else {
                 ImageLoader.showThumb(vh.head, R.drawable.ic_user1);
             }
-if (msg.getType() == 1) {
+            if (msg.getType() == 1) {
                 //主持人
                 vh.emcee.setVisibility(View.VISIBLE);
                 vh.reply.setVisibility(View.VISIBLE);
@@ -134,22 +146,22 @@ if (msg.getType() == 1) {
             }
             vh.name.setText(msg.getNickName());
             vh.content.setText(msg.getMsg());
-if (msg.getParentMsgInfo() != null) {
-ViewGroup.MarginLayoutParams lp=(ViewGroup.MarginLayoutParams)vh.content.getLayoutParams();
-                lp.leftMargin=CommonUtils.dip2px(13);
+            if (msg.getParentMsgInfo() != null) {
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) vh.content.getLayoutParams();
+                lp.leftMargin = CommonUtils.dip2px(13);
                 vh.content.setLayoutParams(lp);
                 if (msg.getParentMsgInfo().getContentType() == 1) {
                     vh.parentLayout.setVisibility(View.GONE);
                     vh.parentContent.setVisibility(View.VISIBLE);
                     vh.divider.setVisibility(View.VISIBLE);
-                    vh.parentContent.setText("「"+msg.getParentMsgInfo().getNickName()+":" + msg.getParentMsgInfo().getMsg().trim() + "」");
+                    vh.parentContent.setText("「" + msg.getParentMsgInfo().getNickName() + ":" + msg.getParentMsgInfo().getMsg().trim() + "」");
                 } else {
                     vh.parentLayout.setVisibility(View.VISIBLE);
-                    vh.parentName.setText("「"+msg.getParentMsgInfo().getNickName());
+                    vh.parentName.setText("「" + msg.getParentMsgInfo().getNickName());
                     vh.parentContent.setVisibility(View.GONE);
                     vh.divider.setVisibility(View.VISIBLE);
                     if (!TextUtils.isEmpty(msg.getParentMsgInfo().getMsg())) {
-ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
+                        ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
                             @Override
                             public void onFinalImageSet(
                                     String id,
@@ -169,31 +181,33 @@ ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() 
                                         qualityInfo.isOfFullQuality());
                                 float ratio = (float) imageInfo.getWidth() / (float) imageInfo.getHeight();
                                 vh.parentPicture.setAspectRatio(ratio);
-}
-@Override
+                            }
+
+                            @Override
                             public void onIntermediateImageSet(String id, @Nullable ImageInfo imageInfo) {
-}
-@Override
+                            }
+
+                            @Override
                             public void onFailure(String id, Throwable throwable) {
-}
+                            }
                         };
-Uri uri = Uri.parse(msg.getParentMsgInfo().getMsg());
+                        Uri uri = Uri.parse(msg.getParentMsgInfo().getMsg());
                         DraweeController controller = Fresco.newDraweeControllerBuilder()
                                 .setControllerListener(controllerListener)
                                 .setUri(uri)
                                 // other setters
                                 .build();
                         vh.parentPicture.setController(controller);
-vh.parentPicture.setOnClickListener(new View.OnClickListener() {
+                        vh.parentPicture.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
-com.shuangling.software.entity.ImageInfo image = new com.shuangling.software.entity.ImageInfo(msg.getParentMsgInfo().getMsg());
+                                ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
+                                com.shuangling.software.entity.ImageInfo image = new com.shuangling.software.entity.ImageInfo(msg.getParentMsgInfo().getMsg());
                                 images.add(image);
                                 Rect bounds = new Rect();
                                 vh.parentPicture.getGlobalVisibleRect(bounds);
                                 image.setBounds(bounds);
-GPreviewBuilder.from(mContext)
+                                GPreviewBuilder.from(mContext)
                                         .setData(images)
                                         .setCurrentIndex(0)
                                         .setDrag(true, 0.6f)
@@ -202,17 +216,17 @@ GPreviewBuilder.from(mContext)
                                         .start();
                             }
                         });
-}
+                    }
                 }
             } else {
-                ViewGroup.MarginLayoutParams lp=(ViewGroup.MarginLayoutParams)vh.content.getLayoutParams();
-                lp.leftMargin=CommonUtils.dip2px(0);
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) vh.content.getLayoutParams();
+                lp.leftMargin = CommonUtils.dip2px(0);
                 vh.content.setLayoutParams(lp);
                 vh.parentContent.setVisibility(View.GONE);
                 vh.parentLayout.setVisibility(View.GONE);
                 vh.divider.setVisibility(View.GONE);
             }
-vh.reply.setOnClickListener(new View.OnClickListener() {
+            vh.reply.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mOnItemReply.replyItem(msg);
@@ -228,15 +242,15 @@ vh.reply.setOnClickListener(new View.OnClickListener() {
                 }
             });
             ChatMessage msg = ChatMessageManager.getInstance().getMessageList().get(position - 1);
-if (!TextUtils.isEmpty(msg.getUserLog())) {
+            if (!TextUtils.isEmpty(msg.getUserLog())) {
                 Uri uri = Uri.parse(msg.getUserLog());
                 int width = CommonUtils.dip2px(30);
                 int height = width;
                 ImageLoader.showThumb(uri, vh.head, width, height);
-} else {
+            } else {
                 ImageLoader.showThumb(vh.head, R.drawable.ic_user1);
             }
-if (msg.getType() == 1) {
+            if (msg.getType() == 1) {
                 //主持人
                 vh.emcee.setVisibility(View.VISIBLE);
                 vh.reply.setVisibility(View.VISIBLE);
@@ -253,19 +267,19 @@ if (msg.getType() == 1) {
                     mOnItemReply.replyItem(msg);
                 }
             });
-if (msg.getParentMsgInfo() != null) {
+            if (msg.getParentMsgInfo() != null) {
                 if (msg.getParentMsgInfo().getContentType() == 1) {
                     vh.parentLayout.setVisibility(View.GONE);
                     vh.parentContent.setVisibility(View.VISIBLE);
                     vh.divider.setVisibility(View.VISIBLE);
-                    vh.parentContent.setText("「"+msg.getNickName()+":" + msg.getParentMsgInfo().getMsg() + "」");
-} else {
+                    vh.parentContent.setText("「" + msg.getNickName() + ":" + msg.getParentMsgInfo().getMsg() + "」");
+                } else {
                     vh.parentLayout.setVisibility(View.VISIBLE);
-                    vh.parentName.setText("「"+msg.getNickName());
+                    vh.parentName.setText("「" + msg.getNickName());
                     vh.parentContent.setVisibility(View.GONE);
                     vh.divider.setVisibility(View.VISIBLE);
                     if (!TextUtils.isEmpty(msg.getParentMsgInfo().getMsg())) {
-ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
+                        ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
                             @Override
                             public void onFinalImageSet(
                                     String id,
@@ -285,31 +299,33 @@ ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() 
                                         qualityInfo.isOfFullQuality());
                                 float ratio = (float) imageInfo.getWidth() / (float) imageInfo.getHeight();
                                 vh.parentPicture.setAspectRatio(ratio);
-}
-@Override
+                            }
+
+                            @Override
                             public void onIntermediateImageSet(String id, @Nullable ImageInfo imageInfo) {
-}
-@Override
+                            }
+
+                            @Override
                             public void onFailure(String id, Throwable throwable) {
-}
+                            }
                         };
-Uri uri = Uri.parse(msg.getParentMsgInfo().getMsg());
+                        Uri uri = Uri.parse(msg.getParentMsgInfo().getMsg());
                         DraweeController controller = Fresco.newDraweeControllerBuilder()
                                 .setControllerListener(controllerListener)
                                 .setUri(uri)
                                 // other setters
                                 .build();
                         vh.parentPicture.setController(controller);
-vh.parentPicture.setOnClickListener(new View.OnClickListener() {
+                        vh.parentPicture.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
-com.shuangling.software.entity.ImageInfo image = new com.shuangling.software.entity.ImageInfo(msg.getParentMsgInfo().getMsg());
+                                ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
+                                com.shuangling.software.entity.ImageInfo image = new com.shuangling.software.entity.ImageInfo(msg.getParentMsgInfo().getMsg());
                                 images.add(image);
                                 Rect bounds = new Rect();
                                 vh.parentPicture.getGlobalVisibleRect(bounds);
                                 image.setBounds(bounds);
-GPreviewBuilder.from(mContext)
+                                GPreviewBuilder.from(mContext)
                                         .setData(images)
                                         .setCurrentIndex(0)
                                         .setDrag(true, 0.6f)
@@ -318,15 +334,15 @@ GPreviewBuilder.from(mContext)
                                         .start();
                             }
                         });
-}
+                    }
                 }
             } else {
                 vh.parentContent.setVisibility(View.GONE);
-                vh.parentLayout .setVisibility(View.GONE);
+                vh.parentLayout.setVisibility(View.GONE);
                 vh.divider.setVisibility(View.GONE);
             }
-if (!TextUtils.isEmpty(msg.getMsg())) {
-ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
+            if (!TextUtils.isEmpty(msg.getMsg())) {
+                ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() {
                     @Override
                     public void onFinalImageSet(
                             String id,
@@ -346,31 +362,33 @@ ControllerListener controllerListener = new BaseControllerListener<ImageInfo>() 
                                 qualityInfo.isOfFullQuality());
                         float ratio = (float) imageInfo.getWidth() / (float) imageInfo.getHeight();
                         vh.picture.setAspectRatio(ratio);
-}
-@Override
+                    }
+
+                    @Override
                     public void onIntermediateImageSet(String id, @Nullable ImageInfo imageInfo) {
-}
-@Override
+                    }
+
+                    @Override
                     public void onFailure(String id, Throwable throwable) {
-}
+                    }
                 };
-Uri uri = Uri.parse(msg.getMsg());
+                Uri uri = Uri.parse(msg.getMsg());
                 DraweeController controller = Fresco.newDraweeControllerBuilder()
                         .setControllerListener(controllerListener)
                         .setUri(uri)
                         // other setters
                         .build();
                 vh.picture.setController(controller);
-vh.picture.setOnClickListener(new View.OnClickListener() {
+                vh.picture.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
+                        ArrayList<com.shuangling.software.entity.ImageInfo> images = new ArrayList<>();
                         com.shuangling.software.entity.ImageInfo image = new com.shuangling.software.entity.ImageInfo(msg.getMsg());
                         images.add(image);
                         Rect bounds = new Rect();
                         vh.picture.getGlobalVisibleRect(bounds);
                         image.setBounds(bounds);
-GPreviewBuilder.from(mContext)
+                        GPreviewBuilder.from(mContext)
                                 .setData(images)
                                 .setCurrentIndex(0)
                                 .setDrag(true, 0.6f)
@@ -381,8 +399,9 @@ GPreviewBuilder.from(mContext)
                 });
             }
         }
-}
-@Override
+    }
+
+    @Override
     public int getItemCount() {
         if (ChatMessageManager.getInstance().getMessageList().size() == 0) {
             return 1;
@@ -391,7 +410,8 @@ GPreviewBuilder.from(mContext)
         }
 //            return 10;
     }
-@Override
+
+    @Override
     public int getItemViewType(int position) {
         if (position == 0) {
             return TYPE_HEADER;
@@ -401,15 +421,18 @@ GPreviewBuilder.from(mContext)
             return TYPE_PICTURE;
         }
     }
-static class HeaderViewHolder extends RecyclerView.ViewHolder {
+
+    static class HeaderViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.content)
         TextView content;
-HeaderViewHolder(View view) {
+
+        HeaderViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
     }
-static class TextViewHolder extends RecyclerView.ViewHolder {
+
+    static class TextViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.root)
         LinearLayout root;
         @BindView(R.id.head)
@@ -432,12 +455,14 @@ static class TextViewHolder extends RecyclerView.ViewHolder {
         ImageView divider;
         @BindView(R.id.content)
         TextView content;
-TextViewHolder(View view) {
+
+        TextViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
     }
-static class PictureViewHolder extends RecyclerView.ViewHolder {
+
+    static class PictureViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.root)
         LinearLayout root;
         @BindView(R.id.head)
@@ -460,7 +485,8 @@ static class PictureViewHolder extends RecyclerView.ViewHolder {
         ImageView divider;
         @BindView(R.id.picture)
         SimpleDraweeView picture;
-PictureViewHolder(View view) {
+
+        PictureViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }

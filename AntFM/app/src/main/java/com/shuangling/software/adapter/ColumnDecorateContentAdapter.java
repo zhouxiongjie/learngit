@@ -24,6 +24,7 @@ import com.shuangling.software.activity.ArticleDetailActivity02;
 import com.shuangling.software.activity.AudioDetailActivity;
 import com.shuangling.software.activity.GalleriaActivity;
 import com.shuangling.software.activity.LiveDetailActivity;
+import com.shuangling.software.activity.LivePortraitActivity;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.activity.WebViewBackActivity;
@@ -853,6 +854,14 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                     liveViewHolder.type.setText("教育");
                     liveViewHolder.typeIcon.setText(R.string.live_shop);
                 }
+
+                if(content.getLive().getStatus()==1){
+                    liveViewHolder.status.setText("未开始");
+                }else if(content.getLive().getStatus()==2){
+                    liveViewHolder.status.setText("直播中");
+                }else{
+                    liveViewHolder.status.setText("已结束 ");
+                }
             }
             liveViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -868,14 +877,29 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                     String url = content.getLive().getUrl();
                     if (content.getLive().getType() == 4 || content.getLive().getType() == 1) {
                         if (!TextUtils.isEmpty(url)) {
-                            String streamName = url.substring(url.lastIndexOf("=") + 1);
-                            Intent it = new Intent(mContext, LiveDetailActivity.class);
-                            it.putExtra("streamName", streamName);
-                            it.putExtra("roomId", content.getLive().getRoom_id());
-                            //it.putExtra("url",content.getLive().getHls_play_url());
-                            it.putExtra("url", content.getLive().getRtmp_play_url());
-                            it.putExtra("type", content.getLive().getType());
-                            mContext.startActivity(it);
+                            ColumnContent.LiveBean.ExtraBean extra=content.getLive().getExtra();
+                            if(extra!=null&&(extra.getShow_model()==2||extra.getShow_model()==3)){
+                                Intent it = new Intent(mContext, LivePortraitActivity.class);
+                                it.putExtra("streamName", extra.getStream_name());
+                                it.putExtra("live_driver",extra.getLive_driver());
+                                it.putExtra("is_rtslive",extra.getIs_rtslive());
+
+//                                it.putExtra("roomId", content.getLive().getRoom_id());
+//                                it.putExtra("url", content.getLive().getRtmp_play_url());
+//                                it.putExtra("type", content.getLive().getType());
+                                mContext.startActivity(it);
+                            }else{
+                                String streamName = url.substring(url.lastIndexOf("=") + 1);
+                                Intent it = new Intent(mContext, LiveDetailActivity.class);
+                                it.putExtra("streamName", streamName);
+                                it.putExtra("roomId", content.getLive().getRoom_id());
+                                //it.putExtra("url",content.getLive().getHls_play_url());
+                                it.putExtra("url", content.getLive().getRtmp_play_url());
+                                it.putExtra("type", content.getLive().getType());
+                                mContext.startActivity(it);
+                            }
+
+
                         }
                     } else {
                         Intent it = new Intent(mContext, WebViewBackActivity.class);

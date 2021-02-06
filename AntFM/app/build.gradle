@@ -267,6 +267,9 @@ dependencies {
     implementation 'com.github.MrBin99:LaravelEchoAndroid:1.0'
     implementation 'com.github.kaisengao:KsgLikeView:1.0.1'
     implementation 'com.aliyun.sdk.android:AlivcArtc:5.1.5'
+    implementation 'io.alterac.blurkit:blurkit:1.1.0'
+
+
 //https://help.aliyun.com/document_detail/124711.html
     implementation externalGSON
     def version = '2.0.0-alpha10'//https://qmuiteam.com/android/get-started/
@@ -275,5 +278,5 @@ dependencies {
     annotationProcessor "com.qmuiteam:arch-compiler:$version"
 //    implementation 'com.tencent.tbs.tbssdk:sdk:43939' //https://x5.tencent.com/docs/access.html
     implementation 'cat.ereza:customactivityoncrash:2.3.0' //https://github.com/Ereza/CustomActivityOnCrash
-
+    implementation 'com.tencent.xbright:lebwebrtcsdk:2.0.6'
 }

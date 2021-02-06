@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item >
+        <shape android:shape="rectangle">
+            <!-- 角度 -->
+            <corners android:topLeftRadius="10dp"
+                android:topRightRadius="10dp"/>
+            <padding android:top="10dp" />
+            <!-- 填充色 -->
+            <solid android:color="#fd2052" />
+            <!-- 描边 设置线宽及颜色 -->
+            <stroke android:width="0dp" android:color="#F2F2F2" />
+        </shape>
+    </item>
+    <!--<item android:state_activated="false">-->
+        <!--<shape android:shape="rectangle">-->
+            <!--<corners android:topLeftRadius="10dp"-->
+                <!--android:topRightRadius="10dp"/>-->
+            <!--<padding android:bottom="10dp" android:left="10dp" android:right="10dp" android:top="10dp" />-->
+            <!--&lt;!&ndash; 填充色 &ndash;&gt;-->
+            <!--<solid android:color="#F5F5F8" />-->
+            <!--&lt;!&ndash; 描边 设置线宽及颜色 &ndash;&gt;-->
+            <!--<stroke android:width="0dp" android:color="?attr/themeColor" />-->
+        <!--</shape>-->
+    <!--</item>-->
+</selector>

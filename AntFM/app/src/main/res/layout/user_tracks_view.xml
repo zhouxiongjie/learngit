@@ -6,14 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.Guideline
+
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_vertical"
         android:layout_width="1dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
-    <androidx.constraintlayout.Guideline
+    <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline_horizontal"
         android:layout_width="1dp"
         android:layout_height="wrap_content"
@@ -51,13 +52,13 @@
     </FrameLayout>
 
     <!--<TextView-->
-        <!--android:id="@+id/qn_audio_view"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:gravity="center"-->
-        <!--android:textColor="@color/white"-->
-        <!--android:textSize="24sp"-->
-        <!--android:visibility="invisible" />-->
+    <!--android:id="@+id/qn_audio_view"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:gravity="center"-->
+    <!--android:textColor="@color/white"-->
+    <!--android:textSize="24sp"-->
+    <!--android:visibility="invisible" />-->
 
     <RelativeLayout
         android:id="@+id/qn_audio_view"
@@ -84,63 +85,61 @@
     </RelativeLayout>
 
     <!--<TextView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:gravity="center"-->
-        <!--android:textColor="@color/red"-->
-        <!--android:textSize="24sp"-->
-        <!--android:visibility="visible"-->
-        <!--android:text="你好 我是trackview"-->
-        <!--/>-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:gravity="center"-->
+    <!--android:textColor="@color/red"-->
+    <!--android:textSize="24sp"-->
+    <!--android:visibility="visible"-->
+    <!--android:text="你好 我是trackview"-->
+    <!--/>-->
 
     <!--<ImageView-->
-        <!--android:id="@+id/microphone_state_view"-->
-        <!--android:layout_width="12dp"-->
-        <!--android:layout_height="12dp"-->
-        <!--android:layout_gravity="bottom"-->
-        <!--android:layout_margin="4dp"-->
-        <!--android:src="@drawable/microphone_state_enable"-->
-        <!--android:visibility="visible"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"/>-->
-
+    <!--android:id="@+id/microphone_state_view"-->
+    <!--android:layout_width="12dp"-->
+    <!--android:layout_height="12dp"-->
+    <!--android:layout_gravity="bottom"-->
+    <!--android:layout_margin="4dp"-->
+    <!--android:src="@drawable/microphone_state_enable"-->
+    <!--android:visibility="visible"-->
+    <!--app:layout_constraintBottom_toBottomOf="parent"/>-->
 
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
         android:background="#7f010509"
+        android:orientation="horizontal"
         android:paddingRight="10dp"
-        android:orientation="horizontal">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
 
         <ImageView
             android:id="@+id/emcee"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:src="@drawable/ic_emcee"
-            android:visibility="visible"
-            android:layout_gravity="center_vertical"/>
+            android:visibility="visible" />
 
 
         <ImageView
             android:id="@+id/microphone_state_view"
             android:layout_width="12dp"
             android:layout_height="12dp"
+            android:layout_gravity="center_vertical"
             android:layout_margin="5dp"
             android:src="@drawable/microphone_state_enable"
-            android:visibility="visible"
-            android:layout_gravity="center_vertical"/>
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/nickname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/font_size_22px"
-            tools:text="张益达"
+            android:layout_gravity="center_vertical"
             android:textColor="#cfff"
-            android:layout_gravity="center_vertical"/>
-
+            android:textSize="@dimen/font_size_22px"
+            tools:text="张益达" />
 
 
     </LinearLayout>

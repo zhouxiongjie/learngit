@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp" >
+
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/head"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_centerVertical="true"
+        app:actualImageScaleType="centerCrop"
+        app:failureImage="@drawable/ic_user3"
+        app:failureImageScaleType="centerCrop"
+        app:placeholderImage="@drawable/ic_user3"
+        app:placeholderImageScaleType="centerCrop"
+        app:roundAsCircle="false"
+        app:roundingBorderColor="@color/white"
+        app:roundedCornerRadius="3dp"
+        app:roundingBorderWidth="0dp"
+        app:viewAspectRatio="1" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/head"
+        android:layout_marginStart="10dp">
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="王大锤"
+            android:textSize="@dimen/font_size_26px"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="#812411"
+            />
+
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="12-27 09:10"
+            android:textSize="@dimen/font_size_24px"
+            android:textColor="#999999"
+            />
+
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:gravity="right"
+        android:layout_marginEnd="10dp">
+
+        <TextView
+            android:id="@+id/money"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1.50元"
+            android:textSize="@dimen/font_size_24px"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="#F24F12"
+            />
+
+
+        <TextView
+            android:id="@+id/bestLuck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="手气最佳"
+            android:textSize="@dimen/font_size_24px"
+            android:drawablePadding="10dp"
+            android:textColor="#FF981E"
+            android:drawableStart="@drawable/ic_best_luck"
+            />
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -104,7 +104,7 @@
             app:outerShadowDx="3"
             app:outerShadowDy="3"
             app:outerShadowRadius="1"
-            app:strokeColor="#f15353"
+            app:strokeColor1="#f15353"
             app:strokeJoinStyle="round" />
 
         <!--app:strokeWidth1="1dp"-->

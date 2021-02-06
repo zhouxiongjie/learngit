@@ -157,7 +157,7 @@ public class MyApplication extends MultiDexApplication {
         }
         setupDatabase();
         registActivity();
-        //initTheme();
+        initTheme();
 
         initStation();
         getApiDomain();

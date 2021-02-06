@@ -672,7 +672,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                     redPacket.setVisibility(View.GONE);
                                 } else {
                                     redPacket.setVisibility(View.VISIBLE);
-                                    RedPacketInfo redPacketInfo = redPacketInfos.get(redPacketInfos.size() - 1);
+                                    RedPacketInfo redPacketInfo = redPacketInfos.get(0);
                                     if (redPacketInfo.getState() == 0) {
                                         //定时红包，即将开始
                                         redPacketStatus.setText("即将开始");
@@ -702,7 +702,7 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                                         //抢红包操作
                                                         RedPacketDialog.getInstance(redPacketInfo, mStreamName).setOnOkClickListener(new RedPacketDialog.OnGrabClickListener() {
                                                             @Override
-                                                            public void onGrab() {
+                                                            public void onGrabSuccess() {
                                                                 if (User.getInstance() == null) {
                                                                     Intent it = new Intent(getContext(), NewLoginActivity.class);
                                                                     startActivity(it);
@@ -712,6 +712,19 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                                                                     startActivity(it);
                                                                 }
                                                             }
+
+                                                            @Override
+                                                            public void onDetail() {
+                                                                if (User.getInstance() == null) {
+                                                                    Intent it = new Intent(getContext(), NewLoginActivity.class);
+                                                                    startActivity(it);
+                                                                } else {
+                                                                    Intent it = new Intent(getContext(), RedPacketDetailActivity.class);
+                                                                    it.putExtra("id", "" + redPacketInfo.getId());
+                                                                    startActivity(it);
+                                                                }
+                                                            }
+
                                                         }).show(getChildFragmentManager(), "RedPacketDialog");
                                                     }
                                                 }

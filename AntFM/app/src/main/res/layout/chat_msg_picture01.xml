@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/transparent"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+
+    <LinearLayout
+        android:id="@+id/layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/chat_msg_bg01"
+        android:padding="5dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/head"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_vertical"
+                fresco:actualImageScaleType="centerCrop"
+                fresco:failureImage="@drawable/ic_user3"
+                fresco:failureImageScaleType="centerCrop"
+                fresco:placeholderImage="@drawable/ic_user3"
+                fresco:placeholderImageScaleType="centerCrop"
+                fresco:roundAsCircle="true"
+                fresco:roundingBorderColor="@color/white"
+                fresco:roundingBorderWidth="0px"
+                fresco:viewAspectRatio="1" />
+
+
+            <TextView
+                android:id="@+id/emcee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/emcee_bg"
+                android:text="主播"
+                android:textColor="#E5F7F7F7"
+                android:textSize="@dimen/font_size_22px" />
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:textColor="#8CE6FF"
+                android:textSize="@dimen/font_size_26px"
+                tools:text="李晓峰" />
+
+
+            <TextView
+                android:id="@+id/reply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:padding="5dp"
+                android:text="回复"
+                android:textColor="#389AFC"
+                android:textSize="@dimen/font_size_22px"
+                android:visibility="gone"/>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="40dp"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/parentLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_msg_bg01"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/parentName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#999999"
+                    android:textSize="@dimen/font_size_28px"
+                    android:layout_gravity="top"
+                    tools:text="李峰:"/>
+                <com.facebook.drawee.view.SimpleDraweeView
+                    android:id="@+id/parentPicture"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/parentName"
+                    android:scaleType="centerCrop"
+                    fresco:backgroundImage="@color/lightgray"
+                    fresco:roundedCornerRadius="2dp"
+                    fresco:roundingBorderColor="@color/white"
+                    fresco:roundingBorderWidth="1dp"
+                    fresco:viewAspectRatio="1" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#999999"
+                    android:textSize="@dimen/font_size_28px"
+                    android:layout_below="@+id/parentPicture"
+                    android:layout_marginTop="-10dp"
+                    android:layout_toRightOf="@+id/parentPicture"
+                    android:text="」"
+                    android:visibility="gone"/>
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/parentContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_msg_bg01"
+                android:textColor="#999999"
+                android:textSize="@dimen/font_size_28px"
+                tools:text="咿呀呀呀呀呀呀呀咿呀呀呀呀"/>
+
+            <ImageView
+                android:id="@+id/divider"
+                android:layout_width="match_parent"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_height="1px"
+                android:background="#E6E6E6"
+                android:visibility="gone"/>
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/picture"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:scaleType="centerCrop"
+                fresco:backgroundImage="@color/lightgray"
+                fresco:roundedCornerRadius="2dp"
+                android:layout_marginTop="5dp"
+                fresco:roundingBorderColor="@color/white"
+                fresco:roundingBorderWidth="1dp"
+                fresco:viewAspectRatio="1" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+    <!--</LinearLayout>-->
+
+</LinearLayout>
+
+
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:fresco="http://schemas.android.com/apk/res-auto"-->
+    <!--xmlns:tools="http://schemas.android.com/tools"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:background="@color/transparent"-->
+    <!--android:orientation="vertical"-->
+    <!--android:padding="5dp">-->
+    <!---->
+    <!---->
+    <!--<LinearLayout-->
+        <!--android:id="@+id/layout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@drawable/chat_msg_bg01"-->
+        <!--android:padding="5dp"-->
+        <!--android:orientation="vertical">-->
+
+        <!--<LinearLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal">-->
+
+            <!--<com.facebook.drawee.view.SimpleDraweeView-->
+                <!--android:id="@+id/head"-->
+                <!--android:layout_width="25dp"-->
+                <!--android:layout_height="25dp"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--fresco:actualImageScaleType="centerCrop"-->
+                <!--fresco:failureImage="@drawable/ic_head01"-->
+                <!--fresco:failureImageScaleType="centerCrop"-->
+                <!--fresco:placeholderImage="@drawable/ic_head01"-->
+                <!--fresco:placeholderImageScaleType="centerCrop"-->
+                <!--fresco:roundAsCircle="true"-->
+                <!--fresco:roundingBorderColor="@color/white"-->
+                <!--fresco:roundingBorderWidth="0px"-->
+                <!--fresco:viewAspectRatio="1" />-->
+
+
+            <!--<TextView-->
+                <!--android:id="@+id/emcee"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginLeft="5dp"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:text="主持人"-->
+                <!--android:textColor="#F7F7F7"-->
+                <!--android:textSize="@dimen/font_size_22px"-->
+                <!--android:background="@drawable/emcee_bg"/>-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/name"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginLeft="5dp"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--tools:text="李晓峰"-->
+                <!--android:textColor="#8CE6FF"-->
+                <!--android:textSize="@dimen/font_size_30px"-->
+                <!--/>-->
+
+
+
+        <!--</LinearLayout>-->
+
+        <!--<com.facebook.drawee.view.SimpleDraweeView-->
+            <!--android:id="@+id/picture"-->
+            <!--android:layout_width="100dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginLeft="30dp"-->
+            <!--android:scaleType="centerCrop"-->
+            <!--fresco:backgroundImage="@color/lightgray"-->
+            <!--fresco:roundedCornerRadius="2dp"-->
+            <!--fresco:roundingBorderColor="@color/white"-->
+            <!--fresco:roundingBorderWidth="1dp"-->
+            <!--fresco:viewAspectRatio="1"/>-->
+
+    <!--</LinearLayout>-->
+
+<!--</LinearLayout>-->

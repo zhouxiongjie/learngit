@@ -204,7 +204,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                initFragment();
+                                 initFragment();
                             }
                         });
                     }

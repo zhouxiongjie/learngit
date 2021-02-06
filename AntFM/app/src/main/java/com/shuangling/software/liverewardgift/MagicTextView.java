@@ -43,7 +43,7 @@ public class MagicTextView extends TextView {
     private Drawable foregroundDrawable;
 
     private float strokeWidth;
-    private Integer strokeColor;
+    private Integer strokeColor1;
     private Join strokeJoin;
     private float strokeMiter;
 
@@ -102,9 +102,9 @@ public class MagicTextView extends TextView {
                         a.getColor(R.styleable.MagicTextView_outerShadowColor, 0xff000000));
             }
 
-            if(a.hasValue(R.styleable.MagicTextView_strokeColor)){
+            if(a.hasValue(R.styleable.MagicTextView_strokeColor1)){
                 float strokeWidth = a.getFloat(R.styleable.MagicTextView_strokeWidth1, 1);
-                int strokeColor = a.getColor(R.styleable.MagicTextView_strokeColor, 0xff000000);
+                int strokeColor = a.getColor(R.styleable.MagicTextView_strokeColor1, 0xff000000);
                 float strokeMiter = a.getFloat(R.styleable.MagicTextView_strokeMiter, 10);
                 switch(a.getInt(R.styleable.MagicTextView_strokeJoinStyle, 0)){
                     case(0): strokeJoin = Join.MITER; break;
@@ -119,7 +119,7 @@ public class MagicTextView extends TextView {
 
     public void setStroke(float width, int color, Join join, float miter){
         strokeWidth = width;
-        strokeColor = color;
+        strokeColor1 = color;
         strokeJoin = join;
         strokeMiter = miter;
     }
@@ -184,13 +184,13 @@ public class MagicTextView extends TextView {
             tempCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         }
 
-        if(strokeColor != null){
+        if(strokeColor1 != null){
             TextPaint paint = this.getPaint();
 //          paint.setTextAlign(Paint.Align.CENTER);
             paint.setStyle(Style.STROKE);
             paint.setStrokeJoin(strokeJoin);
             paint.setStrokeMiter(strokeMiter);
-            this.setTextColor(strokeColor);
+            this.setTextColor(strokeColor1);
             paint.setStrokeWidth(strokeWidth);
             super.onDraw(canvas);
             paint.setStyle(Style.FILL);

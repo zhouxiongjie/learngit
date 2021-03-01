@@ -15,7 +15,7 @@
 
         <LinearLayout
             android:id="@+id/layout"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/chat_msg_bg01"
             android:orientation="vertical"
@@ -80,7 +80,7 @@
                         android:layout_marginLeft="5dp"
                         android:lineSpacingMultiplier="1.0"
                         android:textColor="#FFFFFF"
-                        android:textSize="@dimen/font_size_30px"
+                        android:textSize="@dimen/font_size_28px"
                         tools:text="热心市民：希望大家多多支持我的直的直播" />
 
 
@@ -116,7 +116,7 @@
                     android:layout_marginLeft="25dp"
                     android:textColor="#ffffff"
                     android:visibility="visible"
-                    android:textSize="@dimen/font_size_30px"
+                    android:textSize="@dimen/font_size_28px"
                     tools:text="哈哈哈哈哈哈哈哈哈哈哈哈" />
 
             </LinearLayout>

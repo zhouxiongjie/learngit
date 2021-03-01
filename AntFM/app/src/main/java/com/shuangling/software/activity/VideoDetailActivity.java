@@ -246,6 +246,7 @@ public class VideoDetailActivity extends BaseAudioActivity implements Handler.Ca
     private void initAliyunPlayerView() {
         //保持屏幕敞亮
         aliyunVodPlayerView.setKeepScreenOn(true);
+        aliyunVodPlayerView.getPlayerConfig();
         String sdDir = CommonUtils.getStoragePrivateDirectory(Environment.DIRECTORY_MOVIES);
         aliyunVodPlayerView.setPlayingCache(false, sdDir, 60 * 60 /*时长, s */, 300 /*大小，MB*/);
         aliyunVodPlayerView.setTheme(AliyunVodPlayerView.Theme.Blue);

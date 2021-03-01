@@ -52,9 +52,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/statusBar"
                 android:paddingLeft="10dp"
-                android:paddingTop="10dp"
+                android:paddingTop="5dp"
                 android:paddingRight="10dp"
-                android:paddingBottom="10dp">
+                android:paddingBottom="5dp">
 
                 <FrameLayout
                     android:id="@+id/frameLayout"

@@ -7,6 +7,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,17 +17,14 @@ import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.BaseCircleDialog;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.LiveRewardAdapter;
-import com.shuangling.software.adapter.LiveViewerListAdapter;
 import com.shuangling.software.entity.LiveRoomInfo01;
 import com.shuangling.software.entity.RewardsInfo;
-import com.shuangling.software.entity.Viewer;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ServerInfo;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -44,9 +42,10 @@ public class RewardListDialog extends BaseCircleDialog {
 
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.noData)
+    TextView noData;
 
     Unbinder unbinder;
-
 
     private LiveRoomInfo01.RoomInfoBean liveRoomInfo;
 
@@ -94,9 +93,8 @@ public class RewardListDialog extends BaseCircleDialog {
     }
 
 
-
     private void getRewardList(int roomId) {
-        String url = ServerInfo.live + "/v1/faq/users/"+roomId;
+        String url = ServerInfo.live + "/v1/faq/users/" + roomId;
         Map<String, String> params = new HashMap<>();
 
         OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
@@ -107,16 +105,19 @@ public class RewardListDialog extends BaseCircleDialog {
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
 
-                        RewardsInfo rewards  = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), RewardsInfo.class);
+                        RewardsInfo rewards = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), RewardsInfo.class);
 
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                try{
+                                try {
                                     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                                     recyclerView.setLayoutManager(linearLayoutManager);
-                                    recyclerView.setAdapter(new LiveRewardAdapter(getContext(),rewards));
-                                }catch (Exception e){
+                                    recyclerView.setAdapter(new LiveRewardAdapter(getContext(), rewards));
+                                    if(rewards.getAwards()==null||rewards.getAwards().size()==0){
+                                        noData.setVisibility(View.VISIBLE);
+                                    }
+                                } catch (Exception e) {
 
                                 }
 

@@ -83,6 +83,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.sentry.Sentry;
 import okhttp3.Call;
 
 public class IndexFragment extends Fragment implements Handler.Callback {
@@ -1459,7 +1460,8 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Sentry.capture(e);
+                    //e.printStackTrace();
                 }
                 break;
             case MSG_GET_COLUMN: {

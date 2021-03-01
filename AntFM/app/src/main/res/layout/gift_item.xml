@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/live_gift_bg"
+        app:layout_constraintDimensionRatio="h,1:1">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/logo"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            app:actualImageScaleType="centerCrop"
+            app:failureImage="@color/gray"
+            app:failureImageScaleType="centerCrop"
+            app:placeholderImage="@color/gray"
+            app:placeholderImageScaleType="centerCrop"
+            app:roundAsCircle="false"
+            app:roundingBorderColor="@color/ghostwhite"
+            app:roundingBorderWidth="0dp"
+            app:viewAspectRatio="1" />
+
+        <TextView
+            android:id="@+id/giftName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp"
+            android:textColor="#333333"
+            android:textSize="@dimen/font_size_24px" />
+
+        <TextView
+            android:id="@+id/giftPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="2dp"
+            android:textColor="#666666"
+            android:textSize="@dimen/font_size_20px" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+
+
+
+
+

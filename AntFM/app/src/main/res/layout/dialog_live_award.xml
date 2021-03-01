@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:orientation="vertical"
+        android:padding="0dp"
+        android:background="@drawable/send_red_packet_dialog_bg">
+
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabPageIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabBackground="@android:color/transparent"
+            app:tabRippleColor="@android:color/transparent"
+            android:layout_alignParentTop="true"
+            android:textSize="@dimen/font_size_32px"
+            android:textStyle="bold"
+            app:tabIndicatorColor="#333333"
+            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorHeight="2dp"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="#333333"
+            app:tabTextColor="#999999" />
+
+        <com.shuangling.software.customview.MyViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/tabPageIndicator"
+            android:layout_above="@+id/actionLayout"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

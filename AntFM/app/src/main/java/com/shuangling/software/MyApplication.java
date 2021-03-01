@@ -44,6 +44,7 @@ import com.shuangling.software.manager.SkinManager;
 import com.shuangling.software.network.ElnImageDownloaderFetcher;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.CrashHandler;
 import com.shuangling.software.utils.FloatWindowUtil;
@@ -60,6 +61,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.alterac.blurkit.BlurKit;
 import io.sentry.Sentry;
 import io.sentry.android.AndroidSentryClientFactory;
 import okhttp3.Call;
@@ -120,7 +122,9 @@ public class MyApplication extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         sInstance = this;
+
         QNRTCEnv.setLogLevel(QNLogLevel.INFO);
+        BlurKit.init(this);
         /*
          * init must be called before any other func
          */

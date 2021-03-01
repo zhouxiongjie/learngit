@@ -10,6 +10,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.media.AudioManager;
@@ -93,6 +94,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.sql.Date;
 import java.text.DecimalFormat;
@@ -177,6 +180,22 @@ public class CommonUtils {
             e.printStackTrace();
             return "";
         }
+    }
+
+    public static Bitmap getBitMBitmap(String urlpath) {
+        Bitmap map = null;
+        try {
+            URL url = new URL(urlpath);
+            URLConnection conn = url.openConnection();
+            conn.connect();
+            InputStream in;
+            in = conn.getInputStream();
+            map = BitmapFactory.decodeStream(in);
+            // TODO Auto-generated catch block
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return map;
     }
 
     public static String getRealFilePath(final Context context, final Uri uri) {
@@ -1384,5 +1403,15 @@ public class CommonUtils {
         queueSet.downloadSequentially(tasks);
         //queueSet.downloadTogether(tasks);
         queueSet.start();
+    }
+
+
+    public static String getVersionName(Context context) {
+        try {
+            return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

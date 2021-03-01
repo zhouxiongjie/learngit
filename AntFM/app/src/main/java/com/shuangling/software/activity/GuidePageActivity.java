@@ -1,16 +1,20 @@
 package com.shuangling.software.activity;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
@@ -25,25 +29,29 @@ import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.viewpagerindicator.CirclePageIndicator;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.Call;
+
 public class GuidePageActivity extends AppCompatActivity implements Handler.Callback {
-public static final String FIRST_RUN = "first_run";
+    public static final String FIRST_RUN = "first_run";
     public static final int MSG_GET_PAGES = 0x1;
-@BindView(R.id.viewPager)
+    @BindView(R.id.viewPager)
     ViewPager viewPager;
     @BindView(R.id.indicator)
     CirclePageIndicator indicator;
-private PagerAdapter mPageAdapter;
+    private PagerAdapter mPageAdapter;
     private List<View> mViews = new ArrayList<>();
     private Handler mHandler;
-@Override
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
@@ -52,43 +60,49 @@ private PagerAdapter mPageAdapter;
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         //ImmersionBar.with(this).transparentStatusBar().init();
         //CommonUtils.transparentStatusBar(this);
-        boolean firstRun = SharedPreferencesUtils.getBooleanValue(FIRST_RUN, true);
+
+        //boolean firstRun = SharedPreferencesUtils.getBooleanValue(FIRST_RUN, true);
         //测试
-MainActivity.firstRun=firstRun;
-        if (firstRun) {
+        String lastVersion = SharedPreferencesUtils.getStringValue("lastVersion", null);
+        if(!CommonUtils.getVersionName(this).equals(lastVersion)){
+            //第一次运行或者更新版本后第一次运行
             setContentView(R.layout.activity_guidepage);
             ButterKnife.bind(this);
-            mHandler=new Handler(this);
+            mHandler = new Handler(this);
             guides();
-        } else {
+        }else{
             Intent intent = new Intent(this, StartupActivity.class);
             startActivity(intent);
             finish();
         }
-}
-public void guides() {
-String url = ServerInfo.serviceIP + ServerInfo.guides;
+    }
+
+    public void guides() {
+        String url = ServerInfo.serviceIP + ServerInfo.guides;
         Map<String, String> params = new HashMap<>();
         params.put("version", "V" + getVersionName());
-OkHttpUtils.get(url, params, new OkHttpCallback(this) {
-@Override
+        OkHttpUtils.get(url, params, new OkHttpCallback(this) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_GET_PAGES;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
-}
-@Override
+    }
+
+    @Override
     protected void onDestroy() {
-        SharedPreferencesUtils.putPreferenceTypeValue(FIRST_RUN,SharedPreferencesUtils.PreferenceType.Boolean,"false");
+        //SharedPreferencesUtils.putPreferenceTypeValue(FIRST_RUN, SharedPreferencesUtils.PreferenceType.Boolean, "false");
         super.onDestroy();
     }
-public String getVersionName() {
+
+    public String getVersionName() {
         try {
             return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (Exception e) {
@@ -96,83 +110,84 @@ public String getVersionName() {
             return null;
         }
     }
-@Override
+
+    @Override
     public boolean handleMessage(Message msg) {
-switch (msg.what){
+        switch (msg.what) {
             case MSG_GET_PAGES:
-            try {
-                String result = (String) msg.obj;
-                JSONObject jo = JSONObject.parseObject(result);
-                if (jo.getIntValue("code") == 100000 && jo.getJSONObject("data") != null) {
-                    GuidePage pages = JSONObject.parseObject(jo.getJSONObject("data").toJSONString(), GuidePage.class);
-for(int i=0;pages.getContents()!=null&&i<pages.getContents().size();i++){
-SimpleDraweeView view=new SimpleDraweeView(this);
-                        GenericDraweeHierarchy hierarchy = view.getHierarchy();
-                        hierarchy.setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
-                        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-if(!TextUtils.isEmpty(pages.getContents().get(i).getImage())){
-                            Uri uri = Uri.parse(pages.getContents().get(i).getImage());
-                            ImageLoader.showThumb(uri, view, CommonUtils.getScreenWidth(), CommonUtils.getScreenHeight()-CommonUtils.getNavigationBarHeight(this)-CommonUtils.getStateBarHeight(this));
-                        }
-                        mViews.add(view);
-                        if(i==pages.getContents().size()-1){
-                            view.setOnClickListener(new OnClickListener() {
-@Override
-                                public void onClick(View v) {
-startActivity(new Intent(GuidePageActivity.this,MainActivity.class));
-                                    finish();
+                try {
+                    String result = (String) msg.obj;
+                    JSONObject jo = JSONObject.parseObject(result);
+                    if (jo.getIntValue("code") == 100000 && jo.getJSONObject("data") != null) {
+                        GuidePage pages = JSONObject.parseObject(jo.getJSONObject("data").toJSONString(), GuidePage.class);
+                        for (int i = 0; pages.getContents() != null && i < pages.getContents().size(); i++) {
+                            SimpleDraweeView view = new SimpleDraweeView(this);
+                            GenericDraweeHierarchy hierarchy = view.getHierarchy();
+                            hierarchy.setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP);
+                            view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                            if (!TextUtils.isEmpty(pages.getContents().get(i).getImage())) {
+                                Uri uri = Uri.parse(pages.getContents().get(i).getImage());
+                                ImageLoader.showThumb(uri, view, CommonUtils.getScreenWidth(), CommonUtils.getScreenHeight() - CommonUtils.getNavigationBarHeight(this) - CommonUtils.getStateBarHeight(this));
+                            }
+                            mViews.add(view);
+                            if (i == pages.getContents().size() - 1) {
+                                view.setOnClickListener(new OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        startActivity(new Intent(GuidePageActivity.this, MainActivity.class));
+                                        finish();
+                                    }
+                                });
+                            }
+                            mPageAdapter = new PagerAdapter() {
+                                @Override
+                                public void destroyItem(ViewGroup container, int position, Object object) {
+                                    container.removeView(mViews.get(position));
+                                }
+
+                                @Override
+                                public Object instantiateItem(ViewGroup container, int position) {
+                                    View view = mViews.get(position);
+                                    container.addView(view);
+                                    return view;
+                                }
+
+                                @Override
+                                public boolean isViewFromObject(View arg0, Object arg1) {
+                                    return arg0 == arg1;
+                                }
+
+                                @Override
+                                public int getCount() {
+                                    return mViews.size();
+                                }
+                            };
+                            viewPager.setAdapter(mPageAdapter);
+                            indicator.setViewPager(viewPager);
+                            indicator.setSnap(true);
+                            indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                                @Override
+                                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                                }
+
+                                @Override
+                                public void onPageSelected(int position) {
+                                }
+
+                                @Override
+                                public void onPageScrollStateChanged(int state) {
                                 }
                             });
                         }
-mPageAdapter = new PagerAdapter()
-                        {
-@Override
-                            public void destroyItem(ViewGroup container, int position, Object object)
-                            {
-                                container.removeView(mViews.get(position));
-                            }
-@Override
-                            public Object instantiateItem(ViewGroup container, int position)
-                            {
-                                View view = mViews.get(position);
-                                container.addView(view);
-                                return view;
-                            }
-@Override
-                            public boolean isViewFromObject(View arg0, Object arg1)
-                            {
-                                return arg0 == arg1;
-                            }
-@Override
-                            public int getCount()
-                            {
-                                return mViews.size();
-                            }
-                        };
-                        viewPager.setAdapter(mPageAdapter);
-                        indicator.setViewPager(viewPager);
-                        indicator.setSnap(true);
-                        indicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                            @Override
-                            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-}
-@Override
-                            public void onPageSelected(int position) {
-}
-@Override
-                            public void onPageScrollStateChanged(int state) {
-}
-                        });
-}
-}else{
-                    Intent intent = new Intent(this, StartupActivity.class);
-                    startActivity(intent);
-                    finish();
+                    } else {
+                        Intent intent = new Intent(this, StartupActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-} catch (Exception e) {
-                e.printStackTrace();
-            }
-            break;
+                break;
         }
         return false;
     }

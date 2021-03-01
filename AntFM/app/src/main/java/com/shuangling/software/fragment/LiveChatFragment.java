@@ -664,15 +664,14 @@ public class LiveChatFragment extends Fragment implements ChatAction, OSSComplet
                 try {
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-                        List<RedPacketInfo> redPacketInfos = JSON.parseArray(jsonObject.getJSONObject("data").getJSONArray("my_clip").toJSONString(), RedPacketInfo.class);
+                        RedPacketInfo redPacketInfo = JSON.parseObject(jsonObject.getJSONObject("data").toJSONString(), RedPacketInfo.class);
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if (redPacketInfos == null || redPacketInfos.size() == 0) {
+                                if (redPacketInfo == null) {
                                     redPacket.setVisibility(View.GONE);
                                 } else {
                                     redPacket.setVisibility(View.VISIBLE);
-                                    RedPacketInfo redPacketInfo = redPacketInfos.get(0);
                                     if (redPacketInfo.getState() == 0) {
                                         //定时红包，即将开始
                                         redPacketStatus.setText("即将开始");

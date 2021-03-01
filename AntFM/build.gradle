@@ -65,7 +65,7 @@ allprojects {
 //        maven { url "https://maven.google.com" }
 //        maven { url 'https://jitpack.io' }
 
-//        google()
+        //google()
         jcenter()
         maven{url 'https://maven.aliyun.com/repository/public'}
         maven{url 'https://maven.aliyun.com/repository/google'}

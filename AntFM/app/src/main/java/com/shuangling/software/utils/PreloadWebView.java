@@ -5,9 +5,13 @@ import android.content.MutableContextWrapper;
 import android.os.Build;
 import android.os.Looper;
 import android.os.MessageQueue;
+import android.util.DisplayMetrics;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import com.qmuiteam.qmui.util.QMUIDisplayHelper;
+import com.qmuiteam.qmui.util.QMUIPackageHelper;
+import com.shuangling.software.BuildConfig;
 import com.shuangling.software.MyApplication;
 
 import java.util.Stack;
@@ -68,14 +72,32 @@ public class PreloadWebView {
     private WebView createWebView() {
         WebView webview = new WebView(new MutableContextWrapper(MyApplication.getInstance()));
 //        webview.loadUrl("file:///android_asset/app_article_static.html");//
-        WebSettings s = webview.getSettings();
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-            s.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        WebSettings webSettings = webview.getSettings();
+
+        CommonUtils.setWebviewUserAgent(webSettings);
+
+
+
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setSupportZoom(true);
+        webSettings.setBuiltInZoomControls(true);
+        webSettings.setDefaultTextEncodingName("GBK");
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLoadWithOverviewMode(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+        webSettings.setTextZoom(100);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         }
-        CommonUtils.setWebviewUserAgent(s);
-        s.setJavaScriptEnabled(true);
-        s.setTextZoom(100);// 设置网页字体不跟随系统字体发生改变
-        s.setDomStorageEnabled(true);  //开启 DOM storage API 功能
+
+
+        // 开启调试
+        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            webview.setWebContentsDebuggingEnabled(true);
+        }
+
 //        webview.loadDataWithBaseURL("file:///android_asset/article/?item_id=0&token=0", getHtml(), "text/html", "utf-8", "file:///android_asset/article/?item_id=0&token=0");
         return webview;
     }

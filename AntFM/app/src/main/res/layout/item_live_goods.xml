@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+
+    <RelativeLayout
+        android:id="@+id/left"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_margin="10dp"
+        android:background="#40000000"
+        android:orientation="horizontal">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/picture"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_alignParentLeft="true"
+            android:layout_gravity="center_vertical"
+            fresco:actualImageScaleType="centerCrop"
+            fresco:failureImage="@drawable/ic_default_image"
+            fresco:failureImageScaleType="centerCrop"
+            fresco:placeholderImage="@drawable/ic_default_image"
+            fresco:placeholderImageScaleType="centerCrop"
+            fresco:roundAsCircle="false"
+            fresco:roundingBorderColor="@color/white"
+            fresco:roundingBorderWidth="0dp"
+            fresco:viewAspectRatio="1" />
+
+
+        <TextView
+            android:id="@+id/sort"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:background="#32000000"
+            android:gravity="center"
+            android:text="01"
+            android:textColor="#ffffff"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/explain"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_alignParentBottom="true"
+            android:background="#E5FF5000"
+            android:gravity="center"
+            android:text="讲解中"
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/font_size_30px" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/right"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/goods_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="真维斯短袖T恤男潮夏装男士漫威联名钢铁侠体恤上衣真维斯短袖T恤男潮夏装男士漫威联名钢铁侠体恤上衣"
+            android:textColor="#ff001426"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/source"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/layout_bottom"
+            android:text="来自京东"
+            android:textColor="#ff999999"
+            android:textSize="11sp" />
+
+        <RelativeLayout
+            android:id="@+id/layout_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:layout_alignParentBottom="true">
+
+            <TextView
+
+                android:id="@+id/price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:text="￥49.90"
+                android:textColor="#ffff5000"
+                android:textSize="15sp"
+
+                />
+
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/price"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:layout_alignParentBottom="true"-->
+            <!--                android:text="去看看"-->
+            <!--                android:textColor="#FFFFFF"-->
+            <!--                android:background="@drawable/luck_award_dialog_bg"-->
+            <!--                android:textSize="@dimen/font_size_28px"-->
+
+            <!--                />-->
+
+            <TextView
+                android:id="@+id/see"
+                android:layout_width="75dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/add_goods_btn_bg"
+                android:gravity="center"
+                android:text="去看看"
+                android:textColor="#FFFFFF"
+                android:textSize="@dimen/font_size_26px" />
+
+            <!--            <com.shuangling.software.customview.FontIconView-->
+            <!--                android:id="@+id/delete"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_alignParentEnd="true"-->
+            <!--                android:layout_alignParentBottom="true"-->
+            <!--                android:text="&#xe74e;"-->
+            <!--                android:textColor="#FF4342"-->
+            <!--                android:textSize="@dimen/font_size_26px" />-->
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
+</LinearLayout>

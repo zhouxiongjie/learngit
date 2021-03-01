@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
@@ -92,6 +94,25 @@ public class WebViewBackActivity extends /*AppCompatActivity*/QMUIActivity imple
         QMUIStatusBarHelper.setStatusBarLightMode(this); //
         FrameLayout fl_content = findViewById(R.id.fl_web_container);
         webView = PreloadWebView.getInstance().getWebView(this);
+        int screenDensity = getResources().getDisplayMetrics().densityDpi;
+
+//        WebSettings.ZoomDensity zoomDensity = WebSettings.ZoomDensity.MEDIUM;
+//        switch (screenDensity)
+//        {
+//            case DisplayMetrics.DENSITY_LOW:
+//                zoomDensity = WebSettings.ZoomDensity.CLOSE;
+//                break;
+//            case DisplayMetrics.DENSITY_MEDIUM:
+//                zoomDensity = WebSettings.ZoomDensity.MEDIUM;
+//                break;
+//            case DisplayMetrics.DENSITY_HIGH:
+//            case DisplayMetrics.DENSITY_XHIGH:
+//            case DisplayMetrics.DENSITY_XXHIGH:
+//            default:
+//                zoomDensity = WebSettings.ZoomDensity.FAR;
+//                break;
+//        }
+//        webView.getSettings().setDefaultZoom(WebSettings.ZoomDensity.MEDIUM);
         fl_content.addView(webView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         init();
     }

@@ -31,7 +31,7 @@ public class LiveRoomInfo01 implements Serializable {
         this.props = props;
     }
 
-    public static class RoomInfoBean {
+    public static class RoomInfoBean implements Serializable{
         /**
          * id : 1443
          * studio_id : 0
@@ -616,7 +616,7 @@ public class LiveRoomInfo01 implements Serializable {
             this.expand_activities = expand_activities;
         }
 
-        public static class AnchorBean {
+        public static class AnchorBean implements Serializable{
             /**
              * id : 4
              * name : 黄庚的机构勿删勿改
@@ -652,7 +652,7 @@ public class LiveRoomInfo01 implements Serializable {
             }
         }
 
-        public static class FlowBean {
+        public static class FlowBean implements Serializable {
             /**
              * id : 338
              * room_stream_name : 4B7C99CD0E3A52052F4C2CCAAC7E6E18
@@ -678,7 +678,7 @@ public class LiveRoomInfo01 implements Serializable {
             }
         }
 
-        public static class MenusBean {
+        public static class MenusBean implements Serializable{
             /**
              * id : 4515
              * room_id : 1443
@@ -755,7 +755,7 @@ public class LiveRoomInfo01 implements Serializable {
             }
         }
 
-        public static class ExpandActivitiesBean {
+        public static class ExpandActivitiesBean implements Serializable{
             /**
              * id : 203
              * room_id : 1443
@@ -862,7 +862,7 @@ public class LiveRoomInfo01 implements Serializable {
         }
     }
 
-    public static class PropsBean {
+    public static class PropsBean implements Serializable{
         /**
          * id : 31
          * name : 999
@@ -878,6 +878,7 @@ public class LiveRoomInfo01 implements Serializable {
         private int limit;
         private int space;
         private String icon_url;
+        private boolean isSelect;
 
         public int getId() {
             return id;
@@ -925,6 +926,14 @@ public class LiveRoomInfo01 implements Serializable {
 
         public void setIcon_url(String icon_url) {
             this.icon_url = icon_url;
+        }
+
+        public boolean isSelect() {
+            return isSelect;
+        }
+
+        public void setSelect(boolean select) {
+            isSelect = select;
         }
     }
 }

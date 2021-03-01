@@ -103,7 +103,7 @@ public class LiveRewardAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        if (mRewardsInfo.getAwards().size() == 0) {
+        if (mRewardsInfo.getAwards()==null||mRewardsInfo.getAwards().size() == 0) {
             return 0;
         } else {
             return mRewardsInfo.getAwards().size() + 1;

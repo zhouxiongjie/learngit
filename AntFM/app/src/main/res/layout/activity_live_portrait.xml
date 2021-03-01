@@ -13,41 +13,99 @@
 <!--        app:blk_blurRadius="12"-->
 <!--        app:blk_downscaleFactor="0.12"-->
 <!--        app:blk_fps="20" >-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+<!--        <com.facebook.drawee.view.SimpleDraweeView-->
+<!--            android:id="@+id/background"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            app:actualImageScaleType="centerCrop"-->
+<!--            app:failureImageScaleType="centerCrop"-->
+<!--            app:placeholderImageScaleType="centerCrop" />-->
 
-        <com.facebook.drawee.view.SimpleDraweeView
+        <ImageView
             android:id="@+id/background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:actualImageScaleType="centerCrop"
-            app:failureImageScaleType="centerCrop"
-            app:placeholderImageScaleType="centerCrop" />
+            android:scaleType="centerCrop" />
+        <!--    </io.alterac.blurkit.BlurLayout>-->
+
+<!--        <io.alterac.blurkit.BlurLayout-->
+<!--            android:id="@+id/blurLayout"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            app:blk_blurRadius="12"-->
+<!--            app:blk_downscaleFactor="0.12"-->
+<!--            app:blk_fps="20" />-->
 
 
-<!--    </io.alterac.blurkit.BlurLayout>-->
+        <!--    <com.aliyun.vodplayerview.widget.AliyunVodPlayerView-->
+        <!--        android:id="@+id/aliyunVodPlayerView"-->
+        <!--        android:layout_width="match_parent"-->
+        <!--        android:layout_height="match_parent"-->
+        <!--        android:visibility="gone"-->
+        <!--        android:layout_gravity="center" />-->
 
-        <io.alterac.blurkit.BlurLayout
-            android:id="@+id/blurLayout"
+        <SurfaceView
+            android:id="@+id/surface"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:blk_blurRadius="12"
-            app:blk_downscaleFactor="0.12"
-            app:blk_fps="20" />
+            android:visibility="gone"/>
+
+        <com.tencent.xbright.lebwebrtcsdk.LEBWebRTCSurfaceView
+            android:id="@+id/lebSurfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            />
+
+        <RelativeLayout
+            android:id="@+id/noAnchor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="180dp"
+                android:background="@drawable/no_anchor" />
+
+            <TextView
+                android:id="@+id/noScriptText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/logo"
+                android:layout_marginTop="10dp"
+                android:textStyle="bold"
+                android:layout_centerHorizontal="true"
+                android:textColor="#E5E5E5"
+                android:textSize="@dimen/font_size_32px"
+                android:layout_gravity="center_horizontal"
+                android:text="主播暂时离开~" />
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/noScriptText"
+                android:layout_marginTop="10dp"
+                android:layout_centerHorizontal="true"
+                android:textColor="#E5E5E5"
+                android:textSize="@dimen/font_size_28px"
+                android:layout_gravity="center_horizontal"
+                android:text="休息片刻，更多精彩马上回来" />
 
 
-    <com.aliyun.vodplayerview.widget.AliyunVodPlayerView
-        android:id="@+id/aliyunVodPlayerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        android:layout_gravity="center" />
 
-    <com.tencent.xbright.lebwebrtcsdk.LEBWebRTCSurfaceView
-        android:id="@+id/lebSurfaceView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        />
+        </RelativeLayout>
+
+    </FrameLayout>
+
+
 
 
     <RelativeLayout
@@ -63,11 +121,23 @@
             android:gravity="center_vertical"
             android:padding="10dp">
 
+            <com.shuangling.software.customview.FontIconView
+                android:id="@+id/close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:text="&#xe62a;"
+                android:layout_marginLeft="10dp"
+                android:textColor="#ffffff"
+                android:textSize="@dimen/font_size_40px" />
+
             <TextView
                 android:id="@+id/viewerNumber"
                 android:layout_width="wrap_content"
+                android:minWidth="42dp"
                 android:layout_height="36dp"
-                android:layout_alignParentEnd="true"
+                android:layout_toLeftOf="@+id/close"
                 android:layout_centerVertical="true"
                 android:background="@drawable/inputbox_bg"
                 android:gravity="center"
@@ -406,15 +476,7 @@
                     android:textColor="#BFBFBF"
                     android:textSize="@dimen/font_size_30px" />
 
-                <ImageButton
-                    android:id="@+id/goods"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="8dp"
-                    android:background="@drawable/inputbox_bg"
-                    android:padding="0dp"
-                    android:src="@drawable/ic_goods" />
+
 
                 <ImageButton
                     android:id="@+id/invite"
@@ -427,6 +489,7 @@
                     android:src="@drawable/ic_invite"
                     android:visibility="gone" />
 
+
                 <ImageButton
                     android:id="@+id/more"
                     android:layout_width="36dp"
@@ -438,14 +501,24 @@
                     android:src="@drawable/ic_more01" />
 
                 <ImageButton
-                    android:id="@+id/exist"
+                    android:id="@+id/goods"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="8dp"
                     android:background="@drawable/inputbox_bg"
                     android:padding="0dp"
-                    android:src="@drawable/ic_exist" />
+                    android:src="@drawable/ic_goods" />
+
+                <ImageButton
+                    android:id="@+id/gift"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="8dp"
+                    android:background="@drawable/inputbox_bg"
+                    android:padding="0dp"
+                    android:src="@drawable/ic_gift" />
 
 
             </LinearLayout>
@@ -463,6 +536,135 @@
                 android:visibility="gone" />
 
         </FrameLayout>
+
+
+        <LinearLayout
+            android:id="@+id/showingGoods"
+            android:layout_width="237.5dp"
+            android:layout_height="101.5dp"
+            android:background="@drawable/showing_goods_bg"
+            android:layout_above="@+id/bottomLayout"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="18dp"
+            android:layout_marginBottom="-10dp"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="新品上市！快来抢~"
+                android:background="@drawable/showing_goods_title_bg"
+                android:textColor="#FEA91A"
+                android:textSize="@dimen/font_size_20px"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginLeft="10dp"
+                    android:background="#40000000"
+                    android:orientation="horizontal">
+
+                    <com.facebook.drawee.view.SimpleDraweeView
+                        android:id="@+id/picture"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentLeft="true"
+                        android:layout_gravity="center_vertical"
+                        app:actualImageScaleType="centerCrop"
+                        app:failureImage="@drawable/ic_default_image"
+                        app:failureImageScaleType="centerCrop"
+                        app:placeholderImage="@drawable/ic_default_image"
+                        app:placeholderImageScaleType="centerCrop"
+                        app:roundAsCircle="false"
+                        app:roundingBorderColor="@color/white"
+                        app:roundingBorderWidth="0dp"
+                        app:viewAspectRatio="1" />
+                    
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="15dp"
+                        android:text="讲解中"
+                        android:gravity="center"
+                        android:textColor="#FFFFFF"
+                        android:textSize="@dimen/font_size_20px"
+                        android:background="#CCFF5000"
+                        android:layout_alignParentBottom="true"
+                        />
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginLeft="5dp"
+                    android:orientation="vertical"
+                    android:layout_marginRight="8dp">
+
+                    <TextView
+                        android:id="@+id/goods_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:text="真维斯短袖T恤男潮夏装男士漫威联名钢铁侠体恤上衣"
+                        android:textColor="#001426"
+                        android:lines="1"
+                        android:ellipsize="end"
+                        android:textSize="@dimen/font_size_24px" />
+
+                    <TextView
+                        android:id="@+id/source"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/goods_name"
+                        android:layout_marginTop="3dp"
+                        android:text="来自京东"
+                        android:textColor="#ff999999"
+                        android:textSize="11sp" />
+
+
+
+                        <TextView
+                            android:id="@+id/price"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/source"
+                            android:text="￥49.90"
+                            android:layout_marginTop="5dp"
+                            android:textColor="#ffff5000"
+                            android:textSize="@dimen/font_size_28px" />
+
+                        <TextView
+                            android:id="@+id/see"
+                            android:layout_width="60dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_below="@+id/source"
+                            android:textColor="#FFFFFF"
+                            android:textSize="@dimen/font_size_20px"
+                            android:gravity="center"
+                            android:background="@drawable/add_goods_btn_bg"
+                            android:text="去看看" />
+
+
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+
+
+
+        </LinearLayout>
 
 
 

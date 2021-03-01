@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
@@ -26,8 +27,10 @@ import com.aliyun.player.AliPlayerFactory;
 import com.aliyun.player.IPlayer;
 import com.aliyun.player.bean.ErrorInfo;
 import com.aliyun.player.bean.InfoBean;
+import com.aliyun.player.nativeclass.CacheConfig;
 import com.aliyun.player.nativeclass.TrackInfo;
 import com.aliyun.player.source.UrlSource;
+import com.aliyun.svideo.common.utils.FileUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
@@ -493,9 +496,21 @@ public class StartupActivity extends QMUIActivity implements Handler.Callback {
 //        mAliyunVodPlayer.prepareAsync(localSource);
         UrlSource urlSource = new UrlSource();
         urlSource.setUri(url);
+        initCacheConfig();
+        //mAliyunVodPlayer.setPlayingCache(false, sdDir, 60 * 60 /*时长, s */, 300 /*大小，MB*/);
         //urlSource.setTitle(title);
         mAliyunVodPlayer.setDataSource(urlSource);
         mAliyunVodPlayer.prepare();
+    }
+
+    private void initCacheConfig(){
+        CacheConfig cacheConfig = new CacheConfig();
+        String sdDir = CommonUtils.getStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
+        cacheConfig.mEnable = true;
+        cacheConfig.mDir = sdDir;
+        cacheConfig.mMaxDurationS = 60 * 60;
+        cacheConfig.mMaxSizeMB =300 ;
+        mAliyunVodPlayer.setCacheConfig(cacheConfig);
     }
 
     @Override

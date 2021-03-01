@@ -40,10 +40,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ethanhua.skeleton.Skeleton;
+import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
@@ -88,7 +91,6 @@ import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.shuangling.software.utils.TimeUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-import com.youngfeng.snake.annotations.EnableDragToClose;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -181,6 +183,8 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     TextView noData;
     @BindView(R.id.networkError)
     RelativeLayout networkError;
+    @BindView(R.id.fl)
+    FrameLayout fl;
     private boolean showMerchant = false;
     private Handler mHandler;
     private int mArticleId;
@@ -193,7 +197,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     private int currentPage = 1;
     private Article mArticle;
     private ArticleVoicesInfo mArticleVoicesInfo;
-    //    private ViewSkeletonScreen mViewSkeletonScreen;
+    private ViewSkeletonScreen mViewSkeletonScreen;// 骨骼屏
     private boolean firstTime = true;
     private boolean isPlaying = false;
     private int mScrollY;
@@ -263,15 +267,15 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     }
 
     private void init() {
-//        if (mViewSkeletonScreen == null) {
-//            mViewSkeletonScreen = Skeleton.bind(root)//骨骼图
-//                    .load(R.layout.skeleton_article_detail)
-//                    .shimmer(false)
-//                    .angle(20)
-//                    .duration(1000)
-//                    .color(R.color.shimmer_color)
-//                    .show();
-//        }
+        if (mViewSkeletonScreen == null) {
+            mViewSkeletonScreen = Skeleton.bind(fl)//骨骼图
+                    .load(R.layout.skeleton_article_detail)
+                    .shimmer(false)
+                    .angle(20)
+                    .duration(1000)
+                    .color(R.color.shimmer_color)
+                    .show();
+        }
         if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getLogo2())) {
             Uri uri = Uri.parse(MyApplication.getInstance().getStation().getLogo2());
             ImageLoader.showThumb(uri, logo, CommonUtils.dip2px(161), CommonUtils.dip2px(28));//Toolbar中间的图片
@@ -344,8 +348,15 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         } else {
                             if (mArticle.getIs_collection() == 0) {
                                 collect(true);
+                                mArticle.setIs_collection(1);
+                                mHeadViewHolder.collect.setActivated(false);
+                                mHeadViewHolder.collect.setText("已收藏");
+
                             } else {
                                 collect(false);
+                                mArticle.setIs_collection(1);
+                                mHeadViewHolder.collect.setActivated(false);
+                                mHeadViewHolder.collect.setText("已收藏");
                             }
                         }
                     }
@@ -356,6 +367,8 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mAdapter = new ArticleRecyclerAdapter(this);//
         recyclerView.setAdapter(mAdapter);
+        if (recyclerView.getItemAnimator() != null)
+            ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -456,6 +469,8 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
             @Override
             public void onFailure(Call call, Exception exception) {
+                if (mViewSkeletonScreen != null)
+                    mViewSkeletonScreen.hide();//getRelatedPosts onFailure
             }
         });
     }
@@ -482,6 +497,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
             @Override
             public void onFailure(Call call, Exception exception) {
+                if (mViewSkeletonScreen != null) mViewSkeletonScreen.hide();//getComments onFailure
             }
         });
     }
@@ -699,12 +715,8 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         String js = "javascript:_renderRich('" + mArticle.getArticle().getContent() + "','" + CommonUtils.getFontSize() + "','" + size + "')";//
                         runOnUiThread(() -> {
                             mHeadViewHolder.webView.loadUrl(js);//
-//                                mViewSkeletonScreen.hide();//隐藏骨骼图
                         });
-
-//                        getRelatedPosts();//相关推荐
-//                        getComments(0);//获取评论列表
-//                        articleVoices();//朗读文章   此三个接口调用等WebView加载完成onPageFinished再执行
+//                        mViewSkeletonScreen.hide();
                         if (mArticle.getAuthor_info() != null && mArticle.getAuthor_info().getMerchant() != null) {
                             if (!TextUtils.isEmpty(mArticle.getAuthor_info().getMerchant().getLogo())) {
                                 Uri uri = Uri.parse(mArticle.getAuthor_info().getMerchant().getLogo());
@@ -799,7 +811,34 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                                     it.putExtra("jump_url", ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
                                     startActivityForResult(it, REQUEST_LOGIN);
                                 } else {
+                                    if(mArticle.getIs_likes() == 0){
+                                        int num=mArticle.getLike();
+                                        num++;
+                                        like(true);
+                                        mArticle.setIs_likes(1);
+                                        mHeadViewHolder.praiseSum.setText(""+num);
+                                        mHeadViewHolder.praiseSum.setActivated(false);
+                                        //ToastUtils.show(jsonObject.getString("msg"));
+                                        mArticle.setLike(num);
+
+
+                                    }else{
+                                        int num=mArticle.getLike();
+                                        num--;
+                                        like(false);
+                                        mArticle.setIs_likes(0);
+                                        mHeadViewHolder.praiseSum.setText(""+num);
+                                        mHeadViewHolder.praiseSum.setActivated(true);
+                                        //ToastUtils.show(jsonObject.getString("msg"));
+                                        mArticle.setLike(num);
+
+
+                                        like(false);
+                                    }
+
                                     like(mArticle.getIs_likes() == 0);//点赞/取消赞
+
+
                                 }
                             }
                         });
@@ -812,10 +851,19 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                                     it.putExtra("jump_url", ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
                                     startActivityForResult(it, REQUEST_LOGIN);
                                 } else {
+
+
                                     if (mArticle.getIs_collection() == 0) {
                                         collect(true);
+                                        mArticle.setIs_collection(1);
+                                        mHeadViewHolder.collect.setActivated(false);
+                                        mHeadViewHolder.collect.setText("已收藏");
+
                                     } else {
                                         collect(false);
+                                        mArticle.setIs_collection(0);
+                                        mHeadViewHolder.collect.setActivated(true);
+                                        mHeadViewHolder.collect.setText("收藏");
                                     }
                                 }
                             }
@@ -824,7 +872,9 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         //资源不存在
                         noData.setVisibility(View.VISIBLE);
                         refreshLayout.setVisibility(View.GONE);
+                        findViewById(R.id.ll_bottomBar).setVisibility(View.GONE);
                     }
+                    getRelatedPostsArticleVoicesGetComments();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -910,11 +960,13 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                             }
                         }
                         mAdapter.setPostContents(mPostContents);//相关推荐
+//                        if (mViewSkeletonScreen != null) {
+//                            mViewSkeletonScreen.hide();//获取相关文章
+//                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                mHeadViewHolder.divide_line.setVisibility(View.VISIBLE);//网页加载完成才显示分割线，以免出现闪屏问题
             }
             break;
             case MSG_GET_COMMENTS: {// 获取评论列表
@@ -1046,6 +1098,14 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                             }
                         }
                     });
+                    if (mViewSkeletonScreen != null) {
+//                        new Handler().postDelayed(new Runnable(){
+//                            public void run() {
+                        mViewSkeletonScreen.hide();//获取评论列表
+//                            }
+//                        }, 100);
+                    }
+                    mHeadViewHolder.divide_line.setVisibility(View.VISIBLE);//网页加载完成才显示分割线，以免出现闪屏问题
                 }
             }
             break;
@@ -1124,16 +1184,15 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         ToastUtils.show(jsonObject.getString("msg"));
+                        mArticle.setLike(jsonObject.getInteger("data"));
                         if (like) {
                             //praiseIcon.setTextColor(CommonUtils.getThemeColor(this));
                             mArticle.setIs_likes(1);
-                            mArticle.setLike(mArticle.getLike() + 1);
                             mHeadViewHolder.praiseSum.setText(String.valueOf(mArticle.getLike()));
                             mHeadViewHolder.praiseSum.setActivated(false);
                         } else {
                             //praiseIcon.setTextColor(getResources().getColor(R.color.textColorEleven));
                             mArticle.setIs_likes(0);
-                            mArticle.setLike(mArticle.getLike() - 1);
                             mHeadViewHolder.praiseSum.setText(String.valueOf(mArticle.getLike()));
                             mHeadViewHolder.praiseSum.setActivated(true);
                         }
@@ -1438,12 +1497,16 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-//                        mViewSkeletonScreen.hide();//隐藏骨骼图
+                        if (mViewSkeletonScreen != null)
+                            mViewSkeletonScreen.hide();//getArticleDetail onFailure
                         networkError.setVisibility(View.VISIBLE);
+                        findViewById(R.id.ll_bottomBar).setVisibility(View.GONE);
                     }
                 });
             }
         });
+
+
     }
 
     private void articleVoices() {//朗读文章
@@ -1460,6 +1523,8 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
             @Override
             public void onFailure(Call call, Exception exception) {
+                if (mViewSkeletonScreen != null)
+                    mViewSkeletonScreen.hide();//articleVoices onFailure
             }
         });
     }
@@ -1476,11 +1541,11 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Message msg = Message.obtain();
-                msg.what = MSG_COLLECT_CALLBACK;
-                msg.arg1 = collect ? 1 : 0;
-                msg.obj = response;
-                mHandler.sendMessage(msg);
+//                Message msg = Message.obtain();
+//                msg.what = MSG_COLLECT_CALLBACK;
+//                msg.arg1 = collect ? 1 : 0;
+//                msg.obj = response;
+//                mHandler.sendMessage(msg);
             }
 
             @Override
@@ -1501,11 +1566,11 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
         OkHttpUtils.post(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Message msg = Message.obtain();
-                msg.what = MSG_LIKE_CALLBACK;
-                msg.arg1 = like ? 1 : 0;
-                msg.obj = response;
-                mHandler.sendMessage(msg);
+//                Message msg = Message.obtain();
+//                msg.what = MSG_LIKE_CALLBACK;
+//                msg.arg1 = like ? 1 : 0;
+//                msg.obj = response;
+//                mHandler.sendMessage(msg);
             }
 
             @Override
@@ -1606,12 +1671,14 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
             super.onPageFinished(view, url);
             if (view.getProgress() == 100) {
                 getArticleDetail();//文章详情
-
-                getRelatedPosts();//相关推荐
-                articleVoices();//朗读文章
-                getComments(0);//获取评论列表
             }
         }
+    }
+
+    private void getRelatedPostsArticleVoicesGetComments() {
+        getRelatedPosts();//相关推荐
+        articleVoices();//朗读文章
+        getComments(0);//获取评论列表
     }
 
     @Override

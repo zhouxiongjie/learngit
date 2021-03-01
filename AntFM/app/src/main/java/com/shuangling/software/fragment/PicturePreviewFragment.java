@@ -37,7 +37,7 @@ public class PicturePreviewFragment extends BasePhotoFragment {
             @Override
             public boolean onLongClick(View v) {
                 Log.d("SmoothImageView","onLongClick");
-                Toast.makeText(getContext(), "长按事件:" + b.getUser(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(getContext(), "长按事件:" + b.getUser(), Toast.LENGTH_LONG).show();
                 return false;
             }
         });

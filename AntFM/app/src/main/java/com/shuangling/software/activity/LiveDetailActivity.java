@@ -8,16 +8,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-
-import androidx.annotation.Nullable;
-
-import com.google.android.material.tabs.TabLayout;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +17,12 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -38,9 +34,9 @@ import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.android.material.tabs.TabLayout;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
-import com.mylhyl.circledialog.CircleDialog;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.qmuiteam.qmui.widget.dialog.QMUIDialog;

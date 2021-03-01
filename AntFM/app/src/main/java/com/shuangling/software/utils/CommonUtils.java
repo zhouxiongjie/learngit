@@ -165,6 +165,15 @@ public class CommonUtils {
         return color;
     }
 
+    public static @ColorInt
+    int getTranslucentThemeColor(Context context) {
+        int[] attrs = new int[]{R.attr.translucentThemeColor};
+        TypedArray typedArray = context.obtainStyledAttributes(attrs);
+        int color = typedArray.getColor(0, 0xffffffff);
+        typedArray.recycle();
+        return color;
+    }
+
     public static String saveBitmap(Bitmap b) {
         String path = getStoragePrivateDirectory(Environment.DIRECTORY_PICTURES);
         long dataTake = System.currentTimeMillis();
@@ -1311,7 +1320,7 @@ public class CommonUtils {
             it.putExtra("url", url);
             it.putExtra("title", title);
             context.startActivity(it);
-        } else if (url.startsWith(ServerInfo.h5IP + "/actlist") || url.startsWith(ServerInfo.h5HttpsIP + "/actlist")) {
+        } else if (url.startsWith(ServerInfo.h5IP + "/actlist") || url.startsWith(ServerInfo.h5HttpsIP + "/actlist")||url.startsWith(ServerInfo.activity)) {
             Intent it = new Intent(context, WebViewBackActivity.class);
             it.putExtra("addParams",true);
             it.putExtra("url", url);

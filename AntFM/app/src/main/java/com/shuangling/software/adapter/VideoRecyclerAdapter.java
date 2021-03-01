@@ -244,9 +244,9 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
         } else if (type == TYPE_COMMENT_TOP) {
             CommentTopViewHolder viewHolder = (CommentTopViewHolder) holder;
             if (mTotalComments == 0) {
-                viewHolder.commentNum.setText("");
+                viewHolder.commentNum.setText("全部评论");
             } else {
-                viewHolder.commentNum.setText("(" + mTotalComments + ")");
+                viewHolder.commentNum.setText("全部评论(" + mTotalComments + ")");
             }
         } else if (type == TYPE_NO_COMMENT) {
         } else if (type == TYPE_COMMENT_ROOT) {

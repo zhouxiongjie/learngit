@@ -43,6 +43,7 @@ import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.MyGlideEngine;
 import com.shuangling.software.utils.PreloadWebView;
 import com.shuangling.software.utils.ServerInfo;
@@ -114,7 +115,7 @@ public class CluesActivity extends QMUIActivity/*AppCompatActivity*/ implements 
         fl_content.addView(webView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         View stubView = ((ViewStub) findViewById(R.id.viewStub)).inflate();
         progressBar = stubView.findViewById(R.id.progressBar);
-        progressBar.setColor("#001CA0FF", "#1CA0FF");
+        progressBar.setColor(CommonUtils.getTranslucentThemeColor(this),CommonUtils.getThemeColor(this));
         init();
     }
 

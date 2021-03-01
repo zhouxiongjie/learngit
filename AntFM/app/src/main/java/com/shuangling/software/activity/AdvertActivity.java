@@ -23,6 +23,7 @@ import com.shuangling.software.R;
 import com.shuangling.software.activity.ui.WebProgress;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.PreloadWebView;
 import com.shuangling.software.utils.ServerInfo;
 
@@ -144,7 +145,7 @@ public class AdvertActivity extends QMUIActivity/*AppCompatActivity*/ {
         });
         webView.loadUrl(url);
         progressBar.show();
-        progressBar.setColor("#001CA0FF", "#1CA0FF");
+        progressBar.setColor(CommonUtils.getTranslucentThemeColor(this),CommonUtils.getThemeColor(this));
         clickAdert();
     }
 

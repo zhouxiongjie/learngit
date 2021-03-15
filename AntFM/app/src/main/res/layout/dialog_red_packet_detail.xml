@@ -41,6 +41,8 @@
                     android:id="@+id/recyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
                     android:layout_alignRight="@+id/fg"
                     android:layout_alignLeft="@+id/fg"
                     android:layout_alignBottom="@+id/fg"

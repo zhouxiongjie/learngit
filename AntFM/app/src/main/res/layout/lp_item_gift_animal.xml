@@ -33,10 +33,11 @@
                     android:id="@+id/send_user"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxWidth="60dp"
                     android:layout_marginRight="40dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Johnny"
+                    android:text="JohnnyJohnnyJohnnyJohnnyJohnny"
                     android:textColor="@android:color/white"
                     android:textSize="12sp" />
 

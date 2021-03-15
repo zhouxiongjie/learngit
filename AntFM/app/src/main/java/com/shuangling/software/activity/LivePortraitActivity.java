@@ -95,6 +95,7 @@ import com.shuangling.software.utils.GsdFastBlur;
 import com.shuangling.software.utils.HeightProvider;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
+import com.shuangling.software.utils.TimeUtil;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.tencent.xbright.lebwebrtcsdk.LEBWebRTCEvents;
 import com.tencent.xbright.lebwebrtcsdk.LEBWebRTCParameters;
@@ -291,6 +292,9 @@ public class LivePortraitActivity extends BaseAudioActivity implements LEBWebRTC
     private Runnable mSocketRunnable;
     private ExecutorService mExecutorService;
     private boolean mNeedResumeAudioPlay = false;
+
+    private long lastSendTimeMillis;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -704,6 +708,7 @@ public class LivePortraitActivity extends BaseAudioActivity implements LEBWebRTC
 
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Log.e("test",e.getMessage());
                 }
 
 
@@ -1398,7 +1403,7 @@ public class LivePortraitActivity extends BaseAudioActivity implements LEBWebRTC
         Map<String, String> params = new HashMap<>();
         params.put("room_id", "" + (liveRoomInfo.getRoom_info() != null ? liveRoomInfo.getRoom_info().getId() : ""));
         params.put("page", "1");
-        params.put("page_size", "6");
+        params.put("page_size", "5");
         params.put("state", "1");
         OkHttpUtils.get(url, params, new OkHttpCallback(LivePortraitActivity.this) {
             @Override
@@ -1551,12 +1556,16 @@ public class LivePortraitActivity extends BaseAudioActivity implements LEBWebRTC
         if (User.getInstance() == null) {
             Intent it = new Intent(this, NewLoginActivity.class);
             startActivity(it);
-        } else {
-            msgMap.put("user_id", User.getInstance() != null ? User.getInstance().getId() + "" : "");//用户ID
-            msgMap.put("nick_name", User.getInstance() != null ? User.getInstance().getNickname() : "");//昵称
-            msgMap.put("user_logo", User.getInstance() != null ? User.getInstance().getAvatar() : "");
+            return;
         }
-
+        long timecurrentTimeMillis = System.currentTimeMillis();
+        if((timecurrentTimeMillis-lastSendTimeMillis)/1000<1){
+            ToastUtils.show("发送太快，请稍后再试");
+            return;
+        }
+        msgMap.put("user_id", User.getInstance() != null ? User.getInstance().getId() + "" : "");//用户ID
+        msgMap.put("nick_name", User.getInstance() != null ? User.getInstance().getNickname() : "");//昵称
+        msgMap.put("user_logo", User.getInstance() != null ? User.getInstance().getAvatar() : "");
         chatInput.setText(null);
 
 
@@ -1572,7 +1581,7 @@ public class LivePortraitActivity extends BaseAudioActivity implements LEBWebRTC
                 Log.e("test", response);
             }
         });
-
+        lastSendTimeMillis=timecurrentTimeMillis;
     }
 
 

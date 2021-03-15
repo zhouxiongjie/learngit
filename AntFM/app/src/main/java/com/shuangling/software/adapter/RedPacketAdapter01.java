@@ -26,6 +26,7 @@ import com.shuangling.software.utils.TimeUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -137,6 +138,7 @@ public class RedPacketAdapter01 extends RecyclerView.Adapter {
             }
             vh.name.setText(historyBean.getUser().getNickname());
             vh.time.setText(timeFormatConvert(historyBean.getCreated_at()));
+            //vh.time.setText(TimeUtil.formatDateTime(historyBean.getCreated_at()));
         }
     }
 
@@ -206,10 +208,22 @@ public class RedPacketAdapter01 extends RecyclerView.Adapter {
     private String timeFormatConvert(String time) {
         String timeString = "";
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm");
+        //SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm");
         try {
             Date parse = df.parse(time);
-            timeString = dateFormat.format(parse);
+            Calendar today = Calendar.getInstance();    //今天
+
+            today.set(Calendar.HOUR_OF_DAY, 0);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+
+            if(parse.after(today.getTime())){
+                SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+                timeString = dateFormat.format(parse);
+            }else{
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd HH:mm");
+                timeString = dateFormat.format(parse);
+            }
         } catch (ParseException e) {
             e.printStackTrace();
             timeString = time;

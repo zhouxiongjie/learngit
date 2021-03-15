@@ -194,7 +194,7 @@
     <color name="text_sky_blue">#0C82FF</color>
     <color name="text_gray">#C4C4C4</color>
 
-
+    <color name="grab_bg">#EBCD9A</color>
 
 
     <color name="red_500">#ef4836</color>
@@ -232,7 +232,7 @@
 
 
 
-    #242424
+
 
 </resources>
 

@@ -1,9 +1,12 @@
 package com.shuangling.software.utils;
+
 import android.annotation.SuppressLint;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
 /**
  * @author pangzf
  * @desc:时间工具类
@@ -14,22 +17,24 @@ import java.util.Date;
  */
 @SuppressLint("SimpleDateFormat")
 public class TimeUtil {
-public static String getTime(long time) {
+    public static String getTime(long time) {
         SimpleDateFormat format = new SimpleDateFormat("yy-MM-dd HH:mm");
         return format.format(new Date(time));
     }
-public static String getHourAndMin(long time) {
+
+    public static String getHourAndMin(long time) {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm");
         return format.format(new Date(time));
     }
-public static String getChatTime(long timesamp) {
+
+    public static String getChatTime(long timesamp) {
         String result = "";
         SimpleDateFormat sdf = new SimpleDateFormat("dd");
         Date today = new Date(System.currentTimeMillis());
         Date otherDay = new Date(timesamp);
         int temp = Integer.parseInt(sdf.format(today))
                 - Integer.parseInt(sdf.format(otherDay));
-switch (temp) {
+        switch (temp) {
             case 0:
                 result = "今天 " + getHourAndMin(timesamp);
                 break;
@@ -39,18 +44,18 @@ switch (temp) {
             case 2:
                 result = "前天 " + getHourAndMin(timesamp);
                 break;
-default:
+            default:
                 // result = temp + "天前 ";
                 result = getTime(timesamp);
                 break;
         }
-return result;
+        return result;
     }
 /**
-     * 格式化时间
-     * @param time
-     * @return
-     */
+ * 格式化时间
+ * @param time
+ * @return
+ */
 //	public static String formatDateTime(String time) {
 //		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 //		if(time==null ||"".equals(time)){
@@ -96,7 +101,8 @@ return result;
 //			return time.substring(index, time.length());
 //		}
 //	}
-/**
+
+    /**
      * 将秒转成分秒
      *
      * @return
@@ -108,8 +114,9 @@ return result;
             return String.valueOf(second);
         }
         return minute + ":" + second;
-}
-/**
+    }
+
+    /**
      * 计算相差的小时
      *
      * @param starTime
@@ -119,21 +126,22 @@ return result;
     public static int getTimeDifferenceHour(String starTime, String endTime) {
         int timeString = 0;
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-try {
+        try {
             Date parse = dateFormat.parse(starTime);
             Date parse1 = dateFormat.parse(endTime);
-long diff = parse1.getTime() - parse.getTime();
+            long diff = parse1.getTime() - parse.getTime();
             String string = Long.toString(diff);
-float parseFloat = Float.parseFloat(string);
-float hour1 = parseFloat / (1000);
-timeString = (int) hour1;
+            float parseFloat = Float.parseFloat(string);
+            float hour1 = parseFloat / (1000);
+            timeString = (int) hour1;
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return timeString;
-}
-/**
+    }
+
+    /**
      * 判断时间差 1 min；小于1min 返回null，
      *
      * @param time1
@@ -163,7 +171,8 @@ timeString = (int) hour1;
         }
         return show_time;
     }
-/**
+
+    /**
      * 计算相差的小时
      *
      * @param
@@ -178,22 +187,24 @@ timeString = (int) hour1;
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-Date parse1 = df.parse(endTime);
+            Date parse1 = df.parse(endTime);
             timeString = dateFormat.format(parse1);
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             timeString = endTime;
-}
+        }
         return timeString;
     }
-private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
-// 检查日期格式 YYYY-MM-DD
+
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS");
+
+    // 检查日期格式 YYYY-MM-DD
     public static boolean checkDate(String sourceDate) {
         if (sourceDate == null || sourceDate.trim().length() == 0) {
             return false;
         }
-try {
+        try {
             dateFormat.setLenient(false);
             dateFormat.parse(sourceDate);
             return true;
@@ -201,7 +212,8 @@ try {
             return false;
         }
     }
-public static String formatDateTime(String time_at) {
+
+    public static String formatDateTime(String time_at) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String time = "";
         try {
@@ -213,28 +225,28 @@ public static String formatDateTime(String time_at) {
             long hour = (difference / (3600 * 1000));
             long minute = (difference / (60 * 1000));
             long second = difference / 1000;
-Calendar current = Calendar.getInstance();
-            int currentYear=current.get(Calendar.YEAR);
-today.set(Calendar.HOUR_OF_DAY, 0);
+            Calendar current = Calendar.getInstance();
+            int currentYear = current.get(Calendar.YEAR);
+            today.set(Calendar.HOUR_OF_DAY, 0);
             today.set(Calendar.MINUTE, 0);
             today.set(Calendar.SECOND, 0);
-Calendar yesterday = Calendar.getInstance();    //昨天
-yesterday.set(Calendar.YEAR, today.get(Calendar.YEAR));
+            Calendar yesterday = Calendar.getInstance();    //昨天
+            yesterday.set(Calendar.YEAR, today.get(Calendar.YEAR));
             yesterday.set(Calendar.MONTH, today.get(Calendar.MONTH));
             yesterday.set(Calendar.DAY_OF_MONTH, today.get(Calendar.DAY_OF_MONTH) - 1);
             yesterday.set(Calendar.HOUR_OF_DAY, 0);
             yesterday.set(Calendar.MINUTE, 0);
             yesterday.set(Calendar.SECOND, 0);
-Calendar dateBeforeYesterday = Calendar.getInstance();    //昨天
-dateBeforeYesterday.set(Calendar.YEAR, today.get(Calendar.YEAR));
+            Calendar dateBeforeYesterday = Calendar.getInstance();    //昨天
+            dateBeforeYesterday.set(Calendar.YEAR, today.get(Calendar.YEAR));
             dateBeforeYesterday.set(Calendar.MONTH, today.get(Calendar.MONTH));
             dateBeforeYesterday.set(Calendar.DAY_OF_MONTH, today.get(Calendar.DAY_OF_MONTH) - 2);
             dateBeforeYesterday.set(Calendar.HOUR_OF_DAY, 0);
             dateBeforeYesterday.set(Calendar.MINUTE, 0);
             dateBeforeYesterday.set(Calendar.SECOND, 0);
-current.setTime(timeAt);
-            int timeYear=current.get(Calendar.YEAR);
-if (minute < 1) {
+            current.setTime(timeAt);
+            int timeYear = current.get(Calendar.YEAR);
+            if (minute < 1) {
                 time = "刚刚";
             } else if (hour < 1) {
                 time = minute + "分钟前";
@@ -246,25 +258,84 @@ if (minute < 1) {
                 time = "前天" + time_at.split(" ")[1].substring(0, 5);
             } else {
                 String[] strarr = time_at.split(" ")[0].split("-");
-                if(timeYear!=currentYear){
-                    time = strarr[0]+"年"+strarr[1]+"月"+strarr[2]+"日";
-                }else{
-                    time = strarr[1]+"月"+strarr[2]+"日";
+                if (timeYear != currentYear) {
+                    time = strarr[0] + "年" + strarr[1] + "月" + strarr[2] + "日";
+                } else {
+                    time = strarr[1] + "月" + strarr[2] + "日";
                 }
-}
-} catch (Exception e) {
-}
-return time;
+            }
+        } catch (Exception e) {
+        }
+        return time;
     }
-public static String getTimeSpan(String starTime, String endTime) {
+
+
+
+    public static String formatDateTime01(String time_at) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String time = "";
+        try {
+            Date timeAt = dateFormat.parse(time_at);
+            //Date today = new Date();
+            Calendar today = Calendar.getInstance();    //今天
+            long difference = today.getTime().getTime() - timeAt.getTime();
+            long day = difference / (3600 * 24 * 1000);
+            long hour = (difference / (3600 * 1000));
+            long minute = (difference / (60 * 1000));
+            long second = difference / 1000;
+            Calendar current = Calendar.getInstance();
+            int currentYear = current.get(Calendar.YEAR);
+            today.set(Calendar.HOUR_OF_DAY, 0);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+            Calendar yesterday = Calendar.getInstance();    //昨天
+            yesterday.set(Calendar.YEAR, today.get(Calendar.YEAR));
+            yesterday.set(Calendar.MONTH, today.get(Calendar.MONTH));
+            yesterday.set(Calendar.DAY_OF_MONTH, today.get(Calendar.DAY_OF_MONTH) - 1);
+            yesterday.set(Calendar.HOUR_OF_DAY, 0);
+            yesterday.set(Calendar.MINUTE, 0);
+            yesterday.set(Calendar.SECOND, 0);
+            Calendar dateBeforeYesterday = Calendar.getInstance();    //昨天
+            dateBeforeYesterday.set(Calendar.YEAR, today.get(Calendar.YEAR));
+            dateBeforeYesterday.set(Calendar.MONTH, today.get(Calendar.MONTH));
+            dateBeforeYesterday.set(Calendar.DAY_OF_MONTH, today.get(Calendar.DAY_OF_MONTH) - 2);
+            dateBeforeYesterday.set(Calendar.HOUR_OF_DAY, 0);
+            dateBeforeYesterday.set(Calendar.MINUTE, 0);
+            dateBeforeYesterday.set(Calendar.SECOND, 0);
+            current.setTime(timeAt);
+            int timeYear = current.get(Calendar.YEAR);
+            if (minute < 1) {
+                time = "刚刚";
+            } else if (hour < 1) {
+                time = minute + "分钟前";
+            } else if (current.after(today)) {
+                time = "" + hour + "小时前";
+            } else if (current.before(today) && current.after(yesterday)) {
+                time = "昨天" + time_at.split(" ")[1].substring(0, 5);
+            } else if (current.before(yesterday) && current.after(dateBeforeYesterday)) {
+                time = "前天" + time_at.split(" ")[1].substring(0, 5);
+            } else {
+                String[] strarr = time_at.split(" ")[0].split("-");
+                if (timeYear != currentYear) {
+                    time = strarr[0] + "年" + strarr[1] + "月" + strarr[2] + "日";
+                } else {
+                    time = strarr[1] + "月" + strarr[2] + "日";
+                }
+            }
+        } catch (Exception e) {
+        }
+        return time;
+    }
+
+    public static String getTimeSpan(String starTime, String endTime) {
         int timeString = 0;
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-try {
+        try {
             Date start = dateFormat.parse(starTime);
             Date end = dateFormat.parse(endTime);
             long milliseconds = end.getTime() - start.getTime();
             long seconds = milliseconds / 1000;
-String timecodeSeconds = "" + (seconds % 60);
+            String timecodeSeconds = "" + (seconds % 60);
             String timecodeMinutes = "" + (seconds / 60) % 60;
             String timecodeHours = "" + (seconds / 3600);
             if ((seconds % 60) < 10) {
@@ -277,16 +348,16 @@ String timecodeSeconds = "" + (seconds % 60);
                 timecodeHours = "0" + timecodeHours;
             }
             if (seconds / 60 < 1) {
-                return timecodeSeconds+"秒";
-            }else if (seconds / 3600 < 1) {
-                return timecodeMinutes + "分" + timecodeSeconds+"秒";
+                return timecodeSeconds + "秒";
+            } else if (seconds / 3600 < 1) {
+                return timecodeMinutes + "分" + timecodeSeconds + "秒";
             } else {
-                return timecodeHours + "时" + timecodeMinutes + "分" + timecodeSeconds+"秒";
+                return timecodeHours + "时" + timecodeMinutes + "分" + timecodeSeconds + "秒";
             }
-} catch (ParseException e) {
+        } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return "";
-}
+    }
 }

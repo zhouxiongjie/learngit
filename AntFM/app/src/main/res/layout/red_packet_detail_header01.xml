@@ -100,7 +100,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:textStyle="bold"
-            android:text="去提现 〉"
+            android:text="去提现〉"
             android:textColor="#C1E52600"
             android:textSize="@dimen/font_size_24px" />
 

@@ -2,6 +2,7 @@
 
     <dimen name="font_size_150px">75dp</dimen>
     <dimen name="font_size_100px">50dp</dimen>
+    <dimen name="font_size_80px">40dp</dimen>
     <dimen name="font_size_60px">30dp</dimen>
     <dimen name="font_size_50px">25dp</dimen>
     <dimen name="font_size_48px">24dp</dimen>

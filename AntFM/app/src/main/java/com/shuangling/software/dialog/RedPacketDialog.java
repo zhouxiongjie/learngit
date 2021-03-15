@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
@@ -53,7 +54,7 @@ public class RedPacketDialog extends BaseCircleDialog {
     @BindView(R.id.desc)
     TextView desc;
     @BindView(R.id.grab)
-    SimpleDraweeView grab;
+    RelativeLayout grab;
     @BindView(R.id.close)
     FontIconView close;
     @BindView(R.id.head)
@@ -113,7 +114,12 @@ public class RedPacketDialog extends BaseCircleDialog {
             Uri uri = Uri.parse(mRedPacketInfo.getSponsor_log());
             ImageLoader.showThumb(uri, head, width, height);
         }
-        name.setText(mRedPacketInfo.getSponsor_nm());
+        if(TextUtils.isEmpty(mRedPacketInfo.getSponsor_nm())){
+            name.setText("灵动直播");
+        }else {
+            name.setText(mRedPacketInfo.getSponsor_nm());
+        }
+
         desc.setText(mRedPacketInfo.getWish());
         return rootView;
     }

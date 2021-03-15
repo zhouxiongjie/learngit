@@ -7,6 +7,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,12 +16,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.BaseCircleDialog;
 import com.shuangling.software.R;
+import com.shuangling.software.adapter.LiveInviteListAdapter;
 import com.shuangling.software.adapter.LiveViewerListAdapter;
 import com.shuangling.software.entity.LiveRoomInfo;
 import com.shuangling.software.entity.LiveRoomInfo01;
 import com.shuangling.software.entity.Viewer;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
 
 import java.io.IOException;
@@ -42,11 +45,15 @@ public class ViewerListDialog extends BaseCircleDialog {
 
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+    @BindView(R.id.root)
+    LinearLayout root;
+
 
     Unbinder unbinder;
 
 
     private LiveRoomInfo01.RoomInfoBean liveRoomInfo;
+    private int onlineNum;
 
     private OnChatEventListener mOnChatEventListener;
 
@@ -61,13 +68,14 @@ public class ViewerListDialog extends BaseCircleDialog {
     }
 
 
-    public static ViewerListDialog getInstance(LiveRoomInfo01.RoomInfoBean roomInfo) {
+    public static ViewerListDialog getInstance(LiveRoomInfo01.RoomInfoBean roomInfo,int onlineNum) {
         ViewerListDialog viewerListDialog = new ViewerListDialog();
         viewerListDialog.setCanceledBack(true);
         viewerListDialog.setCanceledOnTouchOutside(true);
         viewerListDialog.setGravity(Gravity.BOTTOM);
         viewerListDialog.setWidth(1f);
         viewerListDialog.liveRoomInfo = roomInfo;
+        viewerListDialog.onlineNum=onlineNum;
         return viewerListDialog;
     }
 
@@ -114,9 +122,19 @@ public class ViewerListDialog extends BaseCircleDialog {
                             @Override
                             public void run() {
                                 try{
+                                    LiveViewerListAdapter adapter=new LiveViewerListAdapter(getContext(),viewers,onlineNum);
+                                    int height=adapter.getItemCount()*60+40;
+                                    if(height>=350){
+                                        height=350;
+                                    }
+                                    ViewGroup.LayoutParams lp=root.getLayoutParams();
+
+                                    lp.height=CommonUtils.dip2px(height);
+                                    root.setLayoutParams(lp);
                                     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                                     recyclerView.setLayoutManager(linearLayoutManager);
-                                    recyclerView.setAdapter(new LiveViewerListAdapter(getContext(),viewers));
+                                    recyclerView.setAdapter(adapter);
+
                                 }catch (Exception e){
 
                                 }

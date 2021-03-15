@@ -7,4 +7,8 @@
     <external-path
         name="my_images"
         path="Pictures"/>
+
+    <external-path
+        name="my_movies"
+        path="Movies"/>
 </paths>

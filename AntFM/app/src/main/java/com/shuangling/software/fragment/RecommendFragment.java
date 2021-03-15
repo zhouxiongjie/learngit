@@ -156,10 +156,10 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
             Uri uri = Uri.parse(MyApplication.getInstance().getBackgroundImage());
             topBackground.setImageURI(uri);
         }
-        if (TextUtils.isEmpty(SharedPreferencesUtils.getStringValue("custom_column", null))) {
+//        if (TextUtils.isEmpty(SharedPreferencesUtils.getStringValue("custom_column", null))) {
             getRecommendColumns(0);
-        } else {
-            mColumns = JSONObject.parseArray(SharedPreferencesUtils.getStringValue("custom_column", null), Column.class);
+//        } else {
+//            mColumns = JSONObject.parseArray(SharedPreferencesUtils.getStringValue("custom_column", null), Column.class);
 //            for (int i = 0; mColumns != null && i < mColumns.size(); i++) {
 //                Column column = mColumns.get(i);
 //                View view = inflater.inflate(R.layout.column_txt_layout, columnContent, false);
@@ -209,14 +209,12 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
 //                });
 //                columnContent.addView(view, i);
 //            }
-            initFragment();
-            getRecommendColumns(1);
-        }
-//        if (!TextUtils.isEmpty(MyApplication.getInstance().getBackgroundImage())) {
-//            Uri uri = Uri.parse(MyApplication.getInstance().getBackgroundImage());
+
+//            initFragment();
+//            getRecommendColumns(1);
 //        }
+
         if (MyApplication.getInstance().getStation() != null && MyApplication.getInstance().getStation().getIs_league() == 0) {
-            //city.setCompoundDrawables(null, null, null, null);
             weatherLayout.setVisibility(View.GONE);
             logo1.setVisibility(View.VISIBLE);
             if (MyApplication.getInstance().getStation() != null && !TextUtils.isEmpty(MyApplication.getInstance().getStation().getLogo1())) {
@@ -377,7 +375,7 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
             }
             pagerIndicator.updateIndicator(true);
             //viewPager.setCurrentItem(mColumnSelectIndex);
-            viewPager.setOffscreenPageLimit(20);
+            viewPager.setOffscreenPageLimit(3);
         }
         if (mSwitchColumn != null) {
             mHandler.postDelayed(new Runnable() {

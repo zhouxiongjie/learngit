@@ -36,6 +36,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.hjq.toast.ToastUtils;
 import com.qmuiteam.qmui.arch.QMUIActivity;
+import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.entity.Advert;
@@ -43,6 +44,7 @@ import com.shuangling.software.entity.User;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.utils.ACache;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
@@ -75,13 +77,14 @@ public class StartupActivity extends QMUIActivity implements Handler.Callback {
     private AliPlayer mAliyunVodPlayer;
     private boolean mSkip = false;
     private int mPlayerState = IPlayer.idle;
-
+    private ACache mACache;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         //隐藏顶部状态栏
+        //QMUIStatusBarHelper.setStatusBarLightMode(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_startup);
         ImmersionBar.with(this).transparentStatusBar().init();
@@ -94,6 +97,7 @@ public class StartupActivity extends QMUIActivity implements Handler.Callback {
     }
 
     private void init() {
+        mACache = ACache.get(this);
         mHandler = new Handler(this);
         getAdvert();
         verifyUserInfo();
@@ -180,31 +184,156 @@ public class StartupActivity extends QMUIActivity implements Handler.Callback {
     }
 
     public void getAdvert() {
+
+        String cache = mACache.getAsString(ServerInfo.serviceIP + ServerInfo.startAdvert);
+        if (!TextUtils.isEmpty(cache)) {
+            try{
+                JSONObject jsonObject = JSONObject.parseObject(cache);
+                if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                    JSONObject jo = jsonObject.getJSONObject("data");
+                    if (jo != null) {
+                        final Advert advert = JSONObject.parseObject(jo.toJSONString(), Advert.class);
+                        if (advert != null) {
+                            if (advert.getType() == 1) {
+                                //图片
+                                surface.setVisibility(View.GONE);
+                                logo.setVisibility(View.VISIBLE);
+                                if (!TextUtils.isEmpty(advert.getContent())) {
+                                    Uri uri = Uri.parse(advert.getContent());
+                                    int width = CommonUtils.getScreenWidth();
+                                    int height = CommonUtils.getScreenHeight() - CommonUtils.dip2px(90);
+                                    ImageLoader.showThumb(uri, logo, width, height);
+                                }
+                                logo.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if (advert.getSkip() == 1) {
+                                            mSkip = true;
+                                            Intent it = new Intent(StartupActivity.this, AdvertActivity.class);
+                                            it.putExtra("url", advert.getUrl());
+                                            it.putExtra("id", advert.getId());
+                                            startActivity(it);
+                                            finish();
+                                        }
+                                    }
+                                });
+                            } else {
+                                //视频
+                                surface.setVisibility(View.VISIBLE);
+                                logo.setVisibility(View.GONE);
+                                if (!TextUtils.isEmpty(advert.getContent())) {
+                                    initAliVcPlayer(advert.getContent());
+                                }
+                                surface.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        if (advert.getSkip() == 1) {
+                                            mSkip = true;
+                                            Intent it = new Intent(StartupActivity.this, AdvertActivity.class);
+                                            it.putExtra("url", advert.getUrl());
+                                            it.putExtra("id", advert.getId());
+                                            startActivity(it);
+                                            finish();
+                                        }
+                                    }
+                                });
+                            }
+                            timer.setVisibility(View.VISIBLE);
+                            mCountDownTimer = new CountDownTimer(advert.getLength() * 1000, 500) {
+                                @Override
+                                public void onTick(long millisUntilFinished) {
+                                    if (millisUntilFinished / 1000 == 0) {
+                                        timer.setText("跳过1s");
+                                    } else {
+                                        timer.setText("跳过" + millisUntilFinished / 1000 + "s");
+                                    }
+                                }
+
+                                @Override
+                                public void onFinish() {
+                                    if (mSkip == false) {
+                                        gotoHome();
+                                    }
+                                }
+                            };
+                            mCountDownTimer.start();
+                        } else {
+                            timer.setVisibility(View.GONE);
+                            mHandler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    gotoHome();
+                                }
+                            }, 4000);
+                        }
+                    } else {
+                        timer.setVisibility(View.GONE);
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                gotoHome();
+                            }
+                        }, 4000);
+                    }
+                } else {
+                    timer.setVisibility(View.GONE);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            gotoHome();
+                        }
+                    }, 4000);
+                }
+            }catch (Exception e){
+
+            }
+
+
+
+        }else {
+            timer.setVisibility(View.GONE);
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    gotoHome();
+                }
+            }, 4000);
+        }
+        getNetAdvert();
+    }
+
+
+    public void getNetAdvert() {
         String url = ServerInfo.serviceIP + ServerInfo.startAdvert;
         Map<String, String> params = new HashMap<String, String>();
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {
-                Message msg = Message.obtain();
-                msg.what = MSG_GET_ADVERT;
-                msg.obj = response;
-                mHandler.sendMessage(msg);
+                try {
+                    JSONObject jsonObject = JSONObject.parseObject(response);
+                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+                        mACache.put(url,response);
+                        JSONObject jo = jsonObject.getJSONObject("data");
+                        if (jo != null) {
+                            final Advert advert = JSONObject.parseObject(jo.toJSONString(), Advert.class);
+                            if (advert != null) {
+                                if (advert.getType() == 2) {
+                                    //视频
+                                    //缓存视频 advert.getContent()
+                                    CommonUtils.downloadMovie(getContext(),advert.getContent());
+                                }
+                            }
+                        }
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        timer.setVisibility(View.GONE);
-                    }
-                });
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        gotoHome();
-                    }
-                }, 4000);
+
             }
         });
     }
@@ -229,12 +358,18 @@ public class StartupActivity extends QMUIActivity implements Handler.Callback {
 
     private void gotoHome() {
         startActivity(new Intent(this, MainActivity.class));
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                finish();
-            }
-        }, 200);
+//        mHandler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                finish();
+//            }
+//        }, 200);
+        if (mAliyunVodPlayer != null) {
+            mAliyunVodPlayer.stop();
+            mAliyunVodPlayer.release();
+            mAliyunVodPlayer = null;
+        }
+        finish();
     }
 
     private void verifyUserInfo() {
@@ -494,9 +629,15 @@ public class StartupActivity extends QMUIActivity implements Handler.Callback {
 //        }
 //        AliyunLocalSource localSource = alsb.build();
 //        mAliyunVodPlayer.prepareAsync(localSource);
-        UrlSource urlSource = new UrlSource();
-        urlSource.setUri(url);
-        initCacheConfig();
+        UrlSource urlSource= new UrlSource();
+        if(!TextUtils.isEmpty(mACache.getAsString(url))){
+            urlSource.setUri(mACache.getAsString(url));
+        }else{
+            urlSource.setUri(url);
+        }
+
+
+        //initCacheConfig();
         //mAliyunVodPlayer.setPlayingCache(false, sdDir, 60 * 60 /*时长, s */, 300 /*大小，MB*/);
         //urlSource.setTitle(title);
         mAliyunVodPlayer.setDataSource(urlSource);

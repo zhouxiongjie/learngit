@@ -881,8 +881,8 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                             if(extra!=null&&(extra.getShow_model()==2||extra.getShow_model()==3)){
                                 Intent it = new Intent(mContext, LivePortraitActivity.class);
                                 it.putExtra("streamName", extra.getStream_name());
-                                it.putExtra("live_driver",extra.getLive_driver());
-                                it.putExtra("is_rtslive",extra.getIs_rtslive());
+                                //it.putExtra("live_driver",extra.getLive_driver());
+                                //it.putExtra("is_rtslive",extra.getIs_rtslive());
 
 //                                it.putExtra("roomId", content.getLive().getRoom_id());
 //                                it.putExtra("url", content.getLive().getRtmp_play_url());
@@ -894,8 +894,8 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
                                 it.putExtra("streamName", streamName);
                                 it.putExtra("roomId", content.getLive().getRoom_id());
                                 //it.putExtra("url",content.getLive().getHls_play_url());
-                                it.putExtra("url", content.getLive().getRtmp_play_url());
-                                it.putExtra("type", content.getLive().getType());
+                                //it.putExtra("url", content.getLive().getRtmp_play_url());
+                                //it.putExtra("type", content.getLive().getType());
                                 mContext.startActivity(it);
                             }
 

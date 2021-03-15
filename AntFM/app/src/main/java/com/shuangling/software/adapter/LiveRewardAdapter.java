@@ -82,31 +82,35 @@ public class LiveRewardAdapter extends RecyclerView.Adapter {
         int itemViewType = getItemViewType(position);
         if (itemViewType == TYPE_HEAD) {
             HeadViewHolder vh = (HeadViewHolder) holder;
-            vh.keyword.setText(mRewardsInfo.getKeyword());
+            String keyword="";
+            if(mRewardsInfo.getData()!=null&&mRewardsInfo.getData().size()>0){
+                keyword=mRewardsInfo.getData().get(0).getGame_record().getGame().getName();
+            }
+            vh.keyword.setText(keyword);
         } else {
             ItemViewHolder vh = (ItemViewHolder) holder;
-            RewardsInfo.AwardsBean awardsBean =mRewardsInfo.getAwards().get(position-1);
-            if (!TextUtils.isEmpty(awardsBean.getAvatar())) {
+            RewardsInfo.DataBean awardsBean =mRewardsInfo.getData().get(position-1);
+            if (!TextUtils.isEmpty(awardsBean.getGame_record().getUser().getAvatar())) {
                 int width = CommonUtils.dip2px(40);
                 int height = width;
-                Uri uri = Uri.parse(awardsBean.getAvatar());
+                Uri uri = Uri.parse(awardsBean.getGame_record().getUser().getAvatar());
                 ImageLoader.showThumb(uri, vh.logo, width, height);
             } else {
                 ImageLoader.showThumb(vh.logo, R.drawable.ic_user3);
             }
-            vh.money.setText(String.format("%.2f", (float) awardsBean.getMoney() / 100) + "元");
+            vh.money.setText(awardsBean.getGame_record().getAward().getName());
 
-            vh.name.setText(awardsBean.getNickname());
+            vh.name.setText(awardsBean.getGame_record().getUser().getName());
         }
 
     }
 
     @Override
     public int getItemCount() {
-        if (mRewardsInfo.getAwards()==null||mRewardsInfo.getAwards().size() == 0) {
+        if (mRewardsInfo.getData()==null||mRewardsInfo.getData().size() == 0) {
             return 0;
         } else {
-            return mRewardsInfo.getAwards().size() + 1;
+            return mRewardsInfo.getData().size() + 1;
         }
     }
 

@@ -128,7 +128,7 @@ public class LiveChatListAdapter extends RecyclerView.Adapter{
             if (msg.getType() == 1) {
                 //主持人
 
-                SpannableString spannableString = new SpannableString("主播"+msg.getNickName()+"："+msg.getMsg());
+                SpannableString spannableString = new SpannableString("主播"+" "+msg.getNickName()+"："+msg.getMsg());
 
                 BackgroundColorSpan backgroundColorSpan = new BackgroundColorSpan(Color.parseColor("#1890FF"));
                 //spannableString.setSpan(backgroundColorSpan, 0, 2, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
@@ -137,7 +137,7 @@ public class LiveChatListAdapter extends RecyclerView.Adapter{
 
                 ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.parseColor("#FFD873"));
                 if(msg.getNickName()!=null){
-                    spannableString.setSpan(foregroundColorSpan, 2, msg.getNickName().length()+3, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    spannableString.setSpan(foregroundColorSpan, 3, msg.getNickName().length()+4, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                 }
 
                 vh.content.setText(spannableString);
@@ -233,19 +233,19 @@ public class LiveChatListAdapter extends RecyclerView.Adapter{
             if (msg.getType() == 1) {
                 //主持人
 
-                SpannableString spannableString = new SpannableString("主播"+msg.getNickName()+"："+"图片");
+                SpannableString spannableString = new SpannableString("主播"+" "+msg.getNickName()+"："+"图片");
 
                 BackgroundColorSpan backgroundColorSpan = new BackgroundColorSpan(Color.parseColor("#1890FF"));
                 //spannableString.setSpan(backgroundColorSpan, 0, 2, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                 spannableString.setSpan(new RelativeSizeSpan(0.7f), 0, 2, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                 spannableString.setSpan(new RoundBackgroundColorSpan(Color.parseColor("#1890FF"),Color.parseColor("#F7F7F7")),0, 2, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                 ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.parseColor("#FFD873"));
-                spannableString.setSpan(foregroundColorSpan, 2, msg.getNickName().length()+3, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                spannableString.setSpan(foregroundColorSpan, 3, msg.getNickName().length()+4, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
                 Drawable drawable = mContext.getResources().getDrawable(R.drawable.placeholder_message_picture);
                 drawable.setBounds(0, 0, CommonUtils.dip2px(29), CommonUtils.dip2px(17));
                 ImageSpan imageSpan = new ImageSpan(drawable);
-                spannableString.setSpan(imageSpan, 4+msg.getNickName().length(), spannableString.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                spannableString.setSpan(imageSpan, 5+msg.getNickName().length(), spannableString.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
                 ClickableSpan clickableSpan=new ClickableSpan() {
                     @Override

@@ -88,11 +88,12 @@ public class RedPacketAdapter01 extends RecyclerView.Adapter {
                 vh.name.setVisibility(View.VISIBLE);
                 vh.name.setText(mRedPacketDetailInfo.getBusiness() + "的红包");
             } else {
-                vh.name.setVisibility(View.GONE);
+                vh.name.setText("灵动直播的红包");
+                vh.name.setVisibility(View.VISIBLE);
             }
             vh.desc.setText(mRedPacketDetailInfo.getWish());
             vh.moneyLayout.setVisibility(View.GONE);
-            vh.tip.setVisibility(View.GONE);
+            vh.takeCash.setVisibility(View.GONE);
             vh.tip.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -107,7 +108,7 @@ public class RedPacketAdapter01 extends RecyclerView.Adapter {
             for (int i = 0; mRedPacketDetailInfo.getHistory() != null && i < mRedPacketDetailInfo.getHistory().size(); i++) {
                 if (User.getInstance().getId() == mRedPacketDetailInfo.getHistory().get(i).getUser_id()) {
                     vh.moneyLayout.setVisibility(View.VISIBLE);
-                    vh.tip.setVisibility(View.VISIBLE);
+                    vh.takeCash.setVisibility(View.VISIBLE);
                     vh.money.setText(String.format("%.2f", (float) mRedPacketDetailInfo.getHistory().get(i).getMoney() / 100));
                     break;
                 }
@@ -115,7 +116,7 @@ public class RedPacketAdapter01 extends RecyclerView.Adapter {
             if (mRedPacketDetailInfo.getSend_num() == mRedPacketDetailInfo.getTotal_num()) {
                 vh.summary.setText(mRedPacketDetailInfo.getTotal_num() + "个红包，" + TimeUtil.getTimeSpan(mRedPacketDetailInfo.getSend_time(), mRedPacketDetailInfo.getSend_end_time()) + "被抢光");
             } else {
-                vh.summary.setText("已领取" + mRedPacketDetailInfo.getSend_num() + "/" + mRedPacketDetailInfo.getTotal_num() + "个");
+                vh.summary.setText("领取" + mRedPacketDetailInfo.getSend_num() + "/" + mRedPacketDetailInfo.getTotal_num() + "个");
             }
         } else {
             UserInfoViewHolder vh = (UserInfoViewHolder) holder;
@@ -156,8 +157,8 @@ public class RedPacketAdapter01 extends RecyclerView.Adapter {
         LinearLayout moneyLayout;
         @BindView(R.id.tip)
         TextView tip;
-//        @BindView(R.id.statusBar)
-//        View statusBar;
+        @BindView(R.id.takeCash)
+        LinearLayout takeCash;
 
         public HeadViewHolder(View view) {
             super(view);

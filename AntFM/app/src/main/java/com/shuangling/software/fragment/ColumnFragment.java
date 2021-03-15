@@ -63,6 +63,7 @@ import com.shuangling.software.adapter.ColumnAlbumContentAdapter;
 import com.shuangling.software.adapter.ColumnContentAdapter;
 import com.shuangling.software.adapter.ColumnDecorateContentAdapter;
 import com.shuangling.software.adapter.ColumnDecorateVideoContentAdapter;
+import com.shuangling.software.adapter.ColumnGridAdapter;
 import com.shuangling.software.adapter.MoudleGridViewAdapter;
 import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.MyGridView;
@@ -299,39 +300,127 @@ public class ColumnFragment extends QMUIFragment/*SimpleImmersionFragment*/ impl
             recyclerView.addItemDecoration(divider);
         }
         recyclerView.setAdapter(mAdapter);
+
         if (mColumn.getChildren() != null && mColumn.getChildren().size() > 0) {
-            ViewGroup secondColumn = (ViewGroup) LayoutInflater.from(getActivity()).inflate(R.layout.second_column_layout, recyclerView, false);
-            LinearLayout columnContent = secondColumn.findViewById(R.id.columnContent);
-            for (int i = 0; i < mColumn.getChildren().size(); i++) {
-                final Column column = mColumn.getChildren().get(i);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.leftMargin = CommonUtils.dip2px(10);
-                params.rightMargin = CommonUtils.dip2px(10);
-                View secondColumnItem = LayoutInflater.from(getActivity()).inflate(R.layout.second_column_item_layout, secondColumn, false);
-                TextView columnTextView = secondColumnItem.findViewById(R.id.text);
-                SimpleDraweeView indicator = secondColumnItem.findViewById(R.id.logo);
-                columnTextView.setText(column.getName());
-                if (!TextUtils.isEmpty(column.getIcon())) {
-                    Uri uri = Uri.parse(column.getIcon());
-                    int width = CommonUtils.dip2px(20);
-                    int height = width;
-                    ImageLoader.showThumb(uri, indicator, width, height);
-                } else {
-                    indicator.setVisibility(View.GONE);
-                }
-                secondColumnItem.setTag(column);
-                secondColumnItem.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent it = new Intent(getContext(), ContentActivity.class);
-                        it.putExtra("column", column);
-                        startActivity(it);
+            if (mColumn.getShow_mode() == 1) {
+                ViewGroup secondColumn = (ViewGroup) LayoutInflater.from(getActivity()).inflate(R.layout.second_column_layout, recyclerView, false);
+                LinearLayout columnContent = secondColumn.findViewById(R.id.columnContent);
+                for (int i = 0; i < mColumn.getChildren().size(); i++) {
+                    final Column column = mColumn.getChildren().get(i);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    params.leftMargin = CommonUtils.dip2px(10);
+                    params.rightMargin = CommonUtils.dip2px(10);
+                    View secondColumnItem = LayoutInflater.from(getActivity()).inflate(R.layout.second_column_item_layout, secondColumn, false);
+                    TextView columnTextView = secondColumnItem.findViewById(R.id.text);
+                    SimpleDraweeView indicator = secondColumnItem.findViewById(R.id.logo);
+                    columnTextView.setText(column.getName());
+                    if (!TextUtils.isEmpty(column.getIcon())) {
+                        Uri uri = Uri.parse(column.getIcon());
+                        int width = CommonUtils.dip2px(20);
+                        int height = width;
+                        ImageLoader.showThumb(uri, indicator, width, height);
+                    } else {
+                        indicator.setVisibility(View.GONE);
                     }
-                });
-                columnContent.addView(secondColumnItem, i, params);
+                    secondColumnItem.setTag(column);
+                    secondColumnItem.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent it = new Intent(getContext(), ContentActivity.class);
+                            it.putExtra("column", column);
+                            startActivity(it);
+                        }
+                    });
+                    columnContent.addView(secondColumnItem, i, params);
+                }
+                mAdapter.addHeaderView(secondColumn);
+            } else {
+                //大图模式
+                if (mColumn.getRange_mode() == 1) {
+                    //单行
+                    ViewGroup secondColumn = (ViewGroup) LayoutInflater.from(getActivity()).inflate(R.layout.second_column_large_no_newline_layout, recyclerView, false);
+                    LinearLayout columnContent = secondColumn.findViewById(R.id.columnContent);
+                    for (int i = 0; i < mColumn.getChildren().size(); i++) {
+                        final Column column = mColumn.getChildren().get(i);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        //params.leftMargin = CommonUtils.dip2px(10);
+                        //params.rightMargin = CommonUtils.dip2px(10);
+                        View secondColumnItem = LayoutInflater.from(getActivity()).inflate(R.layout.second_column_large_no_newline_item_layout, columnContent, false);
+                        TextView columnTextView = secondColumnItem.findViewById(R.id.text);
+                        SimpleDraweeView indicator = secondColumnItem.findViewById(R.id.logo);
+                        columnTextView.setText(column.getName());
+                        if (!TextUtils.isEmpty(column.getIcon())) {
+                            Uri uri = Uri.parse(column.getIcon());
+                            int width = CommonUtils.dip2px(20);
+                            int height = width;
+                            ImageLoader.showThumb(uri, indicator, width, height);
+                        } else {
+                            ImageLoader.showThumb(indicator, R.drawable.article_placeholder);
+                        }
+                        secondColumnItem.setTag(column);
+                        secondColumnItem.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent it = new Intent(getContext(), ContentActivity.class);
+                                it.putExtra("column", column);
+                                startActivity(it);
+                            }
+                        });
+                        columnContent.addView(secondColumnItem, i, params);
+                    }
+                    mAdapter.addHeaderView(secondColumn);
+                } else {
+                    //换行
+                    ViewGroup secondColumn = (ViewGroup) LayoutInflater.from(getActivity()).inflate(R.layout.second_column_large_newline_layout, recyclerView, false);
+                    MyGridView columnContent = secondColumn.findViewById(R.id.columnContent);
+                    ColumnGridAdapter columnGridAdapter = new ColumnGridAdapter(getContext(), mColumn.getChildren());
+                    columnContent.setAdapter(columnGridAdapter);
+                    columnContent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Intent it = new Intent(getContext(), ContentActivity.class);
+                            it.putExtra("column", mColumn.getChildren().get(position));
+                            startActivity(it);
+                        }
+                    });
+                    mAdapter.addHeaderView(secondColumn);
+                }
             }
-            mAdapter.addHeaderView(secondColumn);
         }
+
+//        if (mColumn.getChildren() != null && mColumn.getChildren().size() > 0) {
+//            ViewGroup secondColumn = (ViewGroup) LayoutInflater.from(getActivity()).inflate(R.layout.second_column_layout, recyclerView, false);
+//            LinearLayout columnContent = secondColumn.findViewById(R.id.columnContent);
+//            for (int i = 0; i < mColumn.getChildren().size(); i++) {
+//                final Column column = mColumn.getChildren().get(i);
+//                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//                params.leftMargin = CommonUtils.dip2px(10);
+//                params.rightMargin = CommonUtils.dip2px(10);
+//                View secondColumnItem = LayoutInflater.from(getActivity()).inflate(R.layout.second_column_item_layout, secondColumn, false);
+//                TextView columnTextView = secondColumnItem.findViewById(R.id.text);
+//                SimpleDraweeView indicator = secondColumnItem.findViewById(R.id.logo);
+//                columnTextView.setText(column.getName());
+//                if (!TextUtils.isEmpty(column.getIcon())) {
+//                    Uri uri = Uri.parse(column.getIcon());
+//                    int width = CommonUtils.dip2px(20);
+//                    int height = width;
+//                    ImageLoader.showThumb(uri, indicator, width, height);
+//                } else {
+//                    indicator.setVisibility(View.GONE);
+//                }
+//                secondColumnItem.setTag(column);
+//                secondColumnItem.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        Intent it = new Intent(getContext(), ContentActivity.class);
+//                        it.putExtra("column", column);
+//                        startActivity(it);
+//                    }
+//                });
+//                columnContent.addView(secondColumnItem, i, params);
+//            }
+//            mAdapter.addHeaderView(secondColumn);
+//        }
 
         columnDecorateContent(GetContent.Normal);
         return rootView;

@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="更多"
-                android:textColor="#333333"
+                android:textColor="#B6B6B7"
                 android:textSize="@dimen/font_size_32px" />
 
 
@@ -59,7 +59,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="&#xe76d;"
-                    android:textColor="#97A3BD"
+                    android:textColor="#B6B6B7"
                     android:textSize="@dimen/font_size_36px" />
 
 
@@ -69,8 +69,8 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_margin="10dp"
                     android:text="分享"
-                    android:textColor="#333333"
-                    android:textSize="12sp" />
+                    android:textColor="#B6B6B7"
+                    android:textSize="@dimen/font_size_26px" />
 
             </LinearLayout>
 
@@ -91,7 +91,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="&#xe76f;"
-                    android:textColor="#97A3BD"
+                    android:textColor="#B6B6B7"
                     android:textSize="@dimen/font_size_36px" />
 
 
@@ -102,8 +102,8 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_margin="10dp"
                     android:text="钱包"
-                    android:textColor="#333333"
-                    android:textSize="12sp" />
+                    android:textColor="#B6B6B7"
+                    android:textSize="@dimen/font_size_26px" />
 
             </LinearLayout>
 

@@ -13,26 +13,26 @@
         android:orientation="vertical">
 
         <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="279dp"
+            android:layout_height="409dp"
             android:layout_gravity="center_horizontal">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="388dp"
                 android:layout_gravity="bottom"
                 android:src="@drawable/red_packet_bg01" />
 
             <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="254dp"
+                android:layout_height="395dp"
                 android:layout_gravity="bottom|center_horizontal"
                 android:layout_marginBottom="10dp">
 
                 <ImageView
                     android:id="@+id/fg"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:src="@drawable/red_packet_fg01" />
 
 

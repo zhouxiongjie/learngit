@@ -4,32 +4,33 @@ import java.util.List;
 
 public class RedPacketInfo implements Serializable {
 
+
     /**
-     * id : 182
-     * room_id : 1450
+     * id : 309
+     * room_id : 631
      * anchor_id : 4
      * sponsor_nm :
      * sponsor_log :
-     * bagcount : 10
+     * bagcount : 2
      * money : 100
-     * wish : 恭喜发财，恭喜发财！
+     * wish : 恭喜发财，大吉大利！
      * bag_type : 2
      * send_type : 1
      * state : 1
-     * start : 2021-01-27 09:06:30
-     * stop : 2021-01-27 09:06:30
+     * start : 2021-03-04 15:50:21
+     * stop : 2021-03-04 15:52:01
      * created_by : 1
      * deleted_at : null
-     * created_at : 2021-01-27 09:06:30
-     * updated_at : 2021-01-27 09:06:30
+     * created_at : 2021-03-04 15:50:21
+     * updated_at : 2021-03-04 15:52:01
      * one_money : 0
-     * id_asc : 331
-     * bill_no_asc : 202101273000331
-     * state_end : 0
+     * id_asc : 4364
+     * bill_no_asc : 202103043004364
+     * state_end : 1
      * auto_type : 1
-     * red_bag_money : 16
-     * red_bag_count : 1
-     * user : [{"id":123,"redbag_id":182,"user_id":6311,"envelope_id":331,"money":16,"created_at":"2021-01-27 09:06:48","updated_at":"2021-01-27 09:06:48"}]
+     * red_bag_money : 100
+     * red_bag_count : 2
+     * user : [{"id":629,"redbag_id":309,"user_id":18444,"envelope_id":4364,"money":66,"created_at":"2021-03-04 15:51:55","updated_at":"2021-03-04 15:51:55"},{"id":630,"redbag_id":309,"user_id":859,"envelope_id":4364,"money":34,"created_at":"2021-03-04 15:52:01","updated_at":"2021-03-04 15:52:01"}]
      */
 
     private int id;
@@ -260,13 +261,13 @@ public class RedPacketInfo implements Serializable {
 
     public static class UserBean {
         /**
-         * id : 123
-         * redbag_id : 182
-         * user_id : 6311
-         * envelope_id : 331
-         * money : 16
-         * created_at : 2021-01-27 09:06:48
-         * updated_at : 2021-01-27 09:06:48
+         * id : 629
+         * redbag_id : 309
+         * user_id : 18444
+         * envelope_id : 4364
+         * money : 66
+         * created_at : 2021-03-04 15:51:55
+         * updated_at : 2021-03-04 15:51:55
          */
 
         private int id;

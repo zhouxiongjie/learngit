@@ -56,7 +56,7 @@ public class RedPacketDetailDialog extends BaseCircleDialog {
         dialogFragment.setCanceledBack(false);
         dialogFragment.setCanceledOnTouchOutside(false);
         dialogFragment.setGravity(Gravity.CENTER);
-        dialogFragment.setWidth(0.8f);
+        dialogFragment.setWidth(1.0f);
         dialogFragment.mId = id;
         return dialogFragment;
     }

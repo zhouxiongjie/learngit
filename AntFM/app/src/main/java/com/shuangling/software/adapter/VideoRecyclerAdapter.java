@@ -253,7 +253,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
             final RootCommentViewHolder vh = (RootCommentViewHolder) holder;
             //int pos = mPostContents != null ? position - 2 - mPostContents.size() : position - 2;
             final Comment comment = (Comment) mPositionTypeMap.get(position).data;
-            if (!TextUtils.isEmpty(comment.getUser().getAvatar())) {
+            if (comment.getUser()!=null&&!TextUtils.isEmpty(comment.getUser().getAvatar())) {
                 Uri uri = Uri.parse(comment.getUser().getAvatar());
                 int width = CommonUtils.dip2px(25);
                 int height = width;

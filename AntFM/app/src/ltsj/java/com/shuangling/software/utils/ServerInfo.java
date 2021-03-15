@@ -20,8 +20,10 @@ public class ServerInfo {
 //	public static String echo_server="http://echo-live.staging.slradio.cn";
 //
 //	public static String mlive="http://live-m.staging.slradio.cn";
-
-	public static String shop ="http://api-shop.staging.slradio.cn";
+//
+//	public static String mlives="https://live-m.staging.slradio.cn";
+//
+//	public static String shop ="http://api-shop.staging.slradio.cn";
 
 
 //	public static String serviceIP="http://api-cms.review.slradio.cn";  		//测试环境
@@ -46,6 +48,7 @@ public class ServerInfo {
 //
 //	public static String shop ="http://api-shop.review.slradio.cn";
 
+
 	public static String serviceIP="http://api-cms.on-radio.cn";
 
 	public static String h5IP="http://cms.on-radio.cn";
@@ -65,6 +68,10 @@ public class ServerInfo {
 	public static String echo_server="http://echo-live.on-radio.cn";
 
 	public static String mlive="http://live-m.on-radio.cn";
+
+	public static String mlives="https://live-m.on-radio.cn";
+
+	public static String shop ="http://api-shop.on-radio.cn";
 
 
 

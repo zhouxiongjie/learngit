@@ -1,6 +1,7 @@
 package com.shuangling.software.entity;
+
 public class ChatMessage {
-/**
+    /**
      * messageType : 1
      * userId : 1
      * msg : https://sl-cdn.slradio.cn/cms/live_c_chat/cAFWJS7jcTP7rtaP1589184175714.jpg
@@ -15,7 +16,7 @@ public class ChatMessage {
      * contentType : 2
      * parentMsgInfo :
      */
-private int messageType;
+    private int messageType;
     private String userId;
     private String msg;
     private String streamName;
@@ -28,82 +29,108 @@ private int messageType;
     private int aiAudit;
     private int contentType;
     private ChatMessage parentMsgInfo;
-public int getMessageType() {
+
+    public int getMessageType() {
         return messageType;
     }
-public void setMessageType(int messageType) {
+
+    public void setMessageType(int messageType) {
         this.messageType = messageType;
     }
-public String getUserId() {
+
+    public String getUserId() {
         return userId;
     }
-public void setUserId(String userId) {
+
+    public void setUserId(String userId) {
         this.userId = userId;
     }
-public String getMsg() {
+
+    public String getMsg() {
         return msg;
     }
-public void setMsg(String msg) {
+
+    public void setMsg(String msg) {
         this.msg = msg;
     }
-public String getStreamName() {
+
+    public String getStreamName() {
         return streamName;
     }
-public void setStreamName(String streamName) {
+
+    public void setStreamName(String streamName) {
         this.streamName = streamName;
     }
-public String getNickName() {
+
+    public String getNickName() {
         return nickName;
     }
-public void setNickName(String nickName) {
+
+    public void setNickName(String nickName) {
         this.nickName = nickName;
     }
-public int getType() {
+
+    public int getType() {
         return type;
     }
-public void setType(int type) {
+
+    public void setType(int type) {
         this.type = type;
     }
-public int getChatsId() {
+
+    public int getChatsId() {
         return chatsId;
     }
-public void setChatsId(int chatsId) {
+
+    public void setChatsId(int chatsId) {
         this.chatsId = chatsId;
     }
-public String getUserLog() {
+
+    public String getUserLog() {
         return userLog;
     }
-public void setUserLog(String userLog) {
+
+    public void setUserLog(String userLog) {
         this.userLog = userLog;
     }
-public String getSendTime() {
+
+    public String getSendTime() {
         return sendTime;
     }
-public void setSendTime(String sendTime) {
+
+    public void setSendTime(String sendTime) {
         this.sendTime = sendTime;
     }
-public int getAudit() {
+
+    public int getAudit() {
         return audit;
     }
-public void setAudit(int audit) {
+
+    public void setAudit(int audit) {
         this.audit = audit;
     }
-public int getAiAudit() {
+
+    public int getAiAudit() {
         return aiAudit;
     }
-public void setAiAudit(int aiAudit) {
+
+    public void setAiAudit(int aiAudit) {
         this.aiAudit = aiAudit;
     }
-public int getContentType() {
+
+    public int getContentType() {
         return contentType;
     }
-public void setContentType(int contentType) {
+
+    public void setContentType(int contentType) {
         this.contentType = contentType;
     }
-public ChatMessage getParentMsgInfo() {
+
+    public ChatMessage getParentMsgInfo() {
         return parentMsgInfo;
     }
-public void setParentMsgInfo(ChatMessage parentMsgInfo) {
+
+    public void setParentMsgInfo(ChatMessage parentMsgInfo) {
         this.parentMsgInfo = parentMsgInfo;
     }
 }

@@ -736,10 +736,10 @@ public class WebViewBackActivity extends /*AppCompatActivity*/QMUIActivity imple
             String url = initUrl(mUrl);
             if (User.getInstance() != null) {
                 if (!TextUtils.isEmpty(mJumpUrl)) {
-                    url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android" + "&multiple=" + CommonUtils.getFontSize();
+                     url = mJumpUrl + "?Authorization=" + User.getInstance().getAuthorization() + "&app=android" + "&multiple=" + CommonUtils.getFontSize();
                 }
                 webView.loadUrl(url);
-                progressBar.show();
+                if (progressBar != null) progressBar.show();
             }
         }
     }

@@ -30,6 +30,7 @@ import com.hjq.toast.ToastUtils;
 import com.shuangling.software.R;
 import com.shuangling.software.adapter.LiveAwardRankAdapter;
 import com.shuangling.software.adapter.LiveRewardAdapter;
+import com.shuangling.software.dialog.LiveAwardDialog;
 import com.shuangling.software.entity.AwardInfo;
 import com.shuangling.software.entity.LiveRoomInfo01;
 import com.shuangling.software.entity.RewardsInfo;
@@ -67,6 +68,11 @@ public class LiveAwardRankFragment extends Fragment {
 
 
     private LiveRoomInfo01.RoomInfoBean liveRoomInfo;
+
+    private LiveAwardDialog mDialog;
+    public LiveAwardRankFragment(LiveAwardDialog dialog){
+        mDialog=dialog;
+    }
 
 
 
@@ -108,7 +114,14 @@ public class LiveAwardRankFragment extends Fragment {
                                 try {
                                     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                                     recyclerView.setLayoutManager(linearLayoutManager);
-                                    recyclerView.setAdapter(new LiveAwardRankAdapter(getContext(), awardInfos));
+                                    LiveAwardRankAdapter adapter=new LiveAwardRankAdapter(getContext(), awardInfos);
+                                    adapter.setOnItemClick(new LiveAwardRankAdapter.OnItemClick() {
+                                        @Override
+                                        public void ItemClick(AwardInfo awardInfo) {
+                                            mDialog.onRankItemClick(awardInfo);
+                                        }
+                                    });
+                                    recyclerView.setAdapter(adapter);
                                     if(awardInfos==null||awardInfos.size()==0){
                                         noData.setVisibility(View.VISIBLE);
                                     }

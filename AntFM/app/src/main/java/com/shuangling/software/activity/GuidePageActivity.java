@@ -80,7 +80,7 @@ public class GuidePageActivity extends AppCompatActivity implements Handler.Call
     public void guides() {
         String url = ServerInfo.serviceIP + ServerInfo.guides;
         Map<String, String> params = new HashMap<>();
-        params.put("version", "V" + getVersionName());
+        params.put("version", getVersionName());
         OkHttpUtils.get(url, params, new OkHttpCallback(this) {
             @Override
             public void onResponse(Call call, String response) throws IOException {

@@ -1,0 +1,85 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/order"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textColor="#B0B0B4"
+            android:textSize="@dimen/font_size_30px"
+            tools:text="1" />
+
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/logo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/order"
+            fresco:actualImageScaleType="centerCrop"
+            fresco:failureImage="@drawable/ic_user3"
+            fresco:failureImageScaleType="centerCrop"
+            fresco:placeholderImage="@drawable/ic_user3"
+            fresco:placeholderImageScaleType="centerCrop"
+            fresco:roundAsCircle="true"
+            fresco:roundingBorderColor="@color/white"
+            fresco:roundingBorderWidth="0dp"
+            fresco:viewAspectRatio="1" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/logo"
+            android:ellipsize="end"
+            android:lines="1"
+            android:text="流动的忧郁"
+            android:textColor="#161823"
+            android:textSize="@dimen/font_size_30px" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/hotIndex"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="60dp"
+        android:layout_gravity="center_vertical"
+        android:gravity="center"
+        android:layout_marginLeft="20dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textColor="#333333"
+        android:textSize="@dimen/font_size_24px"
+        tools:text="12人" />
+
+    <TextView
+        android:id="@+id/money"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="60dp"
+        android:gravity="center"
+        android:layout_gravity="center_vertical"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textColor="#EB4B29"
+        android:textSize="@dimen/font_size_24px"
+        tools:text="12人" />
+
+</LinearLayout>

@@ -38,7 +38,7 @@ android {
 //        disable "ResourceType"
 //    }
     MtjCirclePluginConfig {
-        appkey = "8a3086f16e "
+        appkey = "8a3086f16e"
         // 设置debug 开关，如果需要查看日志则打开开关，为避免影响性能建议上线前关闭（设置为false）
         debug = false
         // 默认启动此插件，如果开发者不需要可以禁用（设置为false）
@@ -215,6 +215,7 @@ dependencies {
         exclude module: 'support-v4'
     }
     implementation 'com.facebook.fresco:fresco:2.3.0'
+    implementation 'com.facebook.fresco:animated-gif:2.3.0'
 //0.12.0 2.3.0' // https://github.com/facebook/fresco
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.alibaba:fastjson:1.2.54'

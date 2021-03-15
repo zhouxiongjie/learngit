@@ -1,0 +1,44 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:padding="10dp">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#EEEEEE"
+        android:layout_centerVertical="true"
+        android:layout_margin="10dp"/>
+
+
+
+    <TextView
+        android:id="@+id/desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#F2F2F2"
+        android:padding="5dp"
+        android:layout_centerInParent="true"
+        android:textSize="@dimen/font_size_24px"
+        android:textColor="#999999"
+        android:text="还有4名未登录用户在观看"
+        android:lines="1"
+        android:ellipsize="end"/>
+
+    <!--<CheckBox-->
+    <!--android:id="@+id/checkBox"-->
+    <!--style="@style/CircleCheckboxTheme"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:layout_marginRight="5dp"-->
+    <!--android:enabled="false"-->
+    <!--android:visibility="visible"/>-->
+
+</RelativeLayout>
+
+

@@ -1,41 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white">
 
-    <LinearLayout
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="350dp"
-        android:orientation="vertical"
-        android:padding="0dp"
-        android:background="@drawable/send_red_packet_dialog_bg">
+        android:background="@drawable/send_red_packet_dialog_bg"
+        android:padding="0dp">
 
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabPageIndicator"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:tabBackground="@android:color/transparent"
-            app:tabRippleColor="@android:color/transparent"
-            android:layout_alignParentTop="true"
-            android:textSize="@dimen/font_size_32px"
-            android:textStyle="bold"
-            app:tabIndicatorColor="#333333"
-            app:tabIndicatorFullWidth="false"
-            app:tabIndicatorHeight="2dp"
-            app:tabMode="fixed"
-            app:tabSelectedTextColor="#333333"
-            app:tabTextColor="#999999" />
-
-        <com.shuangling.software.customview.MyViewPager
-            android:id="@+id/viewPager"
+        <LinearLayout
+            android:id="@+id/one"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/tabPageIndicator"
-            android:layout_above="@+id/actionLayout"/>
+            android:visibility="visible"
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabPageIndicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:textSize="@dimen/font_size_32px"
+                android:textStyle="bold"
+                app:tabBackground="@android:color/transparent"
+                app:tabIndicatorColor="#333333"
+                app:tabIndicatorFullWidth="false"
+                app:tabIndicatorHeight="2dp"
+                app:tabMode="fixed"
+                app:tabRippleColor="@android:color/transparent"
+                app:tabSelectedTextColor="#333333"
+                app:tabTextColor="#999999" />
+
+            <com.shuangling.software.customview.MyViewPager
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/actionLayout"
+                android:layout_below="@+id/tabPageIndicator" />
+
+        </LinearLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/two"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <RelativeLayout
+                android:id="@+id/topBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp">
+
+                <ImageView
+                    android:id="@+id/back"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_back_black" />
+
+
+                <TextView
+                    android:id="@+id/awardTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:textColor="#333333"
+                    android:textSize="@dimen/font_size_32px"
+                    tools:text="热度榜" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/tab"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/topBar"
+                android:padding="10dp">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:textColor="#999999"
+                    android:textSize="@dimen/font_size_24px"
+                    android:text="礼物信息" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_marginRight="10dp"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="价值"
+                    android:textColor="#999999"
+                    android:textSize="@dimen/font_size_24px" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="价值"
+                    android:textColor="#999999"
+                    android:textSize="@dimen/font_size_24px" />
+
+
+            </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/tab"
+                android:scrollbars="none" />
+
+            <TextView
+                android:id="@+id/noData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="50dp"
+                android:gravity="center"
+                android:text="暂无数据"
+                android:textColor="#666666"
+                android:textSize="@dimen/font_size_14sp"
+                android:visibility="gone"
+                app:drawableTopCompat="@drawable/no_img_text" />
+        </RelativeLayout>
+
+
+    </FrameLayout>
+
 
 </RelativeLayout>

@@ -12,6 +12,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Point;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
@@ -56,6 +58,8 @@ import com.shuangling.software.activity.BindPhoneActivity;
 import com.shuangling.software.activity.CluesActivity;
 import com.shuangling.software.activity.ContentActivity;
 import com.shuangling.software.activity.GalleriaActivity;
+import com.shuangling.software.activity.LiveDetailActivity;
+import com.shuangling.software.activity.LivePortraitActivity;
 import com.shuangling.software.activity.MainActivity;
 import com.shuangling.software.activity.NewLoginActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
@@ -68,8 +72,10 @@ import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.User;
 
 import android.webkit.WebSettings;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.ColorInt;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import com.gyf.immersionbar.ImmersionBar;
@@ -108,6 +114,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
+import static android.os.Environment.DIRECTORY_MOVIES;
 
 public class CommonUtils {
     public static final int NETWORKTYPE_WIFI = 0x1;
@@ -1326,7 +1333,56 @@ public class CommonUtils {
             it.putExtra("url", url);
             it.putExtra("title", title);
             context.startActivity(it);
-        } else {
+        }else if (url.startsWith(ServerInfo.mlive + "/index?stream_name=") || url.startsWith(ServerInfo.mlives + "/index?stream_name=")) {
+
+            String streamName="";
+            String showMode="";
+            String type="";
+            String roomId="";
+            String[] str=url.split("\\?");
+            if(str.length==2){
+                String sufixStr=str[1];
+                str=sufixStr.split("&");
+                for(int i=0;i<str.length;i++){
+                    sufixStr=str[i];
+                    String[] keyvalue=sufixStr.split("=");
+                    if(keyvalue.length==2){
+                        if(keyvalue[0].equals("stream_name")){
+                            streamName=keyvalue[1];
+                        }else if(keyvalue[0].equals("show_mode")){
+                            showMode=keyvalue[1];
+                        }else if(keyvalue[0].equals("type")){
+                            type=keyvalue[1];
+                        }else if(keyvalue[0].equals("room_id")){
+                            roomId=keyvalue[1];
+                        }
+                    }
+                }
+            }
+
+            if(!TextUtils.isEmpty(streamName)&&!TextUtils.isEmpty(showMode)&&!TextUtils.isEmpty(type)&&!TextUtils.isEmpty(roomId)) {
+                if (type.equals("1") || type.equals("4")) {
+                    if (showMode.equals("2") || showMode.equals("3")) {
+                        Intent it = new Intent(context, LivePortraitActivity.class);
+                        it.putExtra("streamName", streamName);
+                        context.startActivity(it);
+                        return;
+
+                    } else {
+                        Intent it = new Intent(context, LiveDetailActivity.class);
+                        it.putExtra("streamName", streamName);
+                        it.putExtra("roomId", roomId);
+                        return;
+                    }
+                }
+            }
+            Intent it = new Intent(context, WebViewBackActivity.class);
+            it.putExtra("addParams",false);
+            it.putExtra("url", url);
+            it.putExtra("title", title);
+            context.startActivity(it);
+
+        }else {
             Intent it = new Intent(context, WebViewBackActivity.class);
             it.putExtra("addParams",false);
             it.putExtra("url", url);
@@ -1415,6 +1471,77 @@ public class CommonUtils {
     }
 
 
+    public static void downloadMovie(Context context,final String downloadUrl) {
+        String[] preFix = downloadUrl.split("/");
+        String fileName = preFix[preFix.length-1];
+
+
+        File file = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_MOVIES) + File.separator + fileName);
+        if (file.exists()) {
+            return;
+        }
+
+        final FileDownloadListener downloadListener = new FileDownloadListener() {
+            @Override
+            protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                Log.i("test", "pending");
+            }
+
+            @Override
+            protected void connected(BaseDownloadTask task, String etag, boolean isContinue, int soFarBytes, int totalBytes) {
+                Log.i("test", "connected");
+            }
+
+            @Override
+            protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+                //StyledDialog.updateProgress(dialog, (int)((long)soFarBytes * 100 / (long)totalBytes), 100, "素材下载中...", true);
+            }
+
+            @Override
+            protected void blockComplete(BaseDownloadTask task) {
+                try {
+                    ACache.get(context).put(downloadUrl,file.getAbsolutePath());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            protected void retry(final BaseDownloadTask task, final Throwable ex, final int retryingTimes, final int soFarBytes) {
+                Log.i("test", ex.toString());
+            }
+
+            @Override
+            protected void completed(BaseDownloadTask task) {
+            }
+
+            @Override
+            protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+            }
+
+            @Override
+            protected void error(BaseDownloadTask task, Throwable e) {
+                Log.i("test", e.toString());
+            }
+
+            @Override
+            protected void warn(BaseDownloadTask task) {
+            }
+        };
+        final FileDownloadQueueSet queueSet = new FileDownloadQueueSet(downloadListener);
+        final List<BaseDownloadTask> tasks = new ArrayList<>();
+        tasks.add(FileDownloader.getImpl().create(downloadUrl).setPath(file.getPath()));
+        //queueSet.setCallbackProgressMinInterval(200);
+        //queueSet.disableCallbackProgressTimes();
+        // 由于是队列任务, 这里是我们假设了现在不需要每个任务都回调`FileDownloadListener#progress`, 我们只关系每个任务是否完成, 所以这里这样设置可以很有效的减少ipc.
+        // 所有任务在下载失败的时候都自动重试一次
+        queueSet.setAutoRetryTimes(1);
+        // 串行执行该任务队列
+        queueSet.downloadSequentially(tasks);
+        //queueSet.downloadTogether(tasks);
+        queueSet.start();
+    }
+
     public static String getVersionName(Context context) {
         try {
             return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
@@ -1423,4 +1550,8 @@ public class CommonUtils {
             return null;
         }
     }
+
+
+
+
 }

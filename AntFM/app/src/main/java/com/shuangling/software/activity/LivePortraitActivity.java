@@ -1,26 +1,32 @@
 package com.shuangling.software.activity;
 
+import android.Manifest;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.RotateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -31,6 +37,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,23 +51,13 @@ import com.aliyun.player.bean.InfoBean;
 import com.aliyun.player.nativeclass.TrackInfo;
 import com.aliyun.player.source.UrlSource;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
-import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
-import com.facebook.common.executors.CallerThreadExecutor;
-import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.DataSource;
-import com.facebook.drawee.backends.pipeline.Fresco;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableImage;
-import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.hjq.toast.ToastUtils;
-import com.mylhyl.circledialog.CircleDialog;
-import com.mylhyl.circledialog.callback.ConfigButton;
-import com.mylhyl.circledialog.params.ButtonParams;
 import com.qmuiteam.qmui.arch.QMUIActivity;
 import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.shuangling.software.MyApplication;
@@ -77,6 +74,7 @@ import com.shuangling.software.dialog.RedPacketDetailDialog;
 import com.shuangling.software.dialog.RedPacketDialog;
 import com.shuangling.software.dialog.RewardListDialog;
 import com.shuangling.software.dialog.ShareDialog;
+import com.shuangling.software.dialog.ShareLivePosterDialog01;
 import com.shuangling.software.dialog.ViewerListDialog;
 import com.shuangling.software.entity.ChatMessage;
 import com.shuangling.software.entity.LiveGoodsInfo;
@@ -89,12 +87,15 @@ import com.shuangling.software.liverewardgift.LPAnimationManager;
 import com.shuangling.software.network.MyEcho;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
+import com.shuangling.software.service.IAudioPlayer;
 import com.shuangling.software.utils.AsyncHttpURLConnection;
 import com.shuangling.software.utils.CommonUtils;
+import com.shuangling.software.utils.FloatWindowUtil;
+import com.shuangling.software.utils.GsdFastBlur;
 import com.shuangling.software.utils.HeightProvider;
 import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
-import com.shuangling.software.utils.SharedPreferencesUtils;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.tencent.xbright.lebwebrtcsdk.LEBWebRTCEvents;
 import com.tencent.xbright.lebwebrtcsdk.LEBWebRTCParameters;
 import com.tencent.xbright.lebwebrtcsdk.LEBWebRTCStatsReport;
@@ -105,13 +106,17 @@ import net.mrbin99.laravelechoandroid.EchoOptions;
 
 import org.json.JSONException;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Timer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -126,14 +131,16 @@ import cn.sharesdk.tencent.qq.QQ;
 import cn.sharesdk.wechat.favorite.WechatFavorite;
 import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
-import io.alterac.blurkit.BlurKit;
-import io.alterac.blurkit.BlurLayout;
+import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
+import static android.os.Environment.DIRECTORY_PICTURES;
+import static android.view.animation.Animation.INFINITE;
+import static com.tencent.xbright.lebwebrtcsdk.LEBWebRTCView.SCALE_KEEP_ASPECT_CROP;
 import static com.tencent.xbright.lebwebrtcsdk.LEBWebRTCView.SCALE_KEEP_ASPECT_FIT;
 
 
-public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvents {
+public class LivePortraitActivity extends BaseAudioActivity implements LEBWebRTCEvents {
 
     private static final String TAG = LivePortraitActivity.class.getSimpleName();
 
@@ -151,16 +158,11 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
     @BindView(R.id.hotRange)
     TextView hotRange;
     @BindView(R.id.inviteRange)
-    TextView inviteRange;
+    LinearLayout inviteRange;
+    @BindView(R.id.smallRedPacket)
+    ImageView smallRedPacket;
     @BindView(R.id.giftContainer)
     LinearLayout giftContainer;
-    //    @BindView(R.id.shakeRedPacket)
-//    ImageView shakeRedPacket;
-//    @BindView(R.id.redPacketStatus)
-//    TextView redPacketStatus;
-//    @BindView(R.id.redPacket)
-//    FrameLayout redPacket;
-
     @BindView(R.id.surface)
     SurfaceView surface;
     @BindView(R.id.chat_msg_list)
@@ -170,7 +172,9 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
     @BindView(R.id.chatBtn)
     TextView chatBtn;
     @BindView(R.id.goods)
-    ImageButton goods;
+    RelativeLayout goods;
+    @BindView(R.id.goodsNumber)
+    TextView goodsNumber;
     @BindView(R.id.invite)
     ImageButton invite;
     @BindView(R.id.more)
@@ -181,12 +185,10 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
     LinearLayout bottomBar;
     @BindView(R.id.chatInput)
     EditText chatInput;
+    @BindView(R.id.chatInputLayout)
+    LinearLayout chatInputLayout;
     @BindView(R.id.bottomLayout)
     FrameLayout bottomLayout;
-//    @BindView(R.id.blurLayout)
-//    BlurLayout blurLayout;
-//    @BindView(R.id.aliyunVodPlayerView)
-//    AliyunVodPlayerView aliyunVodPlayerView;
     @BindView(R.id.background)
     ImageView background;
     @BindView(R.id.lebSurfaceView)
@@ -225,18 +227,37 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
     FontIconView close;
     @BindView(R.id.noAnchor)
     RelativeLayout noAnchor;
-    @BindView(R.id.b)
-    LinearLayout b;
+    @BindView(R.id.phrase01)
+    TextView phrase01;
+    @BindView(R.id.phrase02)
+    TextView phrase02;
+    @BindView(R.id.phrase03)
+    TextView phrase03;
+    @BindView(R.id.coming)
+    TextView coming;
+    @BindView(R.id.shakeRedPacket)
+    ImageView shakeRedPacket;
+    @BindView(R.id.close1)
+    FontIconView close1;
+    @BindView(R.id.head01)
+    SimpleDraweeView head01;
+    @BindView(R.id.name01)
+    TextView name01;
+    @BindView(R.id.leaveLayout)
+    RelativeLayout leaveLayout;
+    @BindView(R.id.panel)
+    RelativeLayout panel;
+    @BindView(R.id.fullCreenIcon)
+    FontIconView fullCreenIcon;
+    @BindView(R.id.fullCreen)
+    RelativeLayout fullCreen;
+    @BindView(R.id.playerLayout)
+    RelativeLayout playerLayout;
+
+    private int onlineViewer;
 
     private List<Long> selectedGoodsId;
 
-    public List<Long> getSelectedGoodsId() {
-        return selectedGoodsId;
-    }
-
-    public void setSelectedGoodsId(List<Long> selectedGoodsId) {
-        this.selectedGoodsId = selectedGoodsId;
-    }
 
     private Handler mMainHandler;
     private Timer timer;
@@ -255,20 +276,38 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
     private LiveRoomInfo01 mliveRoomInfo;
     private LiveGoodsInfo mLiveGoodsInfo;
     private LEBWebRTCParameters mLEBWebRTCParameters;
-    private int mAudioFormat = LEBWebRTCParameters.OPUS; //LEBWebRTCParameters.AAC_LATM, LEBWebRTCParameters.AAC_ADTS
-    private int mScaleType = SCALE_KEEP_ASPECT_FIT;
-    private boolean mLebInitialized = false;
+    private int mAudioFormat = LEBWebRTCParameters.OPUS;
+    private int mScaleType = SCALE_KEEP_ASPECT_CROP;
 
-    // 用于处理子线程操作
-//    private Handler mSubThreadHandler;
 
     //播放器类型  0 阿里播放器  1 腾讯播放器
-    private int playerType=0;
+    private int playerType = 0;
     //播放器
     private AliPlayer mAliyunVodPlayer;
     private int mPlayerState = IPlayer.idle;
+
+    boolean mFullScreen=false;
+
+    private Runnable mSocketRunnable;
+    private ExecutorService mExecutorService;
+    private boolean mNeedResumeAudioPlay = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        setmOnServiceConnectionListener(new BaseAudioActivity.OnServiceConnectionListener() {
+            @Override
+            public void onServiceConnection(IAudioPlayer audioPlayer) {
+                try {
+                    if (audioPlayer.getPlayerState() == IPlayer.started || audioPlayer.getPlayerState() == IPlayer.paused) {
+                        audioPlayer.pause();
+                        mNeedResumeAudioPlay = true;
+                        FloatWindowUtil.getInstance().hideWindow();
+                    }
+                } catch (RemoteException e) {
+                }
+            }
+        });
+
         setTheme(MyApplication.getInstance().getCurrentTheme());
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -280,9 +319,7 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
         LPAnimationManager.addGiftContainer(giftContainer);
 
         mMainHandler = new Handler(Looper.getMainLooper());
-//        HandlerThread handlerThread = new HandlerThread(TAG);
-//        handlerThread.start();
-//        mSubThreadHandler = new Handler(handlerThread.getLooper());
+
         initLive();
         initChatView();
 
@@ -291,6 +328,7 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
         heightProvider = new HeightProvider(this).init().setHeightListener(new HeightProvider.HeightListener() {
             @Override
             public void onHeightChanged(int height) {
+                long id=Thread.currentThread().getId();
 
                 if (autoRotate == height) return;
 
@@ -298,13 +336,15 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                     RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) bottomLayout.getLayoutParams();
                     layoutParams.setMargins(0, 0, 0, height);
                     bottomLayout.setLayoutParams(layoutParams);
+                    bottomBar.setVisibility(View.GONE);
+                    chatInputLayout.setVisibility(View.VISIBLE);
                 } else {
                     RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) bottomLayout.getLayoutParams();
                     layoutParams.setMargins(0, 0, 0, 0);
                     bottomLayout.setLayoutParams(layoutParams);
 
                     bottomBar.setVisibility(View.VISIBLE);
-                    chatInput.setVisibility(View.GONE);
+                    chatInputLayout.setVisibility(View.GONE);
                 }
 
 
@@ -322,8 +362,17 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
 
     private void initLive() {
         mStreamName = getIntent().getStringExtra("streamName");
-        getLiveRoomDetail(mStreamName);
-        initChatRoom();
+
+        mSocketRunnable=new Runnable() {
+            @Override
+            public void run() {
+                getLiveRoomDetail(mStreamName);
+                initChatRoom();
+            }
+        };
+
+        mExecutorService=Executors.newCachedThreadPool();
+        mExecutorService.submit(mSocketRunnable);
 
     }
 
@@ -344,15 +393,15 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                     JSONObject jsonObject = JSONObject.parseObject(response);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         mLiveGoodsInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), LiveGoodsInfo.class);
+
                         if (mLiveGoodsInfo != null && mLiveGoodsInfo.getData().size() > 0) {
+
                             List<LiveGoodsInfo.DataBean> dataBeans = mLiveGoodsInfo.getData();
                             LiveGoodsInfo.DataBean goods = null;
                             for (int i = 0; i < dataBeans.size(); i++) {
                                 if (dataBeans.get(i).getIn_explanation() == 1) {
                                     goods = dataBeans.get(i);
                                     break;
-
-
                                 }
                             }
                             final LiveGoodsInfo.DataBean liveShowingGoods = goods;
@@ -362,6 +411,8 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                                     @Override
                                     public void run() {
                                         try {
+                                            goodsNumber.setVisibility(View.VISIBLE);
+                                            goodsNumber.setText(""+mLiveGoodsInfo.getData().size());
                                             showingGoods.setVisibility(View.VISIBLE);
 
                                             String pictureUrl = liveShowingGoods.getMerchant_goods() != null ? liveShowingGoods.getMerchant_goods().getPict_url() : "";
@@ -428,6 +479,14 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                                 }, 5000);
                             }
 
+                        }else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    goodsNumber.setVisibility(View.GONE);
+                                }
+                            });
+
                         }
 
                     }
@@ -462,17 +521,19 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                         mliveRoomInfo = JSONObject.parseObject(jsonObject.getJSONObject("data").toJSONString(), LiveRoomInfo01.class);
 
                         if (mliveRoomInfo != null) {
+
+                            getOnlineUsers(mliveRoomInfo);
                             getChatHistory(mliveRoomInfo);
                             initGoods(mliveRoomInfo.getRoom_info());
 
                             msgMap.put("room_id", "" + (mliveRoomInfo.getRoom_info() != null ? mliveRoomInfo.getRoom_info().getId() : ""));//直播间ID
-                            msgMap.put("user_id", User.getInstance().getId() + "");//用户ID
+                            msgMap.put("user_id", User.getInstance() != null ? User.getInstance().getId() + "" : "");//用户ID
                             msgMap.put("message", "");//消息内容
                             msgMap.put("type", "2");//发布端类型：1.主持人   2：用户    3:通知关注  4：通知进入直播间
                             msgMap.put("stream_name", mStreamName);//播间推流ID
-                            msgMap.put("nick_name", User.getInstance().getNickname());//昵称
+                            msgMap.put("nick_name", User.getInstance() != null ? User.getInstance().getNickname() : "");//昵称
                             msgMap.put("message_type", "1");//消息类型 1.互动消息  2.直播状态更新消息  3.删除消息  4.题目 5.菜单设置 6图文保存  默认1
-                            msgMap.put("user_logo", User.getInstance().getAvatar());
+                            msgMap.put("user_logo", User.getInstance() != null ? User.getInstance().getAvatar() : "");
 
 
                             runOnUiThread(new Runnable() {
@@ -482,139 +543,156 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                                     LiveRoomInfo01.RoomInfoBean roomInfoBean = mliveRoomInfo.getRoom_info();
                                     if (roomInfoBean != null) {
 
-                                        ////显示主播头像、名称
-                                        if (roomInfoBean.getAnchor() != null) {
-                                            if (!TextUtils.isEmpty(roomInfoBean.getAnchor().getLogo())) {
-                                                Uri uri = Uri.parse(roomInfoBean.getAnchor().getLogo());
-                                                ImageLoader.showThumb(uri, head, CommonUtils.dip2px(32), CommonUtils.dip2px(32));
+                                        if (roomInfoBean.getState() == 3) {
+                                            //已结束
+                                            leaveLayout.setVisibility(View.VISIBLE);
+                                            panel.setVisibility(View.GONE);
+                                            surface.setVisibility(View.GONE);
+                                            playerLayout.setVisibility(View.GONE);
+
+                                            if (roomInfoBean.getAnchor() != null) {
+                                                if (!TextUtils.isEmpty(roomInfoBean.getAnchor().getLogo())) {
+                                                    Uri uri = Uri.parse(roomInfoBean.getAnchor().getLogo());
+                                                    ImageLoader.showThumb(uri, head01, CommonUtils.dip2px(70), CommonUtils.dip2px(70));
+                                                }
+                                                name01.setText(roomInfoBean.getAnchor().getName());
                                             }
-                                            name.setText(roomInfoBean.getAnchor().getName());
-                                        }
-                                        //毛玻璃封面
-                                        Uri uri = Uri.parse(roomInfoBean.getCover_url());
-//                                        background.setImageURI(uri);
-                                        ImageRequest imageRequest = ImageRequestBuilder
-                                                .newBuilderWithSource(uri)
-                                                .setProgressiveRenderingEnabled(true)
-                                                .build();
-
-                                        ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                                        DataSource<CloseableReference<CloseableImage>>
-                                                dataSource = imagePipeline.fetchDecodedImage(imageRequest,getContext());
-
-                                        dataSource.subscribe(new BaseBitmapDataSubscriber() {
-
-                                                                 @Override
-                                                                 public void onNewResultImpl(Bitmap bitmap) {
-                                                                     // You can use the bitmap in only limited ways
-                                                                     // No need to do any cleanup.
-                                                                     Bitmap bp=BlurKit.getInstance().blur(bitmap, 12);
-                                                                     background.setImageBitmap(bp);
-
-                                                                 }
-
-                                                                 @Override
-                                                                 public void onFailureImpl(DataSource dataSource) {
-                                                                     // No cleanup required here.
-                                                                 }
-                                                             },
-                                                CallerThreadExecutor.getInstance());
-
-
-                                        praiseNumber.setText(CommonUtils.getShowNumber(roomInfoBean.getHeart_num()) + "本场点赞");
-
-
-
-                                        //显示活动
-                                        List<LiveRoomInfo01.RoomInfoBean.MenusBean> menus = roomInfoBean.getMenus();
-                                        //activityContainer.removeAllViews();
-                                        for (int i = 0; menus != null && i < menus.size(); i++) {
-
-                                            if (menus.get(i).getShowtype() == 6 && menus.get(i).getUsing() == 1) {
-                                                //拼手气红包
-                                                luckRedPacket.setVisibility(View.VISIBLE);
-                                                getRedPacketRecord();
-
-                                            } else if (menus.get(i).getShowtype() == 5 && menus.get(i).getUsing() == 1) {
-                                                //直播答题4.1版本不做
-                                                //answer.setVisibility(View.VISIBLE);
-                                            } else if (menus.get(i).getShowtype() == 15 && menus.get(i).getUsing() == 1) {
-                                                //幸运抽奖
-                                                luckAward.setVisibility(View.VISIBLE);
-                                            } else if (menus.get(i).getShowtype() == 16 && menus.get(i).getUsing() == 1) {
-                                                //口令红包
-                                                passwordRedPacket.setVisibility(View.VISIBLE);
-                                            } else if (menus.get(i).getShowtype() == 14 && menus.get(i).getUsing() == 1) {
-                                                //邀请榜
-                                                inviteRange.setVisibility(View.VISIBLE);
-                                            } else if (menus.get(i).getShowtype() == 17 && menus.get(i).getUsing() == 1) {
-                                                //热度榜
-                                                hotRange.setVisibility(View.VISIBLE);
-                                            }
-
-
-                                        }
-
-
-                                        //if(true){
-                                        if (mliveRoomInfo.getRoom_info().getLive_driver().equals("tencent") && mliveRoomInfo.getRoom_info().getIs_rtslive() == 2) {
-                                            playerType=1;
-                                            //腾讯快直 播
-                                            //lebSurfaceView.setVisibility(View.VISIBLE);
-                                            //aliyunVodPlayerView.setVisibility(View.GONE);
-                                            if (mliveRoomInfo.getRoom_info().getShow_model() == 2) {
-                                                //竖屏模式
-
-                                            } else {
-                                                //竖横屏
-                                                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) lebSurfaceView.getLayoutParams();
-                                                lp.height = CommonUtils.getScreenWidth() * 9 / 16;
-                                                lp.gravity = Gravity.TOP;
-                                                lp.topMargin = CommonUtils.dip2px(180);
-                                                lebSurfaceView.setLayoutParams(lp);
-                                            }
-                                            initLeb();
-
 
                                         } else {
+                                            ////显示主播头像、名称
+                                            leaveLayout.setVisibility(View.GONE);
+                                            panel.setVisibility(View.VISIBLE);
+                                            if (roomInfoBean.getAnchor() != null) {
+                                                if (!TextUtils.isEmpty(roomInfoBean.getAnchor().getLogo())) {
+                                                    Uri uri = Uri.parse(roomInfoBean.getAnchor().getLogo());
+                                                    ImageLoader.showThumb(uri, head, CommonUtils.dip2px(32), CommonUtils.dip2px(32));
+                                                    ImageLoader.showThumb(uri, head01, CommonUtils.dip2px(70), CommonUtils.dip2px(70));
+                                                }
+                                                name.setText(roomInfoBean.getAnchor().getName());
+                                                name01.setText(roomInfoBean.getAnchor().getName());
 
-                                            playerType=0;
-                                            //使用阿里播放器播放
+                                            }
+                                            //毛玻璃封面
+
+                                            Uri uri = Uri.parse(roomInfoBean.getCover_url()+CommonUtils.getOssResize(CommonUtils.getScreenWidth()/6,CommonUtils.getScreenHeight()/6));
+//                                        background.setImageURI(uri);
+                                            Glide.with(getContext()).asBitmap().load(uri).into(new SimpleTarget<Bitmap>() {
+                                                @Override
+                                                public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                                    long id=Thread.currentThread().getId();
+                                                    Bitmap bp = GsdFastBlur.fastblur(resource, 99);
+                                                    background.setImageBitmap(bp);
+                                                }
+                                            });
+
+                                            praiseNumber.setText("本场热度" + CommonUtils.getShowNumber(roomInfoBean.getHot_index()));
+
+
+                                            if (mliveRoomInfo.getRoom_info() != null && mliveRoomInfo.getRoom_info().getInvite_rewards() == 1) {
+                                                smallRedPacket.setVisibility(View.VISIBLE);
+                                            }
+
+                                            //显示活动
+                                            List<LiveRoomInfo01.RoomInfoBean.MenusBean> menus = roomInfoBean.getMenus();
+                                            //activityContainer.removeAllViews();
+                                            for (int i = 0; menus != null && i < menus.size(); i++) {
+
+                                                if (menus.get(i).getShowtype() == 6 && menus.get(i).getUsing() == 1) {
+                                                    //拼手气红包
+                                                    luckRedPacket.setVisibility(View.VISIBLE);
+                                                    getRedPacketRecord();
+
+                                                } else if (menus.get(i).getShowtype() == 5 && menus.get(i).getUsing() == 1) {
+                                                    //直播答题4.1版本不做
+                                                    //answer.setVisibility(View.VISIBLE);
+                                                } else if (menus.get(i).getShowtype() == 15 && menus.get(i).getUsing() == 1) {
+                                                    //幸运抽奖
+                                                    luckAward.setVisibility(View.VISIBLE);
+                                                } else if (menus.get(i).getShowtype() == 16 && menus.get(i).getUsing() == 1) {
+                                                    //口令红包
+                                                    passwordRedPacket.setVisibility(View.VISIBLE);
+                                                } else if (menus.get(i).getShowtype() == 14 && menus.get(i).getUsing() == 1) {
+                                                    //邀请榜
+                                                    inviteRange.setVisibility(View.VISIBLE);
+                                                } else if (menus.get(i).getShowtype() == 17 && menus.get(i).getUsing() == 1) {
+                                                    //热度榜
+                                                    hotRange.setVisibility(View.VISIBLE);
+                                                } else if (menus.get(i).getShowtype() == 10 && menus.get(i).getUsing() == 1) {
+                                                    //礼物
+                                                    gift.setVisibility(View.VISIBLE);
+                                                } else if (menus.get(i).getShowtype() == 13 && menus.get(i).getUsing() == 1) {
+                                                    //菱选好物
+                                                    goods.setVisibility(View.VISIBLE);
+                                                }
+
+
+                                            }
+
+
+                                            //if(true){
                                             if (mliveRoomInfo.getRoom_info().getShow_model() == 2) {
                                                 //竖屏模式
+                                                fullCreen.setVisibility(View.GONE);
                                             } else {
                                                 //竖横屏
-                                                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) surface.getLayoutParams();
+                                                FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) playerLayout.getLayoutParams();
                                                 lp.height = CommonUtils.getScreenWidth() * 9 / 16;
                                                 lp.gravity = Gravity.TOP;
-                                                lp.topMargin = CommonUtils.dip2px(180);
-                                                surface.setLayoutParams(lp);
+                                                lp.topMargin = CommonUtils.dip2px(200);
+                                                playerLayout.setLayoutParams(lp);
+
+                                                fullCreen.setVisibility(View.VISIBLE);
+                                                fullCreenIcon.setText(R.string.full_screen);
                                             }
 
-                                            //initAliyunPlayerView();
-                                            getAuthKey("" + mliveRoomInfo.getRoom_info().getId());
+                                            if (mliveRoomInfo.getRoom_info().getLive_driver().equals("tencent") && mliveRoomInfo.getRoom_info().getIs_rtslive() == 2) {
+                                                playerType = 1;
+                                                //腾讯快直播
+
+                                                initLeb();
 
 
-                                        }
+                                            } else {
 
-                                        if(roomInfoBean.getStream_state()==0){
-                                            //主播离开
-                                            noAnchor.setVisibility(View.VISIBLE);
-                                            lebSurfaceView.setVisibility(View.INVISIBLE);
-                                            surface.setVisibility(View.INVISIBLE);
+                                                playerType = 0;
+                                                //使用阿里播放器播放
 
-                                        }else{
-                                            //
-                                            noAnchor.setVisibility(View.INVISIBLE);
-                                            if(playerType==0){
+                                                //initAliyunPlayerView();
+                                                getAuthKey("" + mliveRoomInfo.getRoom_info().getId());
+
+
+                                            }
+
+                                            if (roomInfoBean.getStream_state() == 0) {
+                                                //主播离开
+
+                                                noAnchor.setVisibility(View.VISIBLE);
                                                 lebSurfaceView.setVisibility(View.INVISIBLE);
-                                                surface.setVisibility(View.VISIBLE);
-                                            }else{
-                                                lebSurfaceView.setVisibility(View.VISIBLE);
                                                 surface.setVisibility(View.INVISIBLE);
-                                            }
 
+                                                if(fullCreen.getVisibility()==View.VISIBLE){
+                                                    fullCreen.setVisibility(View.INVISIBLE);
+                                                }
+
+                                            } else {
+                                                //
+                                                noAnchor.setVisibility(View.INVISIBLE);
+
+                                                if (playerType == 0) {
+                                                    lebSurfaceView.setVisibility(View.INVISIBLE);
+                                                    surface.setVisibility(View.VISIBLE);
+                                                } else {
+                                                    lebSurfaceView.setVisibility(View.VISIBLE);
+                                                    surface.setVisibility(View.INVISIBLE);
+                                                }
+                                                if(fullCreen.getVisibility()==View.INVISIBLE){
+                                                    fullCreen.setVisibility(View.VISIBLE);
+                                                }
+
+                                            }
                                         }
+
+
                                     }
 
 
@@ -627,6 +705,84 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+
+            }
+
+            @Override
+            public void onFailure(Call call, Exception exception) {
+
+                Log.e("test", exception.toString());
+
+            }
+        });
+
+
+    }
+
+
+    private void getOnlineUsers(LiveRoomInfo01 liveRoomInfo) {
+        //String url = ServerInfo.live + "/v1/rooms/"+roomId+"/online_users";
+        String url = ServerInfo.live + "/v1/play_users";
+        Map<String, String> params = new HashMap<>();
+        params.put("room_id",""+liveRoomInfo.getRoom_info()!=null?""+liveRoomInfo.getRoom_info().getId():"");
+        params.put("user_id",User.getInstance()!=null?""+User.getInstance().getId():"");
+        OkHttpUtils.post(url, params, new OkHttpCallback(this) {
+
+
+            @Override
+            public void onResponse(Call call, String response) throws IOException {
+
+                Log.e("test", response);
+//                try {
+//                    JSONObject jsonObject = JSONObject.parseObject(response);
+//                    if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
+//
+//
+//
+//                        List<LiveOnlineViewer.MsgBean.AvatarListBean> liveOnlineViewer = JSON.parseArray(jsonObject.getJSONArray("data").toString(), LiveOnlineViewer.MsgBean.AvatarListBean.class);
+//                        if (liveOnlineViewer != null&&liveOnlineViewer.size()>0) {
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    try {
+//                                        viewerContainer.removeAllViews();
+//                                        for (int i = 0; liveOnlineViewer != null && i < liveOnlineViewer.size(); i++) {
+//                                            String avatar = liveOnlineViewer.get(i).getAvatar();
+//                                            SimpleDraweeView head = new SimpleDraweeView(LivePortraitActivity.this);
+//                                            GenericDraweeHierarchy hierarchy = head.getHierarchy();
+//                                            hierarchy.setPlaceholderImage(R.drawable.ic_user3);
+//                                            head.setAspectRatio(1f);
+//                                            RoundingParams roundingParams = head.getHierarchy().getRoundingParams();
+//                                            if (roundingParams == null) {
+//                                                roundingParams = new RoundingParams();
+//                                            }
+//                                            roundingParams.setRoundAsCircle(true);
+//                                            head.getHierarchy().setRoundingParams(roundingParams);
+//                                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(CommonUtils.dip2px(30), CommonUtils.dip2px(30));
+//                                            params.rightMargin = CommonUtils.dip2px(5);
+//                                            viewerContainer.addView(head, params);
+//                                            Uri uri = Uri.parse(avatar);
+//                                            ImageLoader.showThumb(uri, head, CommonUtils.dip2px(30), CommonUtils.dip2px(30));
+//
+//                                        }
+//
+//                                    } catch (Exception e) {
+//
+//                                    }
+//
+//                                }
+//                            });
+//
+//
+//                        }
+//
+//
+//                    }
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
 
 
             }
@@ -678,11 +834,8 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
 
         lebSurfaceView.initilize(mLEBWebRTCParameters, LivePortraitActivity.this);
         lebSurfaceView.setScaleType(mScaleType);
-        mLebInitialized = true;
         lebSurfaceView.startPlay();
     }
-
-
 
 
 //    private void initAliyunPlayerView() {
@@ -884,6 +1037,7 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
             mAdapter = new LiveChatListAdapter(this);
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
             linearLayoutManager.setStackFromEnd(true);
+            linearLayoutManager.scrollToPositionWithOffset(mAdapter.getItemCount() - 1, Integer.MIN_VALUE);
             chatMsgList.setLayoutManager(linearLayoutManager);
             chatMsgList.setAdapter(mAdapter);
             chatMsgList.setHasFixedSize(true);
@@ -941,8 +1095,8 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                                         showMsg(msg);
                                     }
                                 });
-                            } else if (msg.getMessageType() == 17) {
-                                //红包活动结束
+                            } else if (msg.getMessageType() == 17 || msg.getMessageType() == 16) {
+                                //红包活动结束/开始
                                 getRedPacketRecord();
                             } else if (msg.getMessageType() == 12) {
                                 //打赏礼物消息通知
@@ -966,6 +1120,88 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                                     }
                                 });
 
+                            } else if (msg.getMessageType() == 5) {
+                                //菜单状态变化
+                                JSONObject jo = JSON.parseObject(args[1].toString());
+                                runOnUiThread(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        if (jo.getJSONObject("msg").getInteger("showtype") == 6) {
+                                            if (jo.getJSONObject("msg").getString("using").equals("0")) {
+                                                luckRedPacket.setVisibility(View.GONE);
+                                            } else {
+                                                luckRedPacket.setVisibility(View.VISIBLE);
+                                                getRedPacketRecord();
+                                            }
+                                        } else if (jo.getJSONObject("msg").getInteger("showtype") == 15) {
+                                            if (jo.getJSONObject("msg").getString("using").equals("0")) {
+                                                luckAward.setVisibility(View.GONE);
+                                            } else {
+                                                luckAward.setVisibility(View.VISIBLE);
+                                            }
+                                        } else if (jo.getJSONObject("msg").getInteger("showtype") == 16) {
+                                            if (jo.getJSONObject("msg").getString("using").equals("0")) {
+                                                passwordRedPacket.setVisibility(View.GONE);
+                                            } else {
+                                                passwordRedPacket.setVisibility(View.VISIBLE);
+                                            }
+                                        } else if (jo.getJSONObject("msg").getInteger("showtype") == 14) {
+                                            if (jo.getJSONObject("msg").getString("using").equals("0")) {
+                                                inviteRange.setVisibility(View.GONE);
+                                            } else {
+                                                inviteRange.setVisibility(View.VISIBLE);
+                                            }
+                                        } else if (jo.getJSONObject("msg").getInteger("showtype") == 17) {
+                                            if (jo.getJSONObject("msg").getString("using").equals("0")) {
+                                                hotRange.setVisibility(View.GONE);
+                                            } else {
+                                                hotRange.setVisibility(View.VISIBLE);
+                                            }
+                                        } else if (jo.getJSONObject("msg").getInteger("showtype") == 10) {
+                                            if (jo.getJSONObject("msg").getString("using").equals("0")) {
+                                                gift.setVisibility(View.GONE);
+                                            } else {
+                                                gift.setVisibility(View.VISIBLE);
+                                            }
+                                        } else if (jo.getJSONObject("msg").getInteger("showtype") == 13) {
+                                            if (jo.getJSONObject("msg").getString("using").equals("0")) {
+                                                goods.setVisibility(View.GONE);
+                                            } else {
+                                                goods.setVisibility(View.VISIBLE);
+                                            }
+                                        }
+
+
+                                    }
+                                });
+
+
+                            } else if (msg.getMessageType() == 2) {
+                                //
+                                if (msg.getMsg().equals("关闭直播间")) {
+                                    //直播间结束
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            leaveLayout.setVisibility(View.VISIBLE);
+                                            panel.setVisibility(View.GONE);
+                                            playerLayout.setVisibility(View.GONE);
+
+                                            if (mAliyunVodPlayer != null) {
+                                                mAliyunVodPlayer.stop();
+                                                mAliyunVodPlayer.release();
+                                                mAliyunVodPlayer = null;
+                                            }
+                                            if (playerType == 1) {
+                                                lebSurfaceView.release();
+                                            }
+                                        }
+                                    });
+
+
+                                }
+
                             }
 
                         } catch (Exception e) {
@@ -983,7 +1219,19 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                     JSONObject object = JSONObject.parseObject(args[1].toString());
                     if (object != null) {
                         int heartNum = object.getInteger("heart_num");
-                        praiseNumber.setText(CommonUtils.getShowNumber(heartNum) + "本场点赞");
+                        //praiseNumber.setText(CommonUtils.getShowNumber(heartNum) + "本场点赞");
+                        mMainHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                try{
+                                    praiseNumber.setText("本场热度" + CommonUtils.getShowNumber(heartNum));
+                                }catch (Exception e){
+
+                                }
+
+                            }
+                        });
+
                     }
 
 
@@ -1007,7 +1255,8 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                             @Override
                             public void run() {
                                 try {
-                                    viewerNumber.setText("" + msgBean.getOnline_count());
+                                    onlineViewer = msgBean.getOnline_count();
+                                    viewerNumber.setText("" + onlineViewer);
                                     viewerContainer.removeAllViews();
                                     for (int i = 0; msgBean.getAvatar_list() != null && i < msgBean.getAvatar_list().size(); i++) {
                                         String avatar = msgBean.getAvatar_list().get(i).getAvatar();
@@ -1039,7 +1288,8 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                     }
 
                 } catch (Exception e) {
-                    Log.v("SL", e.getMessage());
+                    //Log.v("SL", e.getMessage());
+                    Log.i("SL", e.getMessage());
                 }
             }
         }).listen("ExpandActivityToggleEvent", new EchoCallback() {
@@ -1058,7 +1308,6 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                             mliveRoomInfo.getRoom_info().getExpand_activities().get(0).setUrl(jo.getString("url"));
                         }
                     }
-
 
 
                 } catch (Exception e) {
@@ -1084,14 +1333,20 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                                 noAnchor.setVisibility(View.VISIBLE);
                                 lebSurfaceView.setVisibility(View.INVISIBLE);
                                 surface.setVisibility(View.INVISIBLE);
-                            }else{
+                                if(fullCreen.getVisibility()==View.VISIBLE){
+                                    fullCreen.setVisibility(View.INVISIBLE);
+                                }
+                            } else {
                                 noAnchor.setVisibility(View.INVISIBLE);
-                                if(playerType==0){
+                                if (playerType == 0) {
                                     lebSurfaceView.setVisibility(View.INVISIBLE);
                                     surface.setVisibility(View.VISIBLE);
-                                }else{
+                                } else {
                                     lebSurfaceView.setVisibility(View.VISIBLE);
                                     surface.setVisibility(View.INVISIBLE);
+                                }
+                                if(fullCreen.getVisibility()==View.INVISIBLE){
+                                    fullCreen.setVisibility(View.VISIBLE);
                                 }
 
                             }
@@ -1099,6 +1354,33 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                     });
 
 
+                } catch (Exception e) {
+                    Log.v("SL", e.getMessage());
+                }
+            }
+        }).listen("UserJoinEvent", new EchoCallback() {
+            @Override
+            public void call(Object... args) {
+                // Event thrown.
+                Log.i("test", "args");
+
+                try {
+
+                    String str = args[1].toString();
+                    JSONObject jo = JSON.parseObject(str);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            coming.setVisibility(View.VISIBLE);
+                            coming.setText(jo.getString("user_name") + " 来了");
+                            mMainHandler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    coming.setVisibility(View.INVISIBLE);
+                                }
+                            }, 2000);
+                        }
+                    });
 
 
                 } catch (Exception e) {
@@ -1116,7 +1398,7 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
         Map<String, String> params = new HashMap<>();
         params.put("room_id", "" + (liveRoomInfo.getRoom_info() != null ? liveRoomInfo.getRoom_info().getId() : ""));
         params.put("page", "1");
-        params.put("page_size", "50");
+        params.put("page_size", "6");
         params.put("state", "1");
         OkHttpUtils.get(url, params, new OkHttpCallback(LivePortraitActivity.this) {
             @Override
@@ -1163,6 +1445,9 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                 mAliyunVodPlayer.start();
             }
         }
+        if (playerType == 1) {
+            lebSurfaceView.startPlay();
+        }
 
     }
 
@@ -1170,9 +1455,9 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
     protected void onPause() {
         Log.v(TAG, "onPause");
         super.onPause();
-//        if(lebSurfaceView.getVisibility()==View.VISIBLE){
-//            lebSurfaceView.pausePlay();
-//        }
+        if (playerType == 1) {
+            lebSurfaceView.stopPlay();
+        }
 
     }
 
@@ -1191,13 +1476,23 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                 mAliyunVodPlayer.pause();
             }
         }
+        if (playerType == 1) {
+            lebSurfaceView.stopPlay();
+        }
+
     }
 
 
     @Override
     protected void onDestroy() {
+        Log.i("TG","onDestroy");
         super.onDestroy();
+        if(mExecutorService!=null){
+            mExecutorService.shutdownNow();
+        }
+
         LPAnimationManager.release();
+        shakeRedPacket.clearAnimation();
         if (echo != null) {
             echo.disconnect();
         }
@@ -1211,20 +1506,21 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
             mAliyunVodPlayer = null;
         }
 
+        if (playerType == 1) {
+            lebSurfaceView.release();
+        }
+
 //        if (mSubThreadHandler != null) {
 //            mSubThreadHandler.getLooper().quit();
 //        }
 //        if(lebSurfaceView.getVisibility()==View.VISIBLE) {
 //            lebSurfaceView.release();
 //        }
+        heightProvider.dismiss();
 
     }
 
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
@@ -1232,18 +1528,35 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
 
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                 sendMsg(chatInput.getText().toString());
+                CommonUtils.hideInput(this);
             }
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.showSoftInput(chatInput, InputMethodManager.SHOW_IMPLICIT);
-
             return true;
         }
         return super.dispatchKeyEvent(event);
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() ==  MotionEvent.ACTION_DOWN ) {
+            View view = getCurrentFocus();
+            CommonUtils.hideInput(this);
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+
 
     private void sendMsg(String msg) {
         if (TextUtils.isEmpty(msg)) return;
+        if (User.getInstance() == null) {
+            Intent it = new Intent(this, NewLoginActivity.class);
+            startActivity(it);
+        } else {
+            msgMap.put("user_id", User.getInstance() != null ? User.getInstance().getId() + "" : "");//用户ID
+            msgMap.put("nick_name", User.getInstance() != null ? User.getInstance().getNickname() : "");//昵称
+            msgMap.put("user_logo", User.getInstance() != null ? User.getInstance().getAvatar() : "");
+        }
+
         chatInput.setText(null);
 
 
@@ -1266,10 +1579,16 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
     private void showMsg(ChatMessage msgModel) {
 
         mAdapter.showChatMessage(msgModel);
+
+        if (User.getInstance() != null && msgModel.getUserId().equals("" + User.getInstance().getId())) {
+            //chatMsgList.scrollToPosition(mAdapter.getItemCount() - 1);
+            ((LinearLayoutManager) chatMsgList.getLayoutManager()).scrollToPositionWithOffset(mAdapter.getItemCount() - 1, 0);
+        }
+
         if (chatMsgList.canScrollVertically(1)) {//还可以向下滑动（还没到底部）
             moreMsgBtn.setVisibility(View.VISIBLE);
         } else {//滑动到底部了
-            ((LinearLayoutManager) chatMsgList.getLayoutManager()).scrollToPositionWithOffset(mAdapter.getItemCount() - 1, 0);
+            //((LinearLayoutManager) chatMsgList.getLayoutManager()).scrollToPositionWithOffset(mAdapter.getItemCount() - 1, 0);
             moreMsgBtn.setVisibility(View.GONE);
         }
     }
@@ -1277,18 +1596,20 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
     private void showMsgs(List<ChatMessage> msgs) {
 
         mAdapter.showChatMessages(msgs);
+        //chatMsgList.scrollToPosition(mAdapter.getItemCount() - 1);
+        ((LinearLayoutManager) chatMsgList.getLayoutManager()).scrollToPositionWithOffset(mAdapter.getItemCount() - 1, 0);
         if (chatMsgList.canScrollVertically(1)) {//还可以向下滑动（还没到底部）
             moreMsgBtn.setVisibility(View.VISIBLE);
         } else {//滑动到底部了
-            ((LinearLayoutManager) chatMsgList.getLayoutManager()).scrollToPositionWithOffset(mAdapter.getItemCount() - 1, 0);
+            //((LinearLayoutManager) chatMsgList.getLayoutManager()).scrollToPositionWithOffset(mAdapter.getItemCount() - 1, 0);
             moreMsgBtn.setVisibility(View.GONE);
         }
 
     }
 
 
-    @OnClick({R.id.close, R.id.more_msg_btn, R.id.invite, R.id.gift, R.id.viewerNumber, R.id.more,
-            R.id.hotRange, R.id.inviteRange, R.id.luckAward, R.id.passwordRedPacket, R.id.chatBtn, R.id.goods})
+    @OnClick({R.id.close, R.id.close1,R.id.fullCreen, R.id.more_msg_btn, R.id.invite, R.id.gift, R.id.viewerNumber, R.id.more,
+            R.id.hotRange, R.id.inviteRange, R.id.luckAward, R.id.passwordRedPacket, R.id.chatBtn, R.id.goods, R.id.phrase01, R.id.phrase02, R.id.phrase03})
     public void onViewClicked(View view) {
 
         switch (view.getId()) {
@@ -1302,6 +1623,13 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
             }
             break;
 
+            case R.id.fullCreen:
+                mFullScreen=!mFullScreen;
+                if(mFullScreen){
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                }else{
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                }
 
             case R.id.more_msg_btn: {
                 moreMsgBtn.setVisibility(View.GONE);
@@ -1311,7 +1639,7 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
 
             case R.id.viewerNumber:
                 if (mliveRoomInfo != null && mliveRoomInfo.getRoom_info() != null) {
-                    ViewerListDialog.getInstance(mliveRoomInfo.getRoom_info()).show(getSupportFragmentManager(), "ViewerListDialog");
+                    ViewerListDialog.getInstance(mliveRoomInfo.getRoom_info(), onlineViewer).show(getSupportFragmentManager(), "ViewerListDialog");
                 }
 
                 break;
@@ -1327,6 +1655,7 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                 //
                 break;
             case R.id.close:
+            case R.id.close1:
                 exit();
                 break;
             case R.id.more:
@@ -1334,11 +1663,13 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                     LiveMoreDialog.getInstance(mliveRoomInfo.getRoom_info())
                             .setOnClickEventListener(new LiveMoreDialog.OnClickEventListener() {
 
-
                                 @Override
                                 public void onShare() {
                                     String url = ServerInfo.mlive + "/index?stream_name=" + mliveRoomInfo.getRoom_info().getStream_name() + "&from_url=" + ServerInfo.mlive + "/index?stream_name=" + mliveRoomInfo.getRoom_info().getStream_name() + "&from_user_id=" + ((User.getInstance() != null) ? (User.getInstance().getId()) : "");
-                                    showShareDialog(mliveRoomInfo.getRoom_info().getName(), mliveRoomInfo.getRoom_info().getDes(), mliveRoomInfo.getRoom_info().getCover_url(), url);
+                                    showPosterShare(mliveRoomInfo.getRoom_info(), url);
+
+
+                                    //showShareDialog(mliveRoomInfo.getRoom_info().getName(), mliveRoomInfo.getRoom_info().getDes(), mliveRoomInfo.getRoom_info().getCover_url(), url);
                                 }
 
                                 @Override
@@ -1366,7 +1697,16 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
 
             case R.id.inviteRange:
                 if (mliveRoomInfo != null && mliveRoomInfo.getRoom_info() != null) {
-                    InviteRangeListDialog.getInstance(mliveRoomInfo.getRoom_info()).show(getSupportFragmentManager(), "InviteRangeListDialog");
+                    InviteRangeListDialog dialog = InviteRangeListDialog.getInstance(mliveRoomInfo.getRoom_info());
+                    dialog.setOnInviteListener(new InviteRangeListDialog.OnInviteListener() {
+                        @Override
+                        public void invite() {
+                            String url = ServerInfo.mlive + "/index?stream_name=" + mliveRoomInfo.getRoom_info().getStream_name() + "&from_url=" + ServerInfo.mlive + "/index?stream_name=" + mliveRoomInfo.getRoom_info().getStream_name() + "&from_user_id=" + ((User.getInstance() != null) ? (User.getInstance().getId()) : "");
+                            showPosterShare(mliveRoomInfo.getRoom_info(), url);
+                        }
+                    });
+
+                    dialog.show(getSupportFragmentManager(), "InviteRangeListDialog");
                 }
 
 
@@ -1390,9 +1730,135 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                     RewardListDialog.getInstance(mliveRoomInfo.getRoom_info()).show(getSupportFragmentManager(), "RewardListDialog");
                 }
                 break;
+            case R.id.phrase01:
+            case R.id.phrase02:
+            case R.id.phrase03:
+                sendMsg(((TextView) view).getText().toString());
+                break;
 
         }
     }
+
+    private void showPosterShare(LiveRoomInfo01.RoomInfoBean liveRoom, String shareUrl) {
+        ShareLivePosterDialog01 dialog = ShareLivePosterDialog01.getInstance(liveRoom, shareUrl);
+        dialog.setShareHandler(new ShareLivePosterDialog01.ShareHandler() {
+            @Override
+            public void onShare(String platform, Bitmap bitmap) {
+                showShareImage(platform, bitmap);
+            }
+
+            @Override
+            public void onShare(String platform, LiveRoomInfo01.RoomInfoBean liveRoom) {
+                showShare(platform,liveRoom.getName(),liveRoom.getDes(),liveRoom.getCover_url(),ServerInfo.mlive + "/index?stream_name=" + mliveRoomInfo.getRoom_info().getStream_name() + "&from_url=" + ServerInfo.mlive + "/index?stream_name=" + mliveRoomInfo.getRoom_info().getStream_name() + "&from_user_id=" + ((User.getInstance() != null) ? (User.getInstance().getId()) : ""));
+            }
+
+            @Override
+            public void download(Bitmap bitmap) {
+                final Bitmap saveBitmap = bitmap;
+//获取写文件权限
+                RxPermissions rxPermissions = new RxPermissions(LivePortraitActivity.this);
+                rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .subscribe(new Consumer<Boolean>() {
+                            @Override
+                            public void accept(Boolean granted) throws Exception {
+                                if (granted) {
+                                    Random rand = new Random();
+                                    int randNum = rand.nextInt(1000);
+                                    File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), CommonUtils.getCurrentTimeString() + randNum + ".png");
+                                    CommonUtils.saveBitmapToPNG(tempFile.getAbsolutePath(), saveBitmap);
+                                    ToastUtils.show("图片保存成功");
+//发送广播更新相册
+                                    Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                                    Uri uri = Uri.fromFile(tempFile);
+                                    intent.setData(uri);
+                                    sendBroadcast(intent);
+                                } else {
+                                    ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
+                                }
+                            }
+                        });
+            }
+        });
+        dialog.show(getSupportFragmentManager(), "ShareDialog");
+    }
+
+    private void showShareImage(String platform, final Bitmap bitmap) {
+        final Bitmap saveBitmap = bitmap;
+        final OnekeyShare oks = new OnekeyShare();
+        //关闭sso授权
+        oks.disableSSOWhenAuthorize();
+        oks.setPlatform(platform);
+        final Platform qq = ShareSDK.getPlatform(QQ.NAME);
+        if (!qq.isClientValid()) {
+            oks.addHiddenPlatform(QQ.NAME);
+        }
+        final Platform sina = ShareSDK.getPlatform(SinaWeibo.NAME);
+        if (!sina.isClientValid()) {
+            oks.addHiddenPlatform(SinaWeibo.NAME);
+        }
+        Random rand = new Random();
+        int randNum = rand.nextInt(1000);
+        final String childPath = CommonUtils.getCurrentTimeString() + randNum + ".png";
+        if (QQ.NAME.equals(platform)) {
+//获取写文件权限
+            RxPermissions rxPermissions = new RxPermissions(this);
+            rxPermissions.request(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    .subscribe(new Consumer<Boolean>() {
+                        @Override
+                        public void accept(Boolean granted) throws Exception {
+                            if (granted) {
+                                final File tempFile = new File(CommonUtils.getStoragePublicDirectory(DIRECTORY_PICTURES), childPath);
+                                CommonUtils.saveBitmapToPNG(tempFile.getAbsolutePath(), saveBitmap);
+                                //ToastUtils.show("图片保存成功");
+//发送广播更新相册
+                                Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                                Uri uri = Uri.fromFile(tempFile);
+                                intent.setData(uri);
+                                sendBroadcast(intent);
+// oks.setImagePath(filePath);
+                                oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+                                    //自定义分享的回调想要函数
+                                    @Override
+                                    public void onShare(Platform platform, final Platform.ShareParams paramsToShare) {
+                                        paramsToShare.setShareType(Platform.SHARE_IMAGE);
+                                        // paramsToShare.setImageData(bitmap);
+                                        paramsToShare.setImagePath(tempFile.getAbsolutePath());
+                                    }
+                                });
+                            } else {
+                                ToastUtils.show("未能获取相关权限，功能可能不能正常使用");
+                            }
+                        }
+                    });
+        } else {
+            oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+                //自定义分享的回调想要函数
+                @Override
+                public void onShare(Platform platform, final Platform.ShareParams paramsToShare) {
+                    paramsToShare.setShareType(Platform.SHARE_IMAGE);
+                    paramsToShare.setImageData(bitmap);
+                }
+            });
+        }
+        oks.setCallback(new PlatformActionListener() {
+            @Override
+            public void onError(Platform arg0, int arg1, Throwable arg2) {
+
+            }
+
+            @Override
+            public void onComplete(Platform arg0, int arg1, HashMap<String, Object> arg2) {
+
+            }
+
+            @Override
+            public void onCancel(Platform arg0, int arg1) {
+            }
+        });
+        // 启动分享GUI
+        oks.show(this);
+    }
+
 
     private void showShareDialog(final String title, final String desc, final String logo, final String url) {
         ShareDialog dialog = ShareDialog.getInstance(false, false);
@@ -1557,12 +2023,13 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                                                 //正在进行
                                                 luckRedPacketStatus.setText("进行中");
 
-//                                            Animation anim = new RotateAnimation(-15f, 15f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-//                                            anim.setDuration(600); // 设置动画时间
-//                                            anim.setRepeatCount(INFINITE);
-//                                            anim.setRepeatMode(Animation.REVERSE);
-//                                            anim.setInterpolator(new DecelerateInterpolator()); // 设置插入器
-//                                            shakeRedPacket.startAnimation(anim);
+
+                                                Animation anim = new RotateAnimation(-15f, 15f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                                                anim.setDuration(600); // 设置动画时间
+                                                anim.setRepeatCount(INFINITE);
+                                                anim.setRepeatMode(Animation.REVERSE);
+                                                anim.setInterpolator(new DecelerateInterpolator()); // 设置插入器
+                                                shakeRedPacket.startAnimation(anim);
 
                                                 luckRedPacket.setOnClickListener(new View.OnClickListener() {
                                                     @Override
@@ -1572,38 +2039,54 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                                                             startActivity(it);
                                                         } else {
                                                             //抢红包操作
-                                                            RedPacketDialog.getInstance(redPacketInfo, mStreamName).setOnOkClickListener(new RedPacketDialog.OnGrabClickListener() {
-                                                                @Override
-                                                                public void onGrabSuccess() {
-                                                                    if (User.getInstance() == null) {
-                                                                        Intent it = new Intent(getContext(), NewLoginActivity.class);
-                                                                        startActivity(it);
-                                                                    } else {
+                                                            if (redPacketInfo.getUser() != null) {
+                                                                List<RedPacketInfo.UserBean> userBeans = redPacketInfo.getUser();
+                                                                boolean hasGrabed = false;
+                                                                for (RedPacketInfo.UserBean user : redPacketInfo.getUser()) {
+                                                                    if (user.getUser_id() == User.getInstance().getId()) {
+                                                                        hasGrabed = true;
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                if (hasGrabed) {
+                                                                    RedPacketDetailDialog.getInstance(redPacketInfo.getId())
+                                                                            .show(getSupportFragmentManager(), "RedPacketDialog");
+
+                                                                } else {
+                                                                    RedPacketDialog.getInstance(redPacketInfo, mStreamName).setOnOkClickListener(new RedPacketDialog.OnGrabClickListener() {
+                                                                        @Override
+                                                                        public void onGrabSuccess() {
+                                                                            if (User.getInstance() == null) {
+                                                                                Intent it = new Intent(getContext(), NewLoginActivity.class);
+                                                                                startActivity(it);
+                                                                            } else {
+                                                                                getRedPacketRecord();
+                                                                                RedPacketDetailDialog.getInstance(redPacketInfo.getId())
+                                                                                        .show(getSupportFragmentManager(), "RedPacketDialog");
+                                                                            }
+                                                                        }
+
+                                                                        @Override
+                                                                        public void onDetail() {
+                                                                            if (User.getInstance() == null) {
+                                                                                Intent it = new Intent(getContext(), NewLoginActivity.class);
+                                                                                startActivity(it);
+                                                                            } else {
 //                                                                    Intent it = new Intent(getContext(), RedPacketDetailActivity.class);
 //                                                                    it.putExtra("id", "" + redPacketInfo.getId());
 //                                                                    startActivity(it);
-                                                                        RedPacketDetailDialog.getInstance(redPacketInfo.getId())
-                                                                                .show(getSupportFragmentManager(), "RedPacketDialog");
-                                                                    }
+                                                                                RedPacketDetailDialog.getInstance(redPacketInfo.getId())
+                                                                                        .show(getSupportFragmentManager(), "RedPacketDialog");
+                                                                            }
+
+                                                                        }
+
+
+                                                                    }).show(getSupportFragmentManager(), "RedPacketDialog");
                                                                 }
-
-                                                                @Override
-                                                                public void onDetail() {
-                                                                    if (User.getInstance() == null) {
-                                                                        Intent it = new Intent(getContext(), NewLoginActivity.class);
-                                                                        startActivity(it);
-                                                                    } else {
-//                                                                    Intent it = new Intent(getContext(), RedPacketDetailActivity.class);
-//                                                                    it.putExtra("id", "" + redPacketInfo.getId());
-//                                                                    startActivity(it);
-                                                                        RedPacketDetailDialog.getInstance(redPacketInfo.getId())
-                                                                                .show(getSupportFragmentManager(), "RedPacketDialog");
-                                                                    }
-
-                                                                }
+                                                            }
 
 
-                                                            }).show(getSupportFragmentManager(), "RedPacketDialog");
                                                         }
 
                                                     }
@@ -1613,15 +2096,14 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
                                             } else if (redPacketInfo.getState() == 1 && redPacketInfo.getState_end() == 1) {
                                                 //已结束
                                                 luckRedPacketStatus.setText("已结束");
-                                                //shakeRedPacket.clearAnimation();
+                                                shakeRedPacket.clearAnimation();
 
                                                 luckRedPacket.setOnClickListener(new View.OnClickListener() {
                                                     @Override
                                                     public void onClick(View v) {
 
-//                                                    Intent it = new Intent(getContext(), RedPacketDetailActivity.class);
-//                                                    it.putExtra("id", "" + redPacketInfo.getId());
-//                                                    startActivity(it);
+                                                        RedPacketDetailDialog.getInstance(redPacketInfo.getId())
+                                                                .show(getSupportFragmentManager(), "RedPacketDialog");
 
                                                     }
                                                 });
@@ -1654,35 +2136,43 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
     }
 
 
+    @Override
+    public void doOnBackPressed() {
+        if (mNeedResumeAudioPlay) {
+            FloatWindowUtil.getInstance().visibleWindow();
+        }
+        super.doOnBackPressed();
+    }
     //退出直播
     private void exit() {
-        new CircleDialog.Builder()
-                .setCanceledOnTouchOutside(false)
-                .setCancelable(false)
-
-                .setText("确定结束直播吗")
-                .setNegative("取消", null)
-                .configNegative(new ConfigButton() {
-                    @Override
-                    public void onConfig(ButtonParams params) {
-                        //按钮字体颜色
-                        params.textColor = Color.parseColor("#cc001426");
-                    }
-                })
-                .setPositive("确定", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        finish();
-
-                    }
-                })
-                .configPositive(new ConfigButton() {
-                    @Override
-                    public void onConfig(ButtonParams params) {
-                        params.textColor = Color.parseColor("#3183FF");
-                    }
-                })
-                .show(getSupportFragmentManager());
+        doOnBackPressed();
+//        new CircleDialog.Builder()
+//                .setCanceledOnTouchOutside(false)
+//                .setCancelable(false)
+//
+//                .setText("确定结束直播吗")
+//                .setNegative("取消", null)
+//                .configNegative(new ConfigButton() {
+//                    @Override
+//                    public void onConfig(ButtonParams params) {
+//                        //按钮字体颜色
+//                        params.textColor = Color.parseColor("#cc001426");
+//                    }
+//                })
+//                .setPositive("确定", new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        finish();
+//
+//                    }
+//                })
+//                .configPositive(new ConfigButton() {
+//                    @Override
+//                    public void onConfig(ButtonParams params) {
+//                        params.textColor = Color.parseColor("#3183FF");
+//                    }
+//                })
+//                .show(getSupportFragmentManager());
     }
 
 
@@ -1785,4 +2275,64 @@ public class LivePortraitActivity extends QMUIActivity implements LEBWebRTCEvent
             throw new RuntimeException(e);
         }
     }
+
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        updatePlayerViewMode();
+    }
+
+
+    private void updatePlayerViewMode() {
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            this.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) playerLayout.getLayoutParams();
+            lp.height = (int) (ScreenUtils.getWidth(this) * 9.0f / 16);
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.gravity = Gravity.TOP;
+            lp.topMargin = CommonUtils.dip2px(200);
+            playerLayout.setLayoutParams(lp);
+            panel.setVisibility(View.VISIBLE);
+            fullCreenIcon.setText(R.string.full_screen);
+            QMUIStatusBarHelper.setStatusBarLightMode(this);
+            if(playerType==1){
+                lebSurfaceView.setScaleType(mScaleType);
+            }
+        } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //转到横屏了。
+            //隐藏状态栏
+
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) playerLayout.getLayoutParams();
+            lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.gravity = Gravity.TOP;
+            lp.topMargin = CommonUtils.dip2px(0);
+            playerLayout.setLayoutParams(lp);
+            panel.setVisibility(View.GONE);
+            fullCreenIcon.setText(R.string.full_screen_cancel);
+            if(playerType==1){
+                lebSurfaceView.setScaleType(SCALE_KEEP_ASPECT_FIT);
+            }
+        }
+
+    }
+
+
+    private boolean isStrangePhone() {
+        boolean strangePhone = "mx5".equalsIgnoreCase(Build.DEVICE)
+                || "Redmi Note2".equalsIgnoreCase(Build.DEVICE)
+                || "Z00A_1".equalsIgnoreCase(Build.DEVICE)
+                || "hwH60-L02".equalsIgnoreCase(Build.DEVICE)
+                || "hermes".equalsIgnoreCase(Build.DEVICE)
+                || ("V4".equalsIgnoreCase(Build.DEVICE) && "Meitu".equalsIgnoreCase(Build.MANUFACTURER))
+                || ("m1metal".equalsIgnoreCase(Build.DEVICE) && "Meizu".equalsIgnoreCase(Build.MANUFACTURER));
+        return strangePhone;
+    }
+
+
 }

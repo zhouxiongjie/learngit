@@ -21,7 +21,7 @@
     android:background="@color/white"
     app:qmui_skin_background="?attr/app_skin_common_background">
 
-    <com.qmuiteam.qmui.widget.QMUIViewPager
+    <com.shuangling.software.customview.MyViewPager01
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -44,9 +44,8 @@
             android:id="@+id/menuContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal" />
 
 
     </LinearLayout>

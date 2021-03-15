@@ -22,7 +22,10 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -41,6 +44,10 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.common.ResizeOptions;
 import com.hjq.toast.ToastUtils;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
@@ -56,6 +63,7 @@ import com.qmuiteam.qmui.widget.QMUIViewPager;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.customview.FontIconView;
+import com.shuangling.software.customview.MyViewPager01;
 import com.shuangling.software.dialog.InformationDialog;
 import com.shuangling.software.dialog.NotificationDialog;
 import com.shuangling.software.dialog.UpdateDialog;
@@ -78,6 +86,7 @@ import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.FloatWindowUtil;
+import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -114,7 +123,7 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
     @BindView(R.id.menuContainer)
     LinearLayout menuContainer;
     @BindView(R.id.pager)
-    QMUIViewPager mViewPager;
+    MyViewPager01 mViewPager;
 
     //    private Fragment serverFragment;
 //    private Fragment radioListFragment;
@@ -899,563 +908,197 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
                 break;
             case MSG_GET_BOTTOM_MENUS:
                 try {
-                    String result = (String) msg.obj;
+                    String result = (String) msg.obj;//{"code":100000,"data":[{"id":1,"type":1,"name":"\u9996\u9875","default":1,"sort":1,"display":1,"source_id":"","created_at":"2019-10-23 17:25:46","updated_at":"2021-01-15 15:28:41","source_type":1,"show_type":2,"url":"","logo":""},{"id":2,"type":10,"name":"\u8981\u95fb","default":0,"sort":2,"display":1,"source_id":"12","created_at":"2019-10-23 17:25:46","updated_at":"2021-01-15 15:35:53","source_type":1,"show_type":2,"url":"https:\/\/www.baidu.com","logo":"https:\/\/sl-cdn.slradio.cn\/cms\/logo\/imges\/YemTAKNSkx7MPbDjT2HRdn4jc2QRhT1Y1610694242383.jpg"},{"id":3,"type":10,"name":"\u97f3\u4e50","default":0,"sort":3,"display":1,"source_id":"9","created_at":"2019-10-23 17:25:46","updated_at":"2021-01-15 15:21:58","source_type":1,"show_type":1,"url":"","logo":""},{"id":5,"type":4,"name":"\u5fae\u4fe1\u77e9\u9635\u54c8","default":0,"sort":4,"display":1,"source_id":"","created_at":"2021-01-15 09:49:07","updated_at":"2021-01-15 15:33:12","source_type":2,"show_type":1,"url":"http:\/\/ceshi.yitongnet.com\/GAJGZH\/jz.html","logo":"https:\/\/sl-cdn.slradio.cn\/cms\/logo\/imges\/89kGQADrCaj02F2sphXGTZYaR8Y86rjX1610695887724.png"},{"id":4,"type":2,"name":"\u6211\u7684","default":1,"sort":5,"display":1,"source_id":"","created_at":"2019-10-23 17:25:46","updated_at":"2020-06-01 17:55:10","source_type":1,"show_type":1,"url":"","logo":""}],"msg":"\u8bf7\u6c42\u6210\u529f"}
+//                    Log.e("!", result);
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
                         List<BottomMenu> menus = JSONObject.parseArray(jsonObject.getJSONArray("data").toJSONString(), BottomMenu.class);
                         Iterator<BottomMenu> iterator = menus.iterator();
                         while (iterator.hasNext()) {
                             BottomMenu bottomMenu = iterator.next();
-                            if (bottomMenu.getDisplay() == 0) {
+                            if (bottomMenu.getDisplay() == 0) {//1显示，0删除
                                 iterator.remove();
                             }
                         }
-                        if (menus != null && menus.size() > 0) {
+                        if (menus.size() > 0) {
                             mMenus.clear();
-                            for (int i = 0; menus != null && i < menus.size(); i++) {
+                            for (int i = 0; i < menus.size(); i++) {
                                 final BottomMenu bottomMenu = menus.get(i);
-                                LayoutInflater inflater = LayoutInflater.from(this);
-                                View root = inflater.inflate(R.layout.bottom_menu, menuContainer, false);
+                                View root = LayoutInflater.from(this).inflate(R.layout.bottom_menu, menuContainer, false);//
+                                final BottomMenuHolder bottomMenuHolder = new BottomMenuHolder(root,bottomMenu.getType());
+                                if (bottomMenu.getSource_type() == 1) {//数据源类型 1站内资源
+                                    bottomMenuHolder.iconImg.setVisibility(View.GONE);
+                                    if (bottomMenu.getShow_type() == 1) {//显示效果 1图标+标题
+                                        bottomMenuHolder.name.setText(bottomMenu.getName());
+                                    } else if (bottomMenu.getShow_type() == 2) {//显示效果 2大图
+                                        bottomMenuHolder.name.setVisibility(View.GONE);
+                                        bottomMenuHolder.icon.setTextSize(CommonUtils.dip2px(15));//
+                                    }
+                                    switch (bottomMenu.getType()){
+                                        case 1://首页
+                                            bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_index));
+                                            break;
+                                        case 2://个人中心
+                                            bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_personal_center));
+                                            break;
+                                        case 3://媒体矩阵
+                                            bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_media_matrix));
+                                            break;
+                                        case 4://建言咨政
+                                            bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_suggest_consult));
+                                            break;
+                                        case 5://办事指南
+                                            bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_affairs_guide));
+                                            break;
+                                        case 6://便民服务
+                                            bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_facilitate_people));
+                                            break;
+                                        case 7://活动中心
+                                            bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_activity_center));
+                                            break;
+                                        case 8://电视
+                                            bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_tv));
+                                            break;
+                                        case 9://电台
+                                            bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_radio));
+                                            break;
+                                        case 10://资讯分类
+                                            bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_news));
+                                            break;
 
-                                final BottomMenuHolder bottomMenuHolder = new BottomMenuHolder(root);
-                                bottomMenuHolder.name.setText(bottomMenu.getName());
-                                if (bottomMenu.getType() == 1) {
-                                    //首页
-                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_index));
-                                } else if (bottomMenu.getType() == 2) {
-                                    //个人中心
-                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_personal_center));
-                                } else if (bottomMenu.getType() == 3) {
-                                    //媒体矩阵
-                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_media_matrix));
-                                } else if (bottomMenu.getType() == 4) {
-                                    //建言咨政
-                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_suggest_consult));
-                                } else if (bottomMenu.getType() == 5) {
-                                    //办事指南
-                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_affairs_guide));
-                                } else if (bottomMenu.getType() == 6) {
-                                    //便民服务
-                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_facilitate_people));
-                                } else if (bottomMenu.getType() == 7) {
-                                    //活动中心
-                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_activity_center));
-                                } else if (bottomMenu.getType() == 8) {
-                                    //电视
-                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_tv));
-                                } else if (bottomMenu.getType() == 9) {
-                                    //电台
-                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_radio));
-                                } else if (bottomMenu.getType() == 10) {
-                                    //资讯分类
-                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_news));
-                                }
-                                bottomMenuHolder.root.setTag(i);
-                                bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
+                                    }
+
+                                    bottomMenuHolder.root.setTag(i);
+                                    bottomMenuHolder.root.setOnClickListener(v -> {
                                         bottomMenuHolder.name.setSelected(true);
+
+
+                                        switch (bottomMenu.getType()){
+                                            case 1://首页
+                                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_index_selected));
+                                                break;
+                                            case 2://个人中心
+                                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_personal_center_selected));
+                                                break;
+                                            case 3://媒体矩阵
+                                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_media_matrix_selected));
+                                                break;
+                                            case 4://建言咨政
+                                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_suggest_consult_selected));
+                                                break;
+                                            case 5://办事指南
+                                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_affairs_guide_selected));
+                                                break;
+                                            case 6://便民服务
+                                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_facilitate_people_selected));
+                                                break;
+                                            case 7://活动中心
+                                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_activity_center_selected));
+                                                break;
+                                            case 8://电视
+                                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_tv_selected));
+                                                break;
+                                            case 9://电台
+                                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_radio_selected));
+                                                break;
+                                            case 10://资讯分类
+                                                bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_news_selected));
+                                                break;
+                                        }
                                         bottomMenuHolder.icon.setSelected(true);
-                                        for (int i = 0; i < mMenus.size(); i++) {
-                                            BottomMenuHolder holder = mMenus.get(i);
+
+
+                                        for (int i1 = 0; i1 < mMenus.size(); i1++) {
+                                            BottomMenuHolder holder = mMenus.get(i1);
                                             if (holder != bottomMenuHolder) {
                                                 holder.name.setSelected(false);
                                                 holder.icon.setSelected(false);
+                                                switch (holder.type){
+                                                    case 1://首页
+                                                        holder.icon.setText(getResources().getString(R.string.menus_index));
+                                                        break;
+                                                    case 2://个人中心
+                                                        holder.icon.setText(getResources().getString(R.string.menus_personal_center));
+                                                        break;
+                                                    case 3://媒体矩阵
+                                                        holder.icon.setText(getResources().getString(R.string.menus_media_matrix));
+                                                        break;
+                                                    case 4://建言咨政
+                                                        holder.icon.setText(getResources().getString(R.string.menus_suggest_consult));
+                                                        break;
+                                                    case 5://办事指南
+                                                        holder.icon.setText(getResources().getString(R.string.menus_affairs_guide));
+                                                        break;
+                                                    case 6://便民服务
+                                                        holder.icon.setText(getResources().getString(R.string.menus_facilitate_people));
+                                                        break;
+                                                    case 7://活动中心
+                                                        holder.icon.setText(getResources().getString(R.string.menus_activity_center));
+                                                        break;
+                                                    case 8://电视
+                                                        holder.icon.setText(getResources().getString(R.string.menus_tv));
+                                                        break;
+                                                    case 9://电台
+                                                        holder.icon.setText(getResources().getString(R.string.menus_radio));
+                                                        break;
+                                                    case 10://资讯分类
+                                                        holder.icon.setText(getResources().getString(R.string.menus_news));
+                                                        break;
+
+                                                }
                                             }
                                         }
-
                                         int index = (int) v.getTag();
                                         if (mViewPager != null && mViewPager.getAdapter().getCount() >= index + 1) {
-                                            mViewPager.setCurrentItem(index,false);
+                                            mViewPager.setCurrentItem(index, false);
                                         }
-
-
+                                    });
+                                } else if (bottomMenu.getSource_type() == 2) { //数据源类型  2链接地址
+                                    bottomMenuHolder.icon.setVisibility(View.GONE);
+                                    if (bottomMenu.getShow_type() == 1) {//显示效果 1图标+标题
+                                        bottomMenuHolder.name.setText(bottomMenu.getName());
+                                        //setViewSize(bottomMenuHolder.iconImg, CommonUtils.dip2px(70), 70);
+                                    } else if (bottomMenu.getShow_type() == 2) {//显示效果 2大图
+                                        bottomMenuHolder.name.setVisibility(View.GONE);
+                                        setViewSize(bottomMenuHolder.iconImg, CommonUtils.dip2px(55), CommonUtils.dip2px(55));
                                     }
-                                });
 
+                                    Uri uri=Uri.parse(bottomMenu.getLogo());
 
+//设置Fresco支持gif动态图片
+                                    DraweeController controller = Fresco.newDraweeControllerBuilder().setUri(uri).setAutoPlayAnimations(true).build();
+//将Fresco管理者设置使用
+                                    bottomMenuHolder.iconImg.setController(controller);
+
+                                    //ImageLoader.showThumb(uri,bottomMenuHolder.iconImg,CommonUtils.dip2px(50),CommonUtils.dip2px(50));
+                                    bottomMenuHolder.root.setOnClickListener(v -> {
+                                        Intent it = new Intent(MainActivity.this, WebViewBackActivity.class);
+                                        if(bottomMenu.getSource_type()==2){
+                                            //外链
+                                            it.putExtra("addParams", false);
+
+                                        }else{
+                                            it.putExtra("addParams", true);
+                                        }
+                                        it.putExtra("title", bottomMenu.getName());
+                                        it.putExtra("url", bottomMenu.getUrl());
+                                        startActivity(it);
+
+                                    });
+                                }
                                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                                 params.weight = 1;
                                 menuContainer.addView(root, params);
-
                                 mMenus.add(bottomMenuHolder);
-//                                if (bottomMenu.getType() == 1) {
-//                                    //首页
-//                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_index));
-//                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(View v) {
-//                                            //
-//                                            bottomMenuHolder.name.setSelected(true);
-//                                            bottomMenuHolder.icon.setSelected(true);
-//                                            for (int i = 0; i < mMenus.size(); i++) {
-//                                                BottomMenuHolder holder = mMenus.get(i);
-//                                                if (holder != bottomMenuHolder) {
-//                                                    holder.name.setSelected(false);
-//                                                    holder.icon.setSelected(false);
-//                                                }
-//                                            }
-//                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//                                            if (recommendFragment == null) {
-//                                                recommendFragment = new RecommendFragment();
-//                                                transaction.add(R.id.content, recommendFragment);
-//                                            } else {
-//                                                transaction.show(recommendFragment);
-//                                            }
-//                                            if (personalCenterFragment != null && !personalCenterFragment.isHidden()) {
-//                                                transaction.hide(personalCenterFragment);
-//                                            }
-//                                            if (serverFragment != null && !serverFragment.isHidden()) {
-//                                                transaction.hide(serverFragment);
-//                                            }
-//                                            if (discoverFragment != null && !discoverFragment.isHidden()) {
-//                                                transaction.hide(discoverFragment);
-//                                            }
-//                                            if (radioListFragment != null && !radioListFragment.isHidden()) {
-//                                                transaction.hide(radioListFragment);
-//                                            }
-//                                            if (columnFragment != null && !columnFragment.isHidden()) {
-//                                                transaction.hide(columnFragment);
-//                                            }
-//                                            transaction.commitAllowingStateLoss();
-//                                        }
-//                                    });
-//                                } else if (bottomMenu.getType() == 2) {
-//                                    //个人中心
-//                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_personal_center));
-//                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(View v) {
-//                                            bottomMenuHolder.name.setSelected(true);
-//                                            bottomMenuHolder.icon.setSelected(true);
-//                                            for (int i = 0; i < mMenus.size(); i++) {
-//                                                BottomMenuHolder holder = mMenus.get(i);
-//                                                if (holder != bottomMenuHolder) {
-//                                                    holder.name.setSelected(false);
-//                                                    holder.icon.setSelected(false);
-//                                                }
-//                                            }
-//                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//                                            if (personalCenterFragment == null) {
-////                                                personalCenterFragment = new PersonalCenterFragment01();
-//                                                personalCenterFragment = new PersonalCenterFragment();// todo 4.0版重写‘我的’页面
-//                                                transaction.add(R.id.content, personalCenterFragment);
-//                                            } else {
-//                                                transaction.show(personalCenterFragment);
-//                                            }
-//                                            if (recommendFragment != null && !recommendFragment.isHidden()) {
-//                                                transaction.hide(recommendFragment);
-//                                            }
-//                                            if (serverFragment != null && !serverFragment.isHidden()) {
-//                                                transaction.hide(serverFragment);
-//                                            }
-//                                            if (discoverFragment != null && !discoverFragment.isHidden()) {
-//                                                transaction.hide(discoverFragment);
-//                                            }
-//                                            if (radioListFragment != null && !radioListFragment.isHidden()) {
-//                                                transaction.hide(radioListFragment);
-//                                            }
-//                                            if (columnFragment != null && !columnFragment.isHidden()) {
-//                                                transaction.hide(columnFragment);
-//                                            }
-//                                            transaction.commitAllowingStateLoss();
-//                                        }
-//                                    });
-//                                } else if (bottomMenu.getType() == 3) {
-//                                    //媒体矩阵
-//                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_media_matrix));
-//                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(View v) {
-//                                            bottomMenuHolder.name.setSelected(true);
-//                                            bottomMenuHolder.icon.setSelected(true);
-//                                            for (int i = 0; i < mMenus.size(); i++) {
-//                                                BottomMenuHolder holder = mMenus.get(i);
-//                                                if (holder != bottomMenuHolder) {
-//                                                    holder.name.setSelected(false);
-//                                                    holder.icon.setSelected(false);
-//                                                }
-//                                            }
-//                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//                                            if (discoverFragment == null) {
-//                                                discoverFragment = new DiscoverFragment();
-//                                                Bundle bundle = new Bundle();
-//                                                bundle.putString("url", ServerInfo.h5HttpsIP + "/gover");
-//                                                bundle.putString("title", bottomMenu.getName());
-//                                                discoverFragment.setArguments(bundle);
-//                                                transaction.add(R.id.content, discoverFragment);
-//                                            } else {
-//                                                ((DiscoverFragment) discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/gover", bottomMenu.getName(), false);
-//                                                transaction.show(discoverFragment);
-//                                            }
-//                                            if (recommendFragment != null && !recommendFragment.isHidden()) {
-//                                                transaction.hide(recommendFragment);
-//                                            }
-//                                            if (serverFragment != null && !serverFragment.isHidden()) {
-//                                                transaction.hide(serverFragment);
-//                                            }
-//                                            if (personalCenterFragment != null && !personalCenterFragment.isHidden()) {
-//                                                transaction.hide(personalCenterFragment);
-//                                            }
-//                                            if (radioListFragment != null && !radioListFragment.isHidden()) {
-//                                                transaction.hide(radioListFragment);
-//                                            }
-//                                            if (columnFragment != null && !columnFragment.isHidden()) {
-//                                                transaction.hide(columnFragment);
-//                                            }
-//                                            transaction.commitAllowingStateLoss();
-////跳到媒体矩阵
-//                                        }
-//                                    });
-//                                } else if (bottomMenu.getType() == 4) {
-//                                    //建言咨政
-//                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_suggest_consult));
-//                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(View v) {
-//                                            //跳到建言咨政
-//                                            bottomMenuHolder.name.setSelected(true);
-//                                            bottomMenuHolder.icon.setSelected(true);
-//                                            for (int i = 0; i < mMenus.size(); i++) {
-//                                                BottomMenuHolder holder = mMenus.get(i);
-//                                                if (holder != bottomMenuHolder) {
-//                                                    holder.name.setSelected(false);
-//                                                    holder.icon.setSelected(false);
-//                                                }
-//                                            }
-//                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//                                            if (discoverFragment == null) {
-//                                                discoverFragment = new DiscoverFragment();
-//                                                Bundle bundle = new Bundle();
-//                                                bundle.putString("url", ServerInfo.h5HttpsIP + "/interact");
-//                                                bundle.putString("title", bottomMenu.getName());
-//                                                discoverFragment.setArguments(bundle);
-//                                                transaction.add(R.id.content, discoverFragment);
-//                                            } else {
-//                                                ((DiscoverFragment) discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/interact", bottomMenu.getName(), false);
-//                                                transaction.show(discoverFragment);
-//                                            }
-//                                            if (recommendFragment != null && !recommendFragment.isHidden()) {
-//                                                transaction.hide(recommendFragment);
-//                                            }
-//                                            if (serverFragment != null && !serverFragment.isHidden()) {
-//                                                transaction.hide(serverFragment);
-//                                            }
-//                                            if (personalCenterFragment != null && !personalCenterFragment.isHidden()) {
-//                                                transaction.hide(personalCenterFragment);
-//                                            }
-//                                            if (radioListFragment != null && !radioListFragment.isHidden()) {
-//                                                transaction.hide(radioListFragment);
-//                                            }
-//                                            if (columnFragment != null && !columnFragment.isHidden()) {
-//                                                transaction.hide(columnFragment);
-//                                            }
-//                                            transaction.commitAllowingStateLoss();
-//                                        }
-//                                    });
-//                                } else if (bottomMenu.getType() == 5) {
-//                                    //办事指南
-//                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_affairs_guide));
-//                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(View v) {
-//                                            bottomMenuHolder.name.setSelected(true);
-//                                            bottomMenuHolder.icon.setSelected(true);
-//                                            for (int i = 0; i < mMenus.size(); i++) {
-//                                                BottomMenuHolder holder = mMenus.get(i);
-//                                                if (holder != bottomMenuHolder) {
-//                                                    holder.name.setSelected(false);
-//                                                    holder.icon.setSelected(false);
-//                                                }
-//                                            }
-//                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//                                            if (discoverFragment == null) {
-//                                                discoverFragment = new DiscoverFragment();
-//                                                Bundle bundle = new Bundle();
-//                                                bundle.putString("url", ServerInfo.h5HttpsIP + "/guide");
-//                                                bundle.putString("title", bottomMenu.getName());
-//                                                discoverFragment.setArguments(bundle);
-//                                                transaction.add(R.id.content, discoverFragment);
-//                                            } else {
-//                                                ((DiscoverFragment) discoverFragment).jumpTo(ServerInfo.h5HttpsIP + "/guide", bottomMenu.getName(), false);
-//                                                transaction.show(discoverFragment);
-//                                            }
-//                                            if (recommendFragment != null && !recommendFragment.isHidden()) {
-//                                                transaction.hide(recommendFragment);
-//                                            }
-//                                            if (serverFragment != null && !serverFragment.isHidden()) {
-//                                                transaction.hide(serverFragment);
-//                                            }
-//                                            if (personalCenterFragment != null && !personalCenterFragment.isHidden()) {
-//                                                transaction.hide(personalCenterFragment);
-//                                            }
-//                                            if (radioListFragment != null && !radioListFragment.isHidden()) {
-//                                                transaction.hide(radioListFragment);
-//                                            }
-//                                            if (columnFragment != null && !columnFragment.isHidden()) {
-//                                                transaction.hide(columnFragment);
-//                                            }
-//                                            transaction.commitAllowingStateLoss();
-//                                        }
-//                                    });
-//                                } else if (bottomMenu.getType() == 6) {
-//                                    //便民服务
-//                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_facilitate_people));
-//                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(View v) {
-//                                            bottomMenuHolder.name.setSelected(true);
-//                                            bottomMenuHolder.icon.setSelected(true);
-//                                            for (int i = 0; i < mMenus.size(); i++) {
-//                                                BottomMenuHolder holder = mMenus.get(i);
-//                                                if (holder != bottomMenuHolder) {
-//                                                    holder.name.setSelected(false);
-//                                                    holder.icon.setSelected(false);
-//                                                }
-//                                            }
-//                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//                                            if (serverFragment == null) {
-//                                                serverFragment = new ServiceFragment();
-//                                                Bundle bundle = new Bundle();
-//                                                bundle.putString("title", bottomMenu.getName());
-//                                                serverFragment.setArguments(bundle);
-//                                                transaction.add(R.id.content, serverFragment);
-//                                            } else {
-//                                                transaction.show(serverFragment);
-//                                            }
-//                                            if (recommendFragment != null && !recommendFragment.isHidden()) {
-//                                                transaction.hide(recommendFragment);
-//                                            }
-//                                            if (personalCenterFragment != null && !personalCenterFragment.isHidden()) {
-//                                                transaction.hide(personalCenterFragment);
-//                                            }
-//                                            if (discoverFragment != null && !discoverFragment.isHidden()) {
-//                                                transaction.hide(discoverFragment);
-//                                            }
-//                                            if (radioListFragment != null && !radioListFragment.isHidden()) {
-//                                                transaction.hide(radioListFragment);
-//                                            }
-//                                            if (columnFragment != null && !columnFragment.isHidden()) {
-//                                                transaction.hide(columnFragment);
-//                                            }
-//                                            transaction.commitAllowingStateLoss();
-//                                        }
-//                                    });
-//                                } else if (bottomMenu.getType() == 7) {
-//                                    //活动中心
-//                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_activity_center));
-//                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(View v) {
-//                                            bottomMenuHolder.name.setSelected(true);
-//                                            bottomMenuHolder.icon.setSelected(true);
-//                                            for (int i = 0; i < mMenus.size(); i++) {
-//                                                BottomMenuHolder holder = mMenus.get(i);
-//                                                if (holder != bottomMenuHolder) {
-//                                                    holder.name.setSelected(false);
-//                                                    holder.icon.setSelected(false);
-//                                                }
-//                                            }
-//                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//                                            if (discoverFragment == null) {
-//                                                discoverFragment = new DiscoverFragment();
-//                                                Bundle bundle = new Bundle();
-//                                                bundle.putString("url", ServerInfo.activity + "activity");
-//                                                bundle.putString("title", bottomMenu.getName());
-//                                                bundle.putBoolean("showShare", true);
-//                                                discoverFragment.setArguments(bundle);
-//                                                transaction.add(R.id.content, discoverFragment);
-//                                            } else {
-//                                                ((DiscoverFragment) discoverFragment).jumpTo(ServerInfo.activity + "activity", bottomMenu.getName(), true);
-//                                                transaction.show(discoverFragment);
-//                                            }
-//                                            if (recommendFragment != null && !recommendFragment.isHidden()) {
-//                                                transaction.hide(recommendFragment);
-//                                            }
-//                                            if (serverFragment != null && !serverFragment.isHidden()) {
-//                                                transaction.hide(serverFragment);
-//                                            }
-//                                            if (personalCenterFragment != null && !personalCenterFragment.isHidden()) {
-//                                                transaction.hide(personalCenterFragment);
-//                                            }
-//                                            if (radioListFragment != null && !radioListFragment.isHidden()) {
-//                                                transaction.hide(radioListFragment);
-//                                            }
-//                                            if (columnFragment != null && !columnFragment.isHidden()) {
-//                                                transaction.hide(columnFragment);
-//                                            }
-//                                            transaction.commitAllowingStateLoss();
-//                                        }
-//                                    });
-//                                } else if (bottomMenu.getType() == 8) {
-//                                    //电视
-//                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_tv));
-//                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(View v) {
-//                                            synchronized (MainActivity.this) {
-//                                                bottomMenuHolder.name.setSelected(true);
-//                                                bottomMenuHolder.icon.setSelected(true);
-//                                                for (int i = 0; i < mMenus.size(); i++) {
-//                                                    BottomMenuHolder holder = mMenus.get(i);
-//                                                    if (holder != bottomMenuHolder) {
-//                                                        holder.name.setSelected(false);
-//                                                        holder.icon.setSelected(false);
-//                                                    }
-//                                                }
-//                                                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//                                                if (radioListFragment == null) {
-//                                                    radioListFragment = new RadioListFragment();
-//                                                    Bundle bundle = new Bundle();
-//                                                    bundle.putString("type", "2");
-//                                                    radioListFragment.setArguments(bundle);
-//                                                    transaction.add(R.id.content, radioListFragment);
-//                                                } else {
-//                                                    ((RadioListFragment) radioListFragment).setType("2");
-//                                                    transaction.show(radioListFragment);
-//                                                }
-//                                                if (recommendFragment != null && !recommendFragment.isHidden()) {
-//                                                    transaction.hide(recommendFragment);
-//                                                }
-//                                                if (serverFragment != null && !serverFragment.isHidden()) {
-//                                                    transaction.hide(serverFragment);
-//                                                }
-//                                                if (personalCenterFragment != null && !personalCenterFragment.isHidden()) {
-//                                                    transaction.hide(personalCenterFragment);
-//                                                }
-//                                                if (discoverFragment != null && !discoverFragment.isHidden()) {
-//                                                    transaction.hide(discoverFragment);
-//                                                }
-//                                                if (columnFragment != null && !columnFragment.isHidden()) {
-//                                                    transaction.hide(columnFragment);
-//                                                }
-//                                                transaction.commitAllowingStateLoss();
-//                                            }
-//                                        }
-//                                    });
-//                                } else if (bottomMenu.getType() == 9) {
-//                                    //电台
-//                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_radio));
-//                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(View v) {
-//                                            synchronized (MainActivity.this) {
-//                                                bottomMenuHolder.name.setSelected(true);
-//                                                bottomMenuHolder.icon.setSelected(true);
-//                                                for (int i = 0; i < mMenus.size(); i++) {
-//                                                    BottomMenuHolder holder = mMenus.get(i);
-//                                                    if (holder != bottomMenuHolder) {
-//                                                        holder.name.setSelected(false);
-//                                                        holder.icon.setSelected(false);
-//                                                    }
-//                                                }
-//                                                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//                                                if (radioListFragment == null) {
-//                                                    radioListFragment = new RadioListFragment();
-//                                                    Bundle bundle = new Bundle();
-//                                                    bundle.putString("type", "1");
-//                                                    radioListFragment.setArguments(bundle);
-//                                                    transaction.add(R.id.content, radioListFragment);
-//                                                } else {
-//                                                    ((RadioListFragment) radioListFragment).setType("1");
-//                                                    transaction.show(radioListFragment);
-//                                                }
-//                                                if (recommendFragment != null && !recommendFragment.isHidden()) {
-//                                                    transaction.hide(recommendFragment);
-//                                                }
-//                                                if (serverFragment != null && !serverFragment.isHidden()) {
-//                                                    transaction.hide(serverFragment);
-//                                                }
-//                                                if (personalCenterFragment != null && !personalCenterFragment.isHidden()) {
-//                                                    transaction.hide(personalCenterFragment);
-//                                                }
-//                                                if (discoverFragment != null && !discoverFragment.isHidden()) {
-//                                                    transaction.hide(discoverFragment);
-//                                                }
-//                                                if (columnFragment != null && !columnFragment.isHidden()) {
-//                                                    transaction.hide(columnFragment);
-//                                                }
-//                                                transaction.commitAllowingStateLoss();
-//                                            }
-//
-//                                        }
-//                                    });
-//                                } else if (bottomMenu.getType() == 10) {
-//                                    //资讯分类
-//                                    bottomMenuHolder.icon.setText(getResources().getString(R.string.menus_news));
-//                                    bottomMenuHolder.root.setOnClickListener(new View.OnClickListener() {
-//                                        @Override
-//                                        public void onClick(View v) {
-//                                            Column column = null;
-//                                            int columnId = Integer.parseInt(bottomMenu.getSource_id());
-//                                            List<Column> allColumns = JSONObject.parseArray(SharedPreferencesUtils.getStringValue("all_column", null), Column.class);
-//                                            for (int i = 0; allColumns != null && i < allColumns.size(); i++) {
-//                                                if (allColumns.get(i).getId() == columnId) {
-//                                                    column = allColumns.get(i);
-//                                                    break;
-//                                                }
-//                                            }
-//                                            if (column == null) {
-//                                                column = new Column();
-//                                                column.setId(Integer.parseInt(bottomMenu.getSource_id()));
-//                                                column.setName(bottomMenu.getName());
-//                                            }
-//
-//                                            bottomMenuHolder.name.setSelected(true);
-//                                            bottomMenuHolder.icon.setSelected(true);
-//                                            for (int i = 0; i < mMenus.size(); i++) {
-//                                                BottomMenuHolder holder = mMenus.get(i);
-//                                                if (holder != bottomMenuHolder) {
-//                                                    holder.name.setSelected(false);
-//                                                    holder.icon.setSelected(false);
-//                                                }
-//                                            }
-//                                            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//                                            if (columnFragment == null) {
-//                                                columnFragment = new ColumnFragment();
-//                                                Bundle bundle = new Bundle();
-//                                                bundle.putSerializable("Column", column);
-//                                                columnFragment.setArguments(bundle);
-//                                                transaction.add(R.id.content, columnFragment);
-//                                            } else {
-//                                                ((ColumnFragment) columnFragment).setColumn(column);
-//                                                transaction.show(columnFragment);
-//                                            }
-//                                            if (recommendFragment != null && !recommendFragment.isHidden()) {
-//                                                transaction.hide(recommendFragment);
-//                                            }
-//                                            if (personalCenterFragment != null && !personalCenterFragment.isHidden()) {
-//                                                transaction.hide(personalCenterFragment);
-//                                            }
-//                                            if (discoverFragment != null && !discoverFragment.isHidden()) {
-//                                                transaction.hide(discoverFragment);
-//                                            }
-//                                            if (serverFragment != null && !serverFragment.isHidden()) {
-//                                                transaction.hide(serverFragment);
-//                                            }
-//                                            if (radioListFragment != null && !radioListFragment.isHidden()) {
-//                                                transaction.hide(radioListFragment);
-//                                            }
-//                                            transaction.commitAllowingStateLoss();
-////                                            Column column=new Column();
-////                                            column.setId(Integer.parseInt(bottomMenu.getSource_id()));
-////                                            column.setName(bottomMenu.getName());
-////                                            ((RecommendFragment)recommendFragment).switchColumn(column);
-//                                        }
-//                                    });
-//                                }
-//                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-//                                params.weight = 1;
-//                                menuContainer.addView(root, params);
                             }
-
                             initPagers(menus);
                             if (mMenus.size() > 0) {
                                 mMenus.get(0).root.performClick();
                             }
                         }
                     }
-                } catch (Exception e) {
+                } catch (Exception ignore) {
+                    ToastUtils.show("一级导航异常");
                 }
                 break;
         }
@@ -1474,6 +1117,13 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
             //ComponentActivity.onBack
             //finish();
         }
+    }
+
+    public void setViewSize(View view, int width, int height) {
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        params.width = width;
+        params.height = height;
+        view.setLayoutParams(params);
     }
 
     public String getVersionName() {
@@ -1765,16 +1415,21 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
         return path;
     }
 
+
     static class BottomMenuHolder {
         @BindView(R.id.icon)
         FontIconView icon;
         @BindView(R.id.name)
         TextView name;
         @BindView(R.id.root)
-        LinearLayout root;
+        RelativeLayout root;
+        @BindView(R.id.icon_img)
+        SimpleDraweeView iconImg;
+        int type;
 
-        BottomMenuHolder(View view) {
+        BottomMenuHolder(View view,int type) {
             ButterKnife.bind(this, view);
+            this.type=type;
         }
     }
 
@@ -1945,6 +1600,7 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
         };
         mViewPager.setAdapter(pagerAdapter);
         mViewPager.setEnableLoop(false);
+        mViewPager.setNoScroll(true);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

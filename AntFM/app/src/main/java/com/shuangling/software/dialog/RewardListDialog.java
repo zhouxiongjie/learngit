@@ -114,7 +114,7 @@ public class RewardListDialog extends BaseCircleDialog {
                                     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
                                     recyclerView.setLayoutManager(linearLayoutManager);
                                     recyclerView.setAdapter(new LiveRewardAdapter(getContext(), rewards));
-                                    if(rewards.getAwards()==null||rewards.getAwards().size()==0){
+                                    if(rewards.getData()==null||rewards.getData().size()==0){
                                         noData.setVisibility(View.VISIBLE);
                                     }
                                 } catch (Exception e) {

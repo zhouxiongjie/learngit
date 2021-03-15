@@ -1,4 +1,5 @@
 package com.shuangling.software.adapter;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -8,70 +9,83 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.shuangling.software.R;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.utils.CommonUtils;
+
 import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 public class MyColumnGridViewAdapter extends BaseAdapter {
-private List<Column> mColumns;
+    private List<Column> mColumns;
     private Column mCurrenColumn;
     private Context mContext;
-public void setIsEditor(boolean isEditor) {
+
+    public void setIsEditor(boolean isEditor) {
         this.mIsEditor = isEditor;
         notifyDataSetChanged();
     }
-private boolean mIsEditor;
-public MyColumnGridViewAdapter(Context context, List<Column> columns,Column column) {
+
+    private boolean mIsEditor;
+
+    public MyColumnGridViewAdapter(Context context, List<Column> columns, Column column) {
         super();
         this.mColumns = columns;
         this.mContext = context;
-        this.mCurrenColumn=column;
+        this.mCurrenColumn = column;
     }
-public void setData(List<Column> columns) {
+
+    public void setData(List<Column> columns) {
         this.mColumns = columns;
     }
-@Override
+
+    @Override
     public int getCount() {
-        if(mColumns==null){
+        if (mColumns == null) {
             return 0;
-        }else{
+        } else {
             return mColumns.size();
         }
-}
-@Override
+    }
+
+    @Override
     public Column getItem(int position) {
         return mColumns.get(position);
     }
-@Override
+
+    @Override
     public long getItemId(int position) {
         return position;
     }
-@Override
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-if (convertView == null) {
+        if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.column_gridview_item, parent, false);
         }
         ViewHolder vh = new ViewHolder(convertView);
         Column column = getItem(position);
         vh.columnName.setText(column.getName());
-        if(column.getType()==1||column.getType()==-1){
+        if (column.getType() == 1 || column.getType() == -1) {
             vh.columnName.setTextColor(Color.parseColor("#dcdcdc"));
-        }else{
+        } else {
             vh.columnName.setTextColor(Color.parseColor("#222222"));
         }
-        if(column.getId()==mCurrenColumn.getId()){
+        if (column.getId() == mCurrenColumn.getId()) {
             vh.columnName.setTextColor(CommonUtils.getThemeColor(mContext));
         }
-if (mIsEditor&&column.getType()!=1&&column.getType()!=-1) {
+        if (mIsEditor && column.getType() != 1 && column.getType() != -1) {
             vh.delete.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             vh.delete.setVisibility(View.INVISIBLE);
         }
         return convertView;
     }
-/**
+
+    /**
      * 根据图片的名称获取对应的资源id
      *
      * @param resourceName
@@ -82,12 +96,14 @@ if (mIsEditor&&column.getType()!=1&&column.getType()!=-1) {
         int picid = res.getIdentifier(resourceName, "drawable", mContext.getPackageName());
         return picid;
     }
-static class ViewHolder {
+
+    static class ViewHolder {
         @BindView(R.id.columnName)
         TextView columnName;
         @BindView(R.id.delete)
         ImageView delete;
-ViewHolder(View view) {
+
+        ViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
     }

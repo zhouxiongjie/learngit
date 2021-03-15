@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
     android:padding="10dp" >
 
 
@@ -11,21 +12,23 @@
         android:id="@+id/head"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical"
         app:actualImageScaleType="centerCrop"
         app:failureImage="@drawable/ic_user3"
         app:failureImageScaleType="centerCrop"
         app:placeholderImage="@drawable/ic_user3"
         app:placeholderImageScaleType="centerCrop"
-        app:roundAsCircle="false"
+        app:roundAsCircle="true"
         app:roundingBorderColor="@color/white"
-        app:roundedCornerRadius="3dp"
+        app:roundedCornerRadius="0dp"
         app:roundingBorderWidth="0dp"
         app:viewAspectRatio="1" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+
         android:orientation="vertical"
         android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/head"
@@ -33,9 +36,9 @@
 
         <TextView
             android:id="@+id/name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="王大锤"
+            android:text=""
             android:textSize="@dimen/font_size_26px"
             android:maxLines="1"
             android:ellipsize="end"
@@ -47,6 +50,7 @@
             android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:text="12-27 09:10"
             android:textSize="@dimen/font_size_24px"
@@ -62,10 +66,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true"
+        android:layout_gravity="center_vertical"
         android:gravity="right"
-        android:layout_marginEnd="10dp">
+        android:layout_marginLeft="10dp">
 
         <TextView
             android:id="@+id/money"
@@ -95,4 +98,4 @@
     </LinearLayout>
 
 
-</RelativeLayout>
+</LinearLayout>

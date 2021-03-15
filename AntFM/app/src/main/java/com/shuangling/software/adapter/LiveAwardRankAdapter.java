@@ -41,13 +41,14 @@ public class LiveAwardRankAdapter extends RecyclerView.Adapter {
     private Context mContext;
 
     private List<AwardInfo> mAwardInfos;
+    private OnItemClick mOnItemClick;
 
-    public interface OnItemReply {
-        void replyItem(ChatMessage message);
+    public interface OnItemClick {
+        void ItemClick(AwardInfo awardInfo);
     }
 
-    public void setOnItemReply(LiveChatListAdapter.OnItemReply onItemReply) {
-
+    public void setOnItemClick(OnItemClick onItemClick) {
+        mOnItemClick=onItemClick;
     }
 
 
@@ -92,7 +93,14 @@ public class LiveAwardRankAdapter extends RecyclerView.Adapter {
         vh.money.setText(awardInfo.getDevote_count() + "积分");
 
         vh.name.setText(awardInfo.getNickname());
-
+        vh.root.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mOnItemClick!=null){
+                    mOnItemClick.ItemClick(awardInfo);
+                }
+            }
+        });
 
     }
 

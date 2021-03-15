@@ -1,8 +1,14 @@
 package com.shuangling.software.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,7 +114,14 @@ public class LiveGoodsAdapter extends RecyclerView.Adapter implements View.OnCli
 
         if (goodsBean.getMerchant_goods() != null) {
             viewHolder.goodsName.setText(goodsBean.getMerchant_goods().getGoods_name());
-            viewHolder.price.setText("￥" + goodsBean.getMerchant_goods().getAfter_coupon_price());
+            String price="￥"+goodsBean.getMerchant_goods().getAfter_coupon_price();
+
+            SpannableString spannableString = new SpannableString(price);
+
+            int index=price.indexOf(".");
+            spannableString.setSpan(new RelativeSizeSpan(1.5f), 1, index+1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+
+            viewHolder.price.setText(spannableString);
             switch (goodsBean.getMerchant_goods().getSource()) {
                 case 0: {
                     viewHolder.source.setText("自定义");

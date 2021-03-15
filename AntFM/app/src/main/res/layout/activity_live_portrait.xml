@@ -15,7 +15,8 @@
 <!--        app:blk_fps="20" >-->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 <!--        <com.facebook.drawee.view.SimpleDraweeView-->
 <!--            android:id="@+id/background"-->
 <!--            android:layout_width="match_parent"-->
@@ -29,37 +30,53 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop" />
-        <!--    </io.alterac.blurkit.BlurLayout>-->
 
-<!--        <io.alterac.blurkit.BlurLayout-->
-<!--            android:id="@+id/blurLayout"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            app:blk_blurRadius="12"-->
-<!--            app:blk_downscaleFactor="0.12"-->
-<!--            app:blk_fps="20" />-->
-
-
-        <!--    <com.aliyun.vodplayerview.widget.AliyunVodPlayerView-->
-        <!--        android:id="@+id/aliyunVodPlayerView"-->
-        <!--        android:layout_width="match_parent"-->
-        <!--        android:layout_height="match_parent"-->
-        <!--        android:visibility="gone"-->
-        <!--        android:layout_gravity="center" />-->
-
-        <SurfaceView
-            android:id="@+id/surface"
+        <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"/>
+            android:scaleType="centerCrop"
+            android:background="#4c000000" />
 
-        <com.tencent.xbright.lebwebrtcsdk.LEBWebRTCSurfaceView
-            android:id="@+id/lebSurfaceView"
+        <RelativeLayout
+            android:id="@+id/playerLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            />
+            android:layout_height="match_parent">
+            <SurfaceView
+                android:id="@+id/surface"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"/>
+
+            <com.tencent.xbright.lebwebrtcsdk.LEBWebRTCSurfaceView
+                android:id="@+id/lebSurfaceView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                />
+
+            <RelativeLayout
+                android:id="@+id/fullCreen"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="10dp"
+                android:visibility="gone"
+                android:background="@drawable/full_creen_btn_bg">
+                <com.shuangling.software.customview.FontIconView
+                    android:id="@+id/fullCreenIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="&#xe695;"
+                    android:layout_marginLeft="10dp"
+                    android:textColor="#ffffff"
+                    android:textSize="@dimen/font_size_36px" />
+            </RelativeLayout>
+        </RelativeLayout>
+
 
         <RelativeLayout
             android:id="@+id/noAnchor"
@@ -109,11 +126,13 @@
 
 
     <RelativeLayout
+        android:id="@+id/panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
         android:focusable="true"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:visibility="visible">
         <RelativeLayout
             android:id="@+id/a"
             android:layout_width="match_parent"
@@ -230,6 +249,7 @@
 
             <TextView
                 android:id="@+id/hotRange"
+                android:layout_gravity="center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/inputbox_bg"
@@ -241,25 +261,47 @@
                 android:textColor="#FFFFFF"
                 android:textSize="@dimen/font_size_24px"
                 android:visibility="gone"/>
-
-
-            <TextView
+            
+            <LinearLayout
                 android:id="@+id/inviteRange"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="horizontal"
                 android:layout_marginLeft="10dp"
-                android:background="@drawable/inputbox_bg"
-                android:drawableStart="@drawable/ic_crown"
-                android:drawablePadding="5dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:text="邀请榜"
-                android:textColor="#FFFFFF"
-                android:textSize="@dimen/font_size_24px"
-                android:visibility="gone"/>
+                android:visibility="visible">
+                <TextView
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/inputbox_bg"
+                    android:drawableStart="@drawable/ic_crown"
+                    android:layout_gravity="center_vertical"
+                    android:drawablePadding="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="邀请榜"
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/font_size_24px"
+                    />
+                
+            </LinearLayout>
+
+
+            
 
         </LinearLayout>
 
+        <ImageView
+            android:id="@+id/smallRedPacket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/b"
+            android:layout_above="@+id/b"
+            android:layout_marginBottom="-10dp"
+            android:visibility="gone"
+            android:src="@drawable/red_packet_small_icon"
+            />
 
         <LinearLayout
             android:id="@+id/activityContainer"
@@ -280,6 +322,7 @@
                 android:visibility="gone">
 
                 <ImageView
+                    android:id="@+id/shakeRedPacket"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerInside"
@@ -296,7 +339,7 @@
                     android:background="@drawable/red_packet_status_bg01"
                     android:textColor="#E7F2FC"
                     android:textSize="@dimen/font_size_18px"
-                    tools:text="进行中" />
+                    android:text="即将开始" />
             </RelativeLayout>
 
 
@@ -395,11 +438,22 @@
             android:id="@+id/giftContainer"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_above="@+id/chat_msg_list"
+            android:layout_above="@+id/coming"
             android:animateLayoutChanges="true"
             android:background="#00000000"
             android:gravity="bottom"
             android:orientation="vertical" />
+
+        <TextView
+            android:id="@+id/coming"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:layout_marginLeft="10dp"
+            android:layout_above="@+id/chat_msg_list"
+            tools:text="周星星来了"
+            android:visibility="invisible"
+            android:background="@drawable/chat_msg_bg01"/>
 
 
 <!--        <FrameLayout-->
@@ -433,12 +487,63 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chat_msg_list"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="60dp"
-            android:transcriptMode="normal">
+            android:layout_height="220dp"
+            android:layout_above="@+id/aa"
+            android:layout_marginBottom="5dp"
+            android:transcriptMode="normal"/>
 
-        </androidx.recyclerview.widget.RecyclerView>
+        <LinearLayout
+            android:id="@+id/aa"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:background="@drawable/live_shortcut_box_bg"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal"
+            android:layout_marginBottom="60dp"
+            android:layout_marginLeft="10dp"
+            android:gravity="center_vertical"
+            android:layout_marginRight="10dp">
+            
+            <TextView
+                android:id="@+id/phrase01"
+                android:layout_width="wrap_content"
+                android:layout_height="23dp"
+                android:text="新年快乐"
+                android:textColor="#FFFFFF"
+                android:minWidth="80dp"
+                android:gravity="center"
+                android:background="@drawable/live_shortcut_phrase_bg"
+                android:textSize="@dimen/font_size_24px"/>
+
+            <TextView
+                android:id="@+id/phrase02"
+                android:layout_width="wrap_content"
+                android:layout_height="23dp"
+                android:layout_marginLeft="5dp"
+                android:text="牛气冲天"
+                android:textColor="#FFFFFF"
+                android:minWidth="80dp"
+                android:gravity="center"
+                android:background="@drawable/live_shortcut_phrase_bg"
+                android:textSize="@dimen/font_size_24px"/>
+
+            <TextView
+                android:id="@+id/phrase03"
+                android:layout_width="wrap_content"
+                android:layout_height="23dp"
+                android:layout_marginLeft="5dp"
+                android:text="金牛祈福"
+                android:textColor="#FFFFFF"
+                android:minWidth="80dp"
+                android:gravity="center"
+                android:background="@drawable/live_shortcut_phrase_bg"
+                android:textSize="@dimen/font_size_24px"/>
+
+
+
+
+
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/more_msg_btn"
@@ -472,7 +577,7 @@
                     android:background="@drawable/inputbox_bg"
                     android:gravity="left|center_vertical"
                     android:paddingLeft="10dp"
-                    android:text="点击消息框可回复观众哦"
+                    android:text="说点什么…"
                     android:textColor="#BFBFBF"
                     android:textSize="@dimen/font_size_30px" />
 
@@ -500,15 +605,37 @@
                     android:padding="0dp"
                     android:src="@drawable/ic_more01" />
 
-                <ImageButton
+                <RelativeLayout
                     android:id="@+id/goods"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_gravity="center_vertical"
                     android:layout_marginLeft="8dp"
+                    android:layout_gravity="center_vertical"
                     android:background="@drawable/inputbox_bg"
-                    android:padding="0dp"
-                    android:src="@drawable/ic_goods" />
+                    android:padding="0dp">
+                    <ImageView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_goods" />
+
+                    <TextView
+                        android:id="@+id/goodsNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:background="@drawable/red_circle_bg01"
+                        android:gravity="center"
+                        android:minWidth="20dp"
+                        android:padding="2dp"
+                        android:text="2"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/font_size_16px"
+                        android:visibility="visible" />
+                </RelativeLayout>
+
+
 
                 <ImageButton
                     android:id="@+id/gift"
@@ -518,22 +645,34 @@
                     android:layout_marginLeft="8dp"
                     android:background="@drawable/inputbox_bg"
                     android:padding="0dp"
+                    android:visibility="gone"
                     android:src="@drawable/ic_gift" />
 
 
             </LinearLayout>
-
-            <EditText
-                android:id="@+id/chatInput"
+            <LinearLayout
+                android:id="@+id/chatInputLayout"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_gravity="bottom"
-                android:background="@drawable/bg_inputbox"
-                android:hint="和粉丝聊两句呗!"
-                android:imeOptions="actionSend"
-                android:inputType="text"
+                android:layout_height="match_parent"
                 android:padding="8dp"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:background="@color/white"
+                android:orientation="horizontal">
+                <EditText
+                    android:id="@+id/chatInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="34dp"
+                    android:layout_gravity="center"
+                    android:paddingLeft="10dp"
+                    android:background="@drawable/bg_inputbox"
+                    android:hint="跟大家聊聊"
+                    android:imeOptions="actionSend"
+                    android:inputType="text"
+
+                    android:visibility="visible" />
+            </LinearLayout>
+
+
 
         </FrameLayout>
 
@@ -667,6 +806,72 @@
         </LinearLayout>
 
 
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/leaveLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        android:visibility="gone"
+        android:background="#333333">
+
+
+        <com.shuangling.software.customview.FontIconView
+            android:id="@+id/close1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="&#xe62a;"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/font_size_40px" />
+
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="直播已结束"
+            android:textColor="#E5E5E5"
+            android:textSize="@dimen/font_size_40px"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="150dp"
+            android:textStyle="bold"/>
+
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/head01"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_below="@+id/label"
+            android:layout_marginTop="50dp"
+            android:layout_centerHorizontal="true"
+            app:actualImageScaleType="centerCrop"
+            app:failureImage="@drawable/ic_user3"
+            app:failureImageScaleType="centerCrop"
+            app:placeholderImage="@drawable/ic_user3"
+            app:placeholderImageScaleType="centerCrop"
+            app:roundAsCircle="true"
+            app:roundingBorderColor="@color/white"
+            app:roundingBorderWidth="0dp"
+            app:viewAspectRatio="1" />
+
+
+        <TextView
+            android:id="@+id/name01"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_below="@+id/head01"
+            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true"
+            android:textSize="@dimen/font_size_32px"
+            android:textStyle="bold"
+            tools:text="热心市民" />
 
 
     </RelativeLayout>

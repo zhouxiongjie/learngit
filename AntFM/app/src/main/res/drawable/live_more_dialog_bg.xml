@@ -7,7 +7,7 @@
                 android:topRightRadius="10dp"/>
             <padding android:bottom="10dp" android:left="10dp" android:right="10dp" android:top="10dp" />
             <!-- 填充色 -->
-            <solid android:color="#FFFFFF" />
+            <solid android:color="#1D1D1F" />
             <!-- 描边 设置线宽及颜色 -->
             <stroke android:width="0dp" android:color="#1D1A1A" />
         </shape>

@@ -45,7 +45,7 @@
     <dimen name="font_size_8sp">8sp</dimen>
 
 
-    <dimen name="home_tab_height">60dp</dimen>
+    <dimen name="home_tab_height">61dp</dimen>
 
 
     <dimen name="article_right_image_width">113dp</dimen>

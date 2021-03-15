@@ -1,8 +1,10 @@
 package com.shuangling.software.utils;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.backends.pipeline.PipelineDraweeController;
 import com.facebook.drawee.controller.BaseControllerListener;
@@ -12,10 +14,12 @@ import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+
 import java.io.File;
 import java.io.FileOutputStream;
+
 public class ImageLoader {
-public boolean saveBitmap(String filePath, Bitmap bitmap) {
+    public boolean saveBitmap(String filePath, Bitmap bitmap) {
         File f = new File(filePath);
         if (f.exists()) {
             return false;
@@ -30,7 +34,8 @@ public boolean saveBitmap(String filePath, Bitmap bitmap) {
             return false;
         }
     }
-/**
+
+    /**
      * 获取视频的缩略图
      * 先通过ThumbnailUtils来创建一个视频的缩略图，然后再利用ThumbnailUtils来生成指定大小的缩略图。
      * 如果想要的缩略图的宽和高都小于MICRO_KIND，则类型要使用MICRO_KIND作为kind的值，这样会节省内存。
@@ -52,7 +57,8 @@ public boolean saveBitmap(String filePath, Bitmap bitmap) {
                 ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
         return bitmap;
     }
-/**
+
+    /**
      * 根据指定的图像路径和大小来获取缩略图
      * 此方法有两点好处：
      * 1. 使用较小的内存空间，第一次获取的bitmap实际上为null，只是为了读取宽度和高度，
@@ -94,19 +100,21 @@ public boolean saveBitmap(String filePath, Bitmap bitmap) {
                 ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
         return bitmap;
     }
-public static void showThumb(Uri uri, SimpleDraweeView draweeView, int width, int height) {
+
+    public static void showThumb(Uri uri, SimpleDraweeView draweeView, int width, int height) {
         ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
                 .setAutoRotateEnabled(true)
                 .setResizeOptions(new ResizeOptions(width, height))
                 .build();
-DraweeController controller = Fresco.newDraweeControllerBuilder()
+        DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(request)
                 .setOldController(draweeView.getController())
                 .setControllerListener(new BaseControllerListener<ImageInfo>())
                 .build();
-draweeView.setController(controller);
-}
-public static void showThumb(SimpleDraweeView draweeView, int drawableID) {
+        draweeView.setController(controller);
+    }
+
+    public static void showThumb(SimpleDraweeView draweeView, int drawableID) {
         ImageRequest request = ImageRequestBuilder.newBuilderWithResourceId(drawableID)
                 .setAutoRotateEnabled(true)
                 .build();

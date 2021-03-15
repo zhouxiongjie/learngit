@@ -39,17 +39,30 @@
     <string name="password_visible">&#xe678;</string>
     <string name="password_invisible">&#xe676;</string>
 
+    <string name="full_screen">&#xe695;</string>
+    <string name="full_screen_cancel">&#xe68a;</string>
+
     <!--底部菜单图标-->
-    <string name="menus_index">&#xe614;</string>
-    <string name="menus_personal_center">&#xe61e;</string>
-    <string name="menus_media_matrix">&#xe66f;</string>
-    <string name="menus_suggest_consult">&#xe66e;</string>
-    <string name="menus_affairs_guide">&#xe60b;</string>
-    <string name="menus_facilitate_people">&#xe66c;</string>
-    <string name="menus_activity_center">&#xe60e;</string>
-    <string name="menus_tv">&#xe66d;</string>
-    <string name="menus_radio">&#xe61f;</string>
-    <string name="menus_news">&#xe670;</string>
+    <string name="menus_index">&#xe78c;</string>
+    <string name="menus_index_selected">&#xe786;</string>
+    <string name="menus_personal_center">&#xe78e;</string>
+    <string name="menus_personal_center_selected">&#xe78a;</string>
+    <string name="menus_media_matrix">&#xe783;</string>
+    <string name="menus_media_matrix_selected">&#xe782;</string>
+    <string name="menus_suggest_consult">&#xe784;</string>
+    <string name="menus_suggest_consult_selected">&#xe785;</string>
+    <string name="menus_affairs_guide">&#xe77f;</string>
+    <string name="menus_affairs_guide_selected">&#xe787;</string>
+    <string name="menus_facilitate_people">&#xe788;</string>
+    <string name="menus_facilitate_people_selected">&#xe78d;</string>
+    <string name="menus_activity_center">&#xe789;</string>
+    <string name="menus_activity_center_selected">&#xe781;</string>
+    <string name="menus_tv">&#xe77d;</string>
+    <string name="menus_tv_selected">&#xe77c;</string>
+    <string name="menus_radio">&#xe780;</string>
+    <string name="menus_radio_selected">&#xe77e;</string>
+    <string name="menus_news">&#xe78b;</string>
+    <string name="menus_news_selected">&#xe78f;</string>
 
     <!--互动直播图标-->
     <string name="menus_mute">&#xe6f6;</string>

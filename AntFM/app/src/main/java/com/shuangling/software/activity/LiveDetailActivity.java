@@ -88,7 +88,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
 
-public class LiveDetailActivity extends BaseAudioActivity implements Handler.Callback {
+public class LiveDetailActivity extends BaseAudioActivity2 implements Handler.Callback {
     public static final int MSG_ATTENTION_CALLBACK = 0x07;
     public static final int REQUEST_LOGIN = 0x09;
     private static final int MSG_GET_VIDEO_AUTH = 0xd;
@@ -144,7 +144,7 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         setContentView(R.layout.activity_live_detail);
         QMUIStatusBarHelper.setStatusBarLightMode(this); //
         ImmersionBar.with(this).statusBarDarkFont(true).fitsSystemWindows(true).keyboardEnable(true)  //解决软键盘与底部输入框冲突问题，默认为false，还有一个重载方法，可以指定软键盘mode
-                .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING).init();
+                .keyboardMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN).init();
         EventBus.getDefault().register(this);
         ButterKnife.bind(this);
         init();
@@ -780,23 +780,23 @@ public class LiveDetailActivity extends BaseAudioActivity implements Handler.Cal
         }
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        if (aliyunVodPlayerView != null) {
-//            aliyunVodPlayerView.onDestroy();
-//            aliyunVodPlayerView = null;
-//        }
-//        super.onBackPressed();
-//    }
-
     @Override
-    protected void doOnBackPressed() {
+    public void onBackPressed() {
         if (aliyunVodPlayerView != null) {
             aliyunVodPlayerView.onDestroy();
             aliyunVodPlayerView = null;
         }
-        super.doOnBackPressed();
+        super.onBackPressed();
     }
+
+//    @Override
+//    protected void doOnBackPressed() {
+//        if (aliyunVodPlayerView != null) {
+//            aliyunVodPlayerView.onDestroy();
+//            aliyunVodPlayerView = null;
+//        }
+//        super.doOnBackPressed();
+//    }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {

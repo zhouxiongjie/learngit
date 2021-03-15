@@ -26,6 +26,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hjq.toast.ToastUtils;
 import com.shuangling.software.R;
@@ -85,7 +87,7 @@ public class LiveAwardFragment extends Fragment {
     private LiveRoomInfo01 liveRoomInfo;
     private PagerAdapter mPagerAdapter;
     private List<View> mPagers;     //展示的礼物页
-    private LiveRoomInfo01.PropsBean mSelectGift;
+    private static LiveRoomInfo01.PropsBean mSelectGift;
     private LiveAwardDialog mLiveAwardDialog;
     private List<GiftGridAdapter> mGiftGridAdapter = new ArrayList<>();
 
@@ -138,8 +140,37 @@ public class LiveAwardFragment extends Fragment {
         viewPager.setAdapter(mPagerAdapter);
         viewPager.setCurrentItem(0);
         setupWithPagerPoint(viewPager,pageIndicator);
+        setDefaultSelected();
+
+
 
         return view;
+    }
+
+
+    private void setDefaultSelected(){
+
+        if(mSelectGift==null){
+            if(liveRoomInfo.getProps()!=null&&liveRoomInfo.getProps().size()>0){
+                mSelectGift = liveRoomInfo.getProps().get(0);
+            }
+        }
+        if(mSelectGift==null){
+            return;
+        }
+        number.setText("1");
+        sub.setEnabled(false);
+        if(mSelectGift.getLimit()<=1){
+            add.setEnabled(false);
+        }else{
+            add.setEnabled(true);
+        }
+
+        for (int i = 0; i < mGiftGridAdapter.size(); i++) {
+            mGiftGridAdapter.get(i).notifyDataSetChanged();
+        }
+        giftName.setText(mSelectGift.getName());
+        giftPrice.setText(mSelectGift.getPrice() + "分");
     }
 
     public void setupWithPagerPoint(ViewPager viewPager, final LinearLayout pointLayout) {
@@ -321,7 +352,7 @@ public class LiveAwardFragment extends Fragment {
                         @Override
                         public void run() {
                             mLiveAwardDialog.dismiss();
-                            ToastUtils.show(jsonObject.getString("msg"));
+                            //ToastUtils.show(jsonObject.getString("msg"));
                         }
                     });
 
@@ -383,7 +414,12 @@ public class LiveAwardFragment extends Fragment {
 
             if (!TextUtils.isEmpty(gift.getIcon_url())) {
                 Uri uri = Uri.parse(gift.getIcon_url());
-                ImageLoader.showThumb(uri, holder.logo, CommonUtils.dip2px(50), CommonUtils.dip2px(50));
+//                ImageLoader.showThumb(uri, holder.logo, CommonUtils.dip2px(50), CommonUtils.dip2px(50));
+//                Uri uri=Uri.parse(bottomMenu.getLogo());
+
+                //设置Fresco支持gif动态图片
+                DraweeController controller =Fresco.newDraweeControllerBuilder().setUri(uri).setAutoPlayAnimations(true).build();
+                holder.logo.setController(controller);
             }
 
 

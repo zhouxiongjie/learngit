@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -37,6 +38,7 @@ public class LiveInviteListAdapter extends RecyclerView.Adapter {
 
     private LayoutInflater inflater;
     private Context mContext;
+    private boolean mShowAward;
 
     List<InviteInfo> mInviteInfos = new ArrayList<>();
 
@@ -49,10 +51,11 @@ public class LiveInviteListAdapter extends RecyclerView.Adapter {
     }
 
 
-    public LiveInviteListAdapter(Context context, List<InviteInfo> viewers) {
+    public LiveInviteListAdapter(Context context, List<InviteInfo> viewers,boolean showAward) {
 
         mContext = context;
         mInviteInfos=viewers;
+        mShowAward=showAward;
         inflater = LayoutInflater.from(context);
     }
 
@@ -61,7 +64,7 @@ public class LiveInviteListAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
 
-        return new InviteInfoViewHolder(inflater.inflate(R.layout.live_hot_item, viewGroup, false));
+        return new InviteInfoViewHolder(inflater.inflate(R.layout.live_invite_item, viewGroup, false));
 
     }
 
@@ -82,6 +85,19 @@ public class LiveInviteListAdapter extends RecyclerView.Adapter {
         }
         vh.hotIndex.setText(""+inviteInfo.getNum()+"人");
         vh.name.setText(inviteInfo.getInviter()!=null?inviteInfo.getInviter().getNickname():"");
+
+        if(mShowAward){
+            vh.money.setVisibility(View.VISIBLE);
+            if(inviteInfo.getTotal_bonus()==0){
+                vh.money.setText("-");
+            }else {
+                vh.money.setText("￥"+String.format("%.2f", (float) inviteInfo.getTotal_bonus()/ 100));
+            }
+
+        }else{
+            vh.money.setVisibility(View.GONE);
+        }
+
 
         if (inviteInfo.getInviter()!=null&&!TextUtils.isEmpty(inviteInfo.getInviter().getAvatar())) {
             Uri uri = Uri.parse(inviteInfo.getInviter().getAvatar());
@@ -118,9 +134,12 @@ public class LiveInviteListAdapter extends RecyclerView.Adapter {
         @BindView(R.id.name)
         TextView name;
         @BindView(R.id.root)
-        RelativeLayout root;
+        LinearLayout root;
         @BindView(R.id.hotIndex)
         TextView hotIndex;
+        @BindView(R.id.money)
+        TextView money;
+
 
         InviteInfoViewHolder(View view) {
             super(view);

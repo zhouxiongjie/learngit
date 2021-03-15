@@ -48,89 +48,100 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static android.content.Context.WINDOW_SERVICE;
+
 /**
  * Created by zxj
  * Date：2018/9/29 下午4:29
  * Desc：
  */
 public class FloatWindowUtil {
-public static final int REQUEST_PERMISSION_CODE = 0x0110;
+    public static final int REQUEST_PERMISSION_CODE = 0x0110;
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mLayoutParams;
     private FloatView mView;
     private Point point = new Point();
     private int statusBarHeight = 0;
     private Context mContext;
-private ProgressCircleImageView mProgressCircleImageView;
+    private ProgressCircleImageView mProgressCircleImageView;
     private LinearLayout mRoot;
     private LinearLayout mControllerLayout;
     private ImageView mPlay;
     private ImageView mNext;
     private ImageView mClose;
-private Timer mTimer;
+    private Timer mTimer;
     private UpdateTimerTask mUpdateTimerTask;
-    private Handler mHandler=new Handler(Looper.getMainLooper());
-private OnPermissionListener mOnPermissionListener;
-    public void addOnPermissionListener(OnPermissionListener permissionListener){
-        mOnPermissionListener=permissionListener;
+    private Handler mHandler = new Handler(Looper.getMainLooper());
+    private OnPermissionListener mOnPermissionListener;
+
+    public void addOnPermissionListener(OnPermissionListener permissionListener) {
+        mOnPermissionListener = permissionListener;
     }
-private IAudioPlayer mAudioPlayer;
+
+    private IAudioPlayer mAudioPlayer;
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mAudioPlayer = IAudioPlayer.Stub.asInterface(service);
             initPlayer();
         }
-@Override
+
+        @Override
         public void onServiceDisconnected(ComponentName name) {
-}
+        }
     };
-private FloatWindowUtil() {
-        mContext=MyApplication.getInstance();
+
+    private FloatWindowUtil() {
+        mContext = MyApplication.getInstance();
     }
-private static class SingletonInstance {
+
+    private static class SingletonInstance {
         @SuppressLint("StaticFieldLeak")
         private static final FloatWindowUtil INSTANCE = new FloatWindowUtil();
     }
-public static FloatWindowUtil getInstance() {
+
+    public static FloatWindowUtil getInstance() {
         return SingletonInstance.INSTANCE;
     }
-public void setPermission(){
+
+    public void setPermission() {
         if (checkFloatWindowPermission()) {
         } else {
-            if(mOnPermissionListener!=null){
+            if (mOnPermissionListener != null) {
                 mOnPermissionListener.showPermissionDialog();
             }
         }
     }
-public void showFloatWindow(){
-if (checkFloatWindowPermission()) {
+
+    public void showFloatWindow() {
+        if (checkFloatWindowPermission()) {
             showWindow();
-        }else{
-}
+        } else {
+        }
     }
-public boolean checkFloatWindowPermission() {
+
+    public boolean checkFloatWindowPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return Settings.canDrawOverlays(mContext);
         }
         return true;
     }
-@SuppressLint("CheckResult")
+
+    @SuppressLint("CheckResult")
     private void showWindow() {
         if (null == mWindowManager && null == mView) {
             mWindowManager = (WindowManager) mContext.getSystemService(WINDOW_SERVICE);
             mView = new FloatView(mContext);
             mView.setElevation(CommonUtils.dip2px(5));
-            mProgressCircleImageView=mView.findViewById(R.id.progressImageView);
-            mRoot=mView.findViewById(R.id.root);
-            mControllerLayout=mView.findViewById(R.id.controllerLayout);
-            mPlay=mView.findViewById(R.id.play);
-            mNext=mView.findViewById(R.id.next);
-            mClose=mView.findViewById(R.id.close);
+            mProgressCircleImageView = mView.findViewById(R.id.progressImageView);
+            mRoot = mView.findViewById(R.id.root);
+            mControllerLayout = mView.findViewById(R.id.controllerLayout);
+            mPlay = mView.findViewById(R.id.play);
+            mNext = mView.findViewById(R.id.next);
+            mClose = mView.findViewById(R.id.close);
             //mProgressCircleImageView.setDisableCircularTransformation(true);
             Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
             mWindowManager.getDefaultDisplay().getSize(point);
-mLayoutParams = new WindowManager.LayoutParams();
+            mLayoutParams = new WindowManager.LayoutParams();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 mLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
             } else {
@@ -138,13 +149,13 @@ mLayoutParams = new WindowManager.LayoutParams();
             }
             mLayoutParams.format = PixelFormat.RGBA_8888;                               //窗口透明
             mLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;                         //窗口位置
-            mLayoutParams.flags = WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH|WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+            mLayoutParams.flags = WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
             mLayoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
             mLayoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
             // 可以修改View的初始位置
-            int width=mView.getMeasuredWidth();
-            mLayoutParams.x = mWindowManager.getDefaultDisplay().getWidth()-CommonUtils.dip2px(50);
-            mLayoutParams.y = point.y/2;
+            int width = mView.getMeasuredWidth();
+            mLayoutParams.x = mWindowManager.getDefaultDisplay().getWidth() - CommonUtils.dip2px(50);
+            mLayoutParams.y = point.y / 2;
             mWindowManager.addView(mView, mLayoutParams);
             mView.addOnActionOutListener(new FloatView.OnActionOutListener() {
                 @Override
@@ -152,45 +163,47 @@ mLayoutParams = new WindowManager.LayoutParams();
                     shrinkWindow();
                 }
             });
-EventBus.getDefault().register(this);
+            EventBus.getDefault().register(this);
             Intent it = new Intent(mContext, AudioPlayerService.class);
             mContext.bindService(it, mConnection, Context.BIND_AUTO_CREATE);
-}else{
+        } else {
             visibleWindow();
         }
     }
-public void dismissWindow() {
-        try{
+
+    public void dismissWindow() {
+        try {
             if (mWindowManager != null && mView != null) {
                 mWindowManager.removeViewImmediate(mView);
                 mAudioPlayer.stop();
                 EventBus.getDefault().unregister(this);
                 mContext.unbindService(mConnection);
-                mView=null;
-                mWindowManager=null;
+                mView = null;
+                mWindowManager = null;
             }
-        }catch (RemoteException e){
-}
-}
-private void initPlayer() {
-        try{
+        } catch (RemoteException e) {
+        }
+    }
+
+    private void initPlayer() {
+        try {
             mProgressCircleImageView.setDuration(mAudioPlayer.getDuration());
             mProgressCircleImageView.updateProgress(mAudioPlayer.getCurrentPosition());
-            if(mAudioPlayer.getPlayerState()==IPlayer.started){
+            if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                 mPlay.setImageResource(R.drawable.float_pause_icon);
                 Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
                 startUpdateTimer();
-            }else{
+            } else {
                 mPlay.setImageResource(R.drawable.float_play_icon);
                 Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
             }
-        }catch (RemoteException e){
-}
-mProgressCircleImageView.setOnClickListener(new View.OnClickListener() {
+        } catch (RemoteException e) {
+        }
+        mProgressCircleImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-if(mControllerLayout.getVisibility()==View.GONE){
-if(mLayoutParams.x>CommonUtils.dip2px(10)){
+                if (mControllerLayout.getVisibility() == View.GONE) {
+                    if (mLayoutParams.x > CommonUtils.dip2px(10)) {
                         //右边
                         ValueAnimator animator = ValueAnimator.ofInt(CommonUtils.dip2px(40), CommonUtils.dip2px(198)).setDuration(100);
                         animator.setInterpolator(new LinearInterpolator());
@@ -199,48 +212,51 @@ if(mLayoutParams.x>CommonUtils.dip2px(10)){
                             @Override
                             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                                 mLayoutParams.width = (int) valueAnimator.getAnimatedValue();
-                                mLayoutParams.x=point.x-mLayoutParams.width-CommonUtils.dip2px(10);
+                                mLayoutParams.x = point.x - mLayoutParams.width - CommonUtils.dip2px(10);
                                 updateViewLayout();
                             }
                         });
                         animator.addListener(new Animator.AnimatorListener() {
                             @Override
                             public void onAnimationStart(Animator animation) {
-}
-@Override
+                            }
+
+                            @Override
                             public void onAnimationEnd(Animator animation) {
                                 animation.cancel();
-                                LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)mProgressCircleImageView.getLayoutParams();
-                                lp.leftMargin=10;
-                                lp.width=CommonUtils.dip2px(30);
-                                lp.height=lp.width;
+                                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mProgressCircleImageView.getLayoutParams();
+                                lp.leftMargin = 10;
+                                lp.width = CommonUtils.dip2px(30);
+                                lp.height = lp.width;
                                 mProgressCircleImageView.setLayoutParams(lp);
-try{
-                                    String logo=mAudioPlayer.getCurrentAudio()!=null?mAudioPlayer.getCurrentAudio().getLogo():null;
-                                    if(!TextUtils.isEmpty(logo)){
+                                try {
+                                    String logo = mAudioPlayer.getCurrentAudio() != null ? mAudioPlayer.getCurrentAudio().getLogo() : null;
+                                    if (!TextUtils.isEmpty(logo)) {
                                         //mProgressCircleImageView.setDisableCircularTransformation(false);
                                         Glide.with(mContext).load(logo).into(mProgressCircleImageView);
-                                    }else{
+                                    } else {
                                         //mProgressCircleImageView.setDisableCircularTransformation(false);
-                                        if(mAudioPlayer.getPlayerState()==IPlayer.started){
+                                        if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                                             Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
-                                        }else {
+                                        } else {
                                             Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
                                         }
-}
-}catch (RemoteException e){
-}
+                                    }
+                                } catch (RemoteException e) {
+                                }
                                 //Glide.with(mContext).load(R.drawable.player_gif).diskCacheStrategy(DiskCacheStrategy.ALL).into(mProgressCircleImageView);
                             }
-@Override
+
+                            @Override
                             public void onAnimationCancel(Animator animation) {
-}
-@Override
+                            }
+
+                            @Override
                             public void onAnimationRepeat(Animator animation) {
-}
+                            }
                         });
                         animator.start();
-}else{
+                    } else {
                         //左边
                         ValueAnimator animator = ValueAnimator.ofInt(CommonUtils.dip2px(40), CommonUtils.dip2px(198)).setDuration(100);
                         animator.setInterpolator(new LinearInterpolator());
@@ -256,70 +272,73 @@ try{
                             public void onAnimationStart(Animator animation) {
                                 mControllerLayout.setVisibility(View.VISIBLE);
                             }
-@Override
+
+                            @Override
                             public void onAnimationEnd(Animator animation) {
-LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)mProgressCircleImageView.getLayoutParams();
-                                lp.leftMargin=10;
-                                lp.width=CommonUtils.dip2px(30);
-                                lp.height=lp.width;
+                                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mProgressCircleImageView.getLayoutParams();
+                                lp.leftMargin = 10;
+                                lp.width = CommonUtils.dip2px(30);
+                                lp.height = lp.width;
                                 mProgressCircleImageView.setLayoutParams(lp);
-                                try{
-                                    String logo=mAudioPlayer.getCurrentAudio()!=null?mAudioPlayer.getCurrentAudio().getLogo():null;
-                                    if(!TextUtils.isEmpty(logo)){
+                                try {
+                                    String logo = mAudioPlayer.getCurrentAudio() != null ? mAudioPlayer.getCurrentAudio().getLogo() : null;
+                                    if (!TextUtils.isEmpty(logo)) {
                                         //mProgressCircleImageView.setDisableCircularTransformation(false);
                                         Glide.with(mContext).load(logo).into(mProgressCircleImageView);
-                                    }else{
+                                    } else {
                                         //mProgressCircleImageView.setDisableCircularTransformation(false);
-                                        if(mAudioPlayer.getPlayerState()==IPlayer.started){
+                                        if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                                             Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
-                                        }else {
+                                        } else {
                                             Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
                                         }
                                     }
-}catch (RemoteException e){
-}
+                                } catch (RemoteException e) {
+                                }
                             }
-@Override
+
+                            @Override
                             public void onAnimationCancel(Animator animation) {
-}
-@Override
+                            }
+
+                            @Override
                             public void onAnimationRepeat(Animator animation) {
-}
+                            }
                         });
                         animator.start();
                     }
-}else {
-                    try{
-                        AudioInfo audio=mAudioPlayer.getCurrentAudio();
-                        if(audio.getIsRadio()==0){
-                            Intent it=new Intent(mContext,AudioDetailActivity.class);
-                            it.putExtra("audioId",audio.getId());
-                            it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
+                } else {
+                    try {
+                        AudioInfo audio = mAudioPlayer.getCurrentAudio();
+                        if (audio.getIsRadio() == 0) {
+                            Intent it = new Intent(mContext, AudioDetailActivity.class);
+                            it.putExtra("audioId", audio.getId());
+                            it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             mContext.startActivity(it);
-                        }else if(audio.getIsRadio()==1){
-                            Intent it=new Intent(mContext,RadioDetailActivity.class);
-                            it.putExtra("radioId",audio.getId());
-                            it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
+                        } else if (audio.getIsRadio() == 1) {
+                            Intent it = new Intent(mContext, RadioDetailActivity.class);
+                            it.putExtra("radioId", audio.getId());
+                            it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             mContext.startActivity(it);
-                        }else {
+                        } else {
                             Intent it = new Intent(mContext, ArticleDetailActivity02.class);
                             it.putExtra("articleId", audio.getArticleId());
                             mContext.startActivity(it);
                         }
-}catch (RemoteException e){
-}
+                    } catch (RemoteException e) {
+                    }
                 }
-}
+            }
         });
-mPlay.setOnClickListener(new View.OnClickListener() {
+        mPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-try {
+                try {
                     int sta = mAudioPlayer.getPlayerState();
                     if (mAudioPlayer.getPlayerState() == IPlayer.paused) {
                         mAudioPlayer.start();
                         mPlay.setImageResource(R.drawable.float_pause_icon);
-} else if (mAudioPlayer.getPlayerState() == IPlayer.started) {
+                    } else if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                         mAudioPlayer.pause();
                         mPlay.setImageResource(R.drawable.float_play_icon);
                     }
@@ -328,23 +347,23 @@ try {
                 }
             }
         });
-mNext.setOnClickListener(new View.OnClickListener() {
+        mNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-try {
+                try {
                     mAudioPlayer.next();
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
             }
         });
-mClose.setOnClickListener(new View.OnClickListener() {
+        mClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-dismissWindow();
+                dismissWindow();
             }
         });
-final int mTouchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
+        final int mTouchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
         int resourceId = mContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
             statusBarHeight = mContext.getResources().getDimensionPixelSize(resourceId);
@@ -354,7 +373,8 @@ final int mTouchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
             int startX, startY;  //起始点
             boolean isPerformClick;  //是否点击
             int finalMoveX;  //最后通过动画将mView的X轴坐标移动到finalMoveX
-@SuppressLint("ClickableViewAccessibility")
+
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 Log.d("click", "onTouch: " + event.getAction());
@@ -373,10 +393,10 @@ final int mTouchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
 //mLayoutParams.x = (int) (event.getRawX());
                         mLayoutParams.x = (int) (event.getRawX() - startX);
                         //这里修复了刚开始移动的时候，悬浮窗的y坐标是不正确的，要减去状态栏的高度，可以将这个去掉运行体验一下
-                        if(event.getRawY()>CommonUtils.dip2px(100)&&event.getRawY()<mWindowManager.getDefaultDisplay().getHeight()-CommonUtils.dip2px(100)){
+                        if (event.getRawY() > CommonUtils.dip2px(100) && event.getRawY() < mWindowManager.getDefaultDisplay().getHeight() - CommonUtils.dip2px(100)) {
                             mLayoutParams.y = (int) (event.getRawY() - startY - statusBarHeight);
                             //mLayoutParams.y = (int) (event.getRawY() );
-}
+                        }
                         updateViewLayout();//更新mView 的位置
                         return true;
                     case MotionEvent.ACTION_UP:
@@ -385,7 +405,7 @@ final int mTouchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
                         }
                         //判断mView是在Window中的位置，以中间为界
                         if (mLayoutParams.x + mView.getMeasuredWidth() / 2 >= mWindowManager.getDefaultDisplay().getWidth() / 2) {
-                            finalMoveX = mWindowManager.getDefaultDisplay().getWidth() - mView.getMeasuredWidth()-CommonUtils.dip2px(10);
+                            finalMoveX = mWindowManager.getDefaultDisplay().getWidth() - mView.getMeasuredWidth() - CommonUtils.dip2px(10);
                         } else {
                             finalMoveX = CommonUtils.dip2px(10);
                         }
@@ -394,8 +414,9 @@ final int mTouchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
                 }
                 return false;
             }
-private void stickToSide() {
-                ValueAnimator animator = ValueAnimator.ofInt(mLayoutParams.x, finalMoveX).setDuration(Math.abs(mLayoutParams.x - finalMoveX)/5);
+
+            private void stickToSide() {
+                ValueAnimator animator = ValueAnimator.ofInt(mLayoutParams.x, finalMoveX).setDuration(Math.abs(mLayoutParams.x - finalMoveX) / 5);
                 //animator.setInterpolator(new BounceInterpolator());
                 animator.setInterpolator(new LinearInterpolator());
                 animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -409,60 +430,65 @@ private void stickToSide() {
             }
         });
     }
-private void updateViewLayout() {
+
+    private void updateViewLayout() {
         if (null != mView && null != mLayoutParams) {
             mWindowManager.updateViewLayout(mView, mLayoutParams);
-            Log.i("mLayoutParams","x="+mLayoutParams.x+",y="+mLayoutParams.y);
+            Log.i("mLayoutParams", "x=" + mLayoutParams.x + ",y=" + mLayoutParams.y);
         }
     }
-public void shrinkWindow() {
-if(mControllerLayout.getVisibility()==View.VISIBLE){
-ValueAnimator animator = ValueAnimator.ofInt(CommonUtils.dip2px(198), CommonUtils.dip2px(40)).setDuration(100);
-            if(mLayoutParams.x >CommonUtils.dip2px(10)){
+
+    public void shrinkWindow() {
+        if (mControllerLayout.getVisibility() == View.VISIBLE) {
+            ValueAnimator animator = ValueAnimator.ofInt(CommonUtils.dip2px(198), CommonUtils.dip2px(40)).setDuration(100);
+            if (mLayoutParams.x > CommonUtils.dip2px(10)) {
                 //右边
                 animator.setInterpolator(new LinearInterpolator());
                 animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator valueAnimator) {
                         mLayoutParams.width = (int) valueAnimator.getAnimatedValue();
-                        mLayoutParams.x =point.x-mLayoutParams.width-CommonUtils.dip2px(10);
+                        mLayoutParams.x = point.x - mLayoutParams.width - CommonUtils.dip2px(10);
                         updateViewLayout();
                     }
                 });
                 animator.addListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animation) {
-}
-@Override
+                    }
+
+                    @Override
                     public void onAnimationEnd(Animator animation) {
                         animation.cancel();
                         mControllerLayout.setVisibility(View.GONE);
-                        LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)mProgressCircleImageView.getLayoutParams();
-                        lp.leftMargin=0;
-                        lp.width=CommonUtils.dip2px(40);
-                        lp.height=lp.width;
+                        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mProgressCircleImageView.getLayoutParams();
+                        lp.leftMargin = 0;
+                        lp.width = CommonUtils.dip2px(40);
+                        lp.height = lp.width;
                         mProgressCircleImageView.setLayoutParams(lp);
-                        mLayoutParams.x =point.x-CommonUtils.dip2px(50);
-                        mLayoutParams.width =CommonUtils.dip2px(40);
+                        mLayoutParams.x = point.x - CommonUtils.dip2px(50);
+                        mLayoutParams.width = CommonUtils.dip2px(40);
                         updateViewLayout();
-                        try{
-                            if(mAudioPlayer.getPlayerState()==IPlayer.started){
+                        try {
+                            if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                                 Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
-                            }else{
+                            } else {
                                 Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
                             }
-                        }catch (RemoteException e){
-}
-}
-@Override
+                        } catch (RemoteException e) {
+                        }
+                    }
+
+                    @Override
                     public void onAnimationCancel(Animator animation) {
-}
-@Override
+                    }
+
+                    @Override
                     public void onAnimationRepeat(Animator animation) {
-}
+                    }
                 });
                 animator.start();
-            }else{
+            } else {
                 animator.setInterpolator(new LinearInterpolator());
                 animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
@@ -474,127 +500,137 @@ ValueAnimator animator = ValueAnimator.ofInt(CommonUtils.dip2px(198), CommonUtil
                 animator.addListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animation) {
-}
-@Override
+                    }
+
+                    @Override
                     public void onAnimationEnd(Animator animation) {
                         animation.cancel();
                         mControllerLayout.setVisibility(View.GONE);
-                        LinearLayout.LayoutParams lp=(LinearLayout.LayoutParams)mProgressCircleImageView.getLayoutParams();
-                        lp.leftMargin=0;
-                        lp.width=CommonUtils.dip2px(40);
-                        lp.height=lp.width;
+                        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mProgressCircleImageView.getLayoutParams();
+                        lp.leftMargin = 0;
+                        lp.width = CommonUtils.dip2px(40);
+                        lp.height = lp.width;
                         mProgressCircleImageView.setLayoutParams(lp);
-                        mLayoutParams.x =CommonUtils.dip2px(10);
-                        mLayoutParams.width =CommonUtils.dip2px(40);
+                        mLayoutParams.x = CommonUtils.dip2px(10);
+                        mLayoutParams.width = CommonUtils.dip2px(40);
                         updateViewLayout();
-                        try{
-                            if(mAudioPlayer.getPlayerState()==IPlayer.started){
+                        try {
+                            if (mAudioPlayer.getPlayerState() == IPlayer.started) {
                                 Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
-                            }else{
+                            } else {
                                 Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
                             }
-                        }catch (RemoteException e){
-}
-}
-@Override
+                        } catch (RemoteException e) {
+                        }
+                    }
+
+                    @Override
                     public void onAnimationCancel(Animator animation) {
-}
-@Override
+                    }
+
+                    @Override
                     public void onAnimationRepeat(Animator animation) {
-}
+                    }
                 });
                 animator.start();
             }
-}
-}
-public void hideWindow() {
+        }
+    }
+
+    public void hideWindow() {
         if (mView != null) {
             mView.setVisibility(View.GONE);
         }
     }
-public boolean isVisible(){
+
+    public boolean isVisible() {
         if (mView != null) {
-            return mView.getVisibility()==View.VISIBLE;
+            return mView.getVisibility() == View.VISIBLE;
         }
         return false;
     }
-public void visibleWindow() {
+
+    public void visibleWindow() {
         if (mView != null) {
             mView.setVisibility(View.VISIBLE);
         }
     }
-public interface OnPermissionListener {
+
+    public interface OnPermissionListener {
         void showPermissionDialog();
     }
-@Subscribe(threadMode = ThreadMode.MAIN)
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void getEventBus(PlayerEvent event) {
         if (event.getEventName().equals("OnPrepared")) {
 //1.改变播放按钮的状态
             //2.获取进度时长并显示
             //2.设置定时器更新进度条
-            try{
+            try {
                 mProgressCircleImageView.setDuration(mAudioPlayer.getDuration());
                 mPlay.setImageResource(R.drawable.float_pause_icon);
-                if(mControllerLayout.getVisibility()==View.GONE){
+                if (mControllerLayout.getVisibility() == View.GONE) {
                     Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
                 }
                 startUpdateTimer();
-            }catch (RemoteException e){
-}
-} else if (event.getEventName().equals("OnTimerTick")) {
-} else if (event.getEventName().equals("OnTimerFinish")) {
-}else if (event.getEventName().equals("OnCompleted")) {
-            if(mControllerLayout.getVisibility()==View.GONE){
+            } catch (RemoteException e) {
+            }
+        } else if (event.getEventName().equals("OnTimerTick")) {
+        } else if (event.getEventName().equals("OnTimerFinish")) {
+        } else if (event.getEventName().equals("OnCompleted")) {
+            if (mControllerLayout.getVisibility() == View.GONE) {
                 Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
             }
             mPlay.setImageResource(R.drawable.float_play_icon);
-}else if (event.getEventName().equals("OnTimerCancel")) {
-}else if(event.getEventName().equals("OnPause")){
-try{
+        } else if (event.getEventName().equals("OnTimerCancel")) {
+        } else if (event.getEventName().equals("OnPause")) {
+            try {
                 mPlay.setImageResource(R.drawable.float_play_icon);
                 cancelUpdateTimer();
-                if(mControllerLayout.getVisibility()==View.GONE){
+                if (mControllerLayout.getVisibility() == View.GONE) {
                     Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
-                }else{
-                    String logo=mAudioPlayer.getCurrentAudio()!=null?mAudioPlayer.getCurrentAudio().getLogo():null;
-                    if(!TextUtils.isEmpty(logo)){
+                } else {
+                    String logo = mAudioPlayer.getCurrentAudio() != null ? mAudioPlayer.getCurrentAudio().getLogo() : null;
+                    if (!TextUtils.isEmpty(logo)) {
                         //mProgressCircleImageView.setDisableCircularTransformation(false);
                         Glide.with(mContext).load(logo).into(mProgressCircleImageView);
-                    }else{
+                    } else {
                         //mProgressCircleImageView.setDisableCircularTransformation(false);
-Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
-}
+                        Glide.with(mContext).load(R.drawable.player_static).into(mProgressCircleImageView);
+                    }
                 }
-            }catch (RemoteException e){
-}
-}else if(event.getEventName().equals("OnStart")){
-            try{
+            } catch (RemoteException e) {
+            }
+        } else if (event.getEventName().equals("OnStart")) {
+            try {
                 mProgressCircleImageView.setDuration(mAudioPlayer.getDuration());
                 mPlay.setImageResource(R.drawable.float_pause_icon);
-                if(mControllerLayout.getVisibility()==View.GONE){
+                if (mControllerLayout.getVisibility() == View.GONE) {
                     Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
-                }else{
-                    String logo=mAudioPlayer.getCurrentAudio()!=null?mAudioPlayer.getCurrentAudio().getLogo():null;
-                    if(!TextUtils.isEmpty(logo)){
+                } else {
+                    String logo = mAudioPlayer.getCurrentAudio() != null ? mAudioPlayer.getCurrentAudio().getLogo() : null;
+                    if (!TextUtils.isEmpty(logo)) {
                         //mProgressCircleImageView.setDisableCircularTransformation(false);
                         Glide.with(mContext).load(logo).into(mProgressCircleImageView);
-                    }else{
+                    } else {
                         //mProgressCircleImageView.setDisableCircularTransformation(false);
-Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
-}
-}
+                        Glide.with(mContext).load(R.drawable.player_dynamic).into(mProgressCircleImageView);
+                    }
+                }
                 startUpdateTimer();
-            }catch (RemoteException e){
-}
-}
+            } catch (RemoteException e) {
+            }
+        }
     }
-public void startUpdateTimer() {
-cancelUpdateTimer();
+
+    public void startUpdateTimer() {
+        cancelUpdateTimer();
         mTimer = new Timer();
         mUpdateTimerTask = new UpdateTimerTask();
         mTimer.schedule(mUpdateTimerTask, 0, 500);
     }
-public void cancelUpdateTimer() {
+
+    public void cancelUpdateTimer() {
         if (mTimer != null) {
             mTimer.cancel();
         }
@@ -602,7 +638,8 @@ public void cancelUpdateTimer() {
             mUpdateTimerTask.cancel();
         }
     }
-public class UpdateTimerTask extends TimerTask {
+
+    public class UpdateTimerTask extends TimerTask {
         @Override
         public void run() {
             try {
@@ -612,16 +649,16 @@ public class UpdateTimerTask extends TimerTask {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            try{
+                            try {
                                 mProgressCircleImageView.updateProgress(mAudioPlayer.getCurrentPosition());
-                            }catch (RemoteException e){
-}
-}
+                            } catch (RemoteException e) {
+                            }
+                        }
                     });
-}
-} catch (RemoteException e) {
+                }
+            } catch (RemoteException e) {
                 e.printStackTrace();
             }
-}
+        }
     }
 }

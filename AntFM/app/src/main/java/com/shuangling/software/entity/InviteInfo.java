@@ -4,17 +4,19 @@ public class InviteInfo {
 
 
     /**
-     * num : 3
-     * id : 1
-     * room_id : 425
-     * inviter_user_id : 1
-     * inviter : {"id":1,"nickname":"手动阀","phone":"18207406897","avatar":"https://sl-cdn.slradio.cn/ucenter/avatar/imges/kr137bdceP01yipw1584610030811.png"}
+     * num : 4
+     * id : 139
+     * room_id : 631
+     * inviter_user_id : 18072
+     * total_bonus : 100
+     * inviter : {"id":18072,"nickname":"匿名用户_A8ZSe","phone":"15343221240","avatar":""}
      */
 
     private int num;
     private int id;
     private int room_id;
     private int inviter_user_id;
+    private int total_bonus;
     private InviterBean inviter;
 
     public int getNum() {
@@ -49,6 +51,14 @@ public class InviteInfo {
         this.inviter_user_id = inviter_user_id;
     }
 
+    public int getTotal_bonus() {
+        return total_bonus;
+    }
+
+    public void setTotal_bonus(int total_bonus) {
+        this.total_bonus = total_bonus;
+    }
+
     public InviterBean getInviter() {
         return inviter;
     }
@@ -59,10 +69,10 @@ public class InviteInfo {
 
     public static class InviterBean {
         /**
-         * id : 1
-         * nickname : 手动阀
-         * phone : 18207406897
-         * avatar : https://sl-cdn.slradio.cn/ucenter/avatar/imges/kr137bdceP01yipw1584610030811.png
+         * id : 18072
+         * nickname : 匿名用户_A8ZSe
+         * phone : 15343221240
+         * avatar :
          */
 
         private int id;

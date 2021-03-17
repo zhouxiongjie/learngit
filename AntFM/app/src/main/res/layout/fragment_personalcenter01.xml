@@ -466,6 +466,35 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/scan"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+
+            <com.shuangling.software.customview.FontIconView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="&#xe75c;"
+                android:textColor="#181818"
+                android:textSize="@dimen/font_size_36px" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textColorTwo"
+                android:textSize="@dimen/font_size_26px"
+                android:layout_marginTop="15dp"
+                android:text="扫一扫" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/aboutUs"
             android:layout_width="0dp"
             android:layout_height="match_parent"

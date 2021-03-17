@@ -20,6 +20,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.zxing.activity.CaptureActivity;
 import com.hjq.toast.ToastUtils;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
@@ -67,11 +68,13 @@ import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
+import static android.app.Activity.RESULT_OK;
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
 public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragment*/ {
     public static final int MSG_UPDATE_STATUS = 0x01;
     public static final int MSG_GET_UPDATE_INFO = 0x2;
+    private final int REQUEST_CODE_SCAN = 1001;
     @BindView(R.id.headBg)
     SimpleDraweeView headBg;
     @BindView(R.id.head)
@@ -156,7 +159,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
         //unbinder.unbind();
     }
 
-    @OnClick({R.id.history, R.id.collect, R.id.subscribeNumber, R.id.userLayout, R.id.login, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet, R.id.award, R.id.aboutUs})
+    @OnClick({R.id.history,R.id.scan, R.id.collect, R.id.subscribeNumber, R.id.userLayout, R.id.login, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet, R.id.award, R.id.aboutUs})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.history:
@@ -166,6 +169,24 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
                     Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
+                break;
+            case R.id.scan:
+//跳到扫一扫页面
+                Intent intent = new Intent(getContext(), CaptureActivity.class);
+
+                /*ZxingConfig是配置类  可以设置是否显示底部布局，闪光灯，相册，是否播放提示音  震动等动能
+                 * 也可以不传这个参数
+                 * 不传的话  默认都为默认不震动  其他都为true
+                 * */
+
+                //ZxingConfig config = new ZxingConfig();
+                //config.setShowbottomLayout(true);//底部布局（包括闪光灯和相册）
+                //config.setPlayBeep(true);//是否播放提示音
+                //config.setShake(true);//是否震动
+                //config.setShowAlbum(true);//是否显示相册
+                //config.setShowFlashLight(true);//是否显示闪光灯
+                //intent.putExtra(Constant.INTENT_ZXING_CONFIG, config);
+                startActivityForResult(intent, REQUEST_CODE_SCAN);
                 break;
             case R.id.collect:
                 if (User.getInstance() != null) {
@@ -349,6 +370,18 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // 扫描二维码/条码回传
+        if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK) {
+            if (data != null) {
+                //key值都约束好了
+                String content = data.getStringExtra(CaptureActivity.INTENT_EXTRA_KEY_QR_SCAN);
+                ToastUtils.show(content);
+            }
         }
     }
 

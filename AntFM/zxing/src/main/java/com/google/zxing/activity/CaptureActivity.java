@@ -1,4 +1,5 @@
 package com.google.zxing.activity;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
@@ -22,8 +23,10 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
@@ -42,15 +45,19 @@ import com.google.zxing.view.ViewfinderView;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
+
+
 /**
  * Initial the camera
  *
  * @author Ryan.Tang
  */
 public class CaptureActivity extends AppCompatActivity implements Callback {
-private static final int REQUEST_CODE_SCAN_GALLERY = 100;
+
+    private static final int REQUEST_CODE_SCAN_GALLERY = 100;
     public static final int REQ_CODE = 156;
-private CaptureActivityHandler handler;
+
+    private CaptureActivityHandler handler;
     private ViewfinderView viewfinderView;
     private ImageView back;
     private boolean hasSurface;
@@ -87,10 +94,12 @@ private CaptureActivityHandler handler;
 //		cancelScanButton = (Button) this.findViewById(R.id.btn_cancel_scan);
         hasSurface = false;
         inactivityTimer = new InactivityTimer(this);
-//添加toolbar
+
+        //添加toolbar
 //        addToolbar();
     }
-private void addToolbar() {
+
+    private void addToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        ImageView more = (ImageView) findViewById(R.id.scanner_toolbar_more);
 //        assert more != null;
@@ -102,12 +111,14 @@ private void addToolbar() {
 //        });
         setSupportActionBar(toolbar);
     }
-@Override
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //getMenuInflater().inflate(R.menu.scanner_menu, menu);
         return true;
     }
-@Override
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 //        switch (item.getItemId()){
 //            case R.id.scan_local:
@@ -120,7 +131,8 @@ private void addToolbar() {
 //        }
         return super.onOptionsItemSelected(item);
     }
-@Override
+
+    @Override
     protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
         if (requestCode==RESULT_OK) {
             switch (requestCode) {
@@ -131,11 +143,13 @@ private void addToolbar() {
                         photo_path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
                     }
                     cursor.close();
-mProgress = new ProgressDialog(CaptureActivity.this);
+
+                    mProgress = new ProgressDialog(CaptureActivity.this);
                     mProgress.setMessage("正在扫描...");
                     mProgress.setCancelable(false);
                     mProgress.show();
-new Thread(new Runnable() {
+
+                    new Thread(new Runnable() {
                         @Override
                         public void run() {
                             Result result = scanningImage(photo_path);
@@ -151,7 +165,8 @@ new Thread(new Runnable() {
 //                                bundle.putParcelable("bitmap",result.get);
                                 resultIntent.putExtras(bundle);
                                 CaptureActivity.this.setResult(RESULT_OK, resultIntent);
-} else {
+
+                            } else {
                                 Message m = handler.obtainMessage();
                                 m.what = R.id.decode_failed;
                                 m.obj = "Scan failed!";
@@ -164,7 +179,8 @@ new Thread(new Runnable() {
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
-/**
+
+    /**
      * 扫描二维码图片的方法
      * @param path
      * @return
@@ -175,7 +191,8 @@ new Thread(new Runnable() {
         }
         Hashtable<DecodeHintType, String> hints = new Hashtable<>();
         hints.put(DecodeHintType.CHARACTER_SET, "UTF8"); //设置二维码内容的编码
-BitmapFactory.Options options = new BitmapFactory.Options();
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true; // 先获取原大小
         scanBitmap = BitmapFactory.decodeFile(path, options);
         options.inJustDecodeBounds = false; // 获取新的大小
@@ -199,7 +216,8 @@ BitmapFactory.Options options = new BitmapFactory.Options();
         }
         return null;
     }
-@Override
+
+    @Override
     protected void onResume() {
         super.onResume();
         SurfaceView surfaceView = (SurfaceView) findViewById(R.id.scanner_view);
@@ -212,14 +230,16 @@ BitmapFactory.Options options = new BitmapFactory.Options();
         }
         decodeFormats = null;
         characterSet = null;
-playBeep = true;
+
+        playBeep = true;
         AudioManager audioService = (AudioManager) getSystemService(AUDIO_SERVICE);
         if (audioService.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {
             playBeep = false;
         }
         initBeepSound();
         vibrate = true;
-//quit the scan view
+
+        //quit the scan view
 //		cancelScanButton.setOnClickListener(new OnClickListener() {
 //
 //			@Override
@@ -228,7 +248,8 @@ playBeep = true;
 //			}
 //		});
     }
-@Override
+
+    @Override
     protected void onPause() {
         super.onPause();
         if (handler != null) {
@@ -237,12 +258,14 @@ playBeep = true;
         }
         CameraManager.get().closeDriver();
     }
-@Override
+
+    @Override
     protected void onDestroy() {
         inactivityTimer.shutdown();
         super.onDestroy();
     }
-/**
+
+    /**
      * Handler scan result
      *
      * @param result
@@ -268,7 +291,8 @@ playBeep = true;
         }
         CaptureActivity.this.finish();
     }
-private void initCamera(SurfaceHolder surfaceHolder) {
+
+    private void initCamera(SurfaceHolder surfaceHolder) {
         try {
             CameraManager.get().openDriver(surfaceHolder);
         } catch (IOException ioe) {
@@ -281,31 +305,42 @@ private void initCamera(SurfaceHolder surfaceHolder) {
                     characterSet);
         }
     }
-@Override
+
+    @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width,
                                int height) {
-}
-@Override
+
+    }
+
+    @Override
     public void surfaceCreated(SurfaceHolder holder) {
         if (!hasSurface) {
             hasSurface = true;
             initCamera(holder);
         }
-}
-@Override
+
+    }
+
+    @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         hasSurface = false;
-}
-public ViewfinderView getViewfinderView() {
+
+    }
+
+    public ViewfinderView getViewfinderView() {
         return viewfinderView;
     }
-public Handler getHandler() {
+
+    public Handler getHandler() {
         return handler;
     }
-public void drawViewfinder() {
+
+    public void drawViewfinder() {
         viewfinderView.drawViewfinder();
-}
-private void initBeepSound() {
+
+    }
+
+    private void initBeepSound() {
         if (playBeep && mediaPlayer == null) {
             // The volume on STREAM_SYSTEM is not adjustable, and users found it
             // too loud,
@@ -314,7 +349,8 @@ private void initBeepSound() {
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.setOnCompletionListener(beepListener);
-AssetFileDescriptor file = getResources().openRawResourceFd(
+
+            AssetFileDescriptor file = getResources().openRawResourceFd(
                     R.raw.beep);
             try {
                 mediaPlayer.setDataSource(file.getFileDescriptor(),
@@ -327,8 +363,10 @@ AssetFileDescriptor file = getResources().openRawResourceFd(
             }
         }
     }
-private static final long VIBRATE_DURATION = 200L;
-private void playBeepSoundAndVibrate() {
+
+    private static final long VIBRATE_DURATION = 200L;
+
+    private void playBeepSoundAndVibrate() {
         if (playBeep && mediaPlayer != null) {
             mediaPlayer.start();
         }
@@ -337,7 +375,8 @@ private void playBeepSoundAndVibrate() {
             vibrator.vibrate(VIBRATE_DURATION);
         }
     }
-/**
+
+    /**
      * When the beep has finished playing, rewind to queue up another one.
      */
     private final OnCompletionListener beepListener = new OnCompletionListener() {
@@ -346,4 +385,5 @@ private void playBeepSoundAndVibrate() {
             mediaPlayer.seekTo(0);
         }
     };
+
 }

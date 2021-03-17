@@ -52,7 +52,6 @@ import com.shuangling.software.utils.MyImageLoader;
 import com.shuangling.software.utils.MyToastStyle;
 import com.shuangling.software.utils.PreloadWebView;
 import com.shuangling.software.utils.ServerInfo;
-//import com.tencent.smtt.sdk.QbSdk;
 import com.youngfeng.snake.Snake;
 
 import java.io.IOException;
@@ -60,8 +59,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import io.alterac.blurkit.BlurKit;
 import io.sentry.Sentry;
 import io.sentry.android.AndroidSentryClientFactory;
 import okhttp3.Call;
@@ -124,7 +121,7 @@ public class MyApplication extends MultiDexApplication {
         sInstance = this;
 
         QNRTCEnv.setLogLevel(QNLogLevel.INFO);
-        BlurKit.init(this);
+        //BlurKit.init(this);
         /*
          * init must be called before any other func
          */

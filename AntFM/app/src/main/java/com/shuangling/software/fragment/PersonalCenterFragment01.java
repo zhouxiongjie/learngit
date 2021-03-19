@@ -42,6 +42,7 @@ import com.shuangling.software.activity.MessageListActivity;
 import com.shuangling.software.activity.ModifyUserInfoActivity;
 import com.shuangling.software.activity.MyWalletsActivity;
 import com.shuangling.software.activity.NewLoginActivity;
+import com.shuangling.software.activity.ScanResultActivity;
 import com.shuangling.software.activity.SettingActivity;
 import com.shuangling.software.activity.SubscribeActivity;
 import com.shuangling.software.activity.WebViewBackActivity;
@@ -380,7 +381,11 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
             if (data != null) {
                 //key值都约束好了
                 String content = data.getStringExtra(CaptureActivity.INTENT_EXTRA_KEY_QR_SCAN);
-                ToastUtils.show(content);
+                Intent it=new Intent(getContext(), ScanResultActivity.class);
+                it.putExtra("value",content);
+                startActivity(it);
+
+                //ToastUtils.show(content);
             }
         }
     }

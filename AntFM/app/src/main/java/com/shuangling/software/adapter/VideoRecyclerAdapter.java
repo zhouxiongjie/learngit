@@ -111,7 +111,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
     }
 
     public interface OnPraiseVideo {
-        void praiseVideo();
+        void praiseVideo(View v);
     }
 
     public interface OnCollectVideo {
@@ -206,7 +206,7 @@ public class VideoRecyclerAdapter extends RecyclerView.Adapter implements View.O
                     @Override
                     public void onClick(View v) {
                         if (mOnPraiseVideo != null) {
-                            mOnPraiseVideo.praiseVideo();
+                            mOnPraiseVideo.praiseVideo(v);
                         }
                     }
                 });

@@ -216,25 +216,6 @@ public class RadioDetailActivity extends /*AppCompatActivity*/QMUIActivity imple
                             showShare(platform, mRadioDetail.getChannel().getName(), mRadioDetail.getChannel().getDes(), mRadioDetail.getChannel().getLogo(), url);
                         }
 
-                        @Override
-                        public void poster() {
-                        }
-
-                        @Override
-                        public void report() {
-                        }
-
-                        @Override
-                        public void copyLink() {
-                        }
-
-                        @Override
-                        public void refresh() {
-                        }
-
-                        @Override
-                        public void collectContent() {
-                        }
                     });
                     dialog.show(getSupportFragmentManager(), "ShareDialog");
 //shareTest();

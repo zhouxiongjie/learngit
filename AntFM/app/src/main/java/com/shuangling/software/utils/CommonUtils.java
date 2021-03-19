@@ -1391,6 +1391,103 @@ public class CommonUtils {
         }
     }
 
+
+    public static boolean isInlink(String url) {
+        boolean isInlink=false;
+        if (url.startsWith(ServerInfo.h5IP + "/tv") || url.startsWith(ServerInfo.h5HttpsIP + "/tv")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/lives/") || url.startsWith(ServerInfo.h5HttpsIP + "/lives/")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/radios/") || url.startsWith(ServerInfo.h5HttpsIP + "/radios/")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/radios") || url.startsWith(ServerInfo.h5HttpsIP + "/radios")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/gover") || url.startsWith(ServerInfo.h5HttpsIP + "/gover")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/dj") || url.startsWith(ServerInfo.h5HttpsIP + "/dj")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/interact") || url.startsWith(ServerInfo.h5HttpsIP + "/interact")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/guide") || url.startsWith(ServerInfo.h5HttpsIP + "/guide")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/cates/") || url.startsWith(ServerInfo.h5HttpsIP + "/cates/")) {
+            //跳转栏目
+            isInlink=true;
+
+        } else if (url.startsWith(ServerInfo.h5IP + "/specials") || url.startsWith(ServerInfo.h5HttpsIP + "/specials")) {
+            isInlink=true;
+
+        } else if (url.startsWith(ServerInfo.h5IP + "/orgs/") || url.startsWith(ServerInfo.h5HttpsIP + "/orgs/")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/anchors/") || url.startsWith(ServerInfo.h5HttpsIP + "/anchors/")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/atlas/") || url.startsWith(ServerInfo.h5HttpsIP + "/atlas/")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/albums/") || url.startsWith(ServerInfo.h5HttpsIP + "/albums/")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/audios/") || url.startsWith(ServerInfo.h5HttpsIP + "/audios/")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/posts/") || url.startsWith(ServerInfo.h5HttpsIP + "/posts/")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/specials/") || url.startsWith(ServerInfo.h5HttpsIP + "/specials/")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/videos/") || url.startsWith(ServerInfo.h5HttpsIP + "/videos/")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/subcates/") || url.startsWith(ServerInfo.h5IP + "/subcates/")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.scs + "/broke-create")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/invitation-post") || url.startsWith(ServerInfo.h5HttpsIP + "/invitation-post")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/actrank") || url.startsWith(ServerInfo.h5HttpsIP + "/actrank")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/wish") || url.startsWith(ServerInfo.h5HttpsIP + "/wish")) {
+            isInlink=true;
+        } else if (url.startsWith(ServerInfo.h5IP + "/actlist") || url.startsWith(ServerInfo.h5HttpsIP + "/actlist")||url.startsWith(ServerInfo.activity)) {
+            isInlink=true;
+        }else if (url.startsWith(ServerInfo.mlive + "/index?stream_name=") || url.startsWith(ServerInfo.mlives + "/index?stream_name=")) {
+
+            String streamName="";
+            String showMode="";
+            String type="";
+            String roomId="";
+            String[] str=url.split("\\?");
+            if(str.length==2){
+                String sufixStr=str[1];
+                str=sufixStr.split("&");
+                for(int i=0;i<str.length;i++){
+                    sufixStr=str[i];
+                    String[] keyvalue=sufixStr.split("=");
+                    if(keyvalue.length==2){
+                        if(keyvalue[0].equals("stream_name")){
+                            streamName=keyvalue[1];
+                        }else if(keyvalue[0].equals("show_mode")){
+                            showMode=keyvalue[1];
+                        }else if(keyvalue[0].equals("type")){
+                            type=keyvalue[1];
+                        }else if(keyvalue[0].equals("room_id")){
+                            roomId=keyvalue[1];
+                        }
+                    }
+                }
+            }
+
+            if(!TextUtils.isEmpty(streamName)&&!TextUtils.isEmpty(showMode)&&!TextUtils.isEmpty(type)&&!TextUtils.isEmpty(roomId)) {
+                if (type.equals("1") || type.equals("4")) {
+                    if (showMode.equals("2") || showMode.equals("3")) {
+                        isInlink=true;
+
+                    } else {
+                        isInlink=true;
+                    }
+                }
+            }
+
+
+        }
+        return isInlink;
+    }
+
     public static void downloadPic(Context context,final String downloadUrl) {
         String[] preFix = downloadUrl.split("/");
         String fileName = preFix[preFix.length-1];

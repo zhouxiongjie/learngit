@@ -45,6 +45,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.apsara.alivclittlevideo.utils.BitmapProviderFactory;
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.ViewSkeletonScreen;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -90,6 +91,7 @@ import com.shuangling.software.utils.PreloadWebView;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.shuangling.software.utils.TimeUtil;
+import com.sum.slike.SuperLikeLayout;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import org.greenrobot.eventbus.EventBus;
@@ -102,6 +104,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -185,6 +188,8 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     RelativeLayout networkError;
     @BindView(R.id.fl)
     FrameLayout fl;
+    @BindView(R.id.super_like_layout)
+    SuperLikeLayout superLikeLayout;
     private boolean showMerchant = false;
     private Handler mHandler;
     private int mArticleId;
@@ -202,6 +207,10 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     private boolean isPlaying = false;
     private int mScrollY;
     private int firstItem;
+
+    private long lastClickTime;
+
+    HashMap<Integer, Long> lastClickTimeMap = new LinkedHashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -267,6 +276,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
     }
 
     private void init() {
+        superLikeLayout.setProvider(BitmapProviderFactory.getHDProvider(this));
         if (mViewSkeletonScreen == null) {
             mViewSkeletonScreen = Skeleton.bind(fl)//骨骼图
                     .load(R.layout.skeleton_article_detail)
@@ -288,6 +298,11 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
             if (mArticle != null) {
                 ShareDialog dialog = ShareDialog.getInstance(mArticle.getIs_collection() != 0, mArticle.getIs_user_report() != 0);
                 dialog.setIsShowPosterButton(true);
+                dialog.setIsShowReport(true);
+                dialog.setIsShowCopyLink(true);
+                dialog.setIsShowFontSize(true);
+                dialog.setIsShowRefresh(true);
+                dialog.setIsShowCollect(true);
                 dialog.setShareHandler(new ShareDialog.ShareHandler() {
                     @Override
                     public void onShare(String platform) {//分享至微信/QQ等
@@ -811,32 +826,59 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                                     it.putExtra("jump_url", ServerInfo.h5IP + ServerInfo.getArticlePage + mArticleId);
                                     startActivityForResult(it, REQUEST_LOGIN);
                                 } else {
-                                    if(mArticle.getIs_likes() == 0){
-                                        int num=mArticle.getLike();
-                                        num++;
-                                        like(true);
-                                        mArticle.setIs_likes(1);
-                                        mHeadViewHolder.praiseSum.setText(""+num);
-                                        mHeadViewHolder.praiseSum.setActivated(false);
-                                        //ToastUtils.show(jsonObject.getString("msg"));
-                                        mArticle.setLike(num);
+                                    Long lastTime = lastClickTime;
+                                    if(lastTime == null || System.currentTimeMillis() - lastClickTime> 1000){ // 防抖
+                                        if (mArticle.getIs_likes() == 0) {
+                                            int num = mArticle.getLike();
+                                            num++;
+                                            like(true);
+                                            mArticle.setIs_likes(1);
+                                            mHeadViewHolder.praiseSum.setText("" + num);
+                                            mHeadViewHolder.praiseSum.setActivated(false);
+                                            //ToastUtils.show(jsonObject.getString("msg"));
+                                            mArticle.setLike(num);
 
+
+                                        } else {
+                                            int num = mArticle.getLike();
+                                            num--;
+                                            like(false);
+                                            mArticle.setIs_likes(0);
+                                            mHeadViewHolder.praiseSum.setText("" + num);
+                                            mHeadViewHolder.praiseSum.setActivated(true);
+                                            //ToastUtils.show(jsonObject.getString("msg"));
+                                            mArticle.setLike(num);
+
+
+                                            like(false);
+                                        }
 
                                     }else{
-                                        int num=mArticle.getLike();
-                                        num--;
-                                        like(false);
-                                        mArticle.setIs_likes(0);
-                                        mHeadViewHolder.praiseSum.setText(""+num);
-                                        mHeadViewHolder.praiseSum.setActivated(true);
-                                        //ToastUtils.show(jsonObject.getString("msg"));
-                                        mArticle.setLike(num);
-
-
-                                        like(false);
+                                        if(mArticle.getIs_likes()==1){
+                                            int[] itemPosition = new int[2];
+                                            int[] superLikePosition = new int[2];
+                                            v.getLocationOnScreen(itemPosition);
+                                            superLikeLayout.getLocationOnScreen(superLikePosition);
+                                            int x = itemPosition[0] + v.getWidth() / 2;
+                                            int y = (itemPosition[1] - superLikePosition[1]) + v.getHeight() / 2;
+                                            superLikeLayout.launch(x, y);
+                                        }else{
+                                            int num = mArticle.getLike();
+                                            num++;
+                                            like(true);
+                                            mArticle.setIs_likes(1);
+                                            mHeadViewHolder.praiseSum.setText("" + num);
+                                            mHeadViewHolder.praiseSum.setActivated(false);
+                                            //ToastUtils.show(jsonObject.getString("msg"));
+                                            mArticle.setLike(num);
+                                        }
                                     }
+                                    lastClickTime= System.currentTimeMillis();
 
-                                    like(mArticle.getIs_likes() == 0);//点赞/取消赞
+
+
+
+                                    //like(mArticle.getIs_likes() == 0);//点赞/取消赞
 
 
                                 }
@@ -997,7 +1039,28 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         @Override
                         public void praiseItem(Comment comment, View v) {
                             if (User.getInstance() != null) {
-                                praise(String.valueOf(comment.getId()), v);
+
+                                Long lastClickTime = lastClickTimeMap.get(comment.getId());
+                                if(lastClickTime == null || System.currentTimeMillis() - lastClickTime> 1000) { // 防抖
+
+                                    praise(String.valueOf(comment.getId()), v);
+
+                                }else{
+                                    if(!v.isActivated()){
+                                        int[] itemPosition = new int[2];
+                                        int[] superLikePosition = new int[2];
+                                        v.getLocationOnScreen(itemPosition);
+                                        superLikeLayout.getLocationOnScreen(superLikePosition);
+                                        int x = itemPosition[0] + v.getWidth() / 2;
+                                        int y = (itemPosition[1] - superLikePosition[1]) + v.getHeight() / 2;
+                                        superLikeLayout.launch(x, y);
+                                    } else {
+                                        praise(String.valueOf(comment.getId()), v);
+                                    }
+                                }
+                                lastClickTimeMap.put(comment.getId(), System.currentTimeMillis());
+
+
                             } else {
                                 //startActivityForResult(new Intent(ArticleDetailActivity02.this, NewLoginActivity.class), REQUEST_LOGIN);
                                 Intent it = new Intent(ArticleDetailActivity02.this, NewLoginActivity.class);

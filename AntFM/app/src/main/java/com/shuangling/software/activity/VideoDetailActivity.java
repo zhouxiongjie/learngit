@@ -1,9 +1,6 @@
 package com.shuangling.software.activity;
 
 import android.app.Activity;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
@@ -34,9 +31,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.apsara.alivclittlevideo.utils.BitmapProviderFactory;
 import com.aliyun.player.IPlayer;
 import com.aliyun.player.source.VidAuth;
-import com.aliyun.vodplayerview.activity.AliyunPlayerSkinActivity;
 import com.aliyun.vodplayerview.utils.ScreenUtils;
 import com.aliyun.vodplayerview.widget.AliyunVodPlayerView;
 import com.ethanhua.skeleton.Skeleton;
@@ -79,10 +76,12 @@ import com.shuangling.software.utils.ImageLoader;
 import com.shuangling.software.utils.ServerInfo;
 import com.shuangling.software.utils.SharedPreferencesUtils;
 import com.shuangling.software.utils.TimeUtil;
+import com.sum.slike.SuperLikeLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -155,6 +154,8 @@ public class VideoDetailActivity extends BaseAudioActivity2 implements Handler.C
     RelativeLayout networkError;
     @BindView(R.id.root)
     RelativeLayout root;
+    @BindView(R.id.super_like_layout)
+    SuperLikeLayout superLikeLayout;
     private Handler mHandler;
     private int mVideoId;
     private VideoDetail mVideoDetail;
@@ -172,7 +173,9 @@ public class VideoDetailActivity extends BaseAudioActivity2 implements Handler.C
     private int currentPage = 1;
     private Comment currentComment;
     private ViewSkeletonScreen mViewSkeletonScreen;
+    private long lastClickTime;
 
+    HashMap<Integer, Long> lastClickTimeMap = new LinkedHashMap<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setmOnServiceConnectionListener(new OnServiceConnectionListener() {
@@ -214,6 +217,7 @@ public class VideoDetailActivity extends BaseAudioActivity2 implements Handler.C
     }
 
     private void init() {
+        superLikeLayout.setProvider(BitmapProviderFactory.getHDProvider(this));
         mViewSkeletonScreen = Skeleton.bind(root)
                 .load(R.layout.skeleton_video_detail)
                 .shimmer(false)
@@ -736,33 +740,50 @@ public class VideoDetailActivity extends BaseAudioActivity2 implements Handler.C
                             mAdapter.setVideoDetail(mVideoDetail);
                             mAdapter.setOnPraiseVideo(new VideoRecyclerAdapter.OnPraiseVideo() {
                                 @Override
-                                public void praiseVideo() {
+                                public void praiseVideo(View v) {
                                     if (User.getInstance() == null) {
                                         Intent it = new Intent(VideoDetailActivity.this, NewLoginActivity.class);
                                         it.putExtra("jump_url", ServerInfo.h5IP + "/videos/" + mVideoId);
                                         startActivityForResult(it, REQUEST_LOGIN);
                                     } else {
-                                        if (mVideoDetail.getIs_likes() == 0) {
-                                            int num=mVideoDetail.getLike();
-                                            num++;
-                                            like(true);
+                                        Long lastTime = lastClickTime;
+                                        if (lastTime == null || System.currentTimeMillis() - lastClickTime > 1000) { // 防抖
 
-                                            mVideoDetail.setLike(num);
-                                            mVideoDetail.setIs_likes(1);
-                                            mAdapter.setVideoDetail(mVideoDetail);
-
-
-                                        } else {
-
-                                            int num=mVideoDetail.getLike();
-                                            num--;
-                                            like(false);
-
-                                            mVideoDetail.setLike(num);
-                                            mVideoDetail.setIs_likes(0);
-                                            mAdapter.setVideoDetail(mVideoDetail);
-
+                                            if (mVideoDetail.getIs_likes() == 0) {
+                                                int num = mVideoDetail.getLike();
+                                                num++;
+                                                like(true);
+                                                mVideoDetail.setLike(num);
+                                                mVideoDetail.setIs_likes(1);
+                                                mAdapter.setVideoDetail(mVideoDetail);
+                                            } else {
+                                                int num = mVideoDetail.getLike();
+                                                num--;
+                                                like(false);
+                                                mVideoDetail.setLike(num);
+                                                mVideoDetail.setIs_likes(0);
+                                                mAdapter.setVideoDetail(mVideoDetail);
+                                            }
+                                        }else {
+                                            if (mVideoDetail.getIs_likes() == 1) {
+                                                int[] itemPosition = new int[2];
+                                                int[] superLikePosition = new int[2];
+                                                v.getLocationOnScreen(itemPosition);
+                                                superLikeLayout.getLocationOnScreen(superLikePosition);
+                                                int x = itemPosition[0] + v.getWidth() / 2;
+                                                int y = (itemPosition[1] - superLikePosition[1]) + v.getHeight() / 2;
+                                                superLikeLayout.launch(x, y);
+                                            }else{
+                                                int num = mVideoDetail.getLike();
+                                                num++;
+                                                like(true);
+                                                mVideoDetail.setLike(num);
+                                                mVideoDetail.setIs_likes(1);
+                                                mAdapter.setVideoDetail(mVideoDetail);
+                                            }
                                         }
+                                        lastClickTime = System.currentTimeMillis();
+
                                     }
                                 }
                             });
@@ -972,7 +993,29 @@ public class VideoDetailActivity extends BaseAudioActivity2 implements Handler.C
                             @Override
                             public void praiseItem(Comment comment, View view) {
                                 if (User.getInstance() != null) {
-                                    praise(comment, view);
+
+                                    Long lastClickTime = lastClickTimeMap.get(comment.getId());
+                                    if(lastClickTime == null || System.currentTimeMillis() - lastClickTime> 1000) { // 防抖
+
+                                        praise(comment, view);
+
+                                    }else{
+                                        if(!view.isActivated()){
+                                            int[] itemPosition = new int[2];
+                                            int[] superLikePosition = new int[2];
+                                            view.getLocationOnScreen(itemPosition);
+                                            superLikeLayout.getLocationOnScreen(superLikePosition);
+                                            int x = itemPosition[0] + view.getWidth() / 2;
+                                            int y = (itemPosition[1] - superLikePosition[1]) + view.getHeight() / 2;
+                                            superLikeLayout.launch(x, y);
+                                        } else {
+                                            praise(comment, view);
+                                        }
+                                    }
+                                    lastClickTimeMap.put(comment.getId(), System.currentTimeMillis());
+
+
+
                                 } else {
 //                                    Intent it = new Intent(VideoDetailActivity.this, NewLoginActivity.class);
 //                                    startActivityForResult(it, REQUEST_LOGIN);
@@ -1344,22 +1387,14 @@ public class VideoDetailActivity extends BaseAudioActivity2 implements Handler.C
 
     private void showShareDialog(final String title, final String desc, final String logo, final String url) {
         ShareDialog dialog = ShareDialog.getInstance(false, mVideoDetail.getIs_user_report() == 0 ? false : true);
-        dialog.setIsHideSecondGroup(false);
-        dialog.setIsShowPosterButton(false);
         dialog.setIsShowReport(true);
-        dialog.setIsShowCollect(false);
-        dialog.setIsShowCopyLink(false);
-        dialog.setIsShowFontSize(false);
-        dialog.setIsShowRefresh(false);
+
         dialog.setShareHandler(new ShareDialog.ShareHandler() {
             @Override
             public void onShare(String platform) {
                 showShare(platform, title, desc, logo, url);
             }
 
-            @Override
-            public void poster() {
-            }
 
             @Override
             public void report() {
@@ -1373,24 +1408,7 @@ public class VideoDetailActivity extends BaseAudioActivity2 implements Handler.C
                 }
             }
 
-            @Override
-            public void copyLink() {
-//获取剪贴板管理器：
-                ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                // 创建普通字符型ClipData
-                ClipData clipData = ClipData.newPlainText("Label", url);
-                // 将ClipData内容放到系统剪贴板里。
-                cm.setPrimaryClip(clipData);
-                ToastUtils.show("复制成功，可以发给朋友们了。");
-            }
 
-            @Override
-            public void refresh() {
-            }
-
-            @Override
-            public void collectContent() {
-            }
         });
         dialog.show(getSupportFragmentManager(), "ShareDialog");
     }

@@ -179,159 +179,6 @@
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
 
-    <!-- <android.support.v4.widget.NestedScrollView-->
-    <!--android:id="@+id/scrollView"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_below="@+id/organizationLayout"-->
-    <!--android:layout_above="@+id/bottom">-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:descendantFocusability="blocksDescendants"-->
-    <!--android:orientation="vertical">-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:orientation="vertical"-->
-
-    <!--android:padding="10dp">-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/videoTitle"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="视频名称视频名称视频名称视频名称"-->
-    <!--android:textColor="@color/textColorTwo"-->
-    <!--android:textSize="@dimen/font_size_34px"-->
-    <!--android:textStyle="bold"/>-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/playTimes"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="25万次播放"-->
-    <!--android:textColor="@color/textColorSeven"-->
-    <!--android:textSize="@dimen/font_size_22px" />-->
-
-    <!--</LinearLayout>-->
-
-    <!--<LinearLayout-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="center_horizontal"-->
-    <!--android:orientation="horizontal">-->
-
-    <!--<LinearLayout-->
-    <!--android:id="@+id/praiseLayout"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:background="@drawable/praise_and_collect_bg"-->
-    <!--android:orientation="horizontal">-->
-
-    <!--<com.shuangling.software.customview.FontIconView-->
-    <!--android:id="@+id/praiseIcon"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="center_vertical"-->
-    <!--android:text="&#xe617;"-->
-    <!--android:textColor="@color/main_bottom_text_selector"-->
-    <!--android:textSize="@dimen/font_size_50px" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/praise"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="center_vertical"-->
-    <!--android:layout_marginStart="15dp"-->
-    <!--android:text="666" />-->
-    <!--</LinearLayout>-->
-
-    <!--<LinearLayout-->
-    <!--android:id="@+id/collectLayout"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginStart="40dp"-->
-    <!--android:background="@drawable/praise_and_collect_bg"-->
-    <!--android:orientation="horizontal">-->
-
-    <!--<com.shuangling.software.customview.FontIconView-->
-    <!--android:id="@+id/collectIcon"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="center_vertical"-->
-    <!--android:text="&#xe62e;"-->
-    <!--android:textColor="@color/main_bottom_text_selector"-->
-    <!--android:textSize="@dimen/font_size_50px" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/collectText"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="center_vertical"-->
-    <!--android:layout_marginStart="15dp"-->
-    <!--android:text="666" />-->
-    <!--</LinearLayout>-->
-
-    <!--</LinearLayout>-->
-
-    <!--<com.shuangling.software.customview.MyRecyclerView-->
-    <!--android:id="@+id/recommend"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_marginTop="20dp"-->
-    <!--android:nestedScrollingEnabled="false" />-->
-
-    <!--<ImageView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="6dp"-->
-    <!--android:background="@color/divideColorTwo" />-->
-
-
-    <!--<LinearLayout-->
-    <!--android:id="@+id/commentLayout"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:orientation="horizontal"-->
-    <!--android:padding="10dp">-->
-
-
-    <!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_centerVertical="true"-->
-    <!--android:text="全部评论"-->
-    <!--android:textColor="@color/black"-->
-    <!--android:textSize="@dimen/font_size_36px"-->
-    <!--android:textStyle="bold" />-->
-
-    <!--<TextView-->
-    <!--android:id="@+id/commentNum"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_centerVertical="true"-->
-    <!--android:text="(12)"-->
-    <!--android:textColor="@color/black"-->
-    <!--android:textSize="@dimen/font_size_36px"-->
-    <!--android:textStyle="bold" />-->
-
-    <!--</LinearLayout>-->
-
-
-    <!--<com.shuangling.software.customview.MyListView-->
-    <!--android:id="@+id/listView"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:divider="@drawable/recycleview_divider_drawable"-->
-    <!--android:nestedScrollingEnabled="false">-->
-
-    <!--</com.shuangling.software.customview.MyListView>-->
-
-    <!--</LinearLayout>-->
-    <!--</android.support.v4.widget.NestedScrollView>-->
-
 
     <LinearLayout
         android:id="@+id/bottom"
@@ -440,6 +287,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/activity_title" />
+
+    <com.sum.slike.SuperLikeLayout
+        android:id="@+id/super_like_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
 
 </RelativeLayout>
 

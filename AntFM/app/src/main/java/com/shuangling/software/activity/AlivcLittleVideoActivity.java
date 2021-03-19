@@ -51,6 +51,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -106,6 +107,8 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
     //评论框
     SmallVideoCommentContentBottomDialog mSmallVideoCommentContentBottomDialog;
     CommentDialog mCommentDialog;
+
+    HashMap<Integer, Long> lastClickTimeMap = new LinkedHashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,28 +172,55 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                 ColumnContent columnContent = mColumnContents.get(position);
                 LittleVideoListAdapter.MyHolder holder = videoPlayView.getPlayPager();
                 if (holder != null) {
+
+
                     String likes = holder.getmTvLikes().getText() + "";
                     int nLikes = 0;
                     if (!likes.equals("点赞")) {
                         nLikes = Integer.parseInt(likes);
                     }
-                    if (columnContent.getIs_like() == 1) {
-                        holder.getmFivPrase().setTextColor(Color.parseColor("#ffffff"));
-                        praise(position, false);
-                        nLikes--;
-                        if (nLikes <= 0) {
-                            holder.getmTvLikes().setText("点赞");
+                    Long lastClickTime = lastClickTimeMap.get(position);
+                    if(lastClickTime == null || System.currentTimeMillis() - lastClickTime> 1000) { // 防抖
+                        if (columnContent.getIs_like() == 1) {
+                            holder.getmFivPrase().setTextColor(Color.parseColor("#ffffff"));
+                            praise(position, false);
+                            nLikes--;
+                            if (nLikes <= 0) {
+                                holder.getmTvLikes().setText("点赞");
+                            } else {
+                                holder.getmTvLikes().setText("" + nLikes);
+                            }
+                            columnContent.setIs_like(0);
                         } else {
+                            holder.getmFivPrase().setTextColor(Color.parseColor("#F54C68"));
+                            praise(position, true);
+                            nLikes++;
                             holder.getmTvLikes().setText("" + nLikes);
+                            columnContent.setIs_like(1);
                         }
-                        columnContent.setIs_like(0);
-                    } else {
-                        holder.getmFivPrase().setTextColor(Color.parseColor("#F54C68"));
-                        praise(position, true);
-                        nLikes++;
-                        holder.getmTvLikes().setText("" + nLikes);
-                        columnContent.setIs_like(1);
+
+                    }else{
+                        if(columnContent.getIs_like() == 1){
+                            int[] itemPosition = new int[2];
+                            int[] superLikePosition = new int[2];
+                            holder.getmFivPrase().getLocationOnScreen(itemPosition);
+                            holder.getSuperLikeLayout().getLocationOnScreen(superLikePosition);
+                            int x = itemPosition[0] + holder.getmFivPrase().getWidth() / 2;
+                            int y = (itemPosition[1] - superLikePosition[1]) + holder.getmFivPrase().getHeight() / 2;
+                            holder.getSuperLikeLayout().launch(x, y);
+                        }else{
+                            holder.getmFivPrase().setTextColor(Color.parseColor("#F54C68"));
+                            praise(position, true);
+                            nLikes++;
+                            holder.getmTvLikes().setText("" + nLikes);
+                            columnContent.setIs_like(1);
+                        }
                     }
+                    lastClickTimeMap.put(position, System.currentTimeMillis());
+
+
+
+
                 }
             }
 
@@ -296,6 +326,7 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_LOGIN && resultCode == RESULT_OK) {
             getVideoDetail(mVideoPosition);
         } else if (requestCode == REQUEST_REPORT && resultCode == Activity.RESULT_OK) {
@@ -844,23 +875,15 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
 //<editor-fold desc="Function">
     private void showShareDialog(final String title, final String desc, final String logo, final String url, int is_user_report) {
         ShareDialog dialog = ShareDialog.getInstance(false, is_user_report == 1);
-        dialog.setIsShowPosterButton(false);
-        dialog.setIsHideSecondGroup(false);
-        dialog.setIsShowPosterButton(false);
+
         dialog.setIsShowReport(true);
-        dialog.setIsShowCollect(false);
-        dialog.setIsShowCopyLink(false);
-        dialog.setIsShowFontSize(false);
-        dialog.setIsShowRefresh(false);
+        dialog.setIsShowCopyLink(true);
         dialog.setShareHandler(new ShareDialog.ShareHandler() {
             @Override
             public void onShare(String platform) {
                 showShare(platform, title, desc, logo, url);
             }
 
-            @Override
-            public void poster() {
-            }
 
             @Override
             public void report() {
@@ -887,13 +910,6 @@ public class AlivcLittleVideoActivity extends AppCompatActivity {
                 ToastUtils.show("复制成功，可以发给朋友们了。");
             }
 
-            @Override
-            public void refresh() {
-            }
-
-            @Override
-            public void collectContent() {
-            }
         });
         dialog.show(getSupportFragmentManager(), "ShareDialog");
     }

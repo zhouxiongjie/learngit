@@ -105,13 +105,7 @@ public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Ca
         activityTitle.addRightImageButton(R.drawable.ic_more, com.qmuiteam.qmui.R.id.right_icon).setOnClickListener(view -> {//
             if (mAlbum != null) {
                 ShareDialog dialog = ShareDialog.getInstance(false, mAlbum.getIs_user_report() != 0);
-                dialog.setIsHideSecondGroup(false);
-                dialog.setIsShowPosterButton(false);
                 dialog.setIsShowReport(true);
-                dialog.setIsShowCollect(false);
-                dialog.setIsShowCopyLink(false);
-                dialog.setIsShowFontSize(false);
-                dialog.setIsShowRefresh(false);
                 dialog.setShareHandler(new ShareDialog.ShareHandler() {
                     @Override
                     public void onShare(String platform) {
@@ -126,9 +120,6 @@ public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Ca
                         }
                     }
 
-                    @Override
-                    public void poster() {
-                    }
 
                     @Override
                     public void report() {
@@ -142,17 +133,7 @@ public class AlbumDetailActivity extends BaseAudioActivity implements Handler.Ca
                         }
                     }
 
-                    @Override
-                    public void copyLink() {
-                    }
 
-                    @Override
-                    public void refresh() {
-                    }
-
-                    @Override
-                    public void collectContent() {
-                    }
                 });
                 dialog.show(getSupportFragmentManager(), "ShareDialog");
             }

@@ -32,4 +32,5 @@ dependencies {
     api 'com.google.android.material:material:1.2.1'//externalAndroidDesign
     implementation externalAliyunVodUpload
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation 'com.sum.slike:library:0.2.1'
 }

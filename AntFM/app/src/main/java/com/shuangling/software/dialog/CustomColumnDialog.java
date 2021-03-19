@@ -72,10 +72,10 @@ public class CustomColumnDialog extends BaseCircleDialog {
 
     public static CustomColumnDialog getInstance(List<Column> columns, Column currentColumn) {
         CustomColumnDialog dialogFragment = new CustomColumnDialog();
-        dialogFragment.setCanceledBack(false);
+        dialogFragment.setCanceledBack(true);
         dialogFragment.setCanceledOnTouchOutside(false);
         dialogFragment.setGravity(Gravity.BOTTOM);
-        dialogFragment.setWidth(1f);
+        dialogFragment.setWidth(1.0f);
         dialogFragment.mColumns = columns;
         dialogFragment.mCurrentColumn = currentColumn;
         return dialogFragment;

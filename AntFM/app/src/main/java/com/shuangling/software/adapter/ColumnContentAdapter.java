@@ -40,13 +40,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 /**
  * Created by 666 on 2017/1/3.
  * 首页分类
  */
 public class ColumnContentAdapter extends RecyclerView.Adapter implements View.OnClickListener {
-//"type": 4,//1 音频 2 专辑 3 文章 4 视频 5专题
-public static final int TYPE_AUDIO = 0;             //音频
+    //"type": 4,//1 音频 2 专辑 3 文章 4 视频 5专题
+    public static final int TYPE_AUDIO = 0;             //音频
     public static final int TYPE_ALBUM = 1;             //专辑
     public static final int TYPE_ARTICLE = 2;           //文章
     public static final int TYPE_ARTICLE_THREE = 3;     //文章
@@ -57,60 +58,75 @@ public static final int TYPE_AUDIO = 0;             //音频
     public static final int TYPE_ACTIVITY = 8;    //三图集
     public static final int TYPE_LIVE = 9;    //三图集
     public static final int TYPE_HEAD = 10;              //头
-private Context mContext;
+    private Context mContext;
     private List<ColumnContent> mColumnContent;
     private LayoutInflater inflater;
     private View mHeaderView;
     private RecyclerView mRecyclerView;
-private boolean mIsHot = false;
-private boolean mIsVideo = false;
-public boolean isIsHot() {
+    private boolean mIsHot = false;
+    private boolean mIsVideo = false;
+
+    public boolean isIsHot() {
         return mIsHot;
     }
-public void setIsHot(boolean mIsHot) {
+
+    public void setIsHot(boolean mIsHot) {
         this.mIsHot = mIsHot;
     }
-public boolean isVideo() {
+
+    public boolean isVideo() {
         return mIsVideo;
     }
-public void setIsVideo(boolean isVideo) {
+
+    public void setIsVideo(boolean isVideo) {
         this.mIsVideo = isVideo;
     }
-private OnItemClickListener onItemClickListener;
-public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+
+    private OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
-public String getOssResize(int width,int height){
-        return "?x-oss-process=image/resize,m_fill,h_"+height+",w_"+width;
+
+    public String getOssResize(int width, int height) {
+        return "?x-oss-process=image/resize,m_fill,h_" + height + ",w_" + width;
     }
-public interface OnItemClickListener {
+
+    public interface OnItemClickListener {
         void onItemClick(View view, ColumnContent content);
-void onItemClick(View view, int pos);
+
+        void onItemClick(View view, int pos);
     }
-public ColumnContentAdapter(Context context, RecyclerView recyclerView) {
+
+    public ColumnContentAdapter(Context context, RecyclerView recyclerView) {
         this.mContext = context;
         mRecyclerView = recyclerView;
         inflater = LayoutInflater.from(mContext);
-}
-public ColumnContentAdapter(Context context, RecyclerView recyclerView, List<ColumnContent> columnContent) {
+    }
+
+    public ColumnContentAdapter(Context context, RecyclerView recyclerView, List<ColumnContent> columnContent) {
         this.mContext = context;
         mRecyclerView = recyclerView;
         this.mColumnContent = columnContent;
         inflater = LayoutInflater.from(mContext);
-}
-public void setData(List<ColumnContent> columnContent) {
+    }
+
+    public void setData(List<ColumnContent> columnContent) {
         this.mColumnContent = columnContent;
-}
-public void addHeaderView(View headerView) {
+    }
+
+    public void addHeaderView(View headerView) {
         mHeaderView = headerView;
         notifyItemInserted(0);
     }
-public List<ColumnContent> getData() {
+
+    public List<ColumnContent> getData() {
         return this.mColumnContent;
     }
-@Override
+
+    @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-if (viewType == TYPE_HEAD) {
+        if (viewType == TYPE_HEAD) {
             return new HeadViewHolder(mHeaderView);
         } else if (viewType == TYPE_AUDIO) {
             return new AudioViewHolder(inflater.inflate(R.layout.content_audio_item, parent, false));
@@ -126,7 +142,7 @@ if (viewType == TYPE_HEAD) {
             } else {
                 return new VideoViewHolder(inflater.inflate(R.layout.content_video_item, parent, false));
             }
-} else if (viewType == TYPE_GALLERIE_ONE) {
+        } else if (viewType == TYPE_GALLERIE_ONE) {
             return new GallerieOneViewHolder(inflater.inflate(R.layout.content_gallerie_one_item, parent, false));
         } else if (viewType == TYPE_GALLERIE_THREE) {
             return new GallerieViewThreeHolder(inflater.inflate(R.layout.content_gallerie_three_item, parent, false));
@@ -138,7 +154,8 @@ if (viewType == TYPE_HEAD) {
             return new LiveViewHolder(inflater.inflate(R.layout.content_live_item, parent, false));
         }
     }
-@Override
+
+    @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final ColumnContent content;
         boolean showExcellent = false;
@@ -155,7 +172,7 @@ if (viewType == TYPE_HEAD) {
 //                    }
 //                }
             }
-} else {
+        } else {
             content = mColumnContent.get(position);
 //            if (isIsHot()) {
 //                if (position - 1 > 0) {
@@ -165,9 +182,9 @@ if (viewType == TYPE_HEAD) {
 //                }
 //            }
         }
-int itemViewType = getItemViewType(position);
+        int itemViewType = getItemViewType(position);
         if (itemViewType == TYPE_HEAD) {
-} else if (itemViewType == TYPE_AUDIO) {
+        } else if (itemViewType == TYPE_AUDIO) {
             AudioViewHolder audioViewHolder = (AudioViewHolder) holder;
             if (showExcellent) {
                 audioViewHolder.excellent.setVisibility(View.VISIBLE);
@@ -175,23 +192,23 @@ int itemViewType = getItemViewType(position);
                 if (station != null && !TextUtils.isEmpty(station.getIcon2())) {
                     int width = CommonUtils.dip2px(15);
                     int height = width;
-                    Uri uri = Uri.parse(station.getIcon2()+getOssResize(width,height));
+                    Uri uri = Uri.parse(station.getIcon2() + getOssResize(width, height));
                     ImageLoader.showThumb(uri, audioViewHolder.excellentLogo, width, height);
                 } else {
                     audioViewHolder.excellentLogo.setVisibility(View.GONE);
                 }
-} else {
+            } else {
                 audioViewHolder.excellent.setVisibility(View.GONE);
             }
-if (content.getTop() != null) {
+            if (content.getTop() != null) {
                 audioViewHolder.top.setVisibility(View.VISIBLE);
             } else {
                 audioViewHolder.top.setVisibility(View.GONE);
             }
             if (!TextUtils.isEmpty(content.getCover())) {
-int width = CommonUtils.dip2px(100);
+                int width = CommonUtils.dip2px(100);
                 int height = width;
-                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                 ImageLoader.showThumb(uri, audioViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(audioViewHolder.logo, R.drawable.article_placeholder);
@@ -199,7 +216,7 @@ int width = CommonUtils.dip2px(100);
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 audioViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
-audioViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
+            audioViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             audioViewHolder.title.setText(content.getTitle());
             //audioViewHolder.commentNum.setText(""+content.getComment()+"评论");
             audioViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -210,15 +227,15 @@ audioViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_a
                     mContext.startActivity(it);
                 }
             });
-} else if (itemViewType == TYPE_ALBUM) {
+        } else if (itemViewType == TYPE_ALBUM) {
             final AlbumViewHolder albumViewHolder = (AlbumViewHolder) holder;
             if (showExcellent) {
                 albumViewHolder.excellent.setVisibility(View.VISIBLE);
                 Station station = MyApplication.getInstance().getStation();
                 if (station != null && !TextUtils.isEmpty(station.getIcon2())) {
-int width = CommonUtils.dip2px(15);
+                    int width = CommonUtils.dip2px(15);
                     int height = width;
-                    Uri uri = Uri.parse(station.getIcon2()+getOssResize(width,height));
+                    Uri uri = Uri.parse(station.getIcon2() + getOssResize(width, height));
                     ImageLoader.showThumb(uri, albumViewHolder.excellentLogo, width, height);
                 } else {
                     albumViewHolder.excellentLogo.setVisibility(View.GONE);
@@ -226,21 +243,21 @@ int width = CommonUtils.dip2px(15);
             } else {
                 albumViewHolder.excellent.setVisibility(View.GONE);
             }
-if (content.getTop() != null) {
+            if (content.getTop() != null) {
                 albumViewHolder.top.setVisibility(View.VISIBLE);
             } else {
                 albumViewHolder.top.setVisibility(View.GONE);
             }
-if (!TextUtils.isEmpty(content.getCover())) {
-int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
+            if (!TextUtils.isEmpty(content.getCover())) {
+                int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                 ImageLoader.showThumb(uri, albumViewHolder.logo, width, height);
             }
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 albumViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
-if (albumViewHolder.title.getTag() != null) {
+            if (albumViewHolder.title.getTag() != null) {
                 ViewTreeObserver.OnPreDrawListener listener = (ViewTreeObserver.OnPreDrawListener) albumViewHolder.title.getTag();
                 albumViewHolder.title.getViewTreeObserver().removeOnPreDrawListener(listener);
             }
@@ -287,15 +304,15 @@ if (albumViewHolder.title.getTag() != null) {
             } else {
                 albumViewHolder.title.setText(content.getTitle());
             }
-albumViewHolder.count.setText("" + content.getAlbums().getCount() + "集");
-            CommonUtils.setReadsAndComment(albumViewHolder.commentNum,content.getComment(),content.getView());
-albumViewHolder.title.post(new Runnable() {
+            albumViewHolder.count.setText("" + content.getAlbums().getCount() + "集");
+            CommonUtils.setReadsAndComment(albumViewHolder.commentNum, content.getComment(), content.getView());
+            albumViewHolder.title.post(new Runnable() {
                 @Override
                 public void run() {
                     int titleWidth = albumViewHolder.title.getWidth();
                     int layoutWidth = albumViewHolder.layout.getWidth();
-                    int lineCount=albumViewHolder.title.getLineCount();
-if (lineCount> 2) {
+                    int lineCount = albumViewHolder.title.getLineCount();
+                    if (lineCount > 2) {
 //                            Log.i("test","getLineCount>2");
                         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                         layoutParams.topMargin = CommonUtils.dip2px(5);
@@ -310,33 +327,33 @@ if (lineCount> 2) {
                             layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                             layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                             albumViewHolder.layout.setLayoutParams(layoutParams);
-} else {
+                        } else {
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
                             layoutParams.removeRule(RelativeLayout.BELOW);
                             layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
                             albumViewHolder.layout.setLayoutParams(layoutParams);
                         }
-}
-}
+                    }
+                }
             });
-albumViewHolder.root.setOnClickListener(new View.OnClickListener() {
+            albumViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent it = new Intent(mContext, AlbumDetailActivity.class);
                     it.putExtra("albumId", content.getId());
-mContext.startActivity(it);
+                    mContext.startActivity(it);
                 }
             });
-} else if (itemViewType == TYPE_ARTICLE) {
+        } else if (itemViewType == TYPE_ARTICLE) {
             final ArticleViewHolder articleViewHolder = (ArticleViewHolder) holder;
-if (showExcellent) {
+            if (showExcellent) {
                 articleViewHolder.excellent.setVisibility(View.VISIBLE);
                 Station station = MyApplication.getInstance().getStation();
                 if (station != null && !TextUtils.isEmpty(station.getIcon2())) {
-int width = CommonUtils.dip2px(15);
+                    int width = CommonUtils.dip2px(15);
                     int height = width;
-                    Uri uri = Uri.parse(station.getIcon2()+getOssResize(width,height));
+                    Uri uri = Uri.parse(station.getIcon2() + getOssResize(width, height));
                     ImageLoader.showThumb(uri, articleViewHolder.excellentLogo, width, height);
                 } else {
                     articleViewHolder.excellentLogo.setVisibility(View.GONE);
@@ -348,20 +365,20 @@ int width = CommonUtils.dip2px(15);
                 articleViewHolder.top.setVisibility(View.VISIBLE);
                 if (!TextUtils.isEmpty(content.getCover())) {
                     articleViewHolder.logo.setVisibility(View.VISIBLE);
-int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
+                    int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                     int height = (int) (2f * width / 3f);
-                    Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                    Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                     ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
                 } else {
                     articleViewHolder.logo.setVisibility(View.GONE);
                 }
             } else {
                 articleViewHolder.top.setVisibility(View.GONE);
-                if (content.getArticle().getCovers().size() > 0 && !TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
+                if (content.getArticle()!=null&&content.getArticle().getCovers().size() > 0 && !TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
                     articleViewHolder.logo.setVisibility(View.VISIBLE);
-int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
+                    int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                     int height = (int) (2f * width / 3f);
-                    Uri uri = Uri.parse(content.getArticle().getCovers().get(0)+getOssResize(width,height));
+                    Uri uri = Uri.parse(content.getArticle().getCovers().get(0) + getOssResize(width, height));
                     ImageLoader.showThumb(uri, articleViewHolder.logo, width, height);
                 } else {
                     articleViewHolder.logo.setVisibility(View.GONE);
@@ -413,26 +430,26 @@ int width = (int) mContext.getResources().getDimension(R.dimen.article_right_ima
 //                    return true;
 //                }
 //            });
-if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
+            if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
             articleViewHolder.title.setText(content.getTitle());
-articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-            CommonUtils.setReadsAndComment(articleViewHolder.commentNum,content.getComment(),content.getView());
-if (articleViewHolder.logo.getVisibility() == View.GONE) {
+            articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
+            CommonUtils.setReadsAndComment(articleViewHolder.commentNum, content.getComment(), content.getView());
+            if (articleViewHolder.logo.getVisibility() == View.GONE) {
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                 layoutParams.topMargin = CommonUtils.dip2px(10);
                 layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                 layoutParams.addRule(RelativeLayout.BELOW, R.id.title);
                 articleViewHolder.layout.setLayoutParams(layoutParams);
-            }else{
+            } else {
                 articleViewHolder.title.post(new Runnable() {
                     @Override
                     public void run() {
                         int titleWidth = articleViewHolder.title.getWidth();
                         int layoutWidth = articleViewHolder.layout.getWidth();
-                        int lineCount=articleViewHolder.title.getLineCount();
-if (lineCount> 2) {
+                        int lineCount = articleViewHolder.title.getLineCount();
+                        if (lineCount > 2) {
 //                            Log.i("test","getLineCount>2");
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
@@ -447,18 +464,18 @@ if (lineCount> 2) {
                                 layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                                 layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                                 articleViewHolder.layout.setLayoutParams(layoutParams);
-} else {
+                            } else {
                                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                                 layoutParams.topMargin = CommonUtils.dip2px(5);
                                 layoutParams.removeRule(RelativeLayout.BELOW);
                                 layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
                                 articleViewHolder.layout.setLayoutParams(layoutParams);
                             }
-}
-}
+                        }
+                    }
                 });
             }
-articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
+            articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent it = new Intent(mContext, ArticleDetailActivity02.class);
@@ -468,13 +485,13 @@ articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
             });
         } else if (itemViewType == TYPE_ARTICLE_THREE) {
             final ArticleViewThreeHolder articleViewHolder = (ArticleViewThreeHolder) holder;
-if (showExcellent) {
+            if (showExcellent) {
                 articleViewHolder.excellent.setVisibility(View.VISIBLE);
                 Station station = MyApplication.getInstance().getStation();
                 if (station != null && !TextUtils.isEmpty(station.getIcon2())) {
-int width = CommonUtils.dip2px(15);
+                    int width = CommonUtils.dip2px(15);
                     int height = width;
-                    Uri uri = Uri.parse(station.getIcon2()+getOssResize(width,height));
+                    Uri uri = Uri.parse(station.getIcon2() + getOssResize(width, height));
                     ImageLoader.showThumb(uri, articleViewHolder.excellentLogo, width, height);
                 } else {
                     articleViewHolder.excellentLogo.setVisibility(View.GONE);
@@ -487,26 +504,26 @@ int width = CommonUtils.dip2px(15);
             } else {
                 articleViewHolder.top.setVisibility(View.GONE);
             }
-if (!TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
-int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
+            if (!TextUtils.isEmpty(content.getArticle().getCovers().get(0))) {
+                int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getArticle().getCovers().get(0)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getArticle().getCovers().get(0) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, articleViewHolder.pic1, width, height);
             } else {
                 ImageLoader.showThumb(articleViewHolder.pic1, R.drawable.video_placeholder);
             }
             if (!TextUtils.isEmpty(content.getArticle().getCovers().get(1))) {
-int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
+                int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getArticle().getCovers().get(1)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getArticle().getCovers().get(1) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, articleViewHolder.pic2, width, height);
             } else {
                 ImageLoader.showThumb(articleViewHolder.pic2, R.drawable.video_placeholder);
             }
             if (!TextUtils.isEmpty(content.getArticle().getCovers().get(2))) {
-int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
+                int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getArticle().getCovers().get(2)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getArticle().getCovers().get(2) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, articleViewHolder.pic3, width, height);
             } else {
                 ImageLoader.showThumb(articleViewHolder.pic3, R.drawable.video_placeholder);
@@ -514,10 +531,10 @@ int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
             if (content.getAuthor_info() != null && content.getAuthor_info().getMerchant() != null) {
                 articleViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
-articleViewHolder.title.setText(content.getTitle());
-articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
+            articleViewHolder.title.setText(content.getTitle());
+            articleViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             //articleViewHolder.commentNum.setText("" + content.getComment() + "评论");
-CommonUtils.setReadsAndComment(articleViewHolder.commentNum,content.getComment(),content.getView());
+            CommonUtils.setReadsAndComment(articleViewHolder.commentNum, content.getComment(), content.getView());
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -528,13 +545,13 @@ CommonUtils.setReadsAndComment(articleViewHolder.commentNum,content.getComment()
             });
         } else if (itemViewType == TYPE_VIDEO) {
             VideoViewHolder videoViewHolder = (VideoViewHolder) holder;
-if (showExcellent) {
+            if (showExcellent) {
                 videoViewHolder.excellent.setVisibility(View.VISIBLE);
                 Station station = MyApplication.getInstance().getStation();
                 if (station != null && !TextUtils.isEmpty(station.getIcon2())) {
-int width = CommonUtils.dip2px(15);
+                    int width = CommonUtils.dip2px(15);
                     int height = width;
-                    Uri uri = Uri.parse(station.getIcon2()+getOssResize(width,height));
+                    Uri uri = Uri.parse(station.getIcon2() + getOssResize(width, height));
                     ImageLoader.showThumb(uri, videoViewHolder.excellentLogo, width, height);
                 } else {
                     videoViewHolder.excellentLogo.setVisibility(View.GONE);
@@ -548,9 +565,9 @@ int width = CommonUtils.dip2px(15);
                 videoViewHolder.top.setVisibility(View.GONE);
             }
             if (!TextUtils.isEmpty(content.getCover())) {
-int width = CommonUtils.getScreenWidth() - CommonUtils.dip2px(20);
+                int width = CommonUtils.getScreenWidth() - CommonUtils.dip2px(20);
                 int height = (int) (9f * width / 16f);
-                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                 ImageLoader.showThumb(uri, videoViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(videoViewHolder.logo, R.drawable.video_placeholder);
@@ -559,9 +576,9 @@ int width = CommonUtils.getScreenWidth() - CommonUtils.dip2px(20);
                 videoViewHolder.organization.setText(content.getAuthor_info().getMerchant().getName());
                 if (isVideo()) {
                     if (!TextUtils.isEmpty(content.getAuthor_info().getMerchant().getLogo())) {
-int width = CommonUtils.dip2px(35);
+                        int width = CommonUtils.dip2px(35);
                         int height = width;
-                        Uri uri = Uri.parse(content.getAuthor_info().getMerchant().getLogo()+getOssResize(width,height));
+                        Uri uri = Uri.parse(content.getAuthor_info().getMerchant().getLogo() + getOssResize(width, height));
                         ImageLoader.showThumb(uri, videoViewHolder.organizationLogo, width, height);
                     }
                 }
@@ -571,7 +588,7 @@ int width = CommonUtils.dip2px(35);
             } else {
                 videoViewHolder.duration.setText("00:00");
             }
-RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
+            RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
             if (lm instanceof GridLayoutManager) {
                 GridLayoutManager manager = (GridLayoutManager) lm;
                 int maxSpanCount = manager.getSpanCount();
@@ -582,10 +599,10 @@ RecyclerView.LayoutManager lm = mRecyclerView.getLayoutManager();
                     videoViewHolder.playIcon.setVisibility(View.VISIBLE);
                 }
             }
-videoViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
+            videoViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             videoViewHolder.title.setText(content.getTitle());
-            CommonUtils.setReadsAndComment(videoViewHolder.commentNum,content.getComment(),content.getView());
-videoViewHolder.root.setOnClickListener(new View.OnClickListener() {
+            CommonUtils.setReadsAndComment(videoViewHolder.commentNum, content.getComment(), content.getView());
+            videoViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent it = new Intent(mContext, VideoDetailActivity.class);
@@ -595,13 +612,13 @@ videoViewHolder.root.setOnClickListener(new View.OnClickListener() {
             });
         } else if (itemViewType == TYPE_GALLERIE_ONE) {
             GallerieOneViewHolder gallerieOneViewHolder = (GallerieOneViewHolder) holder;
-if (showExcellent) {
+            if (showExcellent) {
                 gallerieOneViewHolder.excellent.setVisibility(View.VISIBLE);
                 Station station = MyApplication.getInstance().getStation();
                 if (station != null && !TextUtils.isEmpty(station.getIcon2())) {
-int width = CommonUtils.dip2px(15);
+                    int width = CommonUtils.dip2px(15);
                     int height = width;
-                    Uri uri = Uri.parse(station.getIcon2()+getOssResize(width,height));
+                    Uri uri = Uri.parse(station.getIcon2() + getOssResize(width, height));
                     ImageLoader.showThumb(uri, gallerieOneViewHolder.excellentLogo, width, height);
                 } else {
                     gallerieOneViewHolder.excellentLogo.setVisibility(View.GONE);
@@ -615,9 +632,9 @@ int width = CommonUtils.dip2px(15);
                 gallerieOneViewHolder.top.setVisibility(View.GONE);
             }
             if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(0))) {
-int width = CommonUtils.getScreenWidth();
+                int width = CommonUtils.getScreenWidth();
                 int height = (int) (9f * width / 16f);
-                Uri uri = Uri.parse(content.getGallerie().getCovers().get(0)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getGallerie().getCovers().get(0) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, gallerieOneViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(gallerieOneViewHolder.logo, R.drawable.video_placeholder);
@@ -628,8 +645,8 @@ int width = CommonUtils.getScreenWidth();
             gallerieOneViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieOneViewHolder.title.setText(content.getTitle());
             //gallerieOneViewHolder.commentNum.setText("" + content.getComment() + "评论");
-            CommonUtils.setReadsAndComment(gallerieOneViewHolder.commentNum,content.getComment(),content.getView());
-gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
+            CommonUtils.setReadsAndComment(gallerieOneViewHolder.commentNum, content.getComment(), content.getView());
+            gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
             gallerieOneViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -638,15 +655,15 @@ gallerieOneViewHolder.count.setText(content.getGallerie().getCount() + "图");
                     mContext.startActivity(it);
                 }
             });
-} else if (itemViewType == TYPE_GALLERIE_THREE) {
+        } else if (itemViewType == TYPE_GALLERIE_THREE) {
             GallerieViewThreeHolder gallerieViewThreeHolder = (GallerieViewThreeHolder) holder;
-if (showExcellent) {
+            if (showExcellent) {
                 gallerieViewThreeHolder.excellent.setVisibility(View.VISIBLE);
                 Station station = MyApplication.getInstance().getStation();
                 if (station != null && !TextUtils.isEmpty(station.getIcon2())) {
-int width = CommonUtils.dip2px(15);
+                    int width = CommonUtils.dip2px(15);
                     int height = width;
-                    Uri uri = Uri.parse(station.getIcon2()+getOssResize(width,height));
+                    Uri uri = Uri.parse(station.getIcon2() + getOssResize(width, height));
                     ImageLoader.showThumb(uri, gallerieViewThreeHolder.excellentLogo, width, height);
                 } else {
                     gallerieViewThreeHolder.excellentLogo.setVisibility(View.GONE);
@@ -660,25 +677,25 @@ int width = CommonUtils.dip2px(15);
                 gallerieViewThreeHolder.top.setVisibility(View.GONE);
             }
             if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(0))) {
-int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
+                int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getGallerie().getCovers().get(0)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getGallerie().getCovers().get(0) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, gallerieViewThreeHolder.pic1, width, height);
             } else {
                 ImageLoader.showThumb(gallerieViewThreeHolder.pic1, R.drawable.video_placeholder);
             }
             if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(1))) {
-int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
+                int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getGallerie().getCovers().get(1)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getGallerie().getCovers().get(1) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, gallerieViewThreeHolder.pic2, width, height);
             } else {
                 ImageLoader.showThumb(gallerieViewThreeHolder.pic2, R.drawable.video_placeholder);
             }
             if (!TextUtils.isEmpty(content.getGallerie().getCovers().get(2))) {
-int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
+                int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getGallerie().getCovers().get(2)+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getGallerie().getCovers().get(2) + getOssResize(width, height));
                 ImageLoader.showThumb(uri, gallerieViewThreeHolder.pic3, width, height);
             } else {
                 ImageLoader.showThumb(gallerieViewThreeHolder.pic3, R.drawable.video_placeholder);
@@ -688,8 +705,8 @@ int width = (CommonUtils.getScreenWidth() - CommonUtils.dip2px(30)) / 3;
             }
             gallerieViewThreeHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             gallerieViewThreeHolder.title.setText(content.getTitle());
-            CommonUtils.setReadsAndComment(gallerieViewThreeHolder.commentNum,content.getComment(),content.getView());
-gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
+            CommonUtils.setReadsAndComment(gallerieViewThreeHolder.commentNum, content.getComment(), content.getView());
+            gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
             gallerieViewThreeHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -698,15 +715,15 @@ gallerieViewThreeHolder.count.setText(content.getGallerie().getCount() + "图");
                     mContext.startActivity(it);
                 }
             });
-} else if (itemViewType == TYPE_SPECIAL) {
+        } else if (itemViewType == TYPE_SPECIAL) {
             final SpecialViewHolder specialViewHolder = (SpecialViewHolder) holder;
             if (showExcellent) {
                 specialViewHolder.excellent.setVisibility(View.VISIBLE);
                 Station station = MyApplication.getInstance().getStation();
                 if (station != null && !TextUtils.isEmpty(station.getIcon2())) {
-int width = CommonUtils.dip2px(15);
+                    int width = CommonUtils.dip2px(15);
                     int height = width;
-                    Uri uri = Uri.parse(station.getIcon2()+getOssResize(width,height));
+                    Uri uri = Uri.parse(station.getIcon2() + getOssResize(width, height));
                     ImageLoader.showThumb(uri, specialViewHolder.excellentLogo, width, height);
                 } else {
                     specialViewHolder.excellentLogo.setVisibility(View.GONE);
@@ -714,7 +731,7 @@ int width = CommonUtils.dip2px(15);
             } else {
                 specialViewHolder.excellent.setVisibility(View.GONE);
             }
-if (content.getTop() != null) {
+            if (content.getTop() != null) {
                 specialViewHolder.top.setVisibility(View.VISIBLE);
                 specialViewHolder.specialIcon.setVisibility(View.GONE);
             } else {
@@ -722,9 +739,9 @@ if (content.getTop() != null) {
                 specialViewHolder.specialIcon.setVisibility(View.VISIBLE);
             }
             if (!TextUtils.isEmpty(content.getCover())) {
-int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
+                int width = (int) mContext.getResources().getDimension(R.dimen.article_right_image_width);
                 int height = (int) (2f * width / 3f);
-                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                 ImageLoader.showThumb(uri, specialViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(specialViewHolder.logo, R.drawable.article_placeholder);
@@ -780,14 +797,14 @@ int width = (int) mContext.getResources().getDimension(R.dimen.article_right_ima
                 specialViewHolder.merchant.setText(content.getAuthor_info().getMerchant().getName());
             }
             specialViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
-CommonUtils.setReadsAndComment(specialViewHolder.commentNum,content.getComment(),content.getView());
-specialViewHolder.title.post(new Runnable() {
+            CommonUtils.setReadsAndComment(specialViewHolder.commentNum, content.getComment(), content.getView());
+            specialViewHolder.title.post(new Runnable() {
                 @Override
                 public void run() {
                     int titleWidth = specialViewHolder.title.getWidth();
                     int layoutWidth = specialViewHolder.layout.getWidth();
-                    int lineCount=specialViewHolder.title.getLineCount();
-if (lineCount> 2) {
+                    int lineCount = specialViewHolder.title.getLineCount();
+                    if (lineCount > 2) {
 //                            Log.i("test","getLineCount>2");
                         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                         layoutParams.topMargin = CommonUtils.dip2px(5);
@@ -802,54 +819,54 @@ if (lineCount> 2) {
                             layoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
                             layoutParams.addRule(RelativeLayout.BELOW, R.id.logo);
                             specialViewHolder.layout.setLayoutParams(layoutParams);
-} else {
+                        } else {
                             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);//工具类哦
                             layoutParams.topMargin = CommonUtils.dip2px(5);
                             layoutParams.removeRule(RelativeLayout.BELOW);
                             layoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.logo);
                             specialViewHolder.layout.setLayoutParams(layoutParams);
                         }
-}
-}
+                    }
+                }
             });
-specialViewHolder.root.setOnClickListener(new View.OnClickListener() {
+            specialViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent it = new Intent(mContext, SpecialDetailActivity.class);
                     it.putExtra("specialId", content.getId());
-mContext.startActivity(it);
+                    mContext.startActivity(it);
                 }
             });
-} else if (itemViewType == TYPE_ACTIVITY) {
+        } else if (itemViewType == TYPE_ACTIVITY) {
             final ActivityViewHolder activityViewHolder = (ActivityViewHolder) holder;
-if (content.getTop() != null) {
+            if (content.getTop() != null) {
                 activityViewHolder.top.setVisibility(View.VISIBLE);
             } else {
                 activityViewHolder.top.setVisibility(View.GONE);
             }
-            if(content.getActivitiy().getType()==1){
+            if (content.getActivitiy().getType() == 1) {
                 GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
                 hierarchy.setPlaceholderImage(R.drawable.activity_sign_up_logo);
-            }else if(content.getActivitiy().getType()==2){
+            } else if (content.getActivitiy().getType() == 2) {
                 GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
                 hierarchy.setPlaceholderImage(R.drawable.activity_answer_logo);
-            }else if(content.getActivitiy().getType()==3){
+            } else if (content.getActivitiy().getType() == 3) {
                 GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
                 hierarchy.setPlaceholderImage(R.drawable.activity_vote_logo);
-            }else if(content.getActivitiy().getType()==4){
+            } else if (content.getActivitiy().getType() == 4) {
                 GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
                 hierarchy.setPlaceholderImage(R.drawable.activity_luck_logo);
-            }else if(content.getActivitiy().getType()==5){
+            } else if (content.getActivitiy().getType() == 5) {
                 GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
                 hierarchy.setPlaceholderImage(R.drawable.activity_marathon_logo);
-            }else if(content.getActivitiy().getType()==6){
+            } else if (content.getActivitiy().getType() == 6) {
                 GenericDraweeHierarchy hierarchy = activityViewHolder.logo.getHierarchy();
                 hierarchy.setPlaceholderImage(R.drawable.activity_interact_logo);
             }
             if (!TextUtils.isEmpty(content.getCover())) {
-int width = CommonUtils.getScreenWidth();
+                int width = CommonUtils.getScreenWidth();
                 int height = (int) (9f * width / 16f);
-                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                 ImageLoader.showThumb(uri, activityViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(activityViewHolder.logo, R.drawable.video_placeholder);
@@ -860,13 +877,13 @@ int width = CommonUtils.getScreenWidth();
             activityViewHolder.title.setText(content.getTitle());
             activityViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             if (content.getActivitiy() != null) {
-                if(content.getActivitiy().getJoin_count()>0){
+                if (content.getActivitiy().getJoin_count() > 0) {
                     activityViewHolder.commentNum.setText(content.getActivitiy().getJoin_count() + "人参与");
-                }else {
+                } else {
                     activityViewHolder.commentNum.setText("");
                 }
             }
-activityViewHolder.root.setOnClickListener(new View.OnClickListener() {
+            activityViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     activityViewHolder.root.setOnClickListener(new View.OnClickListener() {
@@ -874,7 +891,7 @@ activityViewHolder.root.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
                             Intent it = new Intent(mContext, WebViewBackActivity.class);
                             it.putExtra("url", content.getActivitiy().getUrl());
-                            it.putExtra("title",content.getTitle());
+                            it.putExtra("title", content.getTitle());
                             if (content.getActivitiy().getType() == 2) {
                                 it.putExtra("activityId", content.getActivitiy().getId());
                             }
@@ -883,17 +900,17 @@ activityViewHolder.root.setOnClickListener(new View.OnClickListener() {
                     });
                 }
             });
-} else if (itemViewType == TYPE_LIVE) {
+        } else if (itemViewType == TYPE_LIVE) {
             final LiveViewHolder liveViewHolder = (LiveViewHolder) holder;
-if (content.getTop() != null) {
+            if (content.getTop() != null) {
                 liveViewHolder.top.setVisibility(View.VISIBLE);
             } else {
                 liveViewHolder.top.setVisibility(View.GONE);
             }
             if (!TextUtils.isEmpty(content.getCover())) {
-int width = CommonUtils.getScreenWidth();
+                int width = CommonUtils.getScreenWidth();
                 int height = (int) (9f * width / 16f);
-                Uri uri = Uri.parse(content.getCover()+getOssResize(width,height));
+                Uri uri = Uri.parse(content.getCover() + getOssResize(width, height));
                 ImageLoader.showThumb(uri, liveViewHolder.logo, width, height);
             } else {
                 ImageLoader.showThumb(liveViewHolder.logo, R.drawable.video_placeholder);
@@ -906,7 +923,7 @@ int width = CommonUtils.getScreenWidth();
             liveViewHolder.publishTime.setText(TimeUtil.formatDateTime(content.getPublish_at()));
             liveViewHolder.popularity.setVisibility(View.GONE);
             if (content.getLive() != null) {
-liveViewHolder.popularity.setText(content.getLive().getPopularity() + "人气");
+                liveViewHolder.popularity.setText(content.getLive().getPopularity() + "人气");
                 if (content.getLive().getType() == 1) {
                     liveViewHolder.type.setText("网络");
                     liveViewHolder.typeIcon.setText(R.string.live_network);
@@ -920,51 +937,54 @@ liveViewHolder.popularity.setText(content.getLive().getPopularity() + "人气");
                     liveViewHolder.type.setText("教育");
                     liveViewHolder.typeIcon.setText(R.string.live_shop);
                 }
-}
-liveViewHolder.root.setOnClickListener(new View.OnClickListener() {
+            }
+            liveViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 //                    Intent it = new Intent(mContext, WebViewBackActivity.class);
 //                    it.putExtra("url", content.getLive().getUrl());
 //                    it.putExtra("title",content.getTitle());
 //                    mContext.startActivity(it);
-                    if(content.getLive()==null){
+                    if (content.getLive() == null) {
                         com.hjq.toast.ToastUtils.show("数据异常");
                         return;
                     }
-String url=content.getLive().getUrl();
-                    if(content.getLive().getType()==4||content.getLive().getType()==1){
-                        if(!TextUtils.isEmpty(url)){
-                            String streamName=url.substring(url.lastIndexOf("=")+1);
-                            Intent it = new Intent(mContext,  LiveDetailActivity.class);
-                            it.putExtra("streamName",streamName);
-                            it.putExtra("roomId",content.getLive().getRoom_id());
+                    String url = content.getLive().getUrl();
+                    if (content.getLive().getType() == 4 || content.getLive().getType() == 1) {
+                        if (!TextUtils.isEmpty(url)) {
+                            String streamName = url.substring(url.lastIndexOf("=") + 1);
+                            Intent it = new Intent(mContext, LiveDetailActivity.class);
+                            it.putExtra("streamName", streamName);
+                            it.putExtra("roomId", content.getLive().getRoom_id());
                             //it.putExtra("url",content.getLive().getHls_play_url());
                             //it.putExtra("url",content.getLive().getRtmp_play_url());
-                            it.putExtra("url",content.getLive().getRtmp_play_url());
-                            it.putExtra("type",content.getLive().getType());
+                            it.putExtra("url", content.getLive().getRtmp_play_url());
+                            it.putExtra("type", content.getLive().getType());
                             mContext.startActivity(it);
                         }
-                    }else{
+                    } else {
                         Intent it = new Intent(mContext, WebViewBackActivity.class);
                         it.putExtra("url", content.getLive().getUrl());
-                        it.putExtra("title",content.getTitle());
+                        it.putExtra("title", content.getTitle());
                         mContext.startActivity(it);
                     }
-}
+                }
             });
-}
+        }
     }
-@Override
+
+    @Override
     public void onClick(View v) {
-}
-public class HeadViewHolder extends RecyclerView.ViewHolder {
-public HeadViewHolder(View view) {
-            super(view);
-}
     }
-public class AudioViewHolder extends RecyclerView.ViewHolder {
-@BindView(R.id.logo)
+
+    public class HeadViewHolder extends RecyclerView.ViewHolder {
+        public HeadViewHolder(View view) {
+            super(view);
+        }
+    }
+
+    public class AudioViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.logo)
         SimpleDraweeView logo;
         @BindView(R.id.title)
         TextView title;
@@ -982,13 +1002,15 @@ public class AudioViewHolder extends RecyclerView.ViewHolder {
         RelativeLayout excellent;
         @BindView(R.id.excellentLogo)
         SimpleDraweeView excellentLogo;
-public AudioViewHolder(View view) {
+
+        public AudioViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
     }
-public class AlbumViewHolder extends RecyclerView.ViewHolder {
-@BindView(R.id.excellent)
+
+    public class AlbumViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.excellent)
         RelativeLayout excellent;
         @BindView(R.id.excellentLogo)
         SimpleDraweeView excellentLogo;
@@ -1010,12 +1032,14 @@ public class AlbumViewHolder extends RecyclerView.ViewHolder {
         TextView commentNum;
         @BindView(R.id.layout)
         LinearLayout layout;
-public AlbumViewHolder(View view) {
+
+        public AlbumViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
     }
-public class SpecialViewHolder extends RecyclerView.ViewHolder {
+
+    public class SpecialViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.logo)
         SimpleDraweeView logo;
         @BindView(R.id.title)
@@ -1038,12 +1062,14 @@ public class SpecialViewHolder extends RecyclerView.ViewHolder {
         SimpleDraweeView excellentLogo;
         @BindView(R.id.layout)
         LinearLayout layout;
-public SpecialViewHolder(View view) {
+
+        public SpecialViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-}
+        }
     }
-public class ActivityViewHolder extends RecyclerView.ViewHolder {
+
+    public class ActivityViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.excellentLogo)
         SimpleDraweeView excellentLogo;
         @BindView(R.id.excellent)
@@ -1066,12 +1092,14 @@ public class ActivityViewHolder extends RecyclerView.ViewHolder {
         TextView commentNum;
         @BindView(R.id.root)
         LinearLayout root;
-public ActivityViewHolder(View view) {
+
+        public ActivityViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-}
+        }
     }
-public class LiveViewHolder extends RecyclerView.ViewHolder {
+
+    public class LiveViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.excellentLogo)
         SimpleDraweeView excellentLogo;
         @BindView(R.id.excellent)
@@ -1106,17 +1134,19 @@ public class LiveViewHolder extends RecyclerView.ViewHolder {
         TextView publishTime;
         @BindView(R.id.root)
         LinearLayout root;
-public LiveViewHolder(View view) {
+
+        public LiveViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-}
+        }
     }
-public class VideoViewHolder extends RecyclerView.ViewHolder {
+
+    public class VideoViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.title)
         TextView title;
         @BindView(R.id.top)
         TextView top;
-@BindView(R.id.logo)
+        @BindView(R.id.logo)
         SimpleDraweeView logo;
         @BindView(R.id.duration)
         TextView duration;
@@ -1136,12 +1166,14 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
         SimpleDraweeView organizationLogo;
         @BindView(R.id.playIcon)
         ImageView playIcon;
-public VideoViewHolder(View view) {
+
+        public VideoViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
     }
-public class GallerieOneViewHolder extends RecyclerView.ViewHolder {
+
+    public class GallerieOneViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.logo)
         SimpleDraweeView logo;
         @BindView(R.id.count)
@@ -1162,12 +1194,14 @@ public class GallerieOneViewHolder extends RecyclerView.ViewHolder {
         RelativeLayout excellent;
         @BindView(R.id.excellentLogo)
         SimpleDraweeView excellentLogo;
-public GallerieOneViewHolder(View view) {
+
+        public GallerieOneViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
     }
-public class GallerieViewThreeHolder extends RecyclerView.ViewHolder {
+
+    public class GallerieViewThreeHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.title)
         TextView title;
         @BindView(R.id.top)
@@ -1192,12 +1226,14 @@ public class GallerieViewThreeHolder extends RecyclerView.ViewHolder {
         RelativeLayout excellent;
         @BindView(R.id.excellentLogo)
         SimpleDraweeView excellentLogo;
-public GallerieViewThreeHolder(View view) {
+
+        public GallerieViewThreeHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
     }
-public class ArticleViewHolder extends RecyclerView.ViewHolder {
+
+    public class ArticleViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.logo)
         SimpleDraweeView logo;
         @BindView(R.id.title)
@@ -1218,12 +1254,14 @@ public class ArticleViewHolder extends RecyclerView.ViewHolder {
         SimpleDraweeView excellentLogo;
         @BindView(R.id.layout)
         LinearLayout layout;
-public ArticleViewHolder(View view) {
+
+        public ArticleViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
     }
-public class ArticleViewThreeHolder extends RecyclerView.ViewHolder {
+
+    public class ArticleViewThreeHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.title)
         TextView title;
         @BindView(R.id.top)
@@ -1248,12 +1286,14 @@ public class ArticleViewThreeHolder extends RecyclerView.ViewHolder {
         RelativeLayout excellent;
         @BindView(R.id.excellentLogo)
         SimpleDraweeView excellentLogo;
-public ArticleViewThreeHolder(View view) {
+
+        public ArticleViewThreeHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
         }
     }
-@Override
+
+    @Override
     public int getItemCount() {
         if (mHeaderView != null) {
             if (mColumnContent != null) {
@@ -1268,8 +1308,9 @@ public ArticleViewThreeHolder(View view) {
                 return 0;
             }
         }
-}
-@Override
+    }
+
+    @Override
     public int getItemViewType(int position) {
         if (mHeaderView != null) {
             if (position == 0) {
@@ -1280,7 +1321,9 @@ public ArticleViewThreeHolder(View view) {
                 } else if (mColumnContent.get(position - 1).getType() == 2) {
                     return TYPE_ALBUM;
                 } else if (mColumnContent.get(position - 1).getType() == 3) {
-                    if (mColumnContent.get(position - 1).getArticle().getType() == 1) {
+                    if(mColumnContent.get(position - 1).getArticle()==null){
+                        return TYPE_ARTICLE;
+                    }else if (mColumnContent.get(position - 1).getArticle().getType() == 1) {
                         return TYPE_ARTICLE;
                     } else if (mColumnContent.get(position - 1).getArticle().getType() == 2) {
                         return TYPE_ARTICLE_THREE;
@@ -1307,13 +1350,13 @@ public ArticleViewThreeHolder(View view) {
                             return TYPE_GALLERIE_THREE;
                         }
                     }
-} else if (mColumnContent.get(position - 1).getType() == 9) {
+                } else if (mColumnContent.get(position - 1).getType() == 9) {
                     return TYPE_ACTIVITY;
                 } else {
                     return TYPE_LIVE;
                 }
             }
-} else {
+        } else {
             if (mColumnContent.get(position).getType() == 1) {
                 return TYPE_AUDIO;
             } else if (mColumnContent.get(position).getType() == 2) {
@@ -1322,7 +1365,9 @@ public ArticleViewThreeHolder(View view) {
                 if (mColumnContent.get(position).getTop() != null) {
                     return TYPE_ARTICLE;
                 } else {
-                    if (mColumnContent.get(position).getArticle().getType() == 1) {
+                    if (mColumnContent.get(position).getArticle()==null){
+                        return TYPE_ARTICLE;
+                    }else if (mColumnContent.get(position).getArticle().getType() == 1) {
                         return TYPE_ARTICLE;
                     } else if (mColumnContent.get(position).getArticle().getType() == 2) {
                         return TYPE_ARTICLE_THREE;
@@ -1334,7 +1379,7 @@ public ArticleViewThreeHolder(View view) {
                         }
                     }
                 }
-} else if (mColumnContent.get(position).getType() == 4) {
+            } else if (mColumnContent.get(position).getType() == 4) {
                 return TYPE_VIDEO;
             } else if (mColumnContent.get(position).getType() == 5) {
                 return TYPE_SPECIAL;
@@ -1350,11 +1395,11 @@ public ArticleViewThreeHolder(View view) {
                         return TYPE_GALLERIE_THREE;
                     }
                 }
-} else if (mColumnContent.get(position).getType() == 9) {
+            } else if (mColumnContent.get(position).getType() == 9) {
                 return TYPE_ACTIVITY;
             } else {
                 return TYPE_LIVE;
             }
         }
-}
+    }
 }

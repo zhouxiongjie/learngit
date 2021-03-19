@@ -5,15 +5,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
-
-    <ImageView
-        android:id="@+id/background"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:src="@drawable/start_up_logo"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:scaleType="centerInside" />
+        android:layout_alignParentBottom="true">
+        <ImageView
+            android:id="@+id/background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/start_up_logo"
+            android:scaleType="centerInside" />
+
+        <TextView
+            android:id="@+id/timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/skip_bg"
+            android:textColor="#666666"
+            android:textSize="@dimen/font_size_26px"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:visibility="invisible"
+            tools:text="跳过4s"/>
+    </RelativeLayout>
+
+
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -35,22 +52,36 @@
 
     </FrameLayout>
 
+
     <TextView
-        android:id="@+id/timer"
+
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/skip_bg"
-        android:textColor="#FFFFFF"
+        android:layout_height="26dp"
+        android:background="@drawable/wifi_tip_bg"
+        android:textColor="#E6E6E6"
         android:textSize="@dimen/font_size_26px"
+        android:gravity="center"
+
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="15dp"
         android:layout_marginRight="10dp"
-        android:visibility="invisible"
-        tools:text="跳过4s"/>
+        android:layout_marginTop="15dp"
+        android:visibility="visible"
+        android:text="WiFi预加载"/>
 
+    <TextView
 
-
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:background="@drawable/live_type_bg"
+        android:textColor="#E6E6E6"
+        android:textSize="@dimen/font_size_26px"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:visibility="visible"
+        android:text="广告"/>
 
 </RelativeLayout>
     

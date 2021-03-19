@@ -240,7 +240,7 @@ public class WebViewBackActivity extends /*AppCompatActivity*/QMUIActivity imple
 
     private void showShareDialog(final String title, final String desc, final String logo, final String url) {
         ShareDialog dialog = ShareDialog.getInstance(false, false);
-        dialog.setIsShowPosterButton(false);
+
         dialog.setIsHideSecondGroup(true);
         dialog.setShareHandler(new ShareDialog.ShareHandler() {
             @Override
@@ -248,32 +248,6 @@ public class WebViewBackActivity extends /*AppCompatActivity*/QMUIActivity imple
                 showShare(platform, title, desc, logo, url);
             }
 
-            @Override
-            public void poster() {
-            }
-
-            @Override
-            public void report() {
-            }
-
-            @Override
-            public void copyLink() {
-//获取剪贴板管理器：
-                ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                // 创建普通字符型ClipData
-                ClipData clipData = ClipData.newPlainText("Label", url);
-                // 将ClipData内容放到系统剪贴板里。
-                cm.setPrimaryClip(clipData);
-                ToastUtils.show("复制成功，可以发给朋友们了。");
-            }
-
-            @Override
-            public void refresh() {
-            }
-
-            @Override
-            public void collectContent() {
-            }
         });
         dialog.show(getSupportFragmentManager(), "ShareDialog");
     }

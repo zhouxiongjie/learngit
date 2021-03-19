@@ -249,7 +249,7 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
 //            }
 //        });
         if (MainActivity.sCurrentCity != null) {
-            weather();
+             weather();
         }
         return rootView;
 
@@ -925,9 +925,9 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
                     JSONObject jo = JSONObject.parseObject(result);
                     if (jo.getIntValue("code") == 100000 && jo.getJSONObject("data") != null) {
                         Weather wea = JSONObject.parseObject(jo.getJSONObject("data").toJSONString(), Weather.class);
-                        if (wea.getWeather() != null && wea.getWeather().getHeWeather6() != null && wea.getWeather().getHeWeather6().get(0) != null && wea.getWeather().getHeWeather6().get(0).getNow() != null) {
-                            temperature.setText(wea.getWeather().getHeWeather6().get(0).getNow().getTmp() + "℃");
-                            weather.setText(wea.getWeather().getHeWeather6().get(0).getNow().getCond_txt());
+                        if (wea!=null&&wea.getWeather() != null) {
+                            temperature.setText(wea.getWeather().getTemperature() + "℃");
+                            weather.setText(wea.getWeather().getWeather());
                         }
                     }
                 } catch (Exception e) {

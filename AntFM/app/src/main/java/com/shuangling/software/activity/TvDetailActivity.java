@@ -164,12 +164,7 @@ public class TvDetailActivity extends BaseAudioActivity implements Handler.Callb
             if (mRadioDetail != null) {
                 ShareDialog dialog = ShareDialog.getInstance(false, false);
                 dialog.setIsHideSecondGroup(true);
-//                    dialog.setIsShowPosterButton(false);
-//                    dialog.setIsShowReport(true);
-//                    dialog.setIsShowCollect(false);
-//                    dialog.setIsShowCopyLink(false);
-//                    dialog.setIsShowFontSize(false);
-//                    dialog.setIsShowRefresh(false);
+
                 dialog.setShareHandler(new ShareDialog.ShareHandler() {
                     @Override
                     public void onShare(String platform) {
@@ -182,25 +177,7 @@ public class TvDetailActivity extends BaseAudioActivity implements Handler.Callb
                         showShare(platform, mRadioDetail.getChannel().getName(), mRadioDetail.getChannel().getDes(), mRadioDetail.getChannel().getLogo(), url);
                     }
 
-                    @Override
-                    public void poster() {
-                    }
 
-                    @Override
-                    public void report() {
-                    }
-
-                    @Override
-                    public void copyLink() {
-                    }
-
-                    @Override
-                    public void refresh() {
-                    }
-
-                    @Override
-                    public void collectContent() {
-                    }
                 });
                 dialog.show(getSupportFragmentManager(), "ShareDialog");
 //shareTest();

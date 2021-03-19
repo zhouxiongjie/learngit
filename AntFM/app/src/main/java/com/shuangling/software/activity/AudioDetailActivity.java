@@ -219,12 +219,8 @@ public class AudioDetailActivity extends QMUIActivity/*AppCompatActivity*/ imple
             if (mAudioDetail != null) {
                 ShareDialog dialog = ShareDialog.getInstance(false, mAudioDetail.getIs_user_report() != 0);
                 dialog.setIsHideSecondGroup(false);
-                dialog.setIsShowPosterButton(false);
                 dialog.setIsShowReport(true);
-                dialog.setIsShowCollect(false);
-                dialog.setIsShowCopyLink(false);
-                dialog.setIsShowFontSize(false);
-                dialog.setIsShowRefresh(false);
+                dialog.setIsShowRefresh(true);
                 dialog.setShareHandler(new ShareDialog.ShareHandler() {
                     @Override
                     public void onShare(String platform) {
@@ -239,9 +235,7 @@ public class AudioDetailActivity extends QMUIActivity/*AppCompatActivity*/ imple
                         }
                     }
 
-                    @Override
-                    public void poster() {
-                    }
+
 
                     @Override
                     public void report() {
@@ -256,19 +250,13 @@ public class AudioDetailActivity extends QMUIActivity/*AppCompatActivity*/ imple
                         }
                     }
 
-                    @Override
-                    public void copyLink() {
-//获取剪贴板管理器：
-                    }
 
                     @Override
                     public void refresh() {
                         init();
                     }
 
-                    @Override
-                    public void collectContent() {
-                    }
+
                 });
                 dialog.show(getSupportFragmentManager(), "ShareDialog");
             }

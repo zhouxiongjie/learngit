@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.apsara.alivclittlevideo.utils.BitmapProviderFactory;
 import com.hjq.toast.ToastUtils;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigButton;
@@ -38,9 +39,11 @@ import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ServerInfo;
+import com.sum.slike.SuperLikeLayout;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +68,8 @@ public class CommentDetailActivity extends QMUIActivity/*AppCompatActivity*/ imp
     FrameLayout commentNumLayout;
     @BindView(R.id.bottom)
     LinearLayout bottom;
+    @BindView(R.id.super_like_layout)
+    SuperLikeLayout superLikeLayout;
     private int mCommentId;
     private int mScrollToCommentId;
     private Handler mHandler;
@@ -72,6 +77,8 @@ public class CommentDetailActivity extends QMUIActivity/*AppCompatActivity*/ imp
     private List<Comment> mReplyComment;
     private LevelTwoCommentAdapter mCommentListAdapter;
     private DialogFragment mCommentDialog;
+
+    HashMap<Integer, Long> lastClickTimeMap = new LinkedHashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +96,7 @@ public class CommentDetailActivity extends QMUIActivity/*AppCompatActivity*/ imp
     }
 
     private void init() {
+        superLikeLayout.setProvider(BitmapProviderFactory.getHDProvider(this));
         mHandler = new Handler(this);
         mCommentId = getIntent().getIntExtra("commentId", 0);
         mScrollToCommentId = getIntent().getIntExtra("scrollToCommentId", -1);
@@ -256,7 +264,27 @@ public class CommentDetailActivity extends QMUIActivity/*AppCompatActivity*/ imp
                             @Override
                             public void praiseItem(Comment comment, View view) {
                                 if (User.getInstance() != null) {
-                                    praise("" + comment.getId(), view);
+                                    Long lastClickTime = lastClickTimeMap.get(comment.getId());
+                                    if (lastClickTime == null || System.currentTimeMillis() - lastClickTime > 1000) { // 防抖
+
+                                        praise(String.valueOf(comment.getId()), view);
+
+                                    } else {
+                                        if (!view.isActivated()) {
+                                            int[] itemPosition = new int[2];
+                                            int[] superLikePosition = new int[2];
+                                            view.getLocationOnScreen(itemPosition);
+                                            superLikeLayout.getLocationOnScreen(superLikePosition);
+                                            int x = itemPosition[0] + view.getWidth() / 2;
+                                            int y = (itemPosition[1] - superLikePosition[1]) + view.getHeight() / 2;
+                                            superLikeLayout.launch(x, y);
+                                        } else {
+                                            praise(String.valueOf(comment.getId()), view);
+                                        }
+                                    }
+                                    lastClickTimeMap.put(comment.getId(), System.currentTimeMillis());
+
+                                    //praise("" + comment.getId(), view);
                                 } else {
                                     Intent it = new Intent(CommentDetailActivity.this, NewLoginActivity.class);
                                     startActivity(it);

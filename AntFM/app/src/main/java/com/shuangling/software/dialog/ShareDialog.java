@@ -78,30 +78,51 @@ public class ShareDialog extends BaseCircleDialog {
     LinearLayout refresh;
     @BindView(R.id.report)
     LinearLayout report;
+    @BindView(R.id.qrCode)
+    LinearLayout qrCode;
+    @BindView(R.id.download)
+    LinearLayout download;
     private float mAppFontSize;
     Unbinder unbinder;
     private boolean mIsCollected;
     private boolean mIsReported;
     private boolean mIsShowPosterButton = false;
-    private boolean mIsShowFontSize = true;
-    private boolean mIsShowRefresh = true;
-    private boolean mIsShowCollect = true;
-    private boolean mIsShowReport = true;
-    private boolean mIsShowCopyLink = true;
+    private boolean mIsShowFontSize = false;
+    private boolean mIsShowRefresh = false;
+    private boolean mIsShowCollect = false;
+    private boolean mIsShowReport = false;
+    private boolean mIsShowCopyLink = false;
+    private boolean mIsShowDownLoad = false;
+
+
+    private boolean mIsShowQrCode = true;
+
     private boolean mIsHideSecondGroup = false;
 
     public interface ShareHandler {
-        void onShare(String platform);
+        default void onShare(String platform) {
+        }
 
-        void copyLink();
+        default void copyLink() {
+        }
 
-        void refresh();
+        default void refresh() {
+        }
 
-        void collectContent();
+        default void collectContent() {
+        }
 
-        void poster();
+        default void poster() {
+        }
 
-        void report();
+        default void report() {
+        }
+
+        default void download() {
+        }
+
+        default void qrCode() {
+        }
     }
 
     public boolean isIsShowPosterButton() {
@@ -158,6 +179,22 @@ public class ShareDialog extends BaseCircleDialog {
 
     public void setIsHideSecondGroup(boolean mIsHideSecondGroup) {
         this.mIsHideSecondGroup = mIsHideSecondGroup;
+    }
+
+    public boolean ismIsShowDownLoad() {
+        return mIsShowDownLoad;
+    }
+
+    public void setmIsShowDownLoad(boolean mIsShowDownLoad) {
+        this.mIsShowDownLoad = mIsShowDownLoad;
+    }
+
+    public boolean ismIsShowQrCode() {
+        return mIsShowQrCode;
+    }
+
+    public void setmIsShowQrCode(boolean mIsShowQrCode) {
+        this.mIsShowQrCode = mIsShowQrCode;
     }
 
     public void setShareHandler(ShareHandler shareHandler) {
@@ -276,6 +313,17 @@ public class ShareDialog extends BaseCircleDialog {
         } else {
             copyLink.setVisibility(View.GONE);
         }
+        if (mIsShowDownLoad) {
+            download.setVisibility(View.VISIBLE);
+        }else {
+            download.setVisibility(View.GONE);
+        }
+        if (mIsShowQrCode) {
+            qrCode.setVisibility(View.VISIBLE);
+        }else {
+            qrCode.setVisibility(View.GONE);
+        }
+
         if (mIsHideSecondGroup) {
             secondGroupLayout.setVisibility(View.GONE);
         } else {
@@ -310,7 +358,7 @@ public class ShareDialog extends BaseCircleDialog {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.post, R.id.weiXin, R.id.weiXinCollect, R.id.weiXinFriends, R.id.weibo, R.id.qq, R.id.qqZone, R.id.fontSize, R.id.fontSizeBar, R.id.cancel, R.id.copyLink, R.id.collect, R.id.report, R.id.refresh})
+    @OnClick({R.id.post, R.id.weiXin, R.id.weiXinCollect, R.id.weiXinFriends, R.id.weibo, R.id.qq, R.id.qqZone, R.id.fontSize, R.id.fontSizeBar, R.id.cancel, R.id.copyLink, R.id.collect, R.id.report, R.id.refresh, R.id.download, R.id.qrCode})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.post:
@@ -393,6 +441,16 @@ public class ShareDialog extends BaseCircleDialog {
                     cancel.setText("取消");
                 } else {
                     dismiss();
+                }
+                break;
+            case R.id.qrCode:
+                if (mShareHandler != null) {
+                    mShareHandler.qrCode();
+                }
+                break;
+            case R.id.download:
+                if (mShareHandler != null) {
+                    mShareHandler.download();
                 }
                 break;
         }

@@ -6,6 +6,7 @@ import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -22,6 +23,7 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -77,6 +79,8 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
     /**
      * Called when the activity is first created.
      */
+    private LinearLayout flashLight;
+    private boolean isOpen = false;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,10 +89,25 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
         CameraManager.init(getApplication());
         viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_content);
         back = (ImageView) findViewById(R.id.scanner_toolbar_back);
+        flashLight= findViewById(R.id.flashLight);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
+            }
+        });
+        flashLight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!isOpen)
+                {
+                    openLight();
+                }
+                else
+                {
+                    closeLight();
+                }
+
             }
         });
 //		cancelScanButton = (Button) this.findViewById(R.id.btn_cancel_scan);
@@ -100,7 +119,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
     }
 
     private void addToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        ImageView more = (ImageView) findViewById(R.id.scanner_toolbar_more);
 //        assert more != null;
 //        more.setOnClickListener(new View.OnClickListener() {
@@ -109,7 +128,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
 //
 //            }
 //        });
-        setSupportActionBar(toolbar);
+        //setSupportActionBar(toolbar);
     }
 
     @Override
@@ -385,5 +404,25 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
             mediaPlayer.seekTo(0);
         }
     };
+
+
+    private void openLight() //开闪光灯
+    {
+        Camera camera = CameraManager.getCamera(); //我们先前在CameraManager类中添加的静态方法
+        Camera.Parameters params = camera.getParameters();
+        params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        camera.setParameters(params);
+        camera.startPreview();
+        isOpen = true;
+    }
+
+    private void closeLight() //关闪光灯
+    {
+        Camera camera = CameraManager.getCamera(); //我们先前在CameraManager类中添加的静态方法
+        Camera.Parameters params = camera.getParameters();
+        params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        camera.setParameters(params);
+        isOpen = false;
+    }
 
 }

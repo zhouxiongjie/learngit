@@ -3,152 +3,179 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#F8F9FA"
     android:orientation="vertical">
     <View
         android:id="@+id/statusBar"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/white"/>
+        android:layout_height="0dp"/>
 
     <RelativeLayout
-        android:id="@+id/userLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="15dp"
-        android:paddingTop="40dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="40dp">
+        android:padding="10dp">
 
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/headBg"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            app:actualImageScaleType="centerCrop"
-            app:failureImage="?attr/themeColor"
-            app:failureImageScaleType="centerCrop"
-            app:placeholderImage="?attr/themeColor"
-            app:placeholderImageScaleType="centerCrop"
-            app:roundAsCircle="true"
-            app:roundingBorderColor="@color/white"
-            app:roundingBorderWidth="0dp"
-            app:viewAspectRatio="1" />
-
-        <com.facebook.drawee.view.SimpleDraweeView
-            android:id="@+id/head"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:visibility="visible"
-            app:actualImageScaleType="centerCrop"
-            app:failureImage="@drawable/ic_user4"
-            app:failureImageScaleType="centerCrop"
-            app:placeholderImage="@drawable/ic_user4"
-            app:placeholderImageScaleType="centerCrop"
-            app:roundAsCircle="true"
-            app:roundingBorderColor="@color/white"
-            app:roundingBorderWidth="0dp"
-            app:viewAspectRatio="1" />
-
-        <LinearLayout
-            android:id="@+id/loginLayout"
+        <com.shuangling.software.customview.FontIconView
+            android:id="@+id/scan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/head"
-            android:orientation="vertical"
-            android:visibility="visible">
+            android:text="&#xe792;"
+            android:textColor="#303030"
+            android:textSize="@dimen/font_size_36px" />
 
-            <TextView
-                android:id="@+id/userName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="今晚打老虎"
-                android:textColor="@color/textColorTwo"
-                android:textSize="@dimen/font_size_36px" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/attentionNumber"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="关注 0"
-                    android:textColor="#696969"
-                    android:textSize="@dimen/font_size_24px" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:text="|"
-                    android:textColor="#696969"
-                    android:textSize="@dimen/font_size_24px" />
-
-                <TextView
-                    android:id="@+id/subscribeNumber"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="订阅 0"
-                    android:textColor="#696969"
-                    android:textSize="@dimen/font_size_24px" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/login"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/head"
-            android:text="点击登录"
-            android:textColor="@color/textColorTwo"
-            android:textSize="@dimen/font_size_30px"
-            android:visibility="gone" />
-
-        <ImageView
+        <com.shuangling.software.customview.FontIconView
+            android:id="@+id/setting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/ic_right" />
-
+            android:text="&#xe75c;"
+            android:textColor="#181818"
+            android:textSize="@dimen/font_size_36px" />
     </RelativeLayout>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="6dp"
-        android:background="@color/divideColorOne" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="常用功能"
-        android:textColor="@color/textColorTwo"
-        android:textSize="@dimen/font_size_30px" />
-    
-    <ImageView
+
+    <FrameLayout
+        android:id="@+id/userLayout"
         android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/divideColorTwo"/>
+        android:layout_height="150dp">
+
+        <RelativeLayout
+            android:id="@+id/noLoginLayout"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center">
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:actualImageScaleType="centerCrop"
+                app:failureImage="?attr/themeColor"
+                app:failureImageScaleType="centerCrop"
+                app:placeholderImage="?attr/themeColor"
+                app:placeholderImageScaleType="centerCrop"
+                app:roundAsCircle="true"
+                app:roundingBorderColor="@color/white"
+                app:roundingBorderWidth="0dp"
+                app:viewAspectRatio="1" />
+            <TextView
+
+                android:id="@+id/login"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="登录"
+                android:textSize="@dimen/font_size_32px"
+                android:gravity="center"
+                android:textColor="@color/white"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/loginLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/head"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="30dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                app:actualImageScaleType="centerCrop"
+                app:failureImage="@drawable/ic_user4"
+                app:failureImageScaleType="centerCrop"
+                app:placeholderImage="@drawable/ic_user4"
+                app:placeholderImageScaleType="centerCrop"
+                app:roundAsCircle="true"
+                app:roundingBorderColor="@color/white"
+                app:roundingBorderWidth="0dp"
+                app:viewAspectRatio="1" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@+id/head"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/userName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="今晚打老虎"
+                    android:textColor="#060709"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/font_size_38px" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/attentionNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="#202123"
+                        android:textSize="@dimen/font_size_36px" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:text="关注"
+                        android:textColor="#7C7F85"
+                        android:textSize="@dimen/font_size_26px" />
+
+
+                    <TextView
+                        android:id="@+id/subscribeNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="15dp"
+                        android:text="0"
+                        android:textColor="#202123"
+                        android:textSize="@dimen/font_size_36px" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:text="订阅"
+                        android:textColor="#7C7F85"
+                        android:textSize="@dimen/font_size_26px" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="20dp"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_right" />
+        </RelativeLayout>
+
+    </FrameLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/personal_center_area_bg"
         android:orientation="horizontal"
         android:weightSum="4">
 
@@ -168,46 +195,16 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:text="&#xe737;"
-                android:textColor="#181818"
+                android:textColor="?attr/themeColor"
                 android:textSize="@dimen/font_size_36px" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/textColorTwo"
-                android:textSize="@dimen/font_size_26px"
+                android:textColor="#030407"
+                android:textSize="@dimen/font_size_24px"
                 android:layout_marginTop="15dp"
-                android:text="消息" />
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/history"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-
-            <com.shuangling.software.customview.FontIconView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="&#xe75b;"
-                android:textColor="#181818"
-                android:textSize="@dimen/font_size_36px" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/textColorTwo"
-                android:textSize="@dimen/font_size_26px"
-                android:layout_marginTop="15dp"
-                android:text="历史" />
+                android:text="消息通知" />
 
         </LinearLayout>
 
@@ -228,19 +225,47 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:text="&#xe73d;"
-                android:textColor="#181818"
+                android:textColor="?attr/themeColor"
                 android:textSize="@dimen/font_size_36px" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/textColorTwo"
-                android:textSize="@dimen/font_size_26px"
+                android:textColor="#030407"
+                android:textSize="@dimen/font_size_24px"
                 android:layout_marginTop="15dp"
-                android:text="收藏" />
+                android:text="我的收藏" />
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/history"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+
+            <com.shuangling.software.customview.FontIconView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="&#xe75b;"
+                android:textColor="?attr/themeColor"
+                android:textSize="@dimen/font_size_36px" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#030407"
+                android:textSize="@dimen/font_size_24px"
+                android:layout_marginTop="15dp"
+                android:text="浏览历史" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/brokeNews"
@@ -257,8 +282,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:text="&#xe674;"
-                android:textColor="#181818"
+                android:text="&#xe613;"
+                android:textColor="?attr/themeColor"
                 android:textSize="@dimen/font_size_36px" />
 
             <TextView
@@ -266,116 +291,194 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:text="报料"
-                android:textColor="@color/textColorTwo"
+                android:textColor="#030407"
                 android:textSize="@dimen/font_size_26px" />
 
         </LinearLayout>
 
 
-
-
-
     </LinearLayout>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/divideColorTwo"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="4">
+        android:layout_margin="20dp"
+        android:background="@drawable/personal_center_area_bg"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/myPublish"
-            android:layout_width="0dp"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_gravity="left"
+            android:padding="10dp"
+            android:text="其他服务"
+            android:textStyle="bold"
+            android:textColor="#202123"
+            android:textSize="@dimen/font_size_34px" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/personal_center_area_bg"
+            android:orientation="horizontal"
+            android:weightSum="4">
 
-
-            <com.shuangling.software.customview.FontIconView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/myPublish"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="&#xe743;"
-                android:textColor="#181818"
-                android:textSize="@dimen/font_size_36px" />
+                android:layout_weight="1"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:gravity="center"
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
+
+                <com.shuangling.software.customview.FontIconView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="&#xe743;"
+                    android:textColor="#333333"
+                    android:textSize="@dimen/font_size_36px" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212224"
+                    android:textSize="@dimen/font_size_24px"
+                    android:layout_marginTop="15dp"
+                    android:text="我的发布" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/award"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+
+                <com.shuangling.software.customview.FontIconView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="&#xe76c;"
+                    android:textColor="#333333"
+                    android:textSize="@dimen/font_size_36px" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212224"
+                    android:textSize="@dimen/font_size_24px"
+                    android:layout_marginTop="15dp"
+                    android:text="我的奖品" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/wallet"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="invisible">
+
+
+                <com.shuangling.software.customview.FontIconView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="&#xe76f;"
+                    android:textColor="#333333"
+                    android:textSize="@dimen/font_size_36px" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212224"
+                    android:textSize="@dimen/font_size_24px"
+                    android:layout_marginTop="15dp"
+                    android:text="钱包" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/feedback"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="@color/textColorTwo"
-                android:textSize="@dimen/font_size_26px"
-                android:layout_marginTop="15dp"
-                android:text="我的发布" />
+                android:layout_weight="1"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+
+                <com.shuangling.software.customview.FontIconView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="&#xe75d;"
+                    android:textColor="#333333"
+                    android:textSize="@dimen/font_size_36px" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212224"
+                    android:textSize="@dimen/font_size_24px"
+                    android:layout_marginTop="15dp"
+                    android:text="意见反馈" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-
         <LinearLayout
-            android:id="@+id/award"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/personal_center_area_bg"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <LinearLayout
+                android:id="@+id/aboutUs"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
 
 
-            <com.shuangling.software.customview.FontIconView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="&#xe76c;"
-                android:textColor="#181818"
-                android:textSize="@dimen/font_size_36px" />
+                <com.shuangling.software.customview.FontIconView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="&#xe745;"
+                    android:textColor="#333333"
+                    android:textSize="@dimen/font_size_36px" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/textColorTwo"
-                android:textSize="@dimen/font_size_26px"
-                android:layout_marginTop="15dp"
-                android:text="奖品" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212224"
+                    android:textSize="@dimen/font_size_24px"
+                    android:layout_marginTop="15dp"
+                    android:text="关于我们" />
 
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/wallet"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="invisible">
-
-
-            <com.shuangling.software.customview.FontIconView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="&#xe76f;"
-                android:textColor="#181818"
-                android:textSize="@dimen/font_size_36px" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/textColorTwo"
-                android:textSize="@dimen/font_size_26px"
-                android:layout_marginTop="15dp"
-                android:text="钱包" />
-
+            </LinearLayout>
         </LinearLayout>
 
 
@@ -383,154 +486,10 @@
     </LinearLayout>
 
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="6dp"
-        android:background="@color/divideColorOne" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="更多功能"
-        android:textColor="@color/textColorTwo"
-        android:textSize="@dimen/font_size_30px" />
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/divideColorTwo"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="4">
-
-        <LinearLayout
-            android:id="@+id/feedback"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-
-            <com.shuangling.software.customview.FontIconView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="&#xe75d;"
-                android:textColor="#181818"
-                android:textSize="@dimen/font_size_36px" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/textColorTwo"
-                android:textSize="@dimen/font_size_26px"
-                android:layout_marginTop="15dp"
-                android:text="意见反馈" />
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/setting"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-
-            <com.shuangling.software.customview.FontIconView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="&#xe75c;"
-                android:textColor="#181818"
-                android:textSize="@dimen/font_size_36px" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/textColorTwo"
-                android:textSize="@dimen/font_size_26px"
-                android:layout_marginTop="15dp"
-                android:text="设置" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/scan"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-
-            <com.shuangling.software.customview.FontIconView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="&#xe75c;"
-                android:textColor="#181818"
-                android:textSize="@dimen/font_size_36px" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/textColorTwo"
-                android:textSize="@dimen/font_size_26px"
-                android:layout_marginTop="15dp"
-                android:text="扫一扫" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/aboutUs"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-
-            <com.shuangling.software.customview.FontIconView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:text="&#xe745;"
-                android:textColor="#181818"
-                android:textSize="@dimen/font_size_36px" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/textColorTwo"
-                android:textSize="@dimen/font_size_26px"
-                android:layout_marginTop="15dp"
-                android:text="关于我们" />
-
-        </LinearLayout>
-
-
-    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#F5F5F8">
+        android:layout_height="match_parent">
 
         <TextView
             android:layout_width="wrap_content"

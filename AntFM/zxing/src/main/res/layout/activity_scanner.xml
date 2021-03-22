@@ -18,7 +18,7 @@
         app:corner_color="@color/corner_color"
         app:frame_color="@color/viewfinder_frame"
         app:label_text="二维码/条形码扫描"
-        app:label_text_color="@color/colorAccent"
+        app:label_text_color="@android:color/white"
         app:laser_color="@color/laser_color"
         app:mask_color="@color/viewfinder_mask"
         app:result_color="@color/result_view"
@@ -56,6 +56,34 @@
         <!--android:src="@mipmap/abc_ic_menu_moreoverflow_mtrl_alpha"/>-->
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/flashLight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="100dp"
+        android:orientation="vertical">
+
+        <com.google.zxing.view.FontIconView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="&#xe790;"
+            android:textColor="#FFFFFF"
+            android:textSize="18dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp"
+            android:textSize="18dp"
+            android:textColor="#FFFFFF"
+            android:text="轻触打开"
+            />
+
+    </LinearLayout>
 
 </FrameLayout>
 

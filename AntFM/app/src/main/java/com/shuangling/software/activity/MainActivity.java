@@ -109,6 +109,7 @@ import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
+import static android.util.TypedValue.COMPLEX_UNIT_DIP;
 
 //@EnableDragToClose()
 public class MainActivity extends QMUIActivity implements AMapLocationListener, Handler.Callback {
@@ -932,7 +933,7 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
                                         bottomMenuHolder.name.setText(bottomMenu.getName());
                                     } else if (bottomMenu.getShow_type() == 2) {//显示效果 2大图
                                         bottomMenuHolder.name.setVisibility(View.GONE);
-                                        bottomMenuHolder.icon.setTextSize(CommonUtils.dip2px(15));//
+                                        bottomMenuHolder.icon.setTextSize(COMPLEX_UNIT_DIP,45);//
                                     }
                                     switch (bottomMenu.getType()){
                                         case 1://首页
@@ -1060,7 +1061,7 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
                                         //setViewSize(bottomMenuHolder.iconImg, CommonUtils.dip2px(70), 70);
                                     } else if (bottomMenu.getShow_type() == 2) {//显示效果 2大图
                                         bottomMenuHolder.name.setVisibility(View.GONE);
-                                        setViewSize(bottomMenuHolder.iconImg, CommonUtils.dip2px(55), CommonUtils.dip2px(55));
+                                        setViewSize(bottomMenuHolder.iconImg, CommonUtils.dip2px(45), CommonUtils.dip2px(45));
                                     }
 
                                     Uri uri=Uri.parse(bottomMenu.getLogo());
@@ -1239,7 +1240,28 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
 
             @Override
             protected void error(BaseDownloadTask task, Throwable e) {
-                Log.i("test", e.toString());
+
+                dialogFragment.dismiss();
+
+                new CircleDialog.Builder()
+                .setTitle("下载出错")
+                .setText("是否重新下载？")
+                .setPositive("确定", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        downloadApk(downloadUrl);
+                    }
+                })
+                .setNegative("取消", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                })
+                .setCanceledOnTouchOutside(false)
+                .setCancelable(false)
+                .show(getSupportFragmentManager());
+
             }
 
             @Override

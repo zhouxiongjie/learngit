@@ -141,5 +141,7 @@
 
     <string name="reply">已回复</string>
     <string name="pending_reply">待回复</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

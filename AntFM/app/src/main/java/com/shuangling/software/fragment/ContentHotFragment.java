@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.PagerAdapter;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,15 +52,18 @@ import com.shuangling.software.adapter.ColumnDecorateVideoContentAdapter;
 import com.shuangling.software.adapter.MoudleGridViewAdapter;
 import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.MyGridView;
+import com.shuangling.software.entity.BannerColorInfo;
 import com.shuangling.software.entity.BannerInfo;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.DecorModule;
 import com.shuangling.software.entity.Station;
+import com.shuangling.software.event.BannerColorEvent;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.ACache;
+import com.shuangling.software.utils.BannerViewImageLoader;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.Constant;
 import com.shuangling.software.utils.ImageLoader;
@@ -115,6 +120,11 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
     private RecyclerViewSkeletonScreen mSkeletonScreen;
     private List<RecyclerView> mContentRecyclerView = new ArrayList<>();
     private LinearLayout mDecorateLayout;
+
+    private List<BannerColorInfo> colorList = new ArrayList<>();
+    private BannerViewImageLoader imageLoader;
+    private int count;
+    private boolean isInit = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -589,6 +599,78 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                             banner.setLogo(module.getContents().get(j).getCover());
                                             banner.setUrl(module.getContents().get(j).getSource_url());
                                             banners.add(banner);
+                                        }
+                                        if (module.getBackground_change().equals("1")) {//background_change为1时才获取颜色
+                                            //开始获取banner颜色并封装
+                                            count = banners.size();
+                                            colorList.clear();
+                                            for (int k = 0; k <= count + 1; k++) {
+                                                BannerColorInfo info = new BannerColorInfo();
+                                                if (k == 0) {
+                                                    info.setImgUrl(banners.get(count - 1).getLogo());
+                                                } else if (k == count + 1) {
+                                                    info.setImgUrl(banners.get(0).getLogo());
+                                                } else {
+                                                    info.setImgUrl(banners.get(k - 1).getLogo());
+                                                }
+                                                colorList.add(info);
+                                            }
+                                            imageLoader = new BannerViewImageLoader(colorList);
+                                            bannerView.setLoadImageInterface(imageLoader, colorList);
+                                            bannerView.addOnPageChangedListener(new BannerView.OnPageChangeListener() {
+                                                @Override
+                                                public void onPageScrolleStateChange(int state) {
+
+                                                }
+
+                                                @Override
+                                                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                                                    if (positionOffset > 1) {//会出现极个别大于1的数据
+                                                        return;
+                                                    }
+                                                    //修正position，解决两头颜色错乱
+                                                    if (position == 0) {
+                                                        position = count;
+                                                    }
+                                                    if (position > count) {
+                                                        position = 1;
+                                                    }
+                                                    int pos = (position) % count;//很关键
+                                                    int vibrantColor = ColorUtils.blendARGB(imageLoader.getDominantColor(pos), imageLoader.getDominantColor(pos + 1), positionOffset);
+                                                    // TODO: 2021/3/11 对后台传过来的banner颜色获取模式进行判断：方案待定
+                                                    /**
+                                                     * 模式两种：
+                                                     * 1.用户自定义，不发送彩色EventBus，在RecommendFragment里面直接修改
+                                                     * 2.随banner改变而改变
+                                                     */
+                                                    if (module.getBackground_change().equals("1")) {
+                                                        sendBannerColorEvent(vibrantColor, module.getBackground_change());
+                                                    }
+
+                                                }
+
+                                                @Override
+                                                public void onPageSelected(int position) {
+                                                    if (isInit) {// 第一次,延时加载才能拿到颜色
+                                                        isInit = false;
+                                                        new Handler().postDelayed(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                int vibrantColor = imageLoader.getDominantColor(1);
+                                                                // TODO: 2021/3/11 对后台传过来的banner颜色获取模式进行判断：方案待定
+                                                                if (module.getBackground_change().equals("1")) {
+                                                                    sendBannerColorEvent(vibrantColor, module.getBackground_change());
+                                                                }
+                                                            }
+                                                        }, 200);
+
+                                                    }
+                                                }
+                                            });
+                                        } else if (module.getBackground_change().equals("0")) {
+                                            BannerColorEvent event = new BannerColorEvent();
+                                            event.setIsBannerColorChange(module.getBackground_change());
+                                            EventBus.getDefault().post(event);
                                         }
                                         bannerView.setData(banners);
                                         bannerView.setOnItemClickListener(new BannerView.OnItemClickListener() {
@@ -1193,5 +1275,20 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                 break;
         }
         return false;
+    }
+
+    /**
+     * 发送eventBus颜色改变事件的时候，要判断随banner颜色变化的开关是否打开
+     *
+     * @param vibrantColor 获取到的banner中的图片颜色
+     */
+    public void sendBannerColorEvent(int vibrantColor,String isBannerColorChange) {
+        //0：否；1：是
+        BannerColorEvent bannerColorEvent = new BannerColorEvent();
+        bannerColorEvent.setIsBannerColorChange(isBannerColorChange);
+        bannerColorEvent.setmColumnId(mColumn.getId());
+        bannerColorEvent.setVibrantColor(vibrantColor);
+        EventBus.getDefault().post(bannerColorEvent);
+
     }
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragment.LinkWebViewFragment">
+
+    <!--动态承载WebView的容器-->
+    <FrameLayout
+        android:id="@+id/fl_web_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/activtyTitle" />
+
+    <!--progressBar 需要时再inflate-->
+    <ViewStub
+        android:id="@+id/viewStub"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@id/activtyTitle"
+        android:layout="@layout/progress_web" />
+</FrameLayout>

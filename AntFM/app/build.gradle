@@ -204,7 +204,8 @@ dependencies {
     //    implementation(name: 'AlivcReporter-1.2', ext: 'aar')
     //    implementation(name: 'AliyunVodPlayer-3.4.6', ext: 'aar')
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'com.jakewharton:butterknife:10.1.0'//8.8.1'
+    implementation 'com.jakewharton:butterknife:10.1.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'//8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'//8.8.1'
 //    implementation 'com.jakewharton:butterknife:10.2.1'
 //    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
@@ -270,5 +271,7 @@ dependencies {
 //    implementation 'com.tencent.tbs.tbssdk:sdk:43939' //https://x5.tencent.com/docs/access.html
     implementation 'cat.ereza:customactivityoncrash:2.3.0' //https://github.com/Ereza/CustomActivityOnCrash
     implementation 'com.tencent.xbright:lebwebrtcsdk:2.0.6'
+    implementation 'androidx.palette:palette:1.0.0'//图片取色工具
+
 
 }

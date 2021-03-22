@@ -190,7 +190,7 @@
 
                 <!--</RelativeLayout>-->
 
-                <com.kcrason.dynamicpagerindicatorlibrary.DynamicPagerIndicator
+                <com.shuangling.software.customview.CustomPagerIndicator
                     android:id="@+id/pagerIndicator"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
@@ -212,8 +212,6 @@
                     app:tabSelectedTextColor="@color/white"
                     app:tabSelectedTextSize="@dimen/font_size_44px"
                     app:tabTextColorMode="gradient" />
-
-                <!--app:tabTextSizeMode="gradient"-->
 
                 <FrameLayout
                     android:id="@+id/customColumn"

@@ -20,6 +20,8 @@ import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.shuangling.software.R;
+import com.shuangling.software.entity.BannerColorInfo;
+import com.shuangling.software.interf.LoadImageInterface;
 import com.shuangling.software.utils.CommonUtils;
 import com.shuangling.software.utils.ImageLoader;
 
@@ -36,10 +38,19 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
     private List<T> mData = new ArrayList<T>();
     private List<View> mAutoViews = new ArrayList<View>();
     private PagerAdapter mAutoViewPageAdapter;
+    //定义监听接口，接受外部传过来的监听对象
+    private OnPageChangeListener banner_onPageChangeListener;
+    private LoadImageInterface loadImageInterface;
+    private List<BannerColorInfo> colorList;
     private int mCurponsition;//记录当前显示的索引
     private int mWidth;
     private int mHeight;
     private int mMode = 2;        //1大图，2卡片
+
+    public void setLoadImageInterface(LoadImageInterface loadImageInterface, List<BannerColorInfo> colorList) {
+        this.loadImageInterface = loadImageInterface;
+        this.colorList = colorList;
+    }
 
     public int getmMode() {
         return mMode;
@@ -60,6 +71,21 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
     public interface OnItemClickListener {
         public void onClick(View view);
     }
+
+    // 外部对象通过该接口监听内部viewpager的三种状态，同时获取参数
+    public interface OnPageChangeListener {
+        public void onPageScrolleStateChange(int state);
+
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels);
+
+        public void onPageSelected(int position);
+    }
+
+    //外部调用该方法，传入监听对象
+    public void addOnPageChangedListener(OnPageChangeListener onPageChangeListener) {
+        this.banner_onPageChangeListener = onPageChangeListener;
+    }
+
 
     public void setOnItemClickListener(OnItemClickListener clickListener) {
         this.mClickListener = clickListener;
@@ -116,13 +142,13 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
         for (int i = 0; i < mData.size(); i++) {
             final T data = mData.get(i);
 
-            View banner=mInflater.inflate(R.layout.banner_item, mAutoScrollViewPager, false);
+            View banner = mInflater.inflate(R.layout.banner_item, mAutoScrollViewPager, false);
 
             SimpleDraweeView logo = banner.findViewById(R.id.logo);
             SimpleDraweeView mask = banner.findViewById(R.id.mask);
-            if(TextUtils.isEmpty(data.getTitle())){
+            if (TextUtils.isEmpty(data.getTitle())) {
                 mask.setVisibility(GONE);
-            }else{
+            } else {
                 mask.setVisibility(VISIBLE);
             }
             if (mMode == 1) {
@@ -135,6 +161,9 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
                 int height = 14 * width / 25;
                 if (!TextUtils.isEmpty(data.getLogo())) {
                     Uri uri = Uri.parse(data.getLogo() + CommonUtils.getOssResize(width, height));
+                    if (loadImageInterface != null) {
+                        loadImageInterface.getBitmap(Uri.parse(data.getLogo()));
+                    }
                     ImageLoader.showThumb(uri, logo, width, height);
                 }
 
@@ -161,6 +190,9 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
                 int height = 10 * width / 23;
                 if (!TextUtils.isEmpty(data.getLogo())) {
                     Uri uri = Uri.parse(data.getLogo() + CommonUtils.getOssResize(width, height));
+                    if (loadImageInterface != null) {
+                        loadImageInterface.getBitmap(Uri.parse(data.getLogo()));
+                    }
                     ImageLoader.showThumb(uri, logo, width, height);
                 }
             }
@@ -202,13 +234,20 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
             mAutoViewPageIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    if (banner_onPageChangeListener != null) {
+                        banner_onPageChangeListener.onPageScrolled(position, positionOffset, positionOffsetPixels);
+                    }
                     T adv = (T) mAutoViews.get(position).getTag();
                     mAdvertDesc.setText(adv.getTitle());
                     //mAdvertDesc.setText("抗击疫情我们在一起，坚决打赢疫情防控的人民战争坚决打赢疫情防控的人民战争");
+
                 }
 
                 @Override
                 public void onPageSelected(int position) {
+                    if (banner_onPageChangeListener != null) {
+                        banner_onPageChangeListener.onPageSelected(position);
+                    }
                     mCurponsition = position;//记录当前显示的索引
                     T adv = (T) mAutoViews.get(position).getTag();
                     mAdvertDesc.setText(adv.getTitle());
@@ -221,6 +260,9 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
 
                 @Override
                 public void onPageScrollStateChanged(int state) {
+                    if (banner_onPageChangeListener != null) {
+                        banner_onPageChangeListener.onPageScrolleStateChange(state);
+                    }
                     //验证当前的滑动是否结束
 //                    if (state == ViewPager.SCROLL_STATE_IDLE) {
 //                        if (mCurponsition == 0){

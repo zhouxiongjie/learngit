@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -69,15 +70,13 @@ import butterknife.OnClick;
 import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 
-import static android.app.Activity.RESULT_OK;
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
 public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragment*/ {
     public static final int MSG_UPDATE_STATUS = 0x01;
     public static final int MSG_GET_UPDATE_INFO = 0x2;
     private final int REQUEST_CODE_SCAN = 1001;
-    @BindView(R.id.headBg)
-    SimpleDraweeView headBg;
+
     @BindView(R.id.head)
     SimpleDraweeView head;
     @BindView(R.id.userName)
@@ -87,11 +86,11 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
     @BindView(R.id.subscribeNumber)
     TextView subscribeNumber;
     @BindView(R.id.loginLayout)
-    LinearLayout loginLayout;
-    @BindView(R.id.login)
-    TextView login;
-    @BindView(R.id.userLayout)
-    RelativeLayout userLayout;
+    RelativeLayout loginLayout;
+    //    @BindView(R.id.login)
+//    TextView login;
+//    @BindView(R.id.userLayout)
+//    FrameLayout userLayout;
     @BindView(R.id.message)
     LinearLayout message;
     @BindView(R.id.history)
@@ -108,13 +107,15 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
     LinearLayout wallet;
     @BindView(R.id.feedback)
     LinearLayout feedback;
-    @BindView(R.id.setting)
-    LinearLayout setting;
+    //    @BindView(R.id.setting)
+//    LinearLayout setting;
 //    Unbinder unbinder;
     @BindView(R.id.statusBar)
     View statusBar;
     @BindView(R.id.aboutUs)
     LinearLayout aboutUs;
+    @BindView(R.id.noLoginLayout)
+    RelativeLayout noLoginLayout;
     private Handler mHandler;
     private DialogFragment mDialogFragment;
 
@@ -160,7 +161,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
         //unbinder.unbind();
     }
 
-    @OnClick({R.id.history,R.id.scan, R.id.collect, R.id.subscribeNumber, R.id.userLayout, R.id.login, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet, R.id.award, R.id.aboutUs})
+    @OnClick({R.id.history, R.id.scan, R.id.collect, R.id.head,R.id.subscribeNumber, R.id.noLoginLayout, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet, R.id.award, R.id.aboutUs})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.history:
@@ -213,7 +214,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
                     startActivity(it);
                 }
                 break;
-            case R.id.userLayout:
+            case R.id.head:
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), ModifyUserInfoActivity.class));
                 } else {
@@ -223,7 +224,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
                 break;
             case R.id.loginLayout:
                 break;
-            case R.id.login:
+            case R.id.noLoginLayout:
                 if (User.getInstance() == null) {
                     Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
@@ -381,8 +382,8 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
             if (data != null) {
                 //key值都约束好了
                 String content = data.getStringExtra(CaptureActivity.INTENT_EXTRA_KEY_QR_SCAN);
-                Intent it=new Intent(getContext(), ScanResultActivity.class);
-                it.putExtra("value",content);
+                Intent it = new Intent(getContext(), ScanResultActivity.class);
+                it.putExtra("value", content);
                 startActivity(it);
 
                 //ToastUtils.show(content);
@@ -416,7 +417,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
         super.onResume();
         if (User.getInstance() != null) {
             loginLayout.setVisibility(View.VISIBLE);
-            login.setVisibility(View.GONE);
+            noLoginLayout.setVisibility(View.GONE);
             if (!TextUtils.isEmpty(User.getInstance().getAvatar())) {
                 //String urlStr="https://shuangln-cdn.on-radio.cn/cms/avatar/iZiSDSFQHin5B45c1566434560982.jpg";
                 Uri uri = Uri.parse(User.getInstance().getAvatar());
@@ -430,7 +431,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
             updateStatistics();
         } else {
             loginLayout.setVisibility(View.GONE);
-            login.setVisibility(View.VISIBLE);
+            noLoginLayout.setVisibility(View.VISIBLE);
             ImageLoader.showThumb(head, R.drawable.ic_user4);
         }
     }
@@ -448,8 +449,8 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
                         @Override
                         public void run() {
                             try {
-                                attentionNumber.setText("关注 " + jsonObject.getJSONObject("data").getInteger("follows_count"));
-                                subscribeNumber.setText("订阅 " + jsonObject.getJSONObject("data").getInteger("subscribe_count"));
+                                attentionNumber.setText("" + jsonObject.getJSONObject("data").getInteger("follows_count"));
+                                subscribeNumber.setText("" + jsonObject.getJSONObject("data").getInteger("subscribe_count"));
                             } catch (Exception e) {
                             }
 //

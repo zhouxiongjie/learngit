@@ -44,12 +44,12 @@
 
     <!-- normal skin -->
     <style name="app_skin_normal" parent="BaseAppTheme" >
-        <item name="app_skin_common_background">@color/qmui_config_color_white</item>
+        <item name="app_skin_common_background">@color/app_skin_common_background_light</item>
     </style>
 
     <!-- dark skin -->
     <style name="app_skin_dark" parent="BaseAppTheme">
-        <item name="app_skin_common_background">@color/qmui_config_color_gray_2</item>
+        <item name="app_skin_common_background">@color/app_skin_common_background_dark</item>
     </style>
 
 

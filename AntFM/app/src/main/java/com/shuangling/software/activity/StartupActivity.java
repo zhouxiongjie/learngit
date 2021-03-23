@@ -243,9 +243,11 @@ public class StartupActivity extends QMUIActivity implements Handler.Callback {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
                                     if (millisUntilFinished / 1000 == 0) {
-                                        timer.setText("跳过1s");
+                                        //timer.setText("跳过1s");
+                                        timer.setText("跳过");
                                     } else {
-                                        timer.setText("跳过" + millisUntilFinished / 1000 + "s");
+                                        //timer.setText("跳过" + millisUntilFinished / 1000 + "s");
+                                        timer.setText("跳过" );
                                     }
                                 }
 

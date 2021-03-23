@@ -213,6 +213,10 @@
     </integer-array>
 
 
+    <!--卡片文本颜色-->
+    <color name="app_skin_common_background_light">#ffffff</color>
+    <color name="app_skin_common_background_dark">#1F1F1F</color>
+
     <!--分割线颜色-->
     <color name="divide_6dp_color_light">#F3F4F5</color>
     <color name="divide_6dp_color_dark">#121212</color>

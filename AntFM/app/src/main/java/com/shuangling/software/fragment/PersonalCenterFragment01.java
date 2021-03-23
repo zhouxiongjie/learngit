@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -47,9 +46,11 @@ import com.shuangling.software.activity.ScanResultActivity;
 import com.shuangling.software.activity.SettingActivity;
 import com.shuangling.software.activity.SubscribeActivity;
 import com.shuangling.software.activity.WebViewBackActivity;
+import com.shuangling.software.customview.FontIconView;
 import com.shuangling.software.dialog.UpdateDialog;
 import com.shuangling.software.entity.UpdateInfo;
 import com.shuangling.software.entity.User;
+import com.shuangling.software.manager.SkinManager;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.CommonUtils;
@@ -116,6 +117,13 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
     LinearLayout aboutUs;
     @BindView(R.id.noLoginLayout)
     RelativeLayout noLoginLayout;
+    @BindView(R.id.darkModel)
+    LinearLayout darkModel;
+    @BindView(R.id.darkModelIcon)
+    FontIconView darkModelIcon;
+    @BindView(R.id.darkModelText)
+    TextView darkModelText;
+
     private Handler mHandler;
     private DialogFragment mDialogFragment;
 
@@ -161,7 +169,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
         //unbinder.unbind();
     }
 
-    @OnClick({R.id.history, R.id.scan, R.id.collect, R.id.head,R.id.subscribeNumber, R.id.noLoginLayout, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet, R.id.award, R.id.aboutUs})
+    @OnClick({R.id.history, R.id.darkModel,R.id.scan, R.id.collect, R.id.head, R.id.subscribeNumber, R.id.noLoginLayout, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet, R.id.award, R.id.aboutUs})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.history:
@@ -307,6 +315,19 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
                 it.putExtra("addParams", true);
                 startActivity(it);
                 break;
+            case R.id.darkModel:
+                int skin=SkinManager.getCurrentSkin();
+                if(skin==SkinManager.SKIN_LIGHT){
+                    darkModelIcon.setText(R.string.skin_light);
+                    darkModelText.setText("普通模式");
+                   SkinManager.changeSkin(SkinManager.SKIN_DARK);
+                }else{
+                    darkModelIcon.setText(R.string.skin_dark);
+                    darkModelText.setText("黑夜模式");
+                    SkinManager.changeSkin(SkinManager.SKIN_LIGHT);
+                }
+
+            break;
         }
     }
 

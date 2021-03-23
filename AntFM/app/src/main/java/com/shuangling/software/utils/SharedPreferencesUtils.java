@@ -55,7 +55,7 @@ public class SharedPreferencesUtils {
 
     public static int getSkinIndex() {
         SharedPreferences sp = MyApplication.getInstance().getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
-        return sp.getInt(APP_SKIN_INDEX, SkinManager.SKIN_BLUE);
+        return sp.getInt(APP_SKIN_INDEX, SkinManager.SKIN_LIGHT);
     }
 
 

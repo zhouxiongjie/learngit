@@ -15,7 +15,20 @@
 -->
 <resources>
     <!-- skin attr define-->
+    <!--皮肤背景-->
     <attr name="app_skin_common_background" format="color|reference" />
+    <!--卡片标题颜色-->
+    <attr name="app_skin_title_color" format="color|reference" />
+    <!--卡片其他属性字段颜色-->
+    <attr name="app_skin_attribute_color" format="color|reference" />
+    <!--卡片更多按钮颜色-->
+    <attr name="app_skin_more_btn_color" format="color|reference" />
+    <!--分割线6dp颜色-->
+    <attr name="app_skin_divider_6dp_color" format="color|reference" />
+    <!--分割线1px颜色-->
+    <attr name="app_skin_divider_1px_color" format="color|reference" />
+
+
     <attr name="app_skin_common_background_1" format="color|reference" />
     <attr name="app_skin_common_img_tint_color" format="color|reference" />
     <attr name="app_skin_home_text_color" format="color|reference" />
@@ -40,21 +53,33 @@
     <!-- Base application theme. -->
     <style name="BaseAppTheme" parent="QMUI.Compat.NoActionBar">
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
+
     </style>
 
     <!-- normal skin -->
-    <style name="app_skin_normal" parent="BaseAppTheme" >
+    <style name="AppSkinLight" parent="BaseAppTheme" >
         <item name="app_skin_common_background">@color/app_skin_common_background_light</item>
+        <item name="app_skin_title_color">@color/title_color_one_light</item>
+        <item name="app_skin_attribute_color">@color/text_color_one_light</item>
+        <item name="app_skin_more_btn_color">@color/text_color_two_light</item>
+        <item name="app_skin_divider_6dp_color">@color/divide_6dp_color_light</item>
+        <item name="app_skin_divider_1px_color">@color/divide_1px_color_light</item>
+
     </style>
 
     <!-- dark skin -->
-    <style name="app_skin_dark" parent="BaseAppTheme">
+    <style name="AppSkinDark" parent="BaseAppTheme">
         <item name="app_skin_common_background">@color/app_skin_common_background_dark</item>
+        <item name="app_skin_title_color">@color/title_color_one_dark</item>
+        <item name="app_skin_attribute_color">@color/text_color_one_dark</item>
+        <item name="app_skin_more_btn_color">@color/text_color_two_dark</item>
+        <item name="app_skin_divider_6dp_color">@color/divide_6dp_color_dark</item>
+        <item name="app_skin_divider_1px_color">@color/divide_1px_color_dark</item>
     </style>
 
 
     <!--主题蓝-->
-    <style name="AppThemeBlue" parent="app_skin_normal">
+    <style name="AppThemeBlue" parent="BaseAppTheme">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/themeBlue</item>
         <item name="colorPrimaryDark">@color/themeBlue</item>
@@ -65,19 +90,8 @@
 
     </style>
 
-    <!--夜间模式主题蓝-->
-    <style name="AppThemeDarkBlue" parent="app_skin_dark">
-        <item name="colorPrimary">@color/themeBlue</item>
-        <item name="colorPrimaryDark">@color/themeBlue</item>
-        <item name="colorAccent">@color/themeBlue</item>
-        <!--<item name="android:navigationBarColor">@color/themeBlue</item>-->
-        <item name="themeColor">@color/themeBlue</item>
-        <item name="translucentThemeColor">@color/translucentThemeBlue</item>
-        <item name="app_skin_common_background">@color/qmui_config_color_gray_2</item>
-
-    </style>
     <!--主题紫-->
-    <style name="AppThemePurple" parent="app_skin_normal">
+    <style name="AppThemePurple" parent="BaseAppTheme">
         <item name="colorPrimary">@color/themePurple</item>
         <item name="colorPrimaryDark">@color/themePurple</item>
         <item name="colorAccent">@color/themePurple</item>
@@ -87,19 +101,9 @@
 
     </style>
 
-    <!--夜间模式主题紫-->
-    <style name="AppThemeDarkPurple" parent="app_skin_dark">
 
-        <item name="colorPrimary">@color/themePurple</item>
-        <item name="colorPrimaryDark">@color/themePurple</item>
-        <item name="colorAccent">@color/themePurple</item>
-        <!--<item name="android:navigationBarColor">@color/themePurple</item>-->
-        <item name="themeColor">@color/themePurple</item>
-        <item name="translucentThemeColor">@color/translucentThemePurple</item>
-
-    </style>
     <!--主题红-->
-    <style name="AppThemeRed" parent="app_skin_normal">
+    <style name="AppThemeRed" parent="BaseAppTheme">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/themeRed</item>
         <item name="colorPrimaryDark">@color/themeRed</item>
@@ -110,17 +114,9 @@
 
     </style>
 
-    <!--夜间模式主题红-->
-    <style name="AppThemeDarkRed" parent="app_skin_dark">
-        <item name="colorPrimary">@color/themeRed</item>
-        <item name="colorPrimaryDark">@color/themeRed</item>
-        <item name="colorAccent">@color/themeRed</item>
-        <!--<item name="android:navigationBarColor">@color/themeRed</item>-->
-        <item name="themeColor">@color/themeRed</item>
-        <item name="translucentThemeColor">@color/translucentThemeRed</item>
-    </style>
+
     <!--主题绿-->
-    <style name="AppThemeGreen" parent="app_skin_normal">
+    <style name="AppThemeGreen" parent="BaseAppTheme">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/themeGreen</item>
         <item name="colorPrimaryDark">@color/themeGreen</item>
@@ -131,17 +127,9 @@
 
     </style>
 
-    <!--夜间模式主题绿-->
-    <style name="AppThemeDarkGreen" parent="app_skin_dark">
-        <item name="colorPrimary">@color/themeGreen</item>
-        <item name="colorPrimaryDark">@color/themeGreen</item>
-        <item name="colorAccent">@color/themeGreen</item>
-        <!--<item name="android:navigationBarColor">@color/themeGreen</item>-->
-        <item name="themeColor">@color/themeGreen</item>
-        <item name="translucentThemeColor">@color/translucentThemeGreen</item>
-    </style>
+
     <!--主题橙-->
-    <style name="AppThemeOrange" parent="app_skin_normal">
+    <style name="AppThemeOrange" parent="BaseAppTheme">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/themeOrange</item>
         <item name="colorPrimaryDark">@color/themeOrange</item>
@@ -151,18 +139,6 @@
         <item name="translucentThemeColor">@color/translucentThemeOrange</item>
 
     </style>
-
-    <!--夜间模式主题橙-->
-    <style name="AppThemeDarkOrange" parent="app_skin_dark">
-        <item name="colorPrimary">@color/themeOrange</item>
-        <item name="colorPrimaryDark">@color/themeOrange</item>
-        <item name="colorAccent">@color/themeOrange</item>
-        <!--<item name="android:navigationBarColor">@color/themeOrange</item>-->
-        <item name="themeColor">@color/themeOrange</item>
-        <item name="translucentThemeColor">@color/translucentThemeOrange</item>
-    </style>
-
-
 
 
 </resources>

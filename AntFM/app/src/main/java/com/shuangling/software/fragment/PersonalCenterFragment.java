@@ -280,11 +280,7 @@ public class PersonalCenterFragment extends QMUIFragment/*SimpleImmersionFragmen
             case R.id.reservation://预约 TODO
             case R.id.tv_release:// 发布
 
-                if(SkinManager.getCurrentSkin()==SkinManager.SKIN_PURPLE){
-                    SkinManager.changeSkin(SkinManager.SKIN_DARK_PURPLE);
-                }else if(SkinManager.getCurrentSkin()==SkinManager.SKIN_DARK_PURPLE){
-                    SkinManager.changeSkin(SkinManager.SKIN_PURPLE);
-                }
+
 
 
                 break;

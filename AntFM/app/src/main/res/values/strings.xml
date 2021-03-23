@@ -75,6 +75,9 @@
     <string name="menus_video">&#xe6f2;</string>
     <string name="menus_cancel_video">&#xe6ef;</string>
 
+    <string name="skin_light">&#xe76b;</string>
+    <string name="skin_dark">&#xe76a;</string>
+
 
     <string name="view_icon">&#xe66a;</string>
     <string name="comment_icon">&#xe6cb;</string>

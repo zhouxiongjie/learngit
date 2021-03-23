@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
+    app:qmui_skin_background="?attr/app_skin_common_background"
     android:orientation="vertical">
     <View
         android:id="@+id/statusBar"
@@ -202,6 +202,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#030407"
+                app:qmui_skin_text_color="?attr/app_skin_attribute_color"
                 android:textSize="@dimen/font_size_24px"
                 android:layout_marginTop="15dp"
                 android:text="消息通知" />
@@ -477,6 +478,38 @@
                     android:textSize="@dimen/font_size_24px"
                     android:layout_marginTop="15dp"
                     android:text="关于我们" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/darkModel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+
+                <com.shuangling.software.customview.FontIconView
+                    android:id="@+id/darkModelIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:text="&#xe76a;"
+                    android:textColor="#333333"
+                    android:textSize="@dimen/font_size_36px" />
+
+                <TextView
+                    android:id="@+id/darkModelText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212224"
+                    android:textSize="@dimen/font_size_24px"
+                    android:layout_marginTop="15dp"
+                    android:text="黑夜模式" />
 
             </LinearLayout>
         </LinearLayout>

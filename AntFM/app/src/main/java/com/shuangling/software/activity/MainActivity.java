@@ -159,9 +159,7 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
     private QMUISkinManager.OnSkinChangeListener mOnSkinChangeListener = new QMUISkinManager.OnSkinChangeListener() {
         @Override
         public void onSkinChange(QMUISkinManager skinManager, int oldSkin, int newSkin) {
-            if (newSkin == SkinManager.SKIN_BLUE || newSkin == SkinManager.SKIN_PURPLE ||
-                    newSkin == SkinManager.SKIN_RED || newSkin == SkinManager.SKIN_GREEN ||
-                    newSkin == SkinManager.SKIN_ORANGE) {
+            if (newSkin == SkinManager.SKIN_LIGHT) {
                 QMUIStatusBarHelper.setStatusBarLightMode(MainActivity.this);
             } else {
                 QMUIStatusBarHelper.setStatusBarDarkMode(MainActivity.this);
@@ -176,7 +174,7 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
         setContentView(R.layout.activity_main);
         //QMUISkinManager manager=getSkinManager();
         QMUISkinManager skinManager = QMUISkinManager.defaultInstance(this);
-       // setSkinManager(skinManager);
+        setSkinManager(skinManager);
         mOnSkinChangeListener.onSkinChange(skinManager, -1, skinManager.getCurrentSkin());
         //ImmersionBar.with(this).init();
         //ImmersionBar.with(this).transparentStatusBar().statusBarDarkFont(true).fitsSystemWindows(true).init();
@@ -1481,9 +1479,9 @@ public class MainActivity extends QMUIActivity implements AMapLocationListener, 
         }
         if ((newConfig.uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
             // 假设 SKIN_2 为 Dark Mode 下的 skin
-            SkinManager.changeSkin(SkinManager.SKIN_DARK_PURPLE);
-        } else if (SkinManager.getCurrentSkin() == SkinManager.SKIN_DARK_PURPLE) {
-            SkinManager.changeSkin(SkinManager.SKIN_PURPLE);
+            SkinManager.changeSkin(SkinManager.SKIN_DARK);
+        } else if (SkinManager.getCurrentSkin() == SkinManager.SKIN_DARK) {
+            SkinManager.changeSkin(SkinManager.SKIN_LIGHT);
         }
 
 

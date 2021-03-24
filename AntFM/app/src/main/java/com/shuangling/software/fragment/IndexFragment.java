@@ -3,6 +3,7 @@ package com.shuangling.software.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -28,10 +29,12 @@ import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.vodplayerview.utils.Common;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hjq.toast.ToastUtils;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
@@ -55,6 +58,7 @@ import com.shuangling.software.adapter.ColumnDecorateVideoContentAdapter;
 import com.shuangling.software.adapter.MoudleGridViewAdapter;
 import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.MyGridView;
+import com.shuangling.software.customview.ObservableScrollView;
 import com.shuangling.software.entity.Anchor;
 import com.shuangling.software.entity.BannerColorInfo;
 import com.shuangling.software.entity.BannerInfo;
@@ -68,6 +72,7 @@ import com.shuangling.software.entity.Station;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.event.BannerColorEvent;
 import com.shuangling.software.event.CommonEvent;
+import com.shuangling.software.interf.ScrollViewListener;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.BannerViewImageLoader;
@@ -117,6 +122,8 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     ImageView backgroundImage;
     @BindView(R.id.columnContent)
     LinearLayout columnContent;
+    @BindView(R.id.index_fragment_scrollview)
+    ObservableScrollView scrollView;
     Unbinder unbinder;
     private Handler mHandler;
     private PagerAdapter mModulePageAdapter;
@@ -132,6 +139,8 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     private int count;
     private boolean isInit = true;
     private Column mColumn;
+    private int dominantColor;
+    private boolean isTop = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -141,6 +150,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
         mHandler = new Handler(this);
         mColumn = (Column) args.getSerializable("Column");
         EventBus.getDefault().register(this);
+
     }
 
     @Override
@@ -1121,15 +1131,15 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                                     position = 1;
                                                 }
                                                 int pos = (position) % count;//很关键
-                                                int vibrantColor = ColorUtils.blendARGB(imageLoader.getDominantColor(pos), imageLoader.getDominantColor(pos + 1), positionOffset);
+                                                dominantColor = ColorUtils.blendARGB(imageLoader.getDominantColor(pos), imageLoader.getDominantColor(pos + 1), positionOffset);
                                                 // TODO: 2021/3/11 对后台传过来的banner颜色获取模式进行判断：方案待定
                                                 /**
                                                  * 模式两种：
                                                  * 1.用户自定义，不发送彩色EventBus，在RecommendFragment里面直接修改
                                                  * 2.随banner改变而改变
                                                  */
-                                                if (module.getBackground_change().equals("1")){
-                                                    sendBannerColorEvent(vibrantColor,module.getBackground_change());
+                                                if (module.getBackground_change().equals("1")) {
+                                                    sendBannerColorEvent(dominantColor, module.getBackground_change());
                                                 }
 
                                             }
@@ -1141,10 +1151,10 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                                     new Handler().postDelayed(new Runnable() {
                                                         @Override
                                                         public void run() {
-                                                            int vibrantColor = imageLoader.getDominantColor(1);
+                                                            dominantColor = imageLoader.getDominantColor(1);
                                                             // TODO: 2021/3/11 对后台传过来的banner颜色获取模式进行判断：方案待定
-                                                            if (module.getBackground_change().equals("1")){
-                                                                sendBannerColorEvent(vibrantColor,module.getBackground_change());
+                                                            if (module.getBackground_change().equals("1")) {
+                                                                sendBannerColorEvent(dominantColor, module.getBackground_change());
                                                             }
                                                         }
                                                     }, 200);
@@ -1169,7 +1179,26 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                             CommonUtils.jumpTo(getActivity(), url, title);
                                         }
                                     });
-                                } else {
+                                    //获取当前scrollview的滑动监听事件
+//                                    scrollView.setScrollViewListener(new ScrollViewListener() {
+//                                        @Override
+//                                        public void onScrollChanged(ObservableScrollView scrollView, int x, int y, int oldx, int oldy) {
+////                                            if (scrollView.getScrollY() == 0) {
+////                                                Log.d("IndexFragment", "onScrollChanged: 顶部");
+////
+////                                            if (scrollView.getScrollY() + scrollView.getHeight() - scrollView.getPaddingTop() -
+////                                                    scrollView.getPaddingBottom() == scrollView.getChildAt(0).getHeight()) {
+////                                                Log.d("IndexFragment", "onScrollChanged: 底部");
+////                                            }
+//
+//                                            if (y > bannerView.getHeight() ) {
+//                                                EventBus.getDefault().post(new CommonEvent("isTop"));
+//                                            } else {
+//                                                EventBus.getDefault().post(new CommonEvent("isNotTop"));
+//                                            }
+//                                        }
+//                                    });
+                               } else {
                                     //关闭轮播图
                                 }
                             } else if (module.getType() == 2) {
@@ -1621,15 +1650,26 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     /**
      * 发送eventBus颜色改变事件的时候，要判断随banner颜色变化的开关是否打开
      *
-     * @param vibrantColor 获取到的banner中的图片颜色
+     * @param dominantColor 获取到的banner中的图片颜色
      */
-    public void sendBannerColorEvent(int vibrantColor,String isBannerColorChange) {
+    public void sendBannerColorEvent(int dominantColor, String isBannerColorChange) {
         //0：否；1：是
         BannerColorEvent bannerColorEvent = new BannerColorEvent();
         bannerColorEvent.setIsBannerColorChange(isBannerColorChange);
         bannerColorEvent.setmColumnId(mColumn.getId());
-        bannerColorEvent.setVibrantColor(vibrantColor);
+        bannerColorEvent.setdominantColor(dominantColor);
         EventBus.getDefault().post(bannerColorEvent);
 
     }
+
+//    public void sendBannerColorEvent(int dominantColor,String isBannerColorChange,boolean istop) {
+//        BannerColorEvent bannerColorEvent = new BannerColorEvent();
+//        bannerColorEvent.setIsBannerColorChange(isBannerColorChange);
+//        bannerColorEvent.setIstop(istop);
+//        bannerColorEvent.setmColumnId(mColumn.getId());
+//        bannerColorEvent.setdominantColor(dominantColor);
+//        EventBus.getDefault().post(bannerColorEvent);
+//
+//
+//    }
 }

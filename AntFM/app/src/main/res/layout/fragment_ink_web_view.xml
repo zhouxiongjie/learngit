@@ -3,20 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/parent_framelayout"
     tools:context=".fragment.LinkWebViewFragment">
 
     <!--动态承载WebView的容器-->
     <FrameLayout
-        android:id="@+id/fl_web_container"
+        android:id="@+id/fl_web_container_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/activtyTitle" />
+         />
 
     <!--progressBar 需要时再inflate-->
     <ViewStub
-        android:id="@+id/viewStub"
+        android:id="@+id/viewStub_fragment"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:layout_below="@id/activtyTitle"
         android:layout="@layout/progress_web" />
 </FrameLayout>

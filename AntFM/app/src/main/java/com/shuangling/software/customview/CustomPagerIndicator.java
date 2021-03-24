@@ -1,6 +1,7 @@
 package com.shuangling.software.customview;
 
 import android.content.Context;
+import android.graphics.drawable.Animatable;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.View;
@@ -10,7 +11,10 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.interfaces.DraweeController;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.image.ImageInfo;
 import com.kcrason.dynamicpagerindicatorlibrary.BasePagerTabView;
 import com.kcrason.dynamicpagerindicatorlibrary.DynamicPagerIndicator;
 import com.shuangling.software.entity.Column;
@@ -70,9 +74,15 @@ public class CustomPagerIndicator extends DynamicPagerIndicator {
                     customPagerTabView.getTopIcon().setVisibility(VISIBLE);
                     customPagerTabView.getTabTextView().setVisibility(GONE);
                     customPagerTabView.getCornerMark().setVisibility(GONE);
+                    ViewGroup.LayoutParams params = customPagerTabView.getTopIcon().getLayoutParams();
+                    params.height = CommonUtils.dip2px(28);
+                    params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    customPagerTabView.getTopIcon().setAspectRatio(1.5f);
                     Uri uri = Uri.parse(column.getDisplay_effect());
                     //设置Fresco支持gif动态图片
-                    DraweeController controller = Fresco.newDraweeControllerBuilder().setUri(uri).setAutoPlayAnimations(true).build();
+                    DraweeController controller = Fresco.newDraweeControllerBuilder().
+                            setUri(uri).
+                            setAutoPlayAnimations(true).build();
                     //将Fresco管理者设置使用
                     customPagerTabView.getTopIcon().setController(controller);
                     break;
@@ -81,25 +91,28 @@ public class CustomPagerIndicator extends DynamicPagerIndicator {
         return customPagerTabView;
     }
 
-    public void setBigIcon(int position,CustomPagerTabView customPagerTabView){
+    public void setBigIcon(int position, CustomPagerTabView customPagerTabView) {
         this.customPagerTabView = customPagerTabView;
         ViewGroup.LayoutParams params = customPagerTabView.getTopIcon().getLayoutParams();
-        if (mColumns.get(position).getDisplay_effect_type() == 2){
-            params.height = CommonUtils.dip2px(30);
-            params.width = CommonUtils.dip2px(51);
+        if (mColumns.get(position).getDisplay_effect_type() == 2) {
+            params.height = CommonUtils.dip2px(36);
+            params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            customPagerTabView.getTopIcon().setAspectRatio(1.7f);
             customPagerTabView.getTopIcon().setLayoutParams(params);
         }
     }
 
-    public void setNormalIcon(int position,CustomPagerTabView customPagerTabView){
+    public void setNormalIcon(int position, CustomPagerTabView customPagerTabView) {
         this.customPagerTabView = customPagerTabView;
         ViewGroup.LayoutParams params = customPagerTabView.getTopIcon().getLayoutParams();
-        if (mColumns.get(position).getDisplay_effect_type() == 2){
-            params.height = CommonUtils.dip2px(22);
-            params.width = CommonUtils.dip2px(37.5f);
+        if (mColumns.get(position).getDisplay_effect_type() == 2) {
+            params.height = CommonUtils.dip2px(28);
+            params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+            customPagerTabView.getTopIcon().setAspectRatio(1.5f);
             customPagerTabView.getTopIcon().setLayoutParams(params);
         }
     }
+
 
 
 }

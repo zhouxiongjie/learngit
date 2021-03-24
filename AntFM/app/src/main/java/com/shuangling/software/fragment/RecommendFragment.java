@@ -2,6 +2,7 @@ package com.shuangling.software.fragment;
 
 import android.app.Application;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -120,7 +121,6 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
      * 当前选中的栏目
      */
     private int mColumnSelectIndex = 0;
-    private int mColumnCruentIndex = 0;
     public List<Column> mColumns;
     public List<Column> mRemoteColumns;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
@@ -140,6 +140,7 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
     private String isBannerChangeOpen;
     //自定义的tabview
     private CustomPagerTabView customPagerTabView;
+    private int isTop;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -395,14 +396,16 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
                 @Override
                 public void onPageScrollStateChanged(int state) {
                     super.onPageScrollStateChanged(state);
-                    switch (state){
+                    switch (state) {
                         case ViewPager.SCROLL_STATE_SETTLING:
                             customPagerTabView = (CustomPagerTabView) pagerIndicator.getPagerTabView(mColumnSelectIndex);
-                            pagerIndicator.setNormalIcon(mColumnCruentIndex,customPagerTabView);
-//                            ViewGroup.LayoutParams params = view.getTopIcon().getLayoutParams();
-//                                params.height = CommonUtils.dip2px(22);
-//                                params.width = CommonUtils.dip2px(37.5f);
-//                                view.getTopIcon().setLayoutParams(params);
+                            pagerIndicator.setNormalIcon(mColumnSelectIndex, customPagerTabView);
+                            if (mColumns.get(mColumnSelectIndex).getIs_top_color() == 1) {
+                                topBackground.clearColorFilter();
+                                topBackground.setImageURI("res://drawable/" + R.drawable.index_top_bg);
+                            }
+                            //重置顶部标识位
+                            isTop = 0;
                             break;
                     }
                 }
@@ -417,21 +420,12 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
                     super.onPageSelected(position);
                     // TODO: 2021/3/22 大图模式图片放大处理
                     customPagerTabView = (CustomPagerTabView) pagerIndicator.getPagerTabView(position);
-                    pagerIndicator.setBigIcon(position,customPagerTabView);
+                    pagerIndicator.setBigIcon(position, customPagerTabView);
                     mColumnSelectIndex = position;
-//                    ViewGroup.LayoutParams params = customPagerTabView.getTopIcon().getLayoutParams();
-//                    if (mColumns.get(position).getDisplay_effect_type() == 2){
-//                        params.height = CommonUtils.dip2px(30);
-//                        params.width = CommonUtils.dip2px(51);
-//                        customPagerTabView.getTopIcon().setLayoutParams(params);
-//                        mColumnSelectIndex = position;
-//                    }
-                }
-            });
-            pagerIndicator.setOnItemTabClickListener(new DynamicPagerIndicator.OnItemTabClickListener() {
-                @Override
-                public void onItemTabClick(int i) {
-                    // TODO: 2021/3/22 大图模式图片放大处理
+                    //获取对应栏目的顶部颜色(后台无数据，该方法暂时屏蔽)
+                    if (mColumns.get(position).getIs_top_color() == 1) {
+                        topBackground.setColorFilter(Color.parseColor(mColumns.get(position).getTop_color()));
+                    }
                 }
             });
             pagerIndicator.updateIndicator(true);
@@ -492,7 +486,6 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
                 weatherLayout.setVisibility(View.VISIBLE);
                 logo1.setVisibility(View.GONE);
             }
-            mColumnCruentIndex = position;
             int prePosition = mColumnSelectIndex;
 
             if (topColorFromId == mColumns.get(position).getId()
@@ -802,26 +795,34 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
             }
             weather();
         }
+        if (event.getEventName().equals("isTop")) {
+            isTop = 0;
+//            if (!isTopBackgroundChanged) {
+//                topBackground.setColorFilter(topColor);
+//                isTopBackgroundChanged = true;
+//            }
+        }
+        if (event.getEventName().equals("isNotTop")) {
+            isTop = 1;
+            TopBackgroundShowBitmap();
+        }
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void getEventBus(BannerColorEvent bc_event) {
         // TODO: 2021/3/11 判断栏目头是否随着部背景随轮播图颜色变化(后台已经有参数，大概bg_background)
         isBannerChangeOpen = bc_event.getIsBannerColorChange();
-        if (isBannerChangeOpen.equals("1") && !isBannerChangeOpen.equals(null)) {
-
+        if (isBannerChangeOpen.equals("1")) {
             if (topBackground != null) {
                 topColorFromId = bc_event.getmColumnId();
-                topColor = bc_event.getVibrantColor();
-                if (topColorFromId == mColumns.get(mColumnCruentIndex).getId()) {
-                    topBackground.setColorFilter(topColor);
-                    isTopBackgroundChanged = true;
+                topColor = bc_event.getdominantColor();
+                if (topColorFromId == mColumns.get(mColumnSelectIndex).getId()) {
+                    if (isTop == 0) {
+                        topBackground.setColorFilter(topColor);
+                        isTopBackgroundChanged = true;
+                    }
                 }
-            }
-
-        } else {
-            if (isTopBackgroundChanged == true) {
-                TopBackgroundShowBitmap();
             }
         }
     }

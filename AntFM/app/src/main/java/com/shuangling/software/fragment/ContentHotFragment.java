@@ -2,10 +2,13 @@ package com.shuangling.software.fragment;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
@@ -125,6 +128,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
     private BannerViewImageLoader imageLoader;
     private int count;
     private boolean isInit = true;
+    private int dominantColor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -420,6 +424,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
         super.onDestroy();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
@@ -636,7 +641,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                                         position = 1;
                                                     }
                                                     int pos = (position) % count;//很关键
-                                                    int vibrantColor = ColorUtils.blendARGB(imageLoader.getDominantColor(pos), imageLoader.getDominantColor(pos + 1), positionOffset);
+                                                    dominantColor = ColorUtils.blendARGB(imageLoader.getDominantColor(pos), imageLoader.getDominantColor(pos + 1), positionOffset);
                                                     // TODO: 2021/3/11 对后台传过来的banner颜色获取模式进行判断：方案待定
                                                     /**
                                                      * 模式两种：
@@ -644,7 +649,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                                      * 2.随banner改变而改变
                                                      */
                                                     if (module.getBackground_change().equals("1")) {
-                                                        sendBannerColorEvent(vibrantColor, module.getBackground_change());
+                                                        sendBannerColorEvent(dominantColor, module.getBackground_change());
                                                     }
 
                                                 }
@@ -656,10 +661,10 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                                         new Handler().postDelayed(new Runnable() {
                                                             @Override
                                                             public void run() {
-                                                                int vibrantColor = imageLoader.getDominantColor(1);
+                                                                dominantColor = imageLoader.getDominantColor(1);
                                                                 // TODO: 2021/3/11 对后台传过来的banner颜色获取模式进行判断：方案待定
                                                                 if (module.getBackground_change().equals("1")) {
-                                                                    sendBannerColorEvent(vibrantColor, module.getBackground_change());
+                                                                    sendBannerColorEvent(dominantColor, module.getBackground_change());
                                                                 }
                                                             }
                                                         }, 200);
@@ -683,6 +688,29 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                                 CommonUtils.jumpTo(getActivity(),url, title);
                                             }
                                         });
+//                                        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//                                            @Override
+//                                            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//                                                super.onScrollStateChanged(recyclerView, newState);
+//                                                switch (newState){
+//                                                    case RecyclerView.SCROLL_STATE_IDLE://停止滑动
+//                                                        break;
+//                                                    case RecyclerView.SCROLL_STATE_DRAGGING://触摸滑动
+//                                                    case RecyclerView.SCROLL_STATE_SETTLING://非触摸滑动
+//                                                        if (!recyclerView.canScrollVertically(-1)){
+//                                                            //顶部
+//                                                            EventBus.getDefault().post(new CommonEvent("isTop"));
+//                                                        }else{
+//                                                            EventBus.getDefault().post(new CommonEvent("isNotTop"));
+//                                                        }
+//                                                        break;
+//                                                }
+//                                            }
+//                                            @Override
+//                                            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                                                super.onScrolled(recyclerView, dx, dy);
+//                                            }
+//                                        });
                                     } else if (module.getType() == 2) {
                                         //金刚区
                                         final int cols = module.getCols();
@@ -1280,14 +1308,14 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
     /**
      * 发送eventBus颜色改变事件的时候，要判断随banner颜色变化的开关是否打开
      *
-     * @param vibrantColor 获取到的banner中的图片颜色
+     * @param dominantColor 获取到的banner中的图片颜色
      */
-    public void sendBannerColorEvent(int vibrantColor,String isBannerColorChange) {
+    public void sendBannerColorEvent(int dominantColor,String isBannerColorChange) {
         //0：否；1：是
         BannerColorEvent bannerColorEvent = new BannerColorEvent();
         bannerColorEvent.setIsBannerColorChange(isBannerColorChange);
         bannerColorEvent.setmColumnId(mColumn.getId());
-        bannerColorEvent.setVibrantColor(vibrantColor);
+        bannerColorEvent.setdominantColor(dominantColor);
         EventBus.getDefault().post(bannerColorEvent);
 
     }

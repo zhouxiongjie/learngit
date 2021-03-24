@@ -14,11 +14,12 @@ public class BannerColorEvent {
     public final static String CONTENTHOT_FRAGMENT_COLOR = "CONTENTHOT_FRAGMENT_COLOR";
     public final static String CONTENT_FRAGMENT_COLOR = "CONTENT_FRAGMENT_COLOR";
 
-    private int vibrantColor;
+    private int dominantColor;
     private String mColumnName;
     private String isBannerColorChange;
     private String EventName;
     private int mColumnId;
+
 
     public int getmColumnId() {
         return mColumnId;
@@ -28,35 +29,21 @@ public class BannerColorEvent {
         this.mColumnId = mColumnId;
     }
 
-    public BannerColorEvent(String eventName) {
-        EventName = eventName;
-    }
 
     public String getEventName() {
         return EventName;
     }
 
-    public void setEventName(String eventName) {
-        EventName = eventName;
-    }
 
     public BannerColorEvent() {
     }
 
-    public String getmColumnName() {
-        return mColumnName;
+    public int getdominantColor() {
+        return dominantColor;
     }
 
-    public void setmColumnName(String mColumnName) {
-        this.mColumnName = mColumnName;
-    }
-
-    public int getVibrantColor() {
-        return vibrantColor;
-    }
-
-    public void setVibrantColor(int vibrantColor) {
-        this.vibrantColor = vibrantColor;
+    public void setdominantColor(int dominantColor) {
+        this.dominantColor = dominantColor;
     }
 
     public String getIsBannerColorChange() {

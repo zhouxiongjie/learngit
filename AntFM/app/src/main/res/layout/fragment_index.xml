@@ -117,7 +117,10 @@
             android:id="@+id/refreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            ptr:srlEnableLoadMore="false">
+            ptr:srlEnableLoadMore="false"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:descendantFocusability="beforeDescendants">
 
             <!--<com.scwang.smartrefresh.layout.header.ClassicsHeader-->
                 <!--android:layout_width="match_parent"-->
@@ -126,9 +129,10 @@
                 <!--ptr:srlDrawableProgress="@drawable/smart_refresh_progress_logo"-->
                 <!--ptr:srlDrawableProgressSize="20dp" />-->
 
-            <ScrollView
+            <com.shuangling.software.customview.ObservableScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:id="@+id/index_fragment_scrollview">
 
                 <LinearLayout
                     android:id="@+id/contentLayout"
@@ -137,7 +141,7 @@
                     android:orientation="vertical">
                 </LinearLayout>
 
-            </ScrollView>
+            </com.shuangling.software.customview.ObservableScrollView>
 
         </com.scwang.smartrefresh.layout.SmartRefreshLayout>
     </LinearLayout>

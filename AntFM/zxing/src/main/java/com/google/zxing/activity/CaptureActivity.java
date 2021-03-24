@@ -1,5 +1,6 @@
 package com.google.zxing.activity;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
@@ -27,7 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import io.reactivex.functions.Consumer;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
@@ -44,6 +45,8 @@ import com.google.zxing.decoding.InactivityTimer;
 import com.google.zxing.decoding.RGBLuminanceSource;
 import com.google.zxing.qrcode.QRCodeReader;
 import com.google.zxing.view.ViewfinderView;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -90,6 +93,9 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
         viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_content);
         back = (ImageView) findViewById(R.id.scanner_toolbar_back);
         flashLight= findViewById(R.id.flashLight);
+
+        initPermission();
+
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,6 +122,23 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
 
         //添加toolbar
 //        addToolbar();
+    }
+
+    private void initPermission(){
+        RxPermissions rp = new RxPermissions(this);
+        rp.request(Manifest.permission.CAMERA)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean granted) throws Exception {
+                        try {
+                            if (!granted) {
+                                finish();
+                            }
+                        } catch (Exception e) {
+                        }
+                    }
+                });
+
     }
 
     private void addToolbar() {

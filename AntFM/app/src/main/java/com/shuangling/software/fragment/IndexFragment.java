@@ -1181,7 +1181,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                     if (flip == 1) {
                                         //翻页
                                         final ViewPager moduleViewPager = new ViewPager(getContext());
-                                        moduleViewPager.setBackgroundResource(R.color.white);
+                                        //moduleViewPager.setBackgroundResource(R.color.white);
                                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, CommonUtils.dip2px(100));
                                         contentLayout.addView(moduleViewPager, params);
 //                                    if (mModulePageAdapter == null) {

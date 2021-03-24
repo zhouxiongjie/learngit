@@ -213,15 +213,20 @@
     </integer-array>
 
 
-    <!--卡片文本颜色-->
+    <!--通用背景颜色-->
     <color name="app_skin_common_background_light">#ffffff</color>
     <color name="app_skin_common_background_dark">#1F1F1F</color>
+
+    <!--卡片文本颜色-->
+    <color name="app_skin_common_background01_light">#ffffff</color>
+    <color name="app_skin_common_background01_dark">#262626</color>
 
     <!--分割线颜色-->
     <color name="divide_6dp_color_light">#EFEFEF</color>
     <color name="divide_6dp_color_dark">#121212</color>
-    <color name="divide_1px_color_light">#E8E8E8</color>
-    <color name="divide_1px_color_dark">#292929</color>
+    <color name="divide_1px_color_light">#29666666</color>
+    <color name="divide_1px_color_dark">#29666666</color>
+<!--    <color name="divide_1px_color_dark">#29666666</color>-->
 
     <!--卡片标题颜色-->
     <color name="title_color_one_light">#212121</color>

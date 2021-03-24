@@ -29,7 +29,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="5dp"
         android:textSize="@dimen/font_size_24px"
-        android:textColor="@color/textColorTwo"
+        fresco:qmui_skin_text_color="?attr/app_skin_title_color"
         android:text="李小四"/>
 
 

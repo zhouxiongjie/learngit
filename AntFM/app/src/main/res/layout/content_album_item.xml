@@ -5,7 +5,6 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="vertical"
     android:padding="10dp">
 
@@ -104,7 +103,7 @@
             android:lineSpacingMultiplier="1.0"
             android:ellipsize="end"
             android:maxLines="3"
-            android:textColor="@color/textColorTwo"
+            fresco:qmui_skin_text_color="?attr/app_skin_title_color"
             android:textSize="@dimen/font_size_17sp"
             tools:text="资讯文章内容中只有2张图片以下的，按左图右文的方式显示（左图为封面图）" />
 
@@ -155,7 +154,7 @@
                 android:layout_marginEnd="10dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/textColorThree"
+                fresco:qmui_skin_text_color="?attr/app_skin_attribute_color"
                 android:textSize="@dimen/font_size_24px"
                 tools:text="浏阳电台" />
 
@@ -167,7 +166,7 @@
                 android:layout_marginEnd="10dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/textColorThree"
+                fresco:qmui_skin_text_color="?attr/app_skin_attribute_color"
                 android:textSize="@dimen/font_size_24px"
                 tools:text="3集" />
 
@@ -180,7 +179,7 @@
                 android:layout_marginEnd="10dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/textColorThree"
+                fresco:qmui_skin_text_color="?attr/app_skin_attribute_color"
                 android:textSize="@dimen/font_size_24px"
                 tools:text="52评论" />
 
@@ -192,7 +191,7 @@
                 android:layout_marginEnd="10dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/textColorThree"
+                fresco:qmui_skin_text_color="?attr/app_skin_attribute_color"
                 android:textSize="@dimen/font_size_24px"
                 tools:text="5小时前"
                 android:visibility="gone"/>

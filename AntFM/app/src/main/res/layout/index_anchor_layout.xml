@@ -3,7 +3,6 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/divideColorTwo"
     android:orientation="vertical"
     android:paddingBottom="20dp">
 
@@ -32,7 +31,7 @@
             android:layout_toEndOf="@+id/logo"
             android:layout_centerVertical="true"
             android:text="热门主播"
-            android:textColor="@color/textColorTwo"
+            fresco:qmui_skin_text_color="?attr/app_skin_title_color"
             android:textSize="@dimen/font_size_36px"
             android:textStyle="bold" />
 

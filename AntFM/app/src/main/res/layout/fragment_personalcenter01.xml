@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:text="&#xe792;"
-            android:textColor="#303030"
+            app:qmui_skin_text_color="?attr/app_skin_title_color"
             android:textSize="@dimen/font_size_36px" />
 
         <com.shuangling.software.customview.FontIconView
@@ -31,7 +31,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:text="&#xe75c;"
-            android:textColor="#181818"
+            app:qmui_skin_text_color="?attr/app_skin_title_color"
             android:textSize="@dimen/font_size_36px" />
     </RelativeLayout>
 
@@ -108,7 +108,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="今晚打老虎"
-                    android:textColor="#060709"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textStyle="bold"
                     android:textSize="@dimen/font_size_38px" />
 
@@ -124,7 +124,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textColor="#202123"
+                        app:qmui_skin_text_color="?attr/app_skin_more_btn_color"
                         android:textSize="@dimen/font_size_36px" />
 
                     <TextView
@@ -132,7 +132,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
                         android:text="关注"
-                        android:textColor="#7C7F85"
+                        app:qmui_skin_text_color="?attr/app_skin_title_color"
                         android:textSize="@dimen/font_size_26px" />
 
 
@@ -142,7 +142,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="15dp"
                         android:text="0"
-                        android:textColor="#202123"
+                        app:qmui_skin_text_color="?attr/app_skin_more_btn_color"
                         android:textSize="@dimen/font_size_36px" />
 
                     <TextView
@@ -150,7 +150,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
                         android:text="订阅"
-                        android:textColor="#7C7F85"
+                        app:qmui_skin_text_color="?attr/app_skin_title_color"
                         android:textSize="@dimen/font_size_26px" />
 
                 </LinearLayout>
@@ -175,6 +175,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
+
+        app:qmui_skin_background="?attr/app_skin_common_background01"
         android:background="@drawable/personal_center_area_bg"
         android:orientation="horizontal"
         android:weightSum="4">
@@ -202,7 +204,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#030407"
-                app:qmui_skin_text_color="?attr/app_skin_attribute_color"
+                app:qmui_skin_text_color="?attr/app_skin_title_color"
                 android:textSize="@dimen/font_size_24px"
                 android:layout_marginTop="15dp"
                 android:text="消息通知" />
@@ -232,7 +234,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#030407"
+                app:qmui_skin_text_color="?attr/app_skin_title_color"
                 android:textSize="@dimen/font_size_24px"
                 android:layout_marginTop="15dp"
                 android:text="我的收藏" />
@@ -261,7 +263,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#030407"
+                app:qmui_skin_text_color="?attr/app_skin_title_color"
                 android:textSize="@dimen/font_size_24px"
                 android:layout_marginTop="15dp"
                 android:text="浏览历史" />
@@ -292,7 +294,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:text="报料"
-                android:textColor="#030407"
+                app:qmui_skin_text_color="?attr/app_skin_title_color"
                 android:textSize="@dimen/font_size_26px" />
 
         </LinearLayout>
@@ -304,7 +306,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
+
         android:background="@drawable/personal_center_area_bg"
+
         android:orientation="vertical">
 
         <TextView
@@ -314,12 +318,11 @@
             android:padding="10dp"
             android:text="其他服务"
             android:textStyle="bold"
-            android:textColor="#202123"
+            app:qmui_skin_text_color="?attr/app_skin_title_color"
             android:textSize="@dimen/font_size_34px" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/personal_center_area_bg"
             android:orientation="horizontal"
             android:weightSum="4">
 
@@ -339,13 +342,13 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:text="&#xe743;"
-                    android:textColor="#333333"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textSize="@dimen/font_size_36px" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#212224"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textSize="@dimen/font_size_24px"
                     android:layout_marginTop="15dp"
                     android:text="我的发布" />
@@ -369,13 +372,13 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:text="&#xe76c;"
-                    android:textColor="#333333"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textSize="@dimen/font_size_36px" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#212224"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textSize="@dimen/font_size_24px"
                     android:layout_marginTop="15dp"
                     android:text="我的奖品" />
@@ -400,13 +403,13 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:text="&#xe76f;"
-                    android:textColor="#333333"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textSize="@dimen/font_size_36px" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#212224"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textSize="@dimen/font_size_24px"
                     android:layout_marginTop="15dp"
                     android:text="钱包" />
@@ -429,13 +432,13 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:text="&#xe75d;"
-                    android:textColor="#333333"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textSize="@dimen/font_size_36px" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#212224"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textSize="@dimen/font_size_24px"
                     android:layout_marginTop="15dp"
                     android:text="意见反馈" />
@@ -447,7 +450,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/personal_center_area_bg"
+
             android:orientation="horizontal"
             android:weightSum="4">
 
@@ -468,13 +471,13 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:text="&#xe745;"
-                    android:textColor="#333333"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textSize="@dimen/font_size_36px" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#212224"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textSize="@dimen/font_size_24px"
                     android:layout_marginTop="15dp"
                     android:text="关于我们" />
@@ -499,14 +502,14 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:text="&#xe76a;"
-                    android:textColor="#333333"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textSize="@dimen/font_size_36px" />
 
                 <TextView
                     android:id="@+id/darkModelText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#212224"
+                    app:qmui_skin_text_color="?attr/app_skin_title_color"
                     android:textSize="@dimen/font_size_24px"
                     android:layout_marginTop="15dp"
                     android:text="黑夜模式" />
@@ -528,7 +531,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:textColor="#DCDCDC"
+            app:qmui_skin_text_color="?attr/app_skin_more_btn_color"
             android:textSize="@dimen/font_size_22px"
             android:layout_marginBottom="10dp"
             android:layout_centerHorizontal="true"

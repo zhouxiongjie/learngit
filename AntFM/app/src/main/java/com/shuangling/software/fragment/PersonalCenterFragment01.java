@@ -402,7 +402,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
         if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK) {
             if (data != null) {
                 //key值都约束好了
-                String content = data.getStringExtra(CaptureActivity.INTENT_EXTRA_KEY_QR_SCAN);
+                String content = data.getStringExtra(CaptureActivity.INTENT_EXTRA_KEY_QR_SCAN).trim();
                 Intent it = new Intent(getContext(), ScanResultActivity.class);
                 it.putExtra("value", content);
                 startActivity(it);

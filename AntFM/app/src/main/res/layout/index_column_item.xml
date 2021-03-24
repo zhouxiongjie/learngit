@@ -3,14 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@color/white">
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="6dp"
-        android:background="@color/divideColorTwo" />
+        fresco:qmui_skin_background="?attr/app_skin_divider_6dp_color" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -33,7 +32,7 @@
             android:layout_toRightOf="@+id/logo"
 
             android:text="热门主播"
-            android:textColor="@color/textColorTwo"
+            fresco:qmui_skin_text_color="?attr/app_skin_title_color"
             android:textSize="@dimen/font_size_36px"
             android:textStyle="bold" />
 
@@ -46,7 +45,7 @@
             android:drawableRight="@drawable/ic_right"
             android:drawablePadding="10dp"
             android:text="更多"
-            android:textColor="@color/textColorSeven"
+            fresco:qmui_skin_text_color="?attr/app_skin_more_btn_color"
             android:textSize="@dimen/font_size_26px" />
     </RelativeLayout>
 

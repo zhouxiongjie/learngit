@@ -17,6 +17,9 @@
     <!-- skin attr define-->
     <!--皮肤背景-->
     <attr name="app_skin_common_background" format="color|reference" />
+
+    <!--个人中心卡片背景-->
+    <attr name="app_skin_common_background01" format="color|reference" />
     <!--卡片标题颜色-->
     <attr name="app_skin_title_color" format="color|reference" />
     <!--卡片其他属性字段颜色-->
@@ -59,6 +62,8 @@
     <!-- normal skin -->
     <style name="AppSkinLight" parent="BaseAppTheme" >
         <item name="app_skin_common_background">@color/app_skin_common_background_light</item>
+        <item name="app_skin_common_background01">@color/app_skin_common_background_light</item>
+
         <item name="app_skin_title_color">@color/title_color_one_light</item>
         <item name="app_skin_attribute_color">@color/text_color_one_light</item>
         <item name="app_skin_more_btn_color">@color/text_color_two_light</item>

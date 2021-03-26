@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -116,6 +115,10 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
     LinearLayout aboutUs;
     @BindView(R.id.noLoginLayout)
     RelativeLayout noLoginLayout;
+    @BindView(R.id.attentionLayout)
+    LinearLayout attentionLayout;
+    @BindView(R.id.subscribeLayout)
+    LinearLayout subscribeLayout;
     private Handler mHandler;
     private DialogFragment mDialogFragment;
 
@@ -161,7 +164,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
         //unbinder.unbind();
     }
 
-    @OnClick({R.id.history, R.id.scan, R.id.collect, R.id.head,R.id.subscribeNumber, R.id.noLoginLayout, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet, R.id.award, R.id.aboutUs})
+    @OnClick({R.id.history, R.id.scan, R.id.collect, R.id.subscribeLayout, R.id.noLoginLayout, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionLayout, R.id.myPublish, R.id.wallet, R.id.award, R.id.aboutUs})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.history:
@@ -198,7 +201,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
                     startActivity(it);
                 }
                 break;
-            case R.id.subscribeNumber:
+            case R.id.subscribeLayout:
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), SubscribeActivity.class));
                 } else {
@@ -213,16 +216,16 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
                     Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
+
+
                 break;
-            case R.id.head:
+            case R.id.loginLayout:
                 if (User.getInstance() != null) {
                     startActivity(new Intent(getContext(), ModifyUserInfoActivity.class));
                 } else {
                     Intent it = new Intent(getContext(), NewLoginActivity.class);
                     startActivity(it);
                 }
-                break;
-            case R.id.loginLayout:
                 break;
             case R.id.noLoginLayout:
                 if (User.getInstance() == null) {
@@ -274,7 +277,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
             case R.id.setting:
                 startActivity(new Intent(getContext(), SettingActivity.class));
                 break;
-            case R.id.attentionNumber:
+            case R.id.attentionLayout:
                 startActivity(new Intent(getContext(), AttentionActivity.class));
                 break;
             case R.id.checkUpdate:

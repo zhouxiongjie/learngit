@@ -29,6 +29,7 @@ import com.liulishuo.filedownloader.FileDownloader;
 import com.mylhyl.circledialog.CircleDialog;
 import com.qmuiteam.qmui.arch.QMUIFragment;
 import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundButtonDrawable;
 import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundLinearLayout;
 import com.shuangling.software.BuildConfig;
 import com.shuangling.software.MyApplication;
@@ -138,11 +139,17 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
         @Override
         public void onSkinChange(QMUISkinManager skinManager, int oldSkin, int newSkin) {
             if (newSkin == SkinManager.SKIN_LIGHT) {
-                roundLayout01.setBackgroundColor(getResources().getColor(R.color.app_skin_common_background01_light));
-                roundLayout02.setBackgroundColor(getResources().getColor(R.color.app_skin_common_background01_light));
+                QMUIRoundButtonDrawable roundButtonDrawable = (QMUIRoundButtonDrawable) roundLayout01.getBackground();
+                roundButtonDrawable.setBgData(getResources().getColorStateList(R.color.app_skin_common_background01_light));
+                QMUIRoundButtonDrawable roundButtonDrawable2 = (QMUIRoundButtonDrawable) roundLayout02.getBackground();
+                roundButtonDrawable2.setBgData(getResources().getColorStateList(R.color.app_skin_common_background01_light));
             } else {
-                roundLayout01.setBackgroundColor(getResources().getColor(R.color.app_skin_common_background01_dark));
-                roundLayout02.setBackgroundColor(getResources().getColor(R.color.app_skin_common_background01_dark));
+
+                QMUIRoundButtonDrawable roundButtonDrawable = (QMUIRoundButtonDrawable) roundLayout01.getBackground();
+                roundButtonDrawable.setBgData(getResources().getColorStateList(R.color.app_skin_common_background01_dark));
+                QMUIRoundButtonDrawable roundButtonDrawable2 = (QMUIRoundButtonDrawable) roundLayout02.getBackground();
+                roundButtonDrawable2.setBgData(getResources().getColorStateList(R.color.app_skin_common_background01_dark));
+
             }
         }
     };
@@ -172,7 +179,7 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
     protected View onCreateView() {
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_personalcenter01, null);
         mSkinManager = QMUISkinManager.defaultInstance(getContext());
-        mSkinManager.register(this);
+        //mSkinManager.register(this);
         ButterKnife.bind(this, rootView);
         if (MyApplication.aboutUsInfo != null && MyApplication.aboutUsInfo.getAbout_us_status() == 1) {
             aboutUs.setVisibility(View.VISIBLE);

@@ -28,6 +28,8 @@ import com.liulishuo.filedownloader.FileDownloadQueueSet;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.mylhyl.circledialog.CircleDialog;
 import com.qmuiteam.qmui.arch.QMUIFragment;
+import com.qmuiteam.qmui.skin.QMUISkinManager;
+import com.qmuiteam.qmui.widget.roundwidget.QMUIRoundLinearLayout;
 import com.shuangling.software.BuildConfig;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
@@ -123,9 +125,27 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
     FontIconView darkModelIcon;
     @BindView(R.id.darkModelText)
     TextView darkModelText;
+    @BindView(R.id.roundLayout01)
+    QMUIRoundLinearLayout roundLayout01;
+    @BindView(R.id.roundLayout02)
+    QMUIRoundLinearLayout roundLayout02;
 
     private Handler mHandler;
     private DialogFragment mDialogFragment;
+    private QMUISkinManager mSkinManager;
+
+    private QMUISkinManager.OnSkinChangeListener mOnSkinChangeListener = new QMUISkinManager.OnSkinChangeListener() {
+        @Override
+        public void onSkinChange(QMUISkinManager skinManager, int oldSkin, int newSkin) {
+            if (newSkin == SkinManager.SKIN_LIGHT) {
+                roundLayout01.setBackgroundColor(getResources().getColor(R.color.app_skin_common_background01_light));
+                roundLayout02.setBackgroundColor(getResources().getColor(R.color.app_skin_common_background01_light));
+            } else {
+                roundLayout01.setBackgroundColor(getResources().getColor(R.color.app_skin_common_background01_dark));
+                roundLayout02.setBackgroundColor(getResources().getColor(R.color.app_skin_common_background01_dark));
+            }
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -151,6 +171,8 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
     @Override
     protected View onCreateView() {
         View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_personalcenter01, null);
+        mSkinManager = QMUISkinManager.defaultInstance(getContext());
+        mSkinManager.register(this);
         ButterKnife.bind(this, rootView);
         if (MyApplication.aboutUsInfo != null && MyApplication.aboutUsInfo.getAbout_us_status() == 1) {
             aboutUs.setVisibility(View.VISIBLE);
@@ -169,7 +191,29 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
         //unbinder.unbind();
     }
 
-    @OnClick({R.id.history, R.id.darkModel,R.id.scan, R.id.collect, R.id.head, R.id.subscribeNumber, R.id.noLoginLayout, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet, R.id.award, R.id.aboutUs})
+
+
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if(mSkinManager != null){
+            mSkinManager.register(this);
+            mSkinManager.addSkinChangeListener(mOnSkinChangeListener);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(mSkinManager != null){
+            mSkinManager.unRegister(this);
+            mSkinManager.removeSkinChangeListener(mOnSkinChangeListener);
+        }
+    }
+
+    @OnClick({R.id.history, R.id.darkModel, R.id.scan, R.id.collect, R.id.head, R.id.subscribeNumber, R.id.noLoginLayout, R.id.loginLayout, R.id.feedback, R.id.brokeNews, R.id.message, R.id.setting, R.id.attentionNumber, R.id.myPublish, R.id.wallet, R.id.award, R.id.aboutUs})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.history:
@@ -316,18 +360,18 @@ public class PersonalCenterFragment01 extends QMUIFragment/*SimpleImmersionFragm
                 startActivity(it);
                 break;
             case R.id.darkModel:
-                int skin=SkinManager.getCurrentSkin();
-                if(skin==SkinManager.SKIN_LIGHT){
+                int skin = SkinManager.getCurrentSkin();
+                if (skin == SkinManager.SKIN_LIGHT) {
                     darkModelIcon.setText(R.string.skin_light);
                     darkModelText.setText("普通模式");
-                   SkinManager.changeSkin(SkinManager.SKIN_DARK);
-                }else{
+                    SkinManager.changeSkin(SkinManager.SKIN_DARK);
+                } else {
                     darkModelIcon.setText(R.string.skin_dark);
                     darkModelText.setText("黑夜模式");
                     SkinManager.changeSkin(SkinManager.SKIN_LIGHT);
                 }
 
-            break;
+                break;
         }
     }
 

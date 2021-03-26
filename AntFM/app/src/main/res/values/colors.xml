@@ -221,6 +221,9 @@
     <color name="app_skin_common_background01_light">#ffffff</color>
     <color name="app_skin_common_background01_dark">#262626</color>
 
+    <color name="app_skin_person_center_background_light">#F8F9FA</color>
+
+
     <!--分割线颜色-->
     <color name="divide_6dp_color_light">#EFEFEF</color>
     <color name="divide_6dp_color_dark">#121212</color>

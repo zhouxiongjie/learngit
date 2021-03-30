@@ -274,4 +274,5 @@ dependencies {
     implementation 'androidx.palette:palette:1.0.0'//图片取色工具
 
 
+
 }

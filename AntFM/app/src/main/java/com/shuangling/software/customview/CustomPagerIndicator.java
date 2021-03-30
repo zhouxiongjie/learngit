@@ -74,15 +74,13 @@ public class CustomPagerIndicator extends DynamicPagerIndicator {
                     customPagerTabView.getTopIcon().setVisibility(VISIBLE);
                     customPagerTabView.getTabTextView().setVisibility(GONE);
                     customPagerTabView.getCornerMark().setVisibility(GONE);
-                    ViewGroup.LayoutParams params = customPagerTabView.getTopIcon().getLayoutParams();
-                    params.height = CommonUtils.dip2px(28);
-                    params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    customPagerTabView.getTopIcon().setAspectRatio(1.5f);
                     Uri uri = Uri.parse(column.getDisplay_effect());
                     //设置Fresco支持gif动态图片
                     DraweeController controller = Fresco.newDraweeControllerBuilder().
+                            setAutoPlayAnimations(true).
+                            setOldController(customPagerTabView.getTopIcon().getController()).
                             setUri(uri).
-                            setAutoPlayAnimations(true).build();
+                            build();
                     //将Fresco管理者设置使用
                     customPagerTabView.getTopIcon().setController(controller);
                     break;
@@ -97,7 +95,7 @@ public class CustomPagerIndicator extends DynamicPagerIndicator {
         if (mColumns.get(position).getDisplay_effect_type() == 2) {
             params.height = CommonUtils.dip2px(36);
             params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-            customPagerTabView.getTopIcon().setAspectRatio(1.7f);
+            customPagerTabView.getTopIcon().setAspectRatio(1.33f);
             customPagerTabView.getTopIcon().setLayoutParams(params);
         }
     }
@@ -106,13 +104,12 @@ public class CustomPagerIndicator extends DynamicPagerIndicator {
         this.customPagerTabView = customPagerTabView;
         ViewGroup.LayoutParams params = customPagerTabView.getTopIcon().getLayoutParams();
         if (mColumns.get(position).getDisplay_effect_type() == 2) {
-            params.height = CommonUtils.dip2px(28);
+            params.height = CommonUtils.dip2px(26);
             params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-            customPagerTabView.getTopIcon().setAspectRatio(1.5f);
+            customPagerTabView.getTopIcon().setAspectRatio(1.33f);
             customPagerTabView.getTopIcon().setLayoutParams(params);
         }
     }
-
 
 
 }

@@ -3,6 +3,7 @@ package com.shuangling.software.customview;
 import android.content.Context;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -29,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
+    public static final String BANNER_HIDE = "BannerHide";
+    public static final String BANNER_SHOW = "BannerShow";
     private OnItemClickListener mClickListener;
     private Context mContext;
     private LayoutInflater mInflater;
@@ -227,8 +230,36 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
                 public int getCount() {
                     return mAutoViews.size();
                 }
+
             };
             mAutoScrollViewPager.setAdapter(mAutoViewPageAdapter);
+            mAutoScrollViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+//                    if (position == 0) {    //判断当切换到第0个页面时把currentPosition设置为list.size(),即倒数第二个位置，小圆点位置为length-1
+//                        mCurponsition = mAutoViews.size();
+////                        dotPosition = mList.size() - 1;
+//                    } else if (position == mAutoViews.size() + 1) {    //当切换到最后一个页面时currentPosition设置为第一个位置，小圆点位置为0
+//                        mCurponsition = 1;
+////                        dotPosition = 0;
+//                    } else {
+//                        mCurponsition = position;
+////                        dotPosition = position - 1;
+//                    }
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+                    if (banner_onPageChangeListener != null) {
+                        banner_onPageChangeListener.onPageScrolleStateChange(state);
+                    }
+                }
+            });
             mAutoViewPageIndicator.setViewPager(mAutoScrollViewPager);
             mAutoViewPageIndicator.setSnap(true);
             mAutoViewPageIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -248,14 +279,16 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
                     if (banner_onPageChangeListener != null) {
                         banner_onPageChangeListener.onPageSelected(position);
                     }
-                    mCurponsition = position;//记录当前显示的索引
                     T adv = (T) mAutoViews.get(position).getTag();
                     mAdvertDesc.setText(adv.getTitle());
-//                    if (mCurponsition == 0) {
-//                        mAutoScrollViewPager.setCurrentItem(mAutoViews.size() - 2, false);//切换，不要动画效果
-//                    } else if (mCurponsition == mAutoViews.size() - 1) {
-//                        mAutoScrollViewPager.setCurrentItem(1, false);//切换，不要动画效果
-//                    }
+
+                    mCurponsition = position;//记录当前显示的索引
+                    //最后一个直接跳动到第一个
+                    if (mCurponsition == 0) {
+                        mAutoScrollViewPager.setCurrentItem(mAutoViews.size() - 2, false);//切换，不要动画效果
+                    } else if (mCurponsition == mAutoViews.size() - 1) {
+                        mAutoScrollViewPager.setCurrentItem(1, false);//切换，不要动画效果
+                    }
                 }
 
                 @Override
@@ -263,14 +296,15 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
                     if (banner_onPageChangeListener != null) {
                         banner_onPageChangeListener.onPageScrolleStateChange(state);
                     }
-                    //验证当前的滑动是否结束
-                    if (state == ViewPager.SCROLL_STATE_IDLE) {
-                        if (mCurponsition == 0){
-                            mAutoScrollViewPager.setCurrentItem(mAutoViews.size()-2, false);//切换，不要动画效果
-                        } else if (mCurponsition ==mAutoViews.size()-1) {
-                            mAutoScrollViewPager.setCurrentItem(1, false);//切换，不要动画效果
-                        }
-                    }
+
+//                    if (state == ViewPager.SCROLL_STATE_IDLE) {//验证当前的滑动是否结束最后一个滑动到第一个
+//                        if (mCurponsition == 0) {
+//                            mAutoScrollViewPager.setCurrentItem(mAutoViews.size() - 2, false);//切换，不要动画效果
+//                        } else if (mCurponsition == mAutoViews.size() - 1) {
+//                            mAutoScrollViewPager.setCurrentItem(1, false);//切换，不要动画效果
+//                        }
+//                    }
+
                 }
             });
             mAutoScrollViewPager.startAutoScroll();

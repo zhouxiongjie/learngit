@@ -34,7 +34,7 @@ import java.lang.reflect.Field;
  * @author <a href="http://www.trinea.cn" target="_blank">Trinea</a> 2013-12-30
  */
 public class AutoScrollViewPager extends ViewPager {
-    public static final int DEFAULT_INTERVAL = 2500;
+    public static final int DEFAULT_INTERVAL = 3000;
     public static final int LEFT = 0;
     public static final int RIGHT = 1;
     /**

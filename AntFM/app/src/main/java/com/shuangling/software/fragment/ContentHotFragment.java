@@ -61,7 +61,6 @@ import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.DecorModule;
 import com.shuangling.software.entity.Station;
-import com.shuangling.software.event.BannerColorEvent;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
@@ -96,6 +95,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
     public static final int MSG_GET_EXCELLENT_POST = 0x2;
     public static final int MSG_GET_COLUMN_DECORATE = 0x3;
     public static final int MSG_GET_TYPE_CONTENT = 0x4;
+    public static final String TAG = "ContentHotFragment";
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.refreshLayout)
@@ -118,6 +118,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
         LoadMore,
         Normal
     }
+
     private int page = 1;
     private ACache mACache;
     private RecyclerViewSkeletonScreen mSkeletonScreen;
@@ -129,6 +130,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
     private int count;
     private boolean isInit = true;
     private int dominantColor;
+    int scrollY = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -140,6 +142,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
         EventBus.getDefault().register(this);
         super.onCreate(savedInstanceState);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -648,10 +651,9 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                                      * 1.用户自定义，不发送彩色EventBus，在RecommendFragment里面直接修改
                                                      * 2.随banner改变而改变
                                                      */
-                                                    if (module.getBackground_change().equals("1")) {
-                                                        sendBannerColorEvent(dominantColor, module.getBackground_change());
+                                                    if (getParentFragment() != null) {
+                                                        ((RecommendFragment) getParentFragment()).changeThemeColor(dominantColor, mColumn.getId(),true);
                                                     }
-
                                                 }
 
                                                 @Override
@@ -663,19 +665,48 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                                             public void run() {
                                                                 dominantColor = imageLoader.getDominantColor(1);
                                                                 // TODO: 2021/3/11 对后台传过来的banner颜色获取模式进行判断：方案待定
-                                                                if (module.getBackground_change().equals("1")) {
-                                                                    sendBannerColorEvent(dominantColor, module.getBackground_change());
+                                                                if (getParentFragment() != null) {
+                                                                    ((RecommendFragment) getParentFragment()).changeThemeColor(dominantColor, mColumn.getId(),true);
                                                                 }
                                                             }
                                                         }, 200);
+                                                    }
+                                                }
+                                            });
 
+                                            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                                                @Override
+                                                public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                                                    super.onScrollStateChanged(recyclerView, newState);
+                                                    switch (newState) {
+                                                        case RecyclerView.SCROLL_STATE_IDLE://停止滑动
+                                                            break;
+                                                        case RecyclerView.SCROLL_STATE_DRAGGING://触摸滑动
+                                                        case RecyclerView.SCROLL_STATE_SETTLING://非触摸滑动
+                                                            break;
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                                                    super.onScrolled(recyclerView, dx, dy);
+                                                    scrollY += dy;
+                                                    if (dy > 0) {//向下滚动
+                                                        if (scrollY > bannerView.getHeight()) {
+                                                            EventBus.getDefault().post(new CommonEvent(BannerView.BANNER_HIDE));
+//                                                            Log.i(TAG, "Scroll DOWN" +recyclerView.getScrollY());
+                                                        }
+                                                    }
+                                                    if (dy < 0) {//向上滚动
+                                                        Log.i(TAG, "Scroll UP");
+                                                        if (scrollY < bannerView.getHeight()) {
+                                                            EventBus.getDefault().post(new CommonEvent(BannerView.BANNER_SHOW));
+//                                                            Log.i(TAG, "Scroll DOWN" +recyclerView.getScrollY());
+                                                        }
                                                     }
                                                 }
                                             });
                                         } else if (module.getBackground_change().equals("0")) {
-                                            BannerColorEvent event = new BannerColorEvent();
-                                            event.setIsBannerColorChange(module.getBackground_change());
-                                            EventBus.getDefault().post(event);
                                         }
                                         bannerView.setData(banners);
                                         bannerView.setOnItemClickListener(new BannerView.OnItemClickListener() {
@@ -685,32 +716,9 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                                 String url = banner.getUrl();
                                                 String title = banner.getTitle();
                                                 //((RecommendFragment) getParentFragment()).jumpTo(url, title);
-                                                CommonUtils.jumpTo(getActivity(),url, title);
+                                                CommonUtils.jumpTo(getActivity(), url, title);
                                             }
                                         });
-//                                        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//                                            @Override
-//                                            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-//                                                super.onScrollStateChanged(recyclerView, newState);
-//                                                switch (newState){
-//                                                    case RecyclerView.SCROLL_STATE_IDLE://停止滑动
-//                                                        break;
-//                                                    case RecyclerView.SCROLL_STATE_DRAGGING://触摸滑动
-//                                                    case RecyclerView.SCROLL_STATE_SETTLING://非触摸滑动
-//                                                        if (!recyclerView.canScrollVertically(-1)){
-//                                                            //顶部
-//                                                            EventBus.getDefault().post(new CommonEvent("isTop"));
-//                                                        }else{
-//                                                            EventBus.getDefault().post(new CommonEvent("isNotTop"));
-//                                                        }
-//                                                        break;
-//                                                }
-//                                            }
-//                                            @Override
-//                                            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-//                                                super.onScrolled(recyclerView, dx, dy);
-//                                            }
-//                                        });
                                     } else if (module.getType() == 2) {
                                         //金刚区
                                         final int cols = module.getCols();
@@ -751,7 +759,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                                             String url = cb.getSource_url();
                                                             String title = cb.getTitle();
                                                             //((RecommendFragment) getParentFragment()).jumpTo(url, title);
-                                                            CommonUtils.jumpTo(getActivity(),url, title);
+                                                            CommonUtils.jumpTo(getActivity(), url, title);
                                                         }
                                                     });
                                                     v.setTag(position);
@@ -824,7 +832,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                                         String url = content.getSource_url();
                                                         String title = content.getTitle();
                                                         //((RecommendFragment) getParentFragment()).jumpTo(url, title);
-                                                        CommonUtils.jumpTo(getActivity(),url, title);
+                                                        CommonUtils.jumpTo(getActivity(), url, title);
                                                     }
                                                 });
                                                 moduleLayout.addView(anchorView, j, params);
@@ -855,9 +863,9 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         more.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                Intent it=new Intent(getContext(), MoreActivity.class);
-                                                it.putExtra("decorModule",module);
-                                                it.putExtra("column",mColumn);
+                                                Intent it = new Intent(getContext(), MoreActivity.class);
+                                                it.putExtra("decorModule", module);
+                                                it.putExtra("column", mColumn);
                                                 startActivity(it);
                                             }
                                         });
@@ -893,9 +901,9 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         more.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                Intent it=new Intent(getContext(),MoreActivity.class);
-                                                it.putExtra("decorModule",module);
-                                                it.putExtra("column",mColumn);
+                                                Intent it = new Intent(getContext(), MoreActivity.class);
+                                                it.putExtra("decorModule", module);
+                                                it.putExtra("column", mColumn);
                                                 startActivity(it);
                                             }
                                         });
@@ -931,9 +939,9 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         more.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                Intent it=new Intent(getContext(),MoreActivity.class);
-                                                it.putExtra("decorModule",module);
-                                                it.putExtra("column",mColumn);
+                                                Intent it = new Intent(getContext(), MoreActivity.class);
+                                                it.putExtra("decorModule", module);
+                                                it.putExtra("column", mColumn);
                                                 startActivity(it);
                                             }
                                         });
@@ -969,9 +977,9 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                         more.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                Intent it=new Intent(getContext(),MoreActivity.class);
-                                                it.putExtra("decorModule",module);
-                                                it.putExtra("column",mColumn);
+                                                Intent it = new Intent(getContext(), MoreActivity.class);
+                                                it.putExtra("decorModule", module);
+                                                it.putExtra("column", mColumn);
                                                 startActivity(it);
                                             }
                                         });
@@ -1235,7 +1243,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
                                 recyclerView.setLayoutManager(manager);
-                                recyclerView.setPadding(CommonUtils.dip2px(7.5f),0,CommonUtils.dip2px(7.5f),0);
+                                recyclerView.setPadding(CommonUtils.dip2px(7.5f), 0, CommonUtils.dip2px(7.5f), 0);
                                 DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
@@ -1259,7 +1267,7 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
                                 recyclerView.setLayoutManager(manager);
-                                recyclerView.setPadding(CommonUtils.dip2px(7.5f),0,CommonUtils.dip2px(7.5f),0);
+                                recyclerView.setPadding(CommonUtils.dip2px(7.5f), 0, CommonUtils.dip2px(7.5f), 0);
                                 DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
@@ -1305,18 +1313,21 @@ public class ContentHotFragment extends Fragment implements Handler.Callback {
         return false;
     }
 
-    /**
-     * 发送eventBus颜色改变事件的时候，要判断随banner颜色变化的开关是否打开
-     *
-     * @param dominantColor 获取到的banner中的图片颜色
-     */
-    public void sendBannerColorEvent(int dominantColor,String isBannerColorChange) {
-        //0：否；1：是
-        BannerColorEvent bannerColorEvent = new BannerColorEvent();
-        bannerColorEvent.setIsBannerColorChange(isBannerColorChange);
-        bannerColorEvent.setmColumnId(mColumn.getId());
-        bannerColorEvent.setdominantColor(dominantColor);
-        EventBus.getDefault().post(bannerColorEvent);
 
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser){
+            //可见的时候发送当前图片颜色
+            if (getParentFragment() != null) {
+                ((RecommendFragment) getParentFragment()).changeThemeColor(dominantColor, mColumn.getId(),true);
+            }
+        }
     }
 }

@@ -251,11 +251,11 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
                     mCurponsition = position;//记录当前显示的索引
                     T adv = (T) mAutoViews.get(position).getTag();
                     mAdvertDesc.setText(adv.getTitle());
-                    if (mCurponsition == 0) {
-                        mAutoScrollViewPager.setCurrentItem(mAutoViews.size() - 2, false);//切换，不要动画效果
-                    } else if (mCurponsition == mAutoViews.size() - 1) {
-                        mAutoScrollViewPager.setCurrentItem(1, false);//切换，不要动画效果
-                    }
+//                    if (mCurponsition == 0) {
+//                        mAutoScrollViewPager.setCurrentItem(mAutoViews.size() - 2, false);//切换，不要动画效果
+//                    } else if (mCurponsition == mAutoViews.size() - 1) {
+//                        mAutoScrollViewPager.setCurrentItem(1, false);//切换，不要动画效果
+//                    }
                 }
 
                 @Override
@@ -264,13 +264,13 @@ public class BannerView<T extends BannerView.Banner> extends RelativeLayout {
                         banner_onPageChangeListener.onPageScrolleStateChange(state);
                     }
                     //验证当前的滑动是否结束
-//                    if (state == ViewPager.SCROLL_STATE_IDLE) {
-//                        if (mCurponsition == 0){
-//                            mAutoScrollViewPager.setCurrentItem(mAutoViews.size()-2, false);//切换，不要动画效果
-//                        } else if (mCurponsition ==mAutoViews.size()-1) {
-//                            mAutoScrollViewPager.setCurrentItem(1, false);//切换，不要动画效果
-//                        }
-//                    }
+                    if (state == ViewPager.SCROLL_STATE_IDLE) {
+                        if (mCurponsition == 0){
+                            mAutoScrollViewPager.setCurrentItem(mAutoViews.size()-2, false);//切换，不要动画效果
+                        } else if (mCurponsition ==mAutoViews.size()-1) {
+                            mAutoScrollViewPager.setCurrentItem(1, false);//切换，不要动画效果
+                        }
+                    }
                 }
             });
             mAutoScrollViewPager.startAutoScroll();

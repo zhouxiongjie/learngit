@@ -64,7 +64,7 @@ public class AutoScrollViewPager extends ViewPager {
     /**
      * whether stop auto scroll when touching, default is true
      **/
-    private boolean stopScrollWhenTouch = false;
+    private boolean stopScrollWhenTouch = true;
     /**
      * how to process when sliding at the last or first item, default is {@link #SLIDE_BORDER_MODE_NONE}
      **/

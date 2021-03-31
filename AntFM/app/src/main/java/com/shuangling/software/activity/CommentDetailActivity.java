@@ -376,6 +376,15 @@ public class CommentDetailActivity extends QMUIActivity/*AppCompatActivity*/ imp
                             //点赞成功
                             textView.setActivated(false);
                             textView.setText("" + (Integer.parseInt(textView.getText().toString()) + 1));
+
+
+                            int[] itemPosition = new int[2];
+                            int[] superLikePosition = new int[2];
+                            textView.getLocationOnScreen(itemPosition);
+                            superLikeLayout.getLocationOnScreen(superLikePosition);
+                            int x = itemPosition[0] + textView.getWidth() / 2;
+                            int y = (itemPosition[1] - superLikePosition[1]) + textView.getHeight() / 2;
+                            superLikeLayout.launch(x, y);
                         }
                         //getComments();
                     }

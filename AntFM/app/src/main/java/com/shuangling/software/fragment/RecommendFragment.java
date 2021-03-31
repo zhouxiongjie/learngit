@@ -431,10 +431,10 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
                         topBackground.setColorFilter(topColor);
                         isTopBackgroundChanged = true;
                     } else if (isTopBackgroundChanged) {
-                        if (isBannerChange){
-                        }else{
+//                        if (isBannerChange){
+//                        }else{
                             TopBackgroundShowThemeBackground();
-                        }
+//                        }
                     }
                 }
             });

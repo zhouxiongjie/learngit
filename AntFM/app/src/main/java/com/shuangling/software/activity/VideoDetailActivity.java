@@ -764,24 +764,25 @@ public class VideoDetailActivity extends BaseAudioActivity2 implements Handler.C
                                                 mVideoDetail.setIs_likes(0);
                                                 mAdapter.setVideoDetail(mVideoDetail);
                                             }
-                                        }else {
-                                            if (mVideoDetail.getIs_likes() == 1) {
-                                                int[] itemPosition = new int[2];
-                                                int[] superLikePosition = new int[2];
-                                                v.getLocationOnScreen(itemPosition);
-                                                superLikeLayout.getLocationOnScreen(superLikePosition);
-                                                int x = itemPosition[0] + v.getWidth() / 2;
-                                                int y = (itemPosition[1] - superLikePosition[1]) + v.getHeight() / 2;
-                                                superLikeLayout.launch(x, y);
-                                            }else{
-                                                int num = mVideoDetail.getLike();
-                                                num++;
-                                                like(true);
-                                                mVideoDetail.setLike(num);
-                                                mVideoDetail.setIs_likes(1);
-                                                mAdapter.setVideoDetail(mVideoDetail);
-                                            }
                                         }
+//                                        else {
+//                                            if (mVideoDetail.getIs_likes() == 1) {
+//                                                int[] itemPosition = new int[2];
+//                                                int[] superLikePosition = new int[2];
+//                                                v.getLocationOnScreen(itemPosition);
+//                                                superLikeLayout.getLocationOnScreen(superLikePosition);
+//                                                int x = itemPosition[0] + v.getWidth() / 2;
+//                                                int y = (itemPosition[1] - superLikePosition[1]) + v.getHeight() / 2;
+//                                                superLikeLayout.launch(x, y);
+//                                            }else{
+//                                                int num = mVideoDetail.getLike();
+//                                                num++;
+//                                                like(true);
+//                                                mVideoDetail.setLike(num);
+//                                                mVideoDetail.setIs_likes(1);
+//                                                mAdapter.setVideoDetail(mVideoDetail);
+//                                            }
+//                                        }
                                         lastClickTime = System.currentTimeMillis();
 
                                     }
@@ -1193,6 +1194,14 @@ public class VideoDetailActivity extends BaseAudioActivity2 implements Handler.C
                             textView.setText("" + num);
                             currentComment.setLike_count(num);
                             currentComment.setFabulous(1);
+
+                            int[] itemPosition = new int[2];
+                            int[] superLikePosition = new int[2];
+                            textView.getLocationOnScreen(itemPosition);
+                            superLikeLayout.getLocationOnScreen(superLikePosition);
+                            int x = itemPosition[0] + textView.getWidth() / 2;
+                            int y = (itemPosition[1] - superLikePosition[1]) + textView.getHeight() / 2;
+                            superLikeLayout.launch(x, y);
                         }
                         //getComments();
                     }

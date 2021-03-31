@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:text="&#xe792;"
-            android:textSize="@dimen/font_size_36px"
+            android:textSize="@dimen/font_size_42px"
             app:qmui_skin_text_color="?attr/app_skin_title_color" />
 
 
@@ -33,7 +33,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:text="&#xe75c;"
-            android:textSize="@dimen/font_size_36px"
+            android:textSize="@dimen/font_size_42px"
             app:qmui_skin_text_color="?attr/app_skin_title_color" />
 
     </RelativeLayout>
@@ -229,8 +229,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:text="消息通知"
-                android:textColor="#030407"
-                android:textSize="@dimen/font_size_24px"
+                android:textSize="@dimen/font_size_28px"
                 app:qmui_skin_text_color="?attr/app_skin_title_color" />
 
 
@@ -262,7 +261,7 @@
 
                 android:layout_marginTop="15dp"
                 android:text="我的收藏"
-                android:textSize="@dimen/font_size_24px"
+                android:textSize="@dimen/font_size_28px"
                 app:qmui_skin_text_color="?attr/app_skin_title_color" />
 
         </LinearLayout>
@@ -292,7 +291,7 @@
 
                 android:layout_marginTop="15dp"
                 android:text="浏览历史"
-                android:textSize="@dimen/font_size_24px"
+                android:textSize="@dimen/font_size_28px"
                 app:qmui_skin_text_color="?attr/app_skin_title_color" />
 
 
@@ -322,7 +321,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="报料"
-                android:textSize="@dimen/font_size_26px"
+                android:textSize="@dimen/font_size_28px"
                 app:qmui_skin_text_color="?attr/app_skin_title_color" />
 
         </LinearLayout>
@@ -373,7 +372,7 @@
                     android:layout_centerVertical="true"
                     android:text="&#xe743;"
 
-                    android:textSize="@dimen/font_size_36px"
+                    android:textSize="@dimen/font_size_40px"
                     app:qmui_skin_text_color="?attr/app_skin_title_color" />
 
                 <TextView
@@ -404,7 +403,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:text="&#xe76c;"
-                    android:textSize="@dimen/font_size_36px"
+                    android:textSize="@dimen/font_size_40px"
                     app:qmui_skin_text_color="?attr/app_skin_title_color" />
 
 
@@ -516,7 +515,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
                     android:layout_marginTop="10dp"
                     android:text="关于我们"
                     android:textSize="@dimen/font_size_28px"
@@ -532,8 +530,8 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
                 android:visibility="visible">
 
 
@@ -543,7 +541,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:text="&#xe76a;"
-                    android:textSize="@dimen/font_size_36px"
+                    android:textSize="@dimen/font_size_40px"
                     app:qmui_skin_text_color="?attr/app_skin_title_color" />
 
                 <TextView
@@ -552,7 +550,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp"
                     android:text="黑夜模式"
-                    android:textSize="@dimen/font_size_24px"
+                    android:textSize="@dimen/font_size_28px"
                     app:qmui_skin_text_color="?attr/app_skin_title_color" />
 
             </LinearLayout>

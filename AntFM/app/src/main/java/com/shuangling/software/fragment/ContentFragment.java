@@ -138,6 +138,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
     private BannerViewImageLoader imageLoader;
     private List<BannerColorInfo> colorList = new ArrayList<>();
     private int dominantColor;
+    int scrollY = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -773,15 +774,16 @@ getContent(GetContent.Normal);
                                                 @Override
                                                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                                                     super.onScrolled(recyclerView, dx, dy);
+                                                    scrollY += dy;
                                                     if (dy > 0) {//向下滚动
                                                         Log.i(TAG, "Scroll DOWN");
-                                                        if (recyclerView.getScrollY() > bannerView.getHeight()) {
+                                                        if (scrollY > bannerView.getHeight()) {
                                                             EventBus.getDefault().post(new CommonEvent(BannerView.BANNER_HIDE));
                                                         }
                                                     }
                                                     if (dy < 0) {//向上滚动
                                                         Log.i(TAG, "Scroll UP");
-                                                        if (recyclerView.getScrollY() < bannerView.getHeight()) {
+                                                        if (scrollY < bannerView.getHeight()) {
                                                             EventBus.getDefault().post(new CommonEvent(BannerView.BANNER_SHOW));
                                                         }
                                                     }

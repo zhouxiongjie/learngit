@@ -512,7 +512,13 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
 
             @Override
             public void onFailure(Call call, Exception exception) {
-                if (mViewSkeletonScreen != null) mViewSkeletonScreen.hide();//getComments onFailure
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mViewSkeletonScreen != null) mViewSkeletonScreen.hide();
+                    }
+                });
+                //getComments onFailure
             }
         });
     }
@@ -827,7 +833,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                                     startActivityForResult(it, REQUEST_LOGIN);
                                 } else {
                                     Long lastTime = lastClickTime;
-                                    if(lastTime == null || System.currentTimeMillis() - lastClickTime> 1000){ // 防抖
+                                    //if(lastTime == null || System.currentTimeMillis() - lastClickTime> 1000){ // 防抖
                                         if (mArticle.getIs_likes() == 0) {
                                             int num = mArticle.getLike();
                                             num++;
@@ -853,27 +859,28 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                                             like(false);
                                         }
 
-                                    }else{
-                                        if(mArticle.getIs_likes()==1){
-                                            int[] itemPosition = new int[2];
-                                            int[] superLikePosition = new int[2];
-                                            v.getLocationOnScreen(itemPosition);
-                                            superLikeLayout.getLocationOnScreen(superLikePosition);
-                                            int x = itemPosition[0] + v.getWidth() / 2;
-                                            int y = (itemPosition[1] - superLikePosition[1]) + v.getHeight() / 2;
-                                            superLikeLayout.launch(x, y);
-                                        }else{
-                                            int num = mArticle.getLike();
-                                            num++;
-                                            like(true);
-                                            mArticle.setIs_likes(1);
-                                            mHeadViewHolder.praiseSum.setText("" + num);
-                                            mHeadViewHolder.praiseSum.setActivated(false);
-                                            //ToastUtils.show(jsonObject.getString("msg"));
-                                            mArticle.setLike(num);
-                                        }
                                     }
-                                    lastClickTime= System.currentTimeMillis();
+//                                    else{
+//                                        if(mArticle.getIs_likes()==1){
+//                                            int[] itemPosition = new int[2];
+//                                            int[] superLikePosition = new int[2];
+//                                            v.getLocationOnScreen(itemPosition);
+//                                            superLikeLayout.getLocationOnScreen(superLikePosition);
+//                                            int x = itemPosition[0] + v.getWidth() / 2;
+//                                            int y = (itemPosition[1] - superLikePosition[1]) + v.getHeight() / 2;
+//                                            superLikeLayout.launch(x, y);
+//                                        }else{
+//                                            int num = mArticle.getLike();
+//                                            num++;
+//                                            like(true);
+//                                            mArticle.setIs_likes(1);
+//                                            mHeadViewHolder.praiseSum.setText("" + num);
+//                                            mHeadViewHolder.praiseSum.setActivated(false);
+//                                            //ToastUtils.show(jsonObject.getString("msg"));
+//                                            mArticle.setLike(num);
+//                                        }
+//                                    }
+//                                    lastClickTime= System.currentTimeMillis();
 
 
 
@@ -881,7 +888,7 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                                     //like(mArticle.getIs_likes() == 0);//点赞/取消赞
 
 
-                                }
+//                                }
                             }
                         });
                         mHeadViewHolder.collectLayout.setOnClickListener(new View.OnClickListener() {
@@ -1201,15 +1208,35 @@ public class ArticleDetailActivity02 extends BaseAudioActivity implements Handle
                         if (jsonObject.getInteger("data") == 1) {
                             //取消点赞
                             textView.setActivated(true);
-                            textView.setText(String.valueOf(Integer.parseInt(textView.getText().toString()) - 1));
+                            if(TextUtils.isEmpty(textView.getText().toString())){
+                                textView.setText("");
+                            }else{
+                                textView.setText(String.valueOf(Integer.parseInt(textView.getText().toString()) - 1));
+                            }
+
                         } else {
                             //点赞成功
                             textView.setActivated(false);
-                            textView.setText(String.valueOf(Integer.parseInt(textView.getText().toString()) + 1));
+                            if(TextUtils.isEmpty(textView.getText().toString())){
+                                textView.setText(String.valueOf(1));
+                            }else{
+                                textView.setText(String.valueOf(Integer.parseInt(textView.getText().toString()) + 1));
+                            }
+
+
+                            int[] itemPosition = new int[2];
+                            int[] superLikePosition = new int[2];
+                            textView.getLocationOnScreen(itemPosition);
+                            superLikeLayout.getLocationOnScreen(superLikePosition);
+                            int x = itemPosition[0] + textView.getWidth() / 2;
+                            int y = (itemPosition[1] - superLikePosition[1]) + textView.getHeight() / 2;
+                            superLikeLayout.launch(x, y);
+
                         }
                         //getComments();
                     }
-                } catch (Exception ignore) {
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 break;
             case MSG_ATTENTION_CALLBACK://关注

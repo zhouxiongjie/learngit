@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import androidx.annotation.NonNull;
 import androidx.core.graphics.ColorUtils;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
@@ -62,7 +63,6 @@ import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.ColumnContent;
 import com.shuangling.software.entity.DecorModule;
 import com.shuangling.software.entity.Station;
-import com.shuangling.software.event.BannerColorEvent;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
@@ -95,6 +95,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
     public static final int MSG_UPDATE_LIST = 0x1;
     public static final int MSG_GET_COLUMN_DECORATE = 0x2;
     public static final int MSG_GET_TYPE_CONTENT = 0x3;
+    public static final String TAG = "ContentFragment";
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     @BindView(R.id.refreshLayout)
@@ -116,6 +117,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
     private boolean addInfoStream;
     private boolean hasDecorate = false;
 
+
     public enum GetContent {
         Refresh,
         LoadMore,
@@ -135,6 +137,7 @@ public class ContentFragment extends Fragment implements Handler.Callback {
     int count = 0;
     private BannerViewImageLoader imageLoader;
     private List<BannerColorInfo> colorList = new ArrayList<>();
+    private int dominantColor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -723,17 +726,16 @@ getContent(GetContent.Normal);
                                                         position = 1;
                                                     }
                                                     int pos = (position) % count;//很关键
-                                                    int vibrantColor = ColorUtils.blendARGB(imageLoader.getDominantColor(pos), imageLoader.getDominantColor(pos + 1), positionOffset);
+                                                    dominantColor = ColorUtils.blendARGB(imageLoader.getDominantColor(pos), imageLoader.getDominantColor(pos + 1), positionOffset);
                                                     // TODO: 2021/3/11 对后台传过来的banner颜色获取模式进行判断：方案待定
                                                     /**
                                                      * 模式两种：
                                                      * 1.用户自定义，不发送彩色EventBus，在RecommendFragment里面直接修改
                                                      * 2.随banner改变而改变
                                                      */
-                                                    if (module.getBackground_change().equals("1")) {
-                                                        sendBannerColorEvent(vibrantColor, module.getBackground_change());
+                                                    if (getParentFragment()!= null){
+                                                        ((RecommendFragment) getParentFragment()).changeThemeColor(dominantColor, mColumn.getId(),true);
                                                     }
-
                                                 }
 
                                                 @Override
@@ -743,21 +745,49 @@ getContent(GetContent.Normal);
                                                         new Handler().postDelayed(new Runnable() {
                                                             @Override
                                                             public void run() {
-                                                                int vibrantColor = imageLoader.getDominantColor(1);
+                                                                dominantColor = imageLoader.getDominantColor(1);
                                                                 // TODO: 2021/3/11 对后台传过来的banner颜色获取模式进行判断：方案待定
-                                                                if (module.getBackground_change().equals("1")) {
-                                                                    sendBannerColorEvent(vibrantColor, module.getBackground_change());
+                                                                if (getParentFragment()!= null){
+                                                                    ((RecommendFragment) getParentFragment()).changeThemeColor(dominantColor, mColumn.getId(),true);
                                                                 }
                                                             }
+
                                                         }, 200);
 
                                                     }
                                                 }
                                             });
+                                            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                                                @Override
+                                                public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                                                    super.onScrollStateChanged(recyclerView, newState);
+                                                    switch (newState) {
+                                                        case RecyclerView.SCROLL_STATE_IDLE://停止滑动
+                                                            break;
+                                                        case RecyclerView.SCROLL_STATE_DRAGGING://触摸滑动
+                                                        case RecyclerView.SCROLL_STATE_SETTLING://非触摸滑动
+                                                            break;
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                                                    super.onScrolled(recyclerView, dx, dy);
+                                                    if (dy > 0) {//向下滚动
+                                                        Log.i(TAG, "Scroll DOWN");
+                                                        if (recyclerView.getScrollY() > bannerView.getHeight()) {
+                                                            EventBus.getDefault().post(new CommonEvent(BannerView.BANNER_HIDE));
+                                                        }
+                                                    }
+                                                    if (dy < 0) {//向上滚动
+                                                        Log.i(TAG, "Scroll UP");
+                                                        if (recyclerView.getScrollY() < bannerView.getHeight()) {
+                                                            EventBus.getDefault().post(new CommonEvent(BannerView.BANNER_SHOW));
+                                                        }
+                                                    }
+                                                }
+                                            });
                                         } else if (module.getBackground_change().equals("0")) {
-                                            BannerColorEvent event = new BannerColorEvent();
-                                            event.setIsBannerColorChange(module.getBackground_change());
-                                            EventBus.getDefault().post(event);
                                         }
                                         bannerView.setData(banners);
                                         bannerView.setOnItemClickListener(new BannerView.OnItemClickListener() {
@@ -767,7 +797,7 @@ getContent(GetContent.Normal);
                                                 String url = banner.getUrl();
                                                 String title = banner.getTitle();
                                                 //((RecommendFragment) getParentFragment()).jumpTo(url, title);
-                                                CommonUtils.jumpTo(getActivity(),url, title);
+                                                CommonUtils.jumpTo(getActivity(), url, title);
                                             }
                                         });
                                     } else if (module.getType() == 2) {
@@ -810,7 +840,7 @@ getContent(GetContent.Normal);
                                                             String url = cb.getSource_url();
                                                             String title = cb.getTitle();
                                                             //((RecommendFragment) getParentFragment()).jumpTo(url, title);
-                                                            CommonUtils.jumpTo(getActivity(),url, title);
+                                                            CommonUtils.jumpTo(getActivity(), url, title);
                                                         }
                                                     });
                                                     v.setTag(position);
@@ -883,7 +913,7 @@ getContent(GetContent.Normal);
                                                         String url = content.getSource_url();
                                                         String title = content.getTitle();
                                                         //((RecommendFragment) getParentFragment()).jumpTo(url, title);
-                                                        CommonUtils.jumpTo(getActivity(),url, title);
+                                                        CommonUtils.jumpTo(getActivity(), url, title);
                                                     }
                                                 });
                                                 moduleLayout.addView(anchorView, j, params);
@@ -915,9 +945,9 @@ getContent(GetContent.Normal);
                                             @Override
                                             public void onClick(View v) {
 
-                                                Intent it=new Intent(getContext(),MoreActivity.class);
-                                                it.putExtra("decorModule",module);
-                                                it.putExtra("column",mColumn);
+                                                Intent it = new Intent(getContext(), MoreActivity.class);
+                                                it.putExtra("decorModule", module);
+                                                it.putExtra("column", mColumn);
                                                 startActivity(it);
 
 
@@ -956,9 +986,9 @@ getContent(GetContent.Normal);
                                         more.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                Intent it=new Intent(getContext(),MoreActivity.class);
-                                                it.putExtra("decorModule",module);
-                                                it.putExtra("column",mColumn);
+                                                Intent it = new Intent(getContext(), MoreActivity.class);
+                                                it.putExtra("decorModule", module);
+                                                it.putExtra("column", mColumn);
                                                 startActivity(it);
                                             }
                                         });
@@ -995,9 +1025,9 @@ getContent(GetContent.Normal);
                                         more.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                Intent it=new Intent(getContext(),MoreActivity.class);
-                                                it.putExtra("decorModule",module);
-                                                it.putExtra("column",mColumn);
+                                                Intent it = new Intent(getContext(), MoreActivity.class);
+                                                it.putExtra("decorModule", module);
+                                                it.putExtra("column", mColumn);
                                                 startActivity(it);
                                             }
                                         });
@@ -1034,9 +1064,9 @@ getContent(GetContent.Normal);
                                         more.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                Intent it=new Intent(getContext(),MoreActivity.class);
-                                                it.putExtra("decorModule",module);
-                                                it.putExtra("column",mColumn);
+                                                Intent it = new Intent(getContext(), MoreActivity.class);
+                                                it.putExtra("decorModule", module);
+                                                it.putExtra("column", mColumn);
                                                 startActivity(it);
                                             }
                                         });
@@ -1310,7 +1340,7 @@ getContent(GetContent.Normal);
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
                                 recyclerView.setLayoutManager(manager);
-                                recyclerView.setPadding(CommonUtils.dip2px(7.5f),0,CommonUtils.dip2px(7.5f),0);
+                                recyclerView.setPadding(CommonUtils.dip2px(7.5f), 0, CommonUtils.dip2px(7.5f), 0);
                                 DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
@@ -1334,7 +1364,7 @@ getContent(GetContent.Normal);
                                 RecyclerView recyclerView = mContentRecyclerView.get(position);
                                 GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
                                 recyclerView.setLayoutManager(manager);
-                                recyclerView.setPadding(CommonUtils.dip2px(7.5f),0,CommonUtils.dip2px(7.5f),0);
+                                recyclerView.setPadding(CommonUtils.dip2px(7.5f), 0, CommonUtils.dip2px(7.5f), 0);
                                 DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
                                 divider.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycleview_divider_drawable));
                                 recyclerView.addItemDecoration(divider);
@@ -1379,19 +1409,14 @@ getContent(GetContent.Normal);
         }
         return false;
     }
-
-    /**
-     * 发送eventBus颜色改变事件的时候，要判断随banner颜色变化的开关是否打开
-     *
-     * @param vibrantColor 获取到的banner中的图片颜色
-     */
-    public void sendBannerColorEvent(int vibrantColor,String isBannerColorChange) {
-        //0：否；1：是
-        BannerColorEvent bannerColorEvent = new BannerColorEvent();
-        bannerColorEvent.setIsBannerColorChange(isBannerColorChange);
-        bannerColorEvent.setmColumnId(mColumn.getId());
-        bannerColorEvent.setVibrantColor(vibrantColor);
-        EventBus.getDefault().post(bannerColorEvent);
-
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser){
+            //可见的时候发送当前图片颜色
+            if (getParentFragment() != null) {
+                ((RecommendFragment) getParentFragment()).changeThemeColor(dominantColor, mColumn.getId(),true);
+            }
+        }
     }
 }

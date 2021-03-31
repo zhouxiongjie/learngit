@@ -471,9 +471,19 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, ArticleDetailActivity02.class);
-                    it.putExtra("articleId", content.getId());
-                    mContext.startActivity(it);
+
+                    if(content.getArticle()!=null&&!TextUtils.isEmpty(content.getArticle().getLink_address())){
+                        Intent it = new Intent(mContext, WebViewBackActivity.class);
+                        it.putExtra("addParams",false);
+                        it.putExtra("url", content.getArticle().getLink_address());
+                        it.putExtra("title", "");
+                        mContext.startActivity(it);
+                    }else{
+                        Intent it = new Intent(mContext, ArticleDetailActivity02.class);
+                        it.putExtra("articleId", content.getId());
+                        mContext.startActivity(it);
+                    }
+
                 }
             });
         } else if (itemViewType == TYPE_ARTICLE_THREE) {
@@ -517,9 +527,22 @@ public class ColumnDecorateContentAdapter extends RecyclerView.Adapter implement
             articleViewHolder.root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent it = new Intent(mContext, ArticleDetailActivity02.class);
-                    it.putExtra("articleId", content.getId());
-                    mContext.startActivity(it);
+
+                    if(content.getArticle()!=null&&!TextUtils.isEmpty(content.getArticle().getLink_address())){
+                        Intent it = new Intent(mContext, WebViewBackActivity.class);
+                        it.putExtra("addParams",false);
+                        it.putExtra("url", content.getArticle().getLink_address());
+                        it.putExtra("title", "");
+                        mContext.startActivity(it);
+                    }else{
+                        Intent it = new Intent(mContext, ArticleDetailActivity02.class);
+                        it.putExtra("articleId", content.getId());
+                        mContext.startActivity(it);
+                    }
+
+//                    Intent it = new Intent(mContext, ArticleDetailActivity02.class);
+//                    it.putExtra("articleId", content.getId());
+//                    mContext.startActivity(it);
                 }
             });
         } else if (itemViewType == TYPE_VIDEO) {

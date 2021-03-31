@@ -55,6 +55,7 @@ import com.shuangling.software.adapter.ColumnDecorateVideoContentAdapter;
 import com.shuangling.software.adapter.MoudleGridViewAdapter;
 import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.MyGridView;
+import com.shuangling.software.customview.ObservableScrollView;
 import com.shuangling.software.entity.Anchor;
 import com.shuangling.software.entity.BannerColorInfo;
 import com.shuangling.software.entity.BannerInfo;
@@ -66,8 +67,8 @@ import com.shuangling.software.entity.Organization;
 import com.shuangling.software.entity.Service;
 import com.shuangling.software.entity.Station;
 import com.shuangling.software.entity.User;
-import com.shuangling.software.event.BannerColorEvent;
 import com.shuangling.software.event.CommonEvent;
+import com.shuangling.software.interf.ScrollViewListener;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.utils.BannerViewImageLoader;
@@ -101,6 +102,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     public static final int MSG_ATTENTION_CALLBACK = 0x7;
     public static final int MSG_GET_COLUMN = 0x8;
     public static final int REQUEST_LOGIN = 0x9;
+    private static final String TAG = "IndexFragment";
     //    @BindView(R.id.city)
 //    TextView city;
 //    @BindView(R.id.temperature)
@@ -117,6 +119,8 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     ImageView backgroundImage;
     @BindView(R.id.columnContent)
     LinearLayout columnContent;
+    @BindView(R.id.index_fragment_scrollview)
+    ObservableScrollView scrollView;
     Unbinder unbinder;
     private Handler mHandler;
     private PagerAdapter mModulePageAdapter;
@@ -132,6 +136,9 @@ public class IndexFragment extends Fragment implements Handler.Callback {
     private int count;
     private boolean isInit = true;
     private Column mColumn;
+    private int dominantColor;
+    private boolean isTop = true;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -141,6 +148,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
         mHandler = new Handler(this);
         mColumn = (Column) args.getSerializable("Column");
         EventBus.getDefault().register(this);
+
     }
 
     @Override
@@ -1121,17 +1129,16 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                                     position = 1;
                                                 }
                                                 int pos = (position) % count;//很关键
-                                                int vibrantColor = ColorUtils.blendARGB(imageLoader.getDominantColor(pos), imageLoader.getDominantColor(pos + 1), positionOffset);
+                                                dominantColor = ColorUtils.blendARGB(imageLoader.getDominantColor(pos), imageLoader.getDominantColor(pos + 1), positionOffset);
                                                 // TODO: 2021/3/11 对后台传过来的banner颜色获取模式进行判断：方案待定
                                                 /**
                                                  * 模式两种：
                                                  * 1.用户自定义，不发送彩色EventBus，在RecommendFragment里面直接修改
                                                  * 2.随banner改变而改变
                                                  */
-                                                if (module.getBackground_change().equals("1")){
-                                                    sendBannerColorEvent(vibrantColor,module.getBackground_change());
+                                                if (getParentFragment()!= null){
+                                                    ((RecommendFragment) getParentFragment()).changeThemeColor(dominantColor, mColumn.getId(),true);
                                                 }
-
                                             }
 
                                             @Override
@@ -1141,10 +1148,10 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                                     new Handler().postDelayed(new Runnable() {
                                                         @Override
                                                         public void run() {
-                                                            int vibrantColor = imageLoader.getDominantColor(1);
+                                                            dominantColor = imageLoader.getDominantColor(1);
                                                             // TODO: 2021/3/11 对后台传过来的banner颜色获取模式进行判断：方案待定
-                                                            if (module.getBackground_change().equals("1")){
-                                                                sendBannerColorEvent(vibrantColor,module.getBackground_change());
+                                                            if (getParentFragment()!= null){
+                                                                ((RecommendFragment) getParentFragment()).changeThemeColor(dominantColor, mColumn.getId(),true);
                                                             }
                                                         }
                                                     }, 200);
@@ -1152,11 +1159,28 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                                 }
                                             }
                                         });
+                                        //主题色根据banner变化而变化，则监听scroll滑动事件
+                                        //获取当前scrollview的滑动监听事件
+                                        // TODO: 2021/3/25  (第一版面处理方案直接获取移动位置进行判断，后续版面进行获取当前子布局高度来判断)
+                                        scrollView.setScrollViewListener(new ScrollViewListener() {
+                                            @Override
+                                            public void onScrollChanged(ObservableScrollView scrollView, int x, int y, int oldx, int oldy) {
+                                                if (y > oldy) {//向下滚动
+                                                    Log.i(TAG, "Scroll DOWN");
+                                                    if (scrollView.getScrollY() > bannerView.getHeight()) {
+                                                        EventBus.getDefault().post(new CommonEvent(BannerView.BANNER_HIDE));
+                                                    }
+                                                }
+                                                if (y < oldy) {//向上滚动
+                                                    Log.i(TAG, "Scroll UP");
+                                                    if (scrollView.getScrollY() < bannerView.getHeight()) {
+
+                                                        EventBus.getDefault().post(new CommonEvent(BannerView.BANNER_SHOW));
+                                                    }
+                                                }
+                                            }
+                                        });
                                     } else if (module.getBackground_change().equals("0")) {
-                                        // TODO: 2021/3/16 正常进入则不需要做任何处理，如果是刷新的时候需要额外判断，目前有bug
-                                        BannerColorEvent event = new BannerColorEvent();
-                                        event.setIsBannerColorChange(module.getBackground_change());
-                                        EventBus.getDefault().post(event);
                                     }
                                     bannerView.setData(banners);
                                     bannerView.setOnItemClickListener(new BannerView.OnItemClickListener() {
@@ -1169,6 +1193,7 @@ public class IndexFragment extends Fragment implements Handler.Callback {
                                             CommonUtils.jumpTo(getActivity(), url, title);
                                         }
                                     });
+
                                 } else {
                                     //关闭轮播图
                                 }
@@ -1618,18 +1643,14 @@ public class IndexFragment extends Fragment implements Handler.Callback {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    /**
-     * 发送eventBus颜色改变事件的时候，要判断随banner颜色变化的开关是否打开
-     *
-     * @param vibrantColor 获取到的banner中的图片颜色
-     */
-    public void sendBannerColorEvent(int vibrantColor,String isBannerColorChange) {
-        //0：否；1：是
-        BannerColorEvent bannerColorEvent = new BannerColorEvent();
-        bannerColorEvent.setIsBannerColorChange(isBannerColorChange);
-        bannerColorEvent.setmColumnId(mColumn.getId());
-        bannerColorEvent.setVibrantColor(vibrantColor);
-        EventBus.getDefault().post(bannerColorEvent);
-
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser){
+            //可见的时候发送当前图片颜色
+            if (getParentFragment() != null) {
+                ((RecommendFragment) getParentFragment()).changeThemeColor(dominantColor, mColumn.getId(),true);
+            }
+        }
     }
 }

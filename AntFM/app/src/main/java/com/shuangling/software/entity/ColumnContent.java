@@ -345,6 +345,7 @@ public class ColumnContent implements Serializable {
         private int count;
         private List<String> covers;
         private int type;
+        private String link_address;
 
         public int getId() {
             return id;
@@ -384,6 +385,14 @@ public class ColumnContent implements Serializable {
 
         public void setType(int type) {
             this.type = type;
+        }
+
+        public String getLink_address() {
+            return link_address;
+        }
+
+        public void setLink_address(String link_address) {
+            this.link_address = link_address;
         }
     }
 

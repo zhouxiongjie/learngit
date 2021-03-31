@@ -1,10 +1,13 @@
 package com.shuangling.software.fragment;
+
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
 import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.alibaba.fastjson.JSONObject;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AudioDetailActivity;
@@ -24,19 +28,22 @@ import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
 import com.shuangling.software.service.AudioPlayerService;
 import com.shuangling.software.utils.ServerInfo;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 import okhttp3.Call;
+
 public class AlbumAudiosFragment extends Fragment implements Handler.Callback {
-public static final int MSG_GET_AUDIOS_LIST = 0x1;
+    public static final int MSG_GET_AUDIOS_LIST = 0x1;
     @BindView(R.id.playAll)
     TextView playAll;
     @BindView(R.id.audioSort)
@@ -48,50 +55,55 @@ public static final int MSG_GET_AUDIOS_LIST = 0x1;
     @BindView(R.id.listView)
     ListView listView;
     Unbinder unbinder;
-//    @BindView(R.id.gridView)
+    //    @BindView(R.id.gridView)
 //    GridView gridView;
 //    @BindView(R.id.selectionsLayout)
 //    LinearLayout selectionsLayout;
-private int currentPage = 1;
+    private int currentPage = 1;
     private int mAlbumId;
     private Handler mHandler;
     private AudioListAdapter mAdapter;
-private int mSequence = AudioPlayerService.POSITIVE;
+    private int mSequence = AudioPlayerService.POSITIVE;
     private List<AudioInfo> mAudios = new ArrayList<>();
     private List<Integer> mSelect;
-@Override
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mHandler = new Handler(this);
     }
-@Override
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_album_audios_list, container, false);
         unbinder = ButterKnife.bind(this, view);
         getAlbumAudios();
         return view;
-}
-private void getAlbumAudios() {
+    }
+
+    private void getAlbumAudios() {
         mAlbumId = getArguments().getInt("albumId", 0);
-String url = ServerInfo.serviceIP + ServerInfo.getAlbumAudios + mAlbumId;
+        String url = ServerInfo.serviceIP + ServerInfo.getAlbumAudios + mAlbumId;
         Map<String, String> params = new HashMap<String, String>();
         params.put("pageSize", "" + Integer.MAX_VALUE);
         params.put("page", "" + currentPage);
         params.put("sort", "" + 0);
-OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
-@Override
+        OkHttpUtils.get(url, params, new OkHttpCallback(getContext()) {
+            @Override
             public void onResponse(Call call, String response) throws IOException {
-Message msg = Message.obtain();
+                Message msg = Message.obtain();
                 msg.what = MSG_GET_AUDIOS_LIST;
                 msg.obj = response;
                 mHandler.sendMessage(msg);
-}
-@Override
+            }
+
+            @Override
             public void onFailure(Call call, Exception exception) {
-}
+            }
         });
     }
-@Override
+
+    @Override
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case MSG_GET_AUDIOS_LIST:
@@ -99,10 +111,10 @@ Message msg = Message.obtain();
                     String result = (String) msg.obj;
                     JSONObject jsonObject = JSONObject.parseObject(result);
                     if (jsonObject != null && jsonObject.getIntValue("code") == 100000) {
-JSONObject jo = jsonObject.getJSONObject("data");
-List<Audio> audios = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), Audio.class);
+                        JSONObject jo = jsonObject.getJSONObject("data");
+                        List<Audio> audios = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(), Audio.class);
                         mAudios.clear();
-                        mSelect=new ArrayList<>();
+                        mSelect = new ArrayList<>();
                         for (int i = 0; audios != null && i < audios.size(); i++) {
                             Audio audio = audios.get(i);
                             AudioInfo audioInfo = new AudioInfo();
@@ -116,23 +128,23 @@ List<Audio> audios = JSONObject.parseArray(jo.getJSONArray("data").toJSONString(
                             mAudios.add(audioInfo);
                             mSelect.add(i + 1);
                         }
-playAll.setOnClickListener(new View.OnClickListener() {
+                        playAll.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                if(mAudios.size()>1){
+                                if (mAudios.size() > 1) {
                                     AudioInfo audio = mAudios.get(0);
                                     Intent it = new Intent(getContext(), AudioDetailActivity.class);
                                     it.putExtra("audioId", audio.getId());
                                     getContext().startActivity(it);
                                 }
-}
+                            }
                         });
-if (mAdapter == null) {
+                        if (mAdapter == null) {
                             mAdapter = new AudioListAdapter(getContext(), mAudios, ((BaseAudioActivity) getActivity()).mAudioPlayer);
                             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                 @Override
                                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-}
+                                }
                             });
                             listView.setAdapter(mAdapter);
                             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -143,29 +155,31 @@ if (mAdapter == null) {
                                     Intent it = new Intent(getContext(), AudioDetailActivity.class);
                                     it.putExtra("audioId", audio.getId());
                                     getContext().startActivity(it);
-}
+                                }
                             });
-} else {
+                        } else {
                             mAdapter.updateView(mAudios);
                         }
-}
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-break;
+                break;
         }
         return false;
     }
-@Override
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
-unbinder.unbind();
+        unbinder.unbind();
     }
-@OnClick({R.id.audioSort, R.id.audioSelect})
+
+    @OnClick({R.id.audioSort, R.id.audioSelect})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.audioSort:
-                if(mAdapter==null){
+                if (mAdapter == null) {
                     return;
                 }
                 if (mSequence == AudioPlayerService.POSITIVE) {
@@ -176,7 +190,7 @@ unbinder.unbind();
                     Collections.reverse(mAudios);
                     mAdapter.updateView(mAudios);
                     mAdapter.notifyDataSetChanged();
-} else {
+                } else {
                     mSequence = AudioPlayerService.POSITIVE;
                     Drawable drawableLeft = getResources().getDrawable(R.drawable.order_asc);
                     audioSort.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, null, null, null);
@@ -187,20 +201,20 @@ unbinder.unbind();
                 }
                 break;
             case R.id.audioSelect:
-                if(mAdapter==null){
+                if (mAdapter == null) {
                     return;
                 }
-                AudioSelectionsDialog dialog=AudioSelectionsDialog.getInstance(mAudios,mSequence,mSelect);
+                AudioSelectionsDialog dialog = AudioSelectionsDialog.getInstance(mAudios, mSequence, mSelect);
                 dialog.setSelectAudio(new AudioSelectionsDialog.IselectAudio() {
                     @Override
                     public void onSelectedAudio(List<Integer> select) {
-                        mSelect=select;
-                        List<AudioInfo> selected=new ArrayList<>();
-                        for(int i=0;i<select.size();i++){
-                            if(mSequence==AudioPlayerService.POSITIVE){
-                                selected.add(mAudios.get(select.get(i)-1));
-                            }else{
-                                selected.add(mAudios.get(mAudios.size()-select.get(i)));
+                        mSelect = select;
+                        List<AudioInfo> selected = new ArrayList<>();
+                        for (int i = 0; i < select.size(); i++) {
+                            if (mSequence == AudioPlayerService.POSITIVE) {
+                                selected.add(mAudios.get(select.get(i) - 1));
+                            } else {
+                                selected.add(mAudios.get(mAudios.size() - select.get(i)));
                             }
                         }
                         mAdapter.updateView(selected);

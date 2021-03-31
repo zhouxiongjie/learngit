@@ -38,7 +38,7 @@
                 android:layout_alignBottom="@+id/b"
                 android:layout_alignParentTop="true"
                 app:actualImageScaleType="fitXY"
-                app:placeholderImage="@drawable/index_top_bg"
+                app:placeholderImage="?attr/themeColor"
                 app:placeholderImageScaleType="fitXY" />
 
             <View
@@ -191,6 +191,7 @@
                 <!--</RelativeLayout>-->
 
                 <com.shuangling.software.customview.CustomPagerIndicator
+                    app:tabPadding="10dp"
                     android:id="@+id/pagerIndicator"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"

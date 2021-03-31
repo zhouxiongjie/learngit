@@ -1,7 +1,7 @@
 package com.shuangling.software.fragment;
 
-import android.app.Application;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,7 +15,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
@@ -24,10 +23,8 @@ import androidx.viewpager.widget.ViewPager;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.kcrason.dynamicpagerindicatorlibrary.BasePagerTabView;
 import com.kcrason.dynamicpagerindicatorlibrary.DynamicPagerIndicator;
 import com.qmuiteam.qmui.arch.QMUIFragment;
-import com.qmuiteam.qmui.util.QMUIStatusBarHelper;
 import com.shuangling.software.MyApplication;
 import com.shuangling.software.R;
 import com.shuangling.software.activity.AlbumDetailActivity;
@@ -42,19 +39,18 @@ import com.shuangling.software.activity.MainActivity;
 import com.shuangling.software.activity.NewLoginActivity;
 import com.shuangling.software.activity.RadioDetailActivity;
 import com.shuangling.software.activity.RadioListActivity;
-import com.shuangling.software.activity.SearchActivity;
 import com.shuangling.software.activity.SearchActivity01;
 import com.shuangling.software.activity.SpecialDetailActivity;
 import com.shuangling.software.activity.TvDetailActivity;
 import com.shuangling.software.activity.VideoDetailActivity;
 import com.shuangling.software.activity.WebViewBackActivity;
+import com.shuangling.software.customview.BannerView;
 import com.shuangling.software.customview.CustomPagerIndicator;
 import com.shuangling.software.customview.CustomPagerTabView;
 import com.shuangling.software.dialog.CustomColumnDialog;
 import com.shuangling.software.entity.Column;
 import com.shuangling.software.entity.User;
 import com.shuangling.software.entity.Weather;
-import com.shuangling.software.event.BannerColorEvent;
 import com.shuangling.software.event.CommonEvent;
 import com.shuangling.software.network.OkHttpCallback;
 import com.shuangling.software.network.OkHttpUtils;
@@ -120,7 +116,6 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
      * 当前选中的栏目
      */
     private int mColumnSelectIndex = 0;
-    private int mColumnCruentIndex = 0;
     public List<Column> mColumns;
     public List<Column> mRemoteColumns;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
@@ -136,10 +131,11 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
     private boolean isTopBackgroundChanged = false;
     private int topColorFromId;
     private int topColor;
+    private boolean isBannerChange;
 
-    private String isBannerChangeOpen;
     //自定义的tabview
     private CustomPagerTabView customPagerTabView;
+    private int isTop;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -172,6 +168,8 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
         if (!TextUtils.isEmpty(MyApplication.getInstance().getBackgroundImage())) {
             Uri uri = Uri.parse(MyApplication.getInstance().getBackgroundImage());
             topBackground.setImageURI(uri);
+        } else {
+            topBackground.setColorFilter(CommonUtils.getThemeColor(getContext()));
         }
 //        if (TextUtils.isEmpty(SharedPreferencesUtils.getStringValue("custom_column", null))) {
         getRecommendColumns(0);
@@ -395,14 +393,21 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
                 @Override
                 public void onPageScrollStateChanged(int state) {
                     super.onPageScrollStateChanged(state);
-                    switch (state){
-                        case ViewPager.SCROLL_STATE_SETTLING:
+                    switch (state) {
+                        case ViewPager.SCROLL_STATE_SETTLING://非用户触摸滑动
                             customPagerTabView = (CustomPagerTabView) pagerIndicator.getPagerTabView(mColumnSelectIndex);
-                            pagerIndicator.setNormalIcon(mColumnCruentIndex,customPagerTabView);
-//                            ViewGroup.LayoutParams params = view.getTopIcon().getLayoutParams();
-//                                params.height = CommonUtils.dip2px(22);
-//                                params.width = CommonUtils.dip2px(37.5f);
-//                                view.getTopIcon().setLayoutParams(params);
+                            pagerIndicator.setNormalIcon(mColumnSelectIndex, customPagerTabView);
+                            if (mColumns.get(mColumnSelectIndex).getIs_top_color() == 1) {
+                                topBackground.clearColorFilter();
+                                if (!TextUtils.isEmpty(MyApplication.getInstance().getBackgroundImage())) {
+                                    Uri uri = Uri.parse(MyApplication.getInstance().getBackgroundImage());
+                                    topBackground.setImageURI(uri);
+                                }  else {
+                                    topBackground.setColorFilter(CommonUtils.getThemeColor(getContext()));
+                                }
+                            }
+                            //重置顶部标识位
+                            isTop = 0;
                             break;
                     }
                 }
@@ -417,21 +422,20 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
                     super.onPageSelected(position);
                     // TODO: 2021/3/22 大图模式图片放大处理
                     customPagerTabView = (CustomPagerTabView) pagerIndicator.getPagerTabView(position);
-                    pagerIndicator.setBigIcon(position,customPagerTabView);
+                    pagerIndicator.setBigIcon(position, customPagerTabView);
                     mColumnSelectIndex = position;
-//                    ViewGroup.LayoutParams params = customPagerTabView.getTopIcon().getLayoutParams();
-//                    if (mColumns.get(position).getDisplay_effect_type() == 2){
-//                        params.height = CommonUtils.dip2px(30);
-//                        params.width = CommonUtils.dip2px(51);
-//                        customPagerTabView.getTopIcon().setLayoutParams(params);
-//                        mColumnSelectIndex = position;
-//                    }
-                }
-            });
-            pagerIndicator.setOnItemTabClickListener(new DynamicPagerIndicator.OnItemTabClickListener() {
-                @Override
-                public void onItemTabClick(int i) {
-                    // TODO: 2021/3/22 大图模式图片放大处理
+                    //获取对应栏目的顶部颜色
+                    if (mColumns.get(position).getIs_top_color() == 1) {
+                        topBackground.setColorFilter(Color.parseColor(mColumns.get(position).getTop_color()));
+                    } else if (topColorFromId == mColumns.get(position).getId()) {
+                        topBackground.setColorFilter(topColor);
+                        isTopBackgroundChanged = true;
+                    } else if (isTopBackgroundChanged) {
+//                        if (isBannerChange){
+//                        }else{
+                            TopBackgroundShowThemeBackground();
+//                        }
+                    }
                 }
             });
             pagerIndicator.updateIndicator(true);
@@ -492,16 +496,7 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
                 weatherLayout.setVisibility(View.VISIBLE);
                 logo1.setVisibility(View.GONE);
             }
-            mColumnCruentIndex = position;
             int prePosition = mColumnSelectIndex;
-
-            if (topColorFromId == mColumns.get(position).getId()
-            ) {
-                topBackground.setColorFilter(topColor);
-                isTopBackgroundChanged = true;
-            } else if (isTopBackgroundChanged == true) {
-                TopBackgroundShowBitmap();
-            }
 
 
 //            for (int i = 0; i < columnContent.getChildCount(); i++) {
@@ -802,36 +797,28 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
             }
             weather();
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void getEventBus(BannerColorEvent bc_event) {
-        // TODO: 2021/3/11 判断栏目头是否随着部背景随轮播图颜色变化(后台已经有参数，大概bg_background)
-        isBannerChangeOpen = bc_event.getIsBannerColorChange();
-        if (isBannerChangeOpen.equals("1") && !isBannerChangeOpen.equals(null)) {
-
-            if (topBackground != null) {
-                topColorFromId = bc_event.getmColumnId();
-                topColor = bc_event.getVibrantColor();
-                if (topColorFromId == mColumns.get(mColumnCruentIndex).getId()) {
-                    topBackground.setColorFilter(topColor);
-                    isTopBackgroundChanged = true;
-                }
-            }
-
-        } else {
-            if (isTopBackgroundChanged == true) {
-                TopBackgroundShowBitmap();
-            }
+        if (event.getEventName().equals(BannerView.BANNER_SHOW)) {
+            isTop = 0;
         }
+        if (event.getEventName().equals(BannerView.BANNER_HIDE)) {
+            isTop = 1;
+            TopBackgroundShowThemeBackground();
+        }
+
     }
+
 
     //显示图片
-    public void TopBackgroundShowBitmap() {
-        //默认xml加载图片
-        topBackground.clearColorFilter();
-        topBackground.setImageURI("res://drawable/" + R.drawable.index_top_bg);
+    public void TopBackgroundShowThemeBackground() {
+        if (!TextUtils.isEmpty(MyApplication.getInstance().getBackgroundImage())) {
+            Uri uri = Uri.parse(MyApplication.getInstance().getBackgroundImage());
+            topBackground.clearColorFilter();
+            topBackground.setImageURI(uri);
+        } else {
+            topBackground.setColorFilter(CommonUtils.getThemeColor(getContext()));
+        }
         isTopBackgroundChanged = false;
+        isBannerChange = false;
     }
 
 //    @Override
@@ -1325,6 +1312,21 @@ public class RecommendFragment extends QMUIFragment/*SimpleImmersionFragment*/ i
 //                }
 //            }
 //            mCustomColumns=tempColumns;
+        }
+    }
+
+    //修改颜色
+    public void changeThemeColor(int color, int id,boolean isBannerChange) {
+        this.isBannerChange = isBannerChange;
+        topColor = color;
+        topColorFromId = id;
+        if (id == mColumns.get(mColumnSelectIndex).getId()) {
+            if (isTop == 0) {
+                topBackground.clearColorFilter();
+                topBackground.setColorFilter(color);
+                isTopBackgroundChanged = true;
+            }
+        } else {
         }
     }
 }

@@ -88,7 +88,7 @@ public class ServerInfo {
     public static String attention = "/v1/follow";                                //关注
     public static String collect01 = "/v1/collection";                            //收藏文章/视频/专题/图集
     public static String like = "/v1/like";                                        //点赞文章/专题/视频
-    public static String weather = "/v1/consumer/weather";                        //获取天气
+    public static String weather = "/v1/consumer/gd_weather";                        //获取天气
     public static String feedback = "/v1/feedback";                                //意见反馈
     public static String history = "/v1/my_history";                                //历史记录
     public static String myCollect = "/v1/my_collection";                            //我的收藏-文章/视频/专题/图集

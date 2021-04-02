@@ -107,15 +107,19 @@ public class LevelTwoCommentAdapter extends RecyclerView.Adapter implements View
         if (viewType == TYPE_HEAD) {
             final Comment comment = mTopComment;
             HeadViewHolder viewHolder = (HeadViewHolder) holder;
-            if (!TextUtils.isEmpty(comment.getUser().getAvatar())) {
-                Uri uri = Uri.parse(comment.getUser().getAvatar());
-                int width = CommonUtils.dip2px(40);
-                int height = width;
-                ImageLoader.showThumb(uri, viewHolder.head, width, height);
-            } else {
-                ImageLoader.showThumb(viewHolder.head, R.drawable.ic_user1);
+            if (comment.getUser()!=null) {
+                viewHolder.account.setText(comment.getUser().getNickname());
+                if(!TextUtils.isEmpty(comment.getUser().getAvatar())){
+                    Uri uri = Uri.parse(comment.getUser().getAvatar());
+                    int width = CommonUtils.dip2px(40);
+                    int height = width;
+                    ImageLoader.showThumb(uri, viewHolder.head, width, height);
+                }else {
+                    ImageLoader.showThumb(viewHolder.head, R.drawable.ic_user1);
+                }
+
             }
-            viewHolder.account.setText(comment.getUser().getNickname());
+
             viewHolder.time.setText(TimeUtil.formatDateTime(comment.getCreated_at()));
             if (comment.getLike_count() > 0) {
                 viewHolder.praiseSum.setText("" + comment.getLike_count());
@@ -154,13 +158,16 @@ public class LevelTwoCommentAdapter extends RecyclerView.Adapter implements View
             final RootCommentViewHolder vh = (RootCommentViewHolder) holder;
             //int pos = mPostContents != null ? position - 2 - mPostContents.size() : position - 2;
             final Comment comment = (Comment) mPositionTypeMap.get(position).data;
-            if (!TextUtils.isEmpty(comment.getUser().getAvatar())) {
-                Uri uri = Uri.parse(comment.getUser().getAvatar());
-                int width = CommonUtils.dip2px(40);
-                int height = width;
-                ImageLoader.showThumb(uri, vh.head, width, height);
-            } else {
-                ImageLoader.showThumb(vh.head, R.drawable.ic_user1);
+            if (comment.getUser()!=null) {
+                if(!TextUtils.isEmpty(comment.getUser().getAvatar())){
+                    Uri uri = Uri.parse(comment.getUser().getAvatar());
+                    int width = CommonUtils.dip2px(40);
+                    int height = width;
+                    ImageLoader.showThumb(uri, vh.head, width, height);
+                }else {
+                    ImageLoader.showThumb(vh.head, R.drawable.ic_user1);
+                }
+
             }
             vh.account.setText(comment.getUser().getNickname());
             vh.time.setText(TimeUtil.formatDateTime(comment.getCreated_at()));
